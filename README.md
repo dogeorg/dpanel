@@ -12,7 +12,7 @@ Dogebox Panel - Web UI for managing a Dogebox Server
 > Dev server, configs and tooling to aid in the development process.
 
 To run this in production, simply serve the /src directory.
-To run this locally (with some developer conviences) follow the steps below.
+To run this locally (with some developer conveniences) follow the steps below.
 
 ---
 
@@ -21,7 +21,7 @@ To run this locally (with some developer conviences) follow the steps below.
 Prerequisites
 
 - Expects to be running in a linux/unix environment (or WSL on Windows)
-- Latest npm & node
+- Latest `npm` & `node`
 
 Install dev dependencies and add 3x hostname entries.
 

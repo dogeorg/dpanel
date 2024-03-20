@@ -1,1 +1,1 @@
-export { getManifest, getManifests } from './manifest.js'
+export { getManifest, getManifests } from './manifest.js';

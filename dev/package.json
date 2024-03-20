@@ -1,0 +1,16 @@
+{
+  "name": "dpanel-devtools",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "setup": "./scripts/setup.sh",
+    "check": "./scripts/check.sh",
+    "start": "./scripts/check.sh && node ./example-pups/run.js & node ./scripts/start.js"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@web/dev-server": "^0.4.3"
+  }
+}

@@ -11,9 +11,19 @@ Dogebox Panel - Web UI for managing a Dogebox Server
 
 > Dev server, configs and tooling to aid in the development process.
 
+To run this in production, simply serve the /src directory.
+To run this locally (with some developer conviences) follow the steps below.
+
+---
+
 ### Getting Started
 
-Install dev dependencies and add 3x host file entries.
+Prerequisites
+
+- Expects to be running in a linux/unix environment (or WSL on Windows)
+- Latest npm & node
+
+Install dev dependencies and add 3x hostname entries.
 
 ```
 cd dev
@@ -21,23 +31,27 @@ npm run setup
 ```
 
 Start the development server:
+
 ```
 npm start
 ```
 
 Navigate to
+
 ```
 http://dogebox.local:8080
 ```
 
-### What do I get?
+---
 
-**dPanel running** at [http://dogebox.local:8080](http://dogebox.local:8080), with:
+### Outcome:
+
+**dPanel** running at [http://dogebox.local:8080](http://dogebox.local:8080), with:
 - Hot reloading (auto browser refresh on modify)
 - SPA ready (index.html served at all routes)
 - Basic CORS configuration
 - API mocks (via Ctrl+L)
 
-Two sample 'pups' (apps that dPanel iframes), running at
+Two sample '**pups**' (web-apps that dPanel iframes), running at
 - [http://basic.pup.dogebox.local:9001](http://basic.pup.dogebox.local:9001)
 - [http://spa.pup.dogebox.local:9002](http://spa.pup.dogebox.local:9002)

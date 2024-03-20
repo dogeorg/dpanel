@@ -39,5 +39,5 @@ http://dogebox.local:8080
 - API mocks (via Ctrl+L)
 
 Two sample 'pups' (apps that dPanel iframes), running at
-- [http://basic.spa.dogebox.local:9001](http://basic.spa.dogebox.local:9001)
-- [http://basic.spa.dogebox.local:9002](http://basic.spa.dogebox.local:9002)
+- [http://basic.pup.dogebox.local:9001](http://basic.pup.dogebox.local:9001)
+- [http://spa.pup.dogebox.local:9002](http://spa.pup.dogebox.local:9002)

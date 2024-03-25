@@ -10,15 +10,12 @@ class DynamicForm extends LitElement {
     return {
       data: { type: Object },
       activeFormId: { type: String },
-      isSubmitting: { type: Boolean }
+      isSubmitting: { type: Boolean },
+      orientation: { type: String }
     };
   }
 
   static styles = css`
-    form {
-      max-width: 480px;
-    }
-
     .form-control {
       margin-bottom: 1.5em;
     }
@@ -90,7 +87,7 @@ class DynamicForm extends LitElement {
     // if mutliple sections, render tabs and panels
     if (data.sections.length > 1)
     return html`
-      <sl-tab-group placement=start>
+      <sl-tab-group placement=${this.orientation === 'landscape' ? 'start' : 'top' }>
         ${tabs}
         ${panels}
       </sl-tab-group>

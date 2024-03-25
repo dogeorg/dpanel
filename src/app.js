@@ -20,13 +20,33 @@ import '/utils/debug-panel.js';
 import { getRouter } from '/router/router.js'
 import { loadPupContext } from '/router/middleware.js'
 
+// Utils
+import debounce from '/utils/debounce.js';
+
 // Do this once to set the location of shoelace assets (icons etc..)
 setBasePath('/vendor/@shoelace/cdn@2.14.0/');
 
 class DPanelApp extends LitElement {
+  constructor() {
+    super();
+    this._debouncedHandleResize = debounce(this._handleResize.bind(this), 50);
+  }
+
   connectedCallback() {
     super.connectedCallback();
+
+    // Fetch main manifest (for pup listing)
     this.fetchManifestData();
+
+    // Add the resize event listener
+    window.addEventListener('resize', this._debouncedHandleResize);
+    // Initial check to set orientation on load
+    this._handleResize();
+  }
+
+  disconnectedCallback() {
+    window.removeEventListener('resize', this._debouncedHandleResize);
+    super.disconnectedCallback();
   }
 
   firstUpdated() {
@@ -49,6 +69,13 @@ class DPanelApp extends LitElement {
     setTimeout(() => {
       //  alertExample && alertExample.show();
     }, 3000);
+  }
+
+  _handleResize() {
+    // Determine the orientation based on the window width
+    const orientation = window.innerWidth > 920 ? 'landscape' : 'portrait';
+    // Update the appContext.orientation state
+    store.updateState({ appContext: { orientation }});
   }
 
   async fetchManifestData() {

@@ -1,5 +1,7 @@
 import { LitElement, html, css, ifDefined } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
 import { getRouter } from '/router/router.js'
+import { StoreSubscriber } from '/state/subscribe.js';
+import { store } from '/state/store.js';
 import '/components/common/render-count.js'
 import '/components/common/dynamic-form/dynamic-form.js'
 import * as dataSets from '/components/common/dynamic-form/mocks/index.js'
@@ -42,6 +44,12 @@ class PracticeFormView extends LitElement {
     }
   `
 
+  constructor() {
+    super();
+    // Subscribe to changes of appContext
+    this.context = new StoreSubscriber(this, store)
+  }
+
   firstUpdated() {
     // Demonstration of accessing the router within other components
     const router = getRouter();
@@ -61,6 +69,7 @@ class PracticeFormView extends LitElement {
   }
 
   render() {
+    const { appContext } = this.context.store
     const options = Object.keys(dataSets).map((key, i) => {
       return html`<sl-option value="${key}">${key}</sl-option>`;
     });
@@ -75,7 +84,10 @@ class PracticeFormView extends LitElement {
         </div>
 
         <div>
-          <dynamic-form .data="${ifd(this.data)}"></dynamic-form>
+          <dynamic-form
+            .data="${ifd(this.data)}"
+            orientation=${appContext.orientation}>
+          </dynamic-form>
         </div>
       </div>
     `;

@@ -46,6 +46,12 @@ class PracticeFormView extends LitElement {
     // Demonstration of accessing the router within other components
     const router = getRouter();
     // console.log(router.location.pathname);
+    this.forceDataSet('grouped_verti')
+  }
+
+  forceDataSet(keyName) {
+    this.key = keyName
+    this.data = dataSets[keyName]
   }
 
   onDatasetChange(event) {

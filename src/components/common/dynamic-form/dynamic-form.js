@@ -1,13 +1,14 @@
 import { LitElement, html, css, ifDefined } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
 import { serialize } from '/vendor/@shoelace/cdn@2.14.0/utilities/form.js';
-import * as i from '/components/common/dynamic-form/fields/index.js'
-const ifd = ifDefined;
+import * as i from '/components/common/dynamic-form/renderers/index.js'
+import { customElementsReady } from '/utils/custom-elements-ready.js';
 
 class DynamicForm extends LitElement {
 
   static get properties() {
     return {
-      data: { type: Object }
+      data: { type: Object },
+      activeFormId: { type: String }
     };
   }
 
@@ -31,45 +32,54 @@ class DynamicForm extends LitElement {
     }
   `;
 
-  createFormFields(data) {
+  constructor() {
+    super();
+    this.formValid = true;
+    this.activeFormId = null;
+  }
+
+  createSingleForm(data) {
     if (!data) return;
+    if (!data.fields) return;
+    return html`
+      <form id="primary" action="/submit-form" method="post">
+        ${data.fields.map(field => this.generateField(field))}
+        <div class="footer-controls">
+          <sl-button variant=warning type="submit" form="primary">Submit</sl-button>
+        </div>
+      </form>
+    `;
+  }
 
-    // Handle inline form creation
-    if (!data.type || data.type === 'inline') {
-      return data.fields.map(field => this.generateField(field))
-    }
-
-    // Handle grouped form creation
-    if (data.type && data.type === 'grouped') {
-
-      console.log('HERE', data.sets);
-      
-      const placement = data.ui === 'vertical' ? 'start' : 'top';
-
-      const tabs = data.sets.map((set) => {
-        return html`
-          <sl-tab slot="nav" panel="${set.name}">
-            ${set.label}
-          </sl-tab>
-        `
-      });
-
-      const panels = data.sets.map((set) => {
-        return html`
-          <sl-tab-panel name="${set.name}">
-            ${set.fields.map(field => this.generateField(field))}
-          </sl-tab-panel>
-        `
-      });
-
+  createMultipleForms(data) {
+    const placement = data.ui === 'vertical' ? 'start' : 'top';
+    const tabs = data.sets.map((set) => {
       return html`
-        <sl-tab-group placement=${ifd(placement)}>
-          ${tabs}
-          ${panels}
-        </sl-tab-group>
+        <sl-tab @click=${() => this.handleTabChange(set.name)} slot="nav" panel="${set.name}">
+          ${set.label}
+        </sl-tab>
       `
-      
-    }
+    });
+
+    const panels = data.sets.map((set) => {
+      return html`
+        <sl-tab-panel name="${set.name}">
+          <form id=${set.name} action="/submit-form" method="post">
+            ${set.fields.map(field => this.generateField(field))}
+            <div class="footer-controls">
+              ${this.data ? html`<sl-button variant=primary type="submit" form=${set.name}>Save</sl-button>`: '' }
+            </div>
+          </form>
+        </sl-tab-panel>
+      `
+    });
+
+    return html`
+      <sl-tab-group placement=${ifDefined(placement)}>
+        ${tabs}
+        ${panels}
+      </sl-tab-group>
+    `
   }
 
   generateField(field) {
@@ -101,21 +111,70 @@ class DynamicForm extends LitElement {
   }
 
   render() {
-    return html`
-      <form @submit="${this.handleSubmit}">
-        ${this.createFormFields(this.data)}
-        <div class="footer-controls">
-          ${this.data ? html`<sl-button variant=warning type="submit">Submit</sl-button>`: '' }
-        </div>
-      </form>
-    `;
+    if (!this.data) return;
+    return this.data.sets
+      ? this.createMultipleForms(this.data)
+      : this.createSingleForm(this.data)
   }
 
-  handleSubmit(event) {
+  handleTabChange(tabName) {
+    this.activeFormId = tabName;
+    this.requestUpdate();
+  }
+
+  async updated(changedProperties) {
+    // Check if `data` OR 'activeFormId' is the property that changed
+
+    const dataInitialized = changedProperties.has('data') && !changedProperties.has('activeFormId')
+
+    if (changedProperties.has('data') || changedProperties.has('activeFormId')) {
+      // The `dataSet` has been initialized or updated OR, the activeFormId has changed, both
+      // result in some number of shoelace components being added to the DOM. 
+      
+      // Remove previous listeners
+      this._removeFormSubmitListeners();
+
+      // Determine form
+      const form = dataInitialized
+        ? this.shadowRoot.querySelector(`form`)
+        : this.shadowRoot.querySelector(`form#${this.activeFormId}`);
+
+      if (!form) {
+        return;
+      }
+
+      // Set the activeFormId when initliazing or changing data alone.
+      if (dataInitialized) { this.activeFormId = form.id }
+
+      // Wait for new elements to be ready
+      await customElementsReady(form);
+
+      // Do things knowing all custom-elements are ready.
+      this._attachFormSubmitListener(form);
+    }
+  }
+
+  _formSubmitListener = (event) => {
     event.preventDefault();
-    const form = event.target;
+    const form = this.shadowRoot.querySelector(`form#${this.activeFormId}`);
     const data = serialize(form);
-    console.log(data);
+    console.log('Submitting ..', data);
+  };
+
+  _attachFormSubmitListener(form) {
+    form.addEventListener('submit', this._formSubmitListener);
+  }
+
+  _removeFormSubmitListeners() {
+    // Remove event listeners from all forms.
+    const forms = this.shadowRoot.querySelectorAll('form');
+    forms.forEach((form) => {
+      form.removeEventListener('submit', this._formSubmitListener);
+    });
+  }
+
+  disconnectedCallback() {
+    this._removeFormSubmitListeners();
   }
 }
 

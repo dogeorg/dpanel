@@ -8,6 +8,7 @@ export const populated = {
       "placeholder": "Enter your node's name",
       "help": "A memorable name for your Dogecoin Node",
       "required": true,
+      "minlength": 3,
       "value": "MyDogecoinNode"
     },
     {

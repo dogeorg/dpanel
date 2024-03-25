@@ -20,7 +20,7 @@ export const grouped_verti = {
           "name": "nodeDescription",
           "label": "Node Description",
           "placeholder": "Describe your node's purpose",
-          "rows": 4,
+          "rows": 12,
           "value": "This node is dedicated to maintaining a stable, secure, and efficient Dogecoin network."
         }
       ],

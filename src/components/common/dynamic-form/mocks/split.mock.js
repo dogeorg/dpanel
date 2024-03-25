@@ -1,7 +1,5 @@
-export const grouped_verti = {
-  type: 'grouped',
-  ui: 'vertical',
-  sets: [
+export const split = {
+  sections: [
     { 
       name: 'identity',
       label: "Identity",

@@ -2,13 +2,15 @@ import { LitElement, html, css, ifDefined } from '/vendor/@lit/all@3.1.2/lit-all
 import { serialize } from '/vendor/@shoelace/cdn@2.14.0/utilities/form.js';
 import * as i from '/components/common/dynamic-form/renderers/index.js'
 import { customElementsReady } from '/utils/custom-elements-ready.js';
+import { postConfig } from '/api/config/config.js';
 
 class DynamicForm extends LitElement {
 
   static get properties() {
     return {
       data: { type: Object },
-      activeFormId: { type: String }
+      activeFormId: { type: String },
+      isSubmitting: { type: Boolean }
     };
   }
 
@@ -38,48 +40,67 @@ class DynamicForm extends LitElement {
     this.activeFormId = null;
   }
 
-  createSingleForm(data) {
-    if (!data) return;
-    if (!data.fields) return;
+  createFormControls(options = {}) {
     return html`
-      <form id="primary" action="/submit-form" method="post">
-        ${data.fields.map(field => this.generateField(field))}
-        <div class="footer-controls">
-          <sl-button variant=warning type="submit" form="primary">Submit</sl-button>
-        </div>
-      </form>
-    `;
+      <div class="footer-controls">
+        <sl-button
+          id="${options.formId}__save_button"
+          variant=primary
+          type="submit"
+          form=${options.formId}
+          ?loading=${this.isSubmitting}>
+        ${options.submitLabel || 'Save' }
+      </sl-button>
+      </div>
+    `
   }
 
   createMultipleForms(data) {
-    const placement = data.ui === 'vertical' ? 'start' : 'top';
-    const tabs = data.sets.map((set) => {
+    const tabs = data.sections.map((section, index) => {
+      const sectionId = `${(section.name || "default")}_${index}`;
       return html`
-        <sl-tab @click=${() => this.handleTabChange(set.name)} slot="nav" panel="${set.name}">
-          ${set.label}
+        <sl-tab
+          @click=${() => this.handleTabChange(sectionId)}
+          slot="nav"
+          panel="${sectionId}">
+            ${section.label || sectionId}
         </sl-tab>
       `
     });
 
-    const panels = data.sets.map((set) => {
+    const form = (section, index = 0) => {
+      const sectionId = `${(section.name || "default")}_${index}`;
       return html`
-        <sl-tab-panel name="${set.name}">
-          <form id=${set.name} action="/submit-form" method="post">
-            ${set.fields.map(field => this.generateField(field))}
-            <div class="footer-controls">
-              ${this.data ? html`<sl-button variant=primary type="submit" form=${set.name}>Save</sl-button>`: '' }
-            </div>
-          </form>
+        <form id=${sectionId}>
+          ${section.fields.map(field => this.generateField(field))}
+          ${this.createFormControls({ formId: sectionId, submitLabel: 'Save' })}
+        </form>
+      `
+    }
+
+    const panels = data.sections.map((section, index) => {
+      const sectionId = `${(section.name || "default")}_${index}`;
+      return html`
+        <sl-tab-panel name=${sectionId}>
+          ${form(section, index)}
         </sl-tab-panel>
       `
     });
 
+    // if mutliple sections, render tabs and panels
+    if (data.sections.length > 1)
     return html`
-      <sl-tab-group placement=${ifDefined(placement)}>
+      <sl-tab-group placement=start>
         ${tabs}
         ${panels}
       </sl-tab-group>
     `
+
+    if (data.sections.length === 1) {
+      return html`
+        ${form(data.sections[0])}
+      `
+    }
   }
 
   generateField(field) {
@@ -111,10 +132,8 @@ class DynamicForm extends LitElement {
   }
 
   render() {
-    if (!this.data) return;
-    return this.data.sets
-      ? this.createMultipleForms(this.data)
-      : this.createSingleForm(this.data)
+    if (!this.data || !this.data.sections) return;
+    return this.createMultipleForms(this.data)
   }
 
   handleTabChange(tabName) {
@@ -154,22 +173,68 @@ class DynamicForm extends LitElement {
     }
   }
 
-  _formSubmitListener = (event) => {
+  // Helper function to create and display toasts imperatively
+  createToast(variant, message, icon = 'info-circle', duration = 3000) {
+    const alert = document.createElement('sl-alert');
+    alert.variant = variant;
+    alert.closable = true;
+    alert.duration = duration;
+    alert.innerHTML = `
+      <sl-icon name="${icon}" slot="icon"></sl-icon>
+      ${this.escapeHtml(message)}
+    `;
+    document.body.append(alert);
+    alert.toast();
+  }
+
+  // Utility function to escape HTML
+  escapeHtml(html) {
+    const div = document.createElement('div');
+    div.textContent = html;
+    return div.innerHTML;
+  }
+
+  _formSubmitHandler = async (event) => {
     event.preventDefault();
-    const form = this.shadowRoot.querySelector(`form#${this.activeFormId}`);
-    const data = serialize(form);
-    console.log('Submitting ..', data);
+    this.isSubmitting = true;
+    try {
+      // Collect data
+      const form = this.shadowRoot.querySelector(`form#${this.activeFormId}`);
+      const data = serialize(form);
+
+      // Submit data
+      const res = await postConfig(data);
+      console.log('Response.. ', res);
+    } catch (error) {
+
+      // Display errors
+      this.createToast('danger', `Error: ${error.message}`);
+      console.error('Submission error', error);
+
+    } finally {
+      // Celebrate successs.
+      this.isSubmitting = false;
+      const saveButton = this.shadowRoot.querySelector(`form#${this.activeFormId} sl-button[type="submit"]`);
+      const buttonOriginalText = saveButton.textContent;
+      saveButton.textContent = 'Done';
+      saveButton.disabled = true;
+
+      setTimeout(function () {
+        saveButton.textContent = buttonOriginalText;
+        saveButton.disabled = false;
+      }, 1400);
+    }
   };
 
   _attachFormSubmitListener(form) {
-    form.addEventListener('submit', this._formSubmitListener);
+    form.addEventListener('submit', this._formSubmitHandler);
   }
 
   _removeFormSubmitListeners() {
     // Remove event listeners from all forms.
     const forms = this.shadowRoot.querySelectorAll('form');
     forms.forEach((form) => {
-      form.removeEventListener('submit', this._formSubmitListener);
+      form.removeEventListener('submit', this._formSubmitHandler);
     });
   }
 

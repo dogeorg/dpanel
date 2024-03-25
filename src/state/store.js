@@ -11,6 +11,8 @@ class Store {
     this.networkContext = this.networkContext || {
       // Define network state here
       useMocks: false,
+      forceFailures: false,
+      forceDelayInSeconds: 3,
       status: 'online'
     };
     this.pupContext = {

@@ -12,7 +12,11 @@ class DebugSettingsDialog extends LitElement {
     this.isOpen = false;
   }
 
-  static styles = css``;
+  static styles = css`
+    .form-control {
+      margin-bottom: 1.5em;
+    }
+  `;
 
   connectedCallback() {
     super.connectedCallback();
@@ -24,7 +28,14 @@ class DebugSettingsDialog extends LitElement {
   }
 
   handleToggle(event) {
-    const changes = { networkContext: { useMocks: event.target.checked }}
+    const changes = { networkContext: {}}
+    changes.networkContext[event.target.name] = event.target.checked
+    store.updateState(changes)
+  }
+
+  handleInput(event) {
+    const changes = { networkContext: {} }
+    changes.networkContext[event.target.name] = event.target.value
     store.updateState(changes)
   }
 
@@ -33,11 +44,37 @@ class DebugSettingsDialog extends LitElement {
     return html`
       <sl-dialog ?open=${this.isOpen} class="dialog-deny-close" no-header>
         <form @submit=${this.handleSubmit}>
-          <sl-switch 
-            help-text="When enabled, ApiClient returns mocked responses"
-            .checked=${networkContext.useMocks}
-            @sl-change=${this.handleToggle}
-            >Network Mocks</sl-switch>
+
+          <div class="form-control">
+            <sl-switch
+              name="useMocks"
+              help-text="When enabled, ApiClient returns mocked successful responses"
+              .checked=${networkContext.useMocks}
+              @sl-change=${this.handleToggle}>
+                Network Mocks
+            </sl-switch>
+          </div>
+
+          <div class="form-control">
+            <sl-switch
+              name="forceFailures"
+              help-text="When enabled, ApiClient returns failure responses"
+              .checked=${networkContext.forceFailures}
+              @sl-change=${this.handleToggle}>
+                Force Network Failures
+            </sl-switch>
+          </div>
+
+          <div class="form-control">
+            <sl-input
+              type="number"
+              name="forceDelayInSeconds"
+              help-text="Mocks will wait [x] seconds before responding"
+              value=${networkContext.forceDelayInSeconds}
+              @sl-change=${this.handleInput}>
+                Force Network Delay
+            </sl-switch>
+          </div>
         </form>
         <div slot="footer">
           <sl-button @click=${this.closeDialog}>Close</sl-button>

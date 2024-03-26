@@ -7,10 +7,13 @@ class Store {
     // If there's no persisted state, initialize with defaults.
     this.appContext = this.appContext || {
       // Define application state here
+      orienation: 'landscape'
     };
     this.networkContext = this.networkContext || {
       // Define network state here
       useMocks: false,
+      forceFailures: false,
+      forceDelayInSeconds: 3,
       status: 'online'
     };
     this.pupContext = {
@@ -73,7 +76,6 @@ class Store {
   }
 
   updateState(partialState) {
-    console.log('State Update Requested', partialState);
     // Update the state properties with the partial state provided
     if (partialState.appContext) {
       this.appContext = { ...this.appContext, ...partialState.appContext };

@@ -198,6 +198,7 @@ class DynamicForm extends LitElement {
       // Collect data
       const form = this.shadowRoot.querySelector(`form#${this.activeFormId}`);
       const data = serialize(form);
+      console.log('Attempting to submit:', data);
 
       // Submit data
       const res = await postConfig(data);

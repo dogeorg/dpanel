@@ -61,6 +61,7 @@ class DPanelApp extends LitElement {
       { path: '/config', component: 'config-view' },
       { path: '/config', component: 'config-view' },
       { path: '/form', component: 'form-view' },
+      { path: '/manage', component: 'manage-view' },
       { path: '/pup/:path*', action: loadPupContext, component: 'iframe-view' },
     ]);
 

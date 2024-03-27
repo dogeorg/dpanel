@@ -1,19 +1,20 @@
 import { LitElement, html, css } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
 import { sparkline } from '/vendor/@fnando/sparkline@0.3.10/sparkline.js';
+import { generateMockSparklineData } from './mocks/sparkline.mocks.js';
 
 class SparklineChart extends LitElement {
   static properties = {
     data: { type: Array },
     label: { type: String },
-    disabled: { type: Boolean }
+    disabled: { type: Boolean },
+    mock: { type: Boolean }
   };
 
   static styles = css`
     :host {
       display: flex;
       flex-direction: column;
-      position: relative; // Ensure tooltip positions correctly
-
+      position: relative;
     }
     svg {
       width: auto;
@@ -34,7 +35,7 @@ class SparklineChart extends LitElement {
     }
 
     .label[disabled] {
-      color: lightgrey;
+      color: grey;
     }
 
     .sparkline--cursor {
@@ -49,9 +50,10 @@ class SparklineChart extends LitElement {
 
   constructor() {
     super();
+    this.dataToUse = [];
     this.options = {
       onmousemove: (event, datapoint) => {
-        if (this.disabled) return;
+        if (this.disabled || !datapoint) return;
         const tooltip = this.shadowRoot.querySelector('.tooltip');
         
         tooltip.style.display = 'block';
@@ -68,14 +70,14 @@ class SparklineChart extends LitElement {
   }
 
   render() {
-    const fill = this.disabled ? "rgba(0, 0, 0, 0.1)" :"rgba(0, 0, 255, .2)"
+    const fill = this.disabled ? "rgba(255, 255, 255, 0.1)" :"rgba(0, 0, 255, .2)"
     return html`
       ${this.label ? html`<span class="label" ?disabled=${this.disabled}>${this.label}</span>` : ''}
       <svg
         part="sparkline-svg"
         width="100" height="30" // Adjust size as needed
         stroke-width="2"
-        stroke="${this.disabled ? 'lightgrey' : 'blue'}"
+        stroke="${this.disabled ? 'grey' : 'blue'}"
         fill="${fill}"
         @mousemove="${this.handleMouseMove}"
         @mouseout="${this.handleMouseOut}">
@@ -87,7 +89,7 @@ class SparklineChart extends LitElement {
   handleMouseMove(event) {
     // Delegate to sparkline's mousemove handler if options are set
     if (this.options.onmousemove) {
-      const datapoint = this.data[event.detail.index];
+      const datapoint = this.dataToUse[event.detail.index];
       this.options.onmousemove(event, datapoint);
     }
   }
@@ -100,15 +102,22 @@ class SparklineChart extends LitElement {
   }
 
   updated(changedProperties) {
-    if (changedProperties.has('data')) {
+    if (changedProperties.has('data') || changedProperties.has('mock')) {
       this.drawSparkline();
     }
   }
 
   drawSparkline() {
+    this.dataToUse = this.data;
+    // Check if mock is true, if so use the generated mock data
+    if (this.mock) {
+      const mockDataCount = 10; // Set the desired count for mock data items
+      this.dataToUse = generateMockSparklineData(mockDataCount);
+    }
+
     const svg = this.shadowRoot.querySelector('svg[part="sparkline-svg"]');
     // Pass options to the sparkline function
-    sparkline(svg, this.data, this.options);
+    sparkline(svg, this.dataToUse, this.options);
   }
 }
 

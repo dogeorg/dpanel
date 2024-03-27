@@ -84,7 +84,7 @@ class DebugPanel extends LitElement {
   }
 
   firstUpdated() {
-    console.info('Log UI loaded.');
+    // console.info('Log UI loaded.');
   }
 
   connectedCallback() {

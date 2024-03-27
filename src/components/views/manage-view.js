@@ -1,9 +1,5 @@
 import { LitElement, html, css } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
-
-import '/components/common/dynamic-form/dynamic-form.js'
-import '/components/common/animated-dots.js'
-import '/components/common/sparkline-chart.js'
-import * as dataSets from '/components/common/dynamic-form/mocks/index.js'
+import '/components/views/pup-snapshot/pup-snapshot.js'
 
 class ManageView extends LitElement {
 
@@ -22,67 +18,10 @@ class ManageView extends LitElement {
     }
 
     /* Details toggle */
-    .details-group sl-details:not(:last-of-type) {
+    .details-group pup-snapshot:not(:last-of-type) {
       margin-bottom: var(--sl-spacing-x-small);
     }
-
-
-    .details-group sl-details::part(summary-icon) {
-      /* Disable the expand/collapse animation */
-      display: none;
-      rotate: none;
-    }
-
-    /* Summary buttons */
-    .details-group sl-icon-button::part(base) {
-      font-size: 1rem;
-    }
-
-    .details-summary {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      width: 100%;
-    }
-
-    .details-summary > div {
-      min-width: 200px;
-      display: flex;
-      flex-direction: row;
-      gap: 0.5em;
-    }
-
-    details-summary div.center {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-    }
-
-    .details-summary > div:last-of-type {
-      display: flex;
-      justify-content: end;
-      gap: 0.25em;
-    }
-
-    .chart-summary {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: baseline;
-      font-size: var(--sl-font-size-x-small);
-    }
   `
-
-  firstUpdated() {
-    const container = this.shadowRoot.querySelector('.details-group');
-
-    // Close all other details when one is shown
-    container.addEventListener('sl-show', event => {
-      if (event.target.localName === 'sl-details') {
-        [...container.querySelectorAll('sl-details')].map(details => (details.open = event.target === details));
-      }
-    });
-  }
 
   render() {
     return html`
@@ -91,188 +30,40 @@ class ManageView extends LitElement {
         <h1>Manage</h1>
 
         <div class="details-group">
-          <sl-details open>
-            <div class="details-summary" slot="summary">
-              
-              <!-- ------ LEFT ------ -->
-              <div class="title-wrap">
-                <span class="title">Core</span>
-                <span class="tags">
-                  <sl-tag size="small" pill>v1.6.12</sl-tag>
-                </span>
-              </div>
-              
-              <!-- ------ CENTRE ------ -->
-              <div class="center">
-                <sparkline-chart 
-                  label="CPU usage"
-                  unit="%"
-                  .data=${sparkCPUdata}>
-                </sparkline-chart>
-                <sparkline-chart 
-                  label="MEM usage"
-                  unit="%"
-                  .data=${sparkMEMdata}>
-                </sparkline-chart>
-                <sparkline-chart 
-                  label="DISK usage"
-                  unit="%"
-                  .data=${sparkDISKdata}>
-                </sparkline-chart>
-              </div>
+          <pup-snapshot
+            pupId="core"
+            pupName="Core"
+            version="12.2.1"
+            icon="box">
+          </pup-snapshot>
 
-              <!-- ------ RIGHT ------ -->
-              <div class="right">
-                </sl-tooltip>
-                <sl-tooltip content="Stop">
-                  <sl-button variant="danger" outline size="medium">
-                    <sl-icon name="stop-fill" label="Stop"></sl-icon> Stop
-                  </sl-button>
-                </sl-tooltip>
-              </div>
-            </div>
+          <pup-snapshot
+            pupId="gigawallet"
+            pupName="GigaWallet"
+            version="2.1.3"
+            icon="wallet2">
+          </pup-snapshot>
 
-            <!-- ##### CONTENT ##### -->
-            <div class="content">
-              <sl-tab-group>
-                <sl-tab slot="nav" panel="general">Logs</sl-tab>
-                <sl-tab slot="nav" panel="custom">Stats</sl-tab>
-                <sl-tab slot="nav" panel="advanced">Config</sl-tab>
+          <pup-snapshot
+            pupId="identity"
+            pupName="Identity"
+            version="1.0.1"
+            icon="person-circle">
+          </pup-snapshot>
 
-                <sl-tab-panel name="general">
-                  This is the logs tab panel.
-                </sl-tab-panel>
-                <sl-tab-panel name="custom">This is the stats tab panel.</sl-tab-panel>
-                <sl-tab-panel name="advanced">
-                  <dynamic-form .data=${dataSets.split} orientation="landscape"></dynamic-form>
-                </sl-tab-panel>
-              </sl-tab-group>
-            </div>
-            <sl-icon name="plus-square" slot="expand-icon"></sl-icon>
-            <sl-icon name="dash-square" slot="collapse-icon"></sl-icon>
-          </sl-details>
+          <pup-snapshot
+            pupId="shibeshop"
+            pupName="ShibeShop"
+            version="3.1.3"
+            icon="bag">
+          </pup-snapshot>
 
-          <sl-details>
-            <div class="details-summary" slot="summary">
-              
-              <!-- ------ LEFT ------ -->
-              <div class="title-wrap">
-                <span class="title">GigaWallet</span>
-                <span class="tags">
-                  <sl-tag size="small" pill>v0.1.3</sl-tag>
-                </span>
-              </div>
-
-              <!-- ------ CENTER ------ -->
-              <div class="center">
-                <sparkline-chart 
-                  label="CPU usage"
-                  unit="%"
-                  .data=${sparkCPUdata.reverse()}>
-                </sparkline-chart>
-                <sparkline-chart 
-                  label="MEM usage"
-                  unit="%"
-                  .data=${sparkMEMdata.reverse()}>
-                </sparkline-chart>
-                <sparkline-chart 
-                  label="DISK usage"
-                  unit="%"
-                  .data=${sparkDISKdata}>
-                </sparkline-chart>
-              </div>
-
-              <!-- ------ RIGHT ------ -->
-              <div class="right">
-                </sl-tooltip>
-                <sl-tooltip content="Stop">
-                  <sl-button variant="danger" outline size="medium">
-                    <sl-icon name="stop-fill" label="Stop"></sl-icon> Stop
-                  </sl-button>
-                </sl-tooltip>
-              </div>
-            </div>
-
-            <!-- ###### CONTENT ###### -->
-            <div class="content">
-              <sl-tab-group>
-                <sl-tab slot="nav" panel="general">Logs</sl-tab>
-                <sl-tab slot="nav" panel="custom">Stats</sl-tab>
-                <sl-tab slot="nav" panel="advanced">Config</sl-tab>
-
-                <sl-tab-panel name="general">
-                  This is the logs tab panel.
-                </sl-tab-panel>
-                <sl-tab-panel name="custom">This is the stats tab panel.</sl-tab-panel>
-                <sl-tab-panel name="advanced">This is the config tab panel.</sl-tab-panel>
-              </sl-tab-group>
-            </div>
-
-            <sl-icon name="plus-square" slot="expand-icon"></sl-icon>
-            <sl-icon name="dash-square" slot="collapse-icon"></sl-icon>
-          </sl-details>
-
-          <sl-details>
-
-            <!-- ------ LEFT ------ -->
-            <div class="details-summary" slot="summary">
-              <div class="title-wrap">
-                <span class="title">NodesMap</span>
-                <span class="tags">
-                  <sl-tag size="small" pill>v0.0.2</sl-tag>
-                </span>
-              </div>
-
-              <!-- ------ CENTRE ------ -->
-              <div class="center">
-                <sparkline-chart 
-                  disabled
-                  label="CPU usage"
-                  unit="%"
-                  .data=${sparkCPUdata}>
-                </sparkline-chart>
-                <sparkline-chart 
-                  disabled
-                  label="MEM usage"
-                  unit="%"
-                  .data=${sparkMEMdata}>
-                </sparkline-chart>
-                <sparkline-chart 
-                  disabled
-                  label="DISK usage"
-                  unit="%"
-                  .data=${sparkDISKdata}>
-                </sparkline-chart>
-              </div>
-
-              <!-- ------ RIGHT ------ -->
-              <div class="right">
-                <sl-tooltip content="Start">
-                  <sl-button variant="success" outline size="medium">
-                    <sl-icon name="play-fill" label="Start"></sl-icon> Start
-                  </sl-button>
-                </sl-tooltip>
-              </div>
-            </div>
-
-            <!-- ###### CONTENT ###### -->
-            <div class="content">
-              <sl-tab-group>
-                <sl-tab slot="nav" panel="general">Logs</sl-tab>
-                <sl-tab slot="nav" panel="custom">Stats</sl-tab>
-                <sl-tab slot="nav" panel="advanced">Config</sl-tab>
-
-                <sl-tab-panel name="general">
-                  This is the logs tab panel.
-                </sl-tab-panel>
-                <sl-tab-panel name="custom">This is the stats tab panel.</sl-tab-panel>
-                <sl-tab-panel name="advanced">This is the config tab panel.</sl-tab-panel>
-              </sl-tab-group>
-            </div>
-
-            <sl-icon name="plus-square" slot="expand-icon"></sl-icon>
-            <sl-icon name="dash-square" slot="collapse-icon"></sl-icon>
-          </sl-details>
+          <pup-snapshot
+            pupId="tipjar"
+            pupName="Tipjar"
+            version="8.2.3"
+            icon="hand-thumbs-up">
+          </pup-snapshot>
         </div>
 
       </div>

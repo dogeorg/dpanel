@@ -11,29 +11,42 @@ import * as renderMethods from './renders/index.js';
 
 class PupSnapshot extends LitElement {
 
-  static properties = {
-    pupId: { type: String },
-    pupName: { type: String },
-    version: { type: String },
-    icon: { type: String },
-    stats: { type: Object },
-    running: { type: Boolean },
+  static get properties() {
+    return {
+      pupId: { type: String },
+      pupName: { type: String },
+      version: { type: String },
+      icon: { type: String },
+      stats: { type: Object },
+      status: { type: String },
+      running: { type: Boolean }
+    }
   }
 
   constructor() {
     super();
     this.stats = {}
+    this.running = false;
     this.configManifest = mockConfig // TODO, dont use mock data.
-    this.running = Boolean(Math.random() < 0.5); // random true or false.
-    
+
     // Bind all imported renderMehtods to 'this'
     bindToClass(renderMethods, this)
+  }
+
+  get status() {
+    return this._status;
+  }
+
+  set status(newStatus) {
+    this._status = newStatus;
+    this.running = newStatus === 'running';
+    this.requestUpdate();
   }
 
   render() {
     return html`
       <sl-details>
-        <div class="summary" slot="summary">  
+        <div class="summary" slot="summary">
           ${this.renderSummary()}
         </div>
 

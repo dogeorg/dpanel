@@ -20,7 +20,6 @@ export const styles = css`
   }
 
   .summary > div {
-    min-width: 200px;
     display: flex;
     flex-direction: row;
     gap: 0.5em;

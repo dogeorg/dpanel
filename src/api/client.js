@@ -13,6 +13,11 @@ export default class ApiClient {
   }
 
   async request(path, config) {
+    // Debug, if the dev has forceDelay, wait the delay time in seconds before making request
+    if (this.networkContext.forceDelayInSeconds) {
+      await new Promise(resolve => setTimeout(resolve, this.networkContext.forceDelayInSeconds * 1000));
+    }
+
     // If mocks enabled, avoid making legitimate request, return mocked response (success or error) instead.
     if (this.networkContext.useMocks && config.mock) {
       return await returnMockedResponse(path, config, this.networkContext)
@@ -21,11 +26,6 @@ export default class ApiClient {
     // Otherwise, perform the fetch request
     const url = new URL(path, this.baseURL).href;
     const headers = { 'Content-Type': 'application/json', ...config.headers };
-
-    // Debug, if the dev has forceDelay, wait the delay time in seconds before making request
-    if (this.networkContext.forceDelayInSeconds) {
-      await new Promise(resolve => setTimeout(resolve, this.networkContext.forceDelayInSeconds * 1000));
-    }
 
     const response = await fetch(url, { ...config, headers });
     const data = await response.json();
@@ -36,23 +36,26 @@ export default class ApiClient {
   }
 }
 
-function returnMockedResponse(path, config, networkContext) {
-  const { useMocks ,forceDelayInSeconds, forceFailures, reqLogs } = networkContext;
+async function returnMockedResponse(path, config, networkContext) {
+
+  const { forceFailures, reqLogs } = networkContext;
+
   reqLogs && console.group('Mock Request', path)
   reqLogs && console.log('Req:', config.method, (config.body || '--no-body'));
-  return new Promise((resolve) => {
-    setTimeout(function() {
-      const response = (typeof config.mock === 'function')
-        ? mock(path, { forceFailures })
-        : getMockedSuccessOrError(config.mock, forceFailures);
-        reqLogs && console.log('Res:', response);
-        reqLogs && console.groupEnd();
-      resolve(response);
-    }, forceDelayInSeconds * 1000 || 0);
-  });
+
+  const response = (typeof config.mock === 'function')
+    ? mock(path, { forceFailures })
+    : getMockedSuccessOrError(path, config.mock, forceFailures);
+    reqLogs && console.log('Res:', response);
+    reqLogs && console.groupEnd();
+
+  return response
 }
 
-function getMockedSuccessOrError(mock, forceFailuresFlag) {
-  if (Array.isArray(mock) && mock.length >= 2) return mock[forceFailuresFlag ? 1 : 0];
-  return mock
+function getMockedSuccessOrError(path, mock, forceFailures) {
+  // When forcing failure
+  if (forceFailures) {
+    throw new Error(`Simulated error returned from ${path}`)
+  }
+  return mock;
 }

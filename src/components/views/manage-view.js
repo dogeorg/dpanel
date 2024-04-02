@@ -20,7 +20,7 @@ class ManageView extends LitElement {
     this.busyQueue = [];
     this.fetchLoading = true;
     this.fetchError = false;
-    this.itemsPerPage = 5;
+    this.itemsPerPage = 20;
     this.pc = new PaginationController(this, undefined, this.itemsPerPage);
   }
 
@@ -175,11 +175,15 @@ class ManageView extends LitElement {
       overflow-y: auto;
     }
     .padded {
-      padding: 20px;
+      padding: 0.5em;
+      @media (min-width: 768px) {
+        padding: 1.4em;
+      }
     }
 
     h1, h2 {
       font-family: 'Comic Neue', sans-serif;
+      color: #ffc107;
     }
 
     header {

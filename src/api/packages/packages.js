@@ -9,6 +9,7 @@ const client = new ApiClient('http://localhost:3000', store.networkContext)
 
 export async function getPackageList() {
   return client.get('/packages', { mock: generatePackageList(
-    ['Core', 'GigaWallet', 'Identity']
+    300
+    // ['Core', 'GigaWallet', 'Identity']
   ) });
 }

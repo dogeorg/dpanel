@@ -149,6 +149,7 @@ class ManageView extends LitElement {
                 pupName=${pkg.package}
                 version=${pkg.version}
                 status=${pkg.command.status}
+                .config=${pkg.command.config}
                 icon="box"
                 ?disabled=${this.busy}>
               </pup-snapshot>

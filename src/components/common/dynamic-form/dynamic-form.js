@@ -9,6 +9,7 @@ class DynamicForm extends LitElement {
 
   static get properties() {
     return {
+      pupId: { type: String },
       data: { type: Object },
       activeFormId: { type: String },
       isSubmitting: { type: Boolean },
@@ -58,10 +59,10 @@ class DynamicForm extends LitElement {
       const sectionId = `${(section.name || "default")}_${index}`;
       return html`
         <sl-tab
-          @click=${() => this.handleTabChange(sectionId)}
+          @click=${(event ) => this.handleTabChange(event, sectionId)}
           slot="nav"
           panel="${sectionId}">
-            ${section.label || sectionId}
+            ${section.name}
         </sl-tab>
       `
     });
@@ -134,7 +135,7 @@ class DynamicForm extends LitElement {
     return this.createMultipleForms(this.data)
   }
 
-  handleTabChange(tabName) {
+  handleTabChange(event, tabName) {
     this.activeFormId = tabName;
     this.requestUpdate();
   }
@@ -142,7 +143,8 @@ class DynamicForm extends LitElement {
   async updated(changedProperties) {
     // Check if `data` OR 'activeFormId' is the property that changed
 
-    const dataInitialized = changedProperties.has('data') && !changedProperties.has('activeFormId')
+    const dataInitialized = changedProperties.has('data') 
+      && (!changedProperties.has('activeFormId') || !changedProperties.activeFormId)
 
     if (changedProperties.has('data') || changedProperties.has('activeFormId')) {
       // The `dataSet` has been initialized or updated OR, the activeFormId has changed, both
@@ -157,6 +159,8 @@ class DynamicForm extends LitElement {
         : this.shadowRoot.querySelector(`form#${this.activeFormId}`);
 
       if (!form) {
+        console.log(this.shadowRoot.querySelector(`form`));
+        console.log(this.shadowRoot.querySelector(`form#${this.activeFormId}`));
         return;
       }
 
@@ -181,7 +185,7 @@ class DynamicForm extends LitElement {
       console.log('Attempting to submit:', data);
 
       // Submit data
-      const res = await postConfig(data);
+      const res = await postConfig(this.pupId, data);
       console.log('Response.. ', res);
     } catch (error) {
 

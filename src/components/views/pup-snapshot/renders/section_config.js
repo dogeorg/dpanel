@@ -1,10 +1,13 @@
-import { html } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
+import { html, nothing } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
 
 export function renderSectionConfig() {
   return html`
-    <sl-tab slot="nav" panel="advanced">Config</sl-tab>
-    <sl-tab-panel name="advanced">
-      <dynamic-form .data=${this.configManifest.split} orientation="landscape"></dynamic-form>
+    <sl-tab slot="nav" panel="config">Config</sl-tab>
+    <sl-tab-panel name="config">
+      ${this.activeTab === 'config'
+        ? html`<dynamic-form pupId=${this.pupId} .data=${this.config} orientation="landscape"></dynamic-form>`
+        : nothing
+      }
     </sl-tab-panel>
   `
 }

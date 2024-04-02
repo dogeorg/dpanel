@@ -21,7 +21,9 @@ class PupSnapshot extends LitElement {
       status: { type: String },
       running: { type: Boolean },
       disabled: { type: Boolean },
-      focus: { type: String, reflect: true, attribute: true },
+      config: { type: Object },
+      focus: { type: String, reflect: true },
+      activeTab: { type: String },
     }
   }
 
@@ -29,8 +31,7 @@ class PupSnapshot extends LitElement {
     super();
     this.stats = {}
     this.running = false;
-    this.configManifest = mockConfig // TODO, dont use mock data.
-
+    this.activeTab = null;
     // Bind all imported renderMehtods to 'this'
     bindToClass(renderMethods, this)
   }
@@ -45,6 +46,23 @@ class PupSnapshot extends LitElement {
     this.requestUpdate();
   }
 
+  connectedCallback() {
+    super.connectedCallback();
+    this.addEventListener('sl-tab-show', this.handleTabChange.bind(this));
+  }
+
+  disconnectedCallback() {
+    this.removeEventListener('sl-tab-show', this.handleTabChange.bind(this));
+    super.disconnectedCallback();
+  }
+
+  handleTabChange(event) {
+    const tabGroup = this.shadowRoot.querySelector('#PupTabs');
+    if (event.originalTarget === tabGroup) {
+      this.activeTab = event.detail.name
+    }
+  }
+
   render() {
     return html`
       <sl-details>
@@ -53,7 +71,7 @@ class PupSnapshot extends LitElement {
         </div>
 
         <div class="content">
-          <sl-tab-group>
+          <sl-tab-group id="PupTabs">
             ${this.renderSectionLogs()}
             ${this.renderSectionStats()}
             ${this.renderSectionConfig()}

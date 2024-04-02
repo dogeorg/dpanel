@@ -1,6 +1,7 @@
 import { LitElement, html, css, ifDefined } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
 import { serialize } from '/vendor/@shoelace/cdn@2.14.0/utilities/form.js';
-import * as i from '/components/common/dynamic-form/renderers/index.js'
+import * as i from '/components/common/dynamic-form/renders/index.js'
+import { createAlert } from '/components/common/alert.js';
 import { customElementsReady } from '/utils/custom-elements-ready.js';
 import { postConfig } from '/api/config/config.js';
 
@@ -170,27 +171,6 @@ class DynamicForm extends LitElement {
     }
   }
 
-  // Helper function to create and display toasts imperatively
-  createToast(variant, message, icon = 'info-circle', duration = 3000) {
-    const alert = document.createElement('sl-alert');
-    alert.variant = variant;
-    alert.closable = true;
-    alert.duration = duration;
-    alert.innerHTML = `
-      <sl-icon name="${icon}" slot="icon"></sl-icon>
-      ${this.escapeHtml(message)}
-    `;
-    document.body.append(alert);
-    alert.toast();
-  }
-
-  // Utility function to escape HTML
-  escapeHtml(html) {
-    const div = document.createElement('div');
-    div.textContent = html;
-    return div.innerHTML;
-  }
-
   _formSubmitHandler = async (event) => {
     event.preventDefault();
     this.isSubmitting = true;
@@ -198,6 +178,7 @@ class DynamicForm extends LitElement {
       // Collect data
       const form = this.shadowRoot.querySelector(`form#${this.activeFormId}`);
       const data = serialize(form);
+      console.log('Attempting to submit:', data);
 
       // Submit data
       const res = await postConfig(data);
@@ -205,7 +186,7 @@ class DynamicForm extends LitElement {
     } catch (error) {
 
       // Display errors
-      this.createToast('danger', `Error: ${error.message}`);
+      createAlert('danger', `Error: ${error.message}`);
       console.error('Submission error', error);
 
     } finally {

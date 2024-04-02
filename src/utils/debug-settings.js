@@ -66,6 +66,16 @@ class DebugSettingsDialog extends LitElement {
           </div>
 
           <div class="form-control">
+            <sl-switch
+              name="reqLogs"
+              help-text="When enabled, Requests and Responses are logged"
+              .checked=${networkContext.reqLogs}
+              @sl-change=${this.handleToggle}>
+                Request/Response Logs
+            </sl-switch>
+          </div>
+
+          <div class="form-control">
             <sl-input
               type="number"
               name="forceDelayInSeconds"

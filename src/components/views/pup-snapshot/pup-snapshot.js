@@ -19,7 +19,9 @@ class PupSnapshot extends LitElement {
       icon: { type: String },
       stats: { type: Object },
       status: { type: String },
-      running: { type: Boolean }
+      running: { type: Boolean },
+      disabled: { type: Boolean },
+      focus: { type: String, reflect: true, attribute: true },
     }
   }
 

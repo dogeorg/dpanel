@@ -11,7 +11,7 @@ export function renderSummaryActions() {
     ${this.running ? html`
       </sl-tooltip>
         <sl-tooltip content="Stop">
-        <sl-button @click=${(e) => this.handleAction(e, 'stop')} variant="danger" outline size="medium">
+        <sl-button ?disabled=${this.disabled} @click=${(e) => this.handleAction(e, 'stop')} variant="danger" outline size="medium">
           <sl-icon name="stop-fill" label="Stop"></sl-icon> Stop
         </sl-button>
       </sl-tooltip>
@@ -21,7 +21,7 @@ export function renderSummaryActions() {
     ${!this.running ? html`
       </sl-tooltip>
         <sl-tooltip content="Start">
-        <sl-button @click=${(e) => this.handleAction(e, 'start')} variant="success" outline size="medium">
+        <sl-button ?disabled=${this.disabled} @click=${(e) => this.handleAction(e, 'start')} variant="success" outline size="medium">
           <sl-icon name="play-fill" label="Start"></sl-icon> Start
       </sl-button>
       ` : nothing
@@ -46,6 +46,12 @@ export async function handleAction (event, action) {
   button.loading = true;
   button.disabled = true;
 
+  // Dispatch a 'busy-start' event
+  this.dispatchEvent(new CustomEvent('busy-start', { bubbles: true, composed: true }));
+
+  // Set this pupSnapshot as having focus
+  this.focus = true;
+
   try {
     
     // Initiate a stopPup request over the network
@@ -68,6 +74,8 @@ export async function handleAction (event, action) {
     // Stop loading, re-enable button
     button.loading = false;
     button.disabled = false;
+
+    this.dispatchEvent(new CustomEvent('busy-stop', { bubbles: true, composed: true }));
     
     // If the action failed, do not adjust running state.
     if (actionFailed) {
@@ -82,5 +90,10 @@ export async function handleAction (event, action) {
     if (action === 'stop') {
       this.running = false;
     }
+
+    // Remove focus from this snapshot, after a small delay
+    setTimeout(() => {
+      this.focus = false;
+    }, 500);
   }
 }

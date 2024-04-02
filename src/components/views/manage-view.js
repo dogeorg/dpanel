@@ -10,11 +10,14 @@ class ManageView extends LitElement {
   static properties = {
     fetchLoading: { type: Boolean },
     fetchError: { type: Boolean },
-    packageList: { type: Array }
+    packageList: { type: Array },
+    busy: { type: Boolean }
   }
 
   constructor() {
     super();
+    this.busy = false;
+    this.busyQueue = [];
     this.fetchLoading = true;
     this.fetchError = false;
     this.itemsPerPage = 5;
@@ -23,7 +26,15 @@ class ManageView extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
+    this.addEventListener('busy-start', this.handleBusyStart.bind(this));
+    this.addEventListener('busy-stop', this.handleBusyStop.bind(this));
     this.fetchPackageList();
+  }
+
+  disconnectedCallback() {
+    this.removeEventListener('busy-start', this.handleBusyStart.bind(this));
+    this.removeEventListener('busy-stop', this.handleBusyStop.bind(this));
+    super.disconnectedCallback();
   }
 
   reset() {
@@ -32,15 +43,39 @@ class ManageView extends LitElement {
     this.packageList = null;
   }
 
+  updateBusyState() {
+    this.busy = this.busyQueue.length > 0;
+  }
+
+  handleBusyStart(event) {
+    this.busyQueue.push(event.target);
+    this.updateBusyState();
+  }
+
+  handleBusyStop(event) {
+    // Remove the identifier of the event source from the queue
+    const index = this.busyQueue.indexOf(event.target);
+    if (index > -1) {
+      this.busyQueue.splice(index, 1);
+    }
+    setTimeout(() => {
+      this.updateBusyState();
+    }, 500);
+  }
+
   async fetchPackageList() {
 
     this.reset();
+    // Emit busy start event which adds this action to a busy-queue.
+    this.dispatchEvent(new CustomEvent('busy-start', {}));
 
     try {
       this.pc.setData(await getPackageList())
     } catch (err) {
       this.fetchError = true;
     } finally {
+      // Emit a busy stop event which removes this action from the busy-queue.
+      this.dispatchEvent(new CustomEvent('busy-stop', {}));
       this.fetchLoading = false
     }
   }
@@ -82,7 +117,7 @@ class ManageView extends LitElement {
 
           <div class="actions">
             <sl-dropdown>
-              <sl-button slot="trigger"><sl-icon name="three-dots-vertical"></sl-icon></sl-button>
+              <sl-button slot="trigger" ?disabled=${this.busy}><sl-icon name="three-dots-vertical"></sl-icon></sl-button>
               <sl-menu @sl-select=${this.handleActionsMenuSelect}>
                 <sl-menu-item value="refresh">Refresh</sl-menu-item>
               </sl-menu>
@@ -114,11 +149,13 @@ class ManageView extends LitElement {
                 pupName=${pkg.package}
                 version=${pkg.version}
                 status=${pkg.command.status}
-                icon="box">
+                icon="box"
+                ?disabled=${this.busy}>
               </pup-snapshot>
             `)}
           </div>
           <paginator-ui
+            ?disabled=${this.busy}
             @go-next=${this.pc.nextPage}
             @go-prev=${this.pc.previousPage}
             currentPage=${this.pc.currentPage}

@@ -7,6 +7,7 @@ class PaginatorUI extends LitElement {
       totalPages: { type: Number },
       onNext: { type: Object },
       onPrev: { type: Object },
+      disabled: { type: Boolean },
     };
   }
 
@@ -31,6 +32,10 @@ class PaginatorUI extends LitElement {
         cursor: default;
         opacity: 0.5;
       }
+
+      .page-counter[disabled] {
+        opacity: 0.2;
+      }
     `;
   }
 
@@ -46,15 +51,17 @@ class PaginatorUI extends LitElement {
         <sl-button
           class="page-button"
           @click=${this.handlePrevious}
-          ?disabled=${this.currentPage <= 1}
+          ?disabled=${this.disabled || this.currentPage <= 1}
         >
           Previous
         </sl-button>
-        <span>Page ${this.currentPage} of ${this.totalPages}</span>
+        <span class="page-counter" ?disabled=${this.disabled}>
+          Page ${this.currentPage} of ${this.totalPages}
+        </span>
         <sl-button
           class="page-button"
           @click=${this.handleNext}
-          ?disabled=${this.currentPage >= this.totalPages}
+          ?disabled=${this.disabled || this.currentPage >= this.totalPages}
         >
           Next
         </sl-button>

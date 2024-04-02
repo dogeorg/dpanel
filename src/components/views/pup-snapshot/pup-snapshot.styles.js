@@ -2,7 +2,13 @@ import { css } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
 
 export const styles = css`
   :host {
+    opacity: 1;
+    transition: opacity 500ms;
     display: block;
+  }
+
+  :host([disabled]:not([focus="true"])) {
+    opacity: 0.2;
   }
   
   /* Details toggle */

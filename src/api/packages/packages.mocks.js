@@ -2,20 +2,44 @@ export function generatePackageList(input) {
   const randomChoice = (choices) => choices[Math.floor(Math.random() * choices.length)];
 
   const generateRandomConfig = () => {
-    const sectionNames = ['identity', 'connection'];
+    const sectionNames = ['Identity', 'Connection'];
     const fieldTypes = ['text', 'textarea', 'number'];
-    const section = randomChoice(sectionNames);
-    const field = randomChoice(fieldTypes)
+    const field1 = randomChoice(fieldTypes)
+    const field2 = randomChoice(fieldTypes)
+    const field3 = randomChoice(fieldTypes)
 
     return {
       sections: [
         {
-          name: section,
+          name: sectionNames[0],
           fields: [
             {
-              label: `${field.charAt(0).toUpperCase() + section.slice(1)} Field`,
-              name: field,
-              type: randomChoice(fieldTypes),
+              label: `${field1.charAt(0).toUpperCase() + field1.slice(1)} Field`,
+              name: `${field1}_1`,
+              type: field1,
+              required: randomChoice[true, false]
+            },
+            {
+              label: `${field2.charAt(0).toUpperCase() + field2.slice(1)} Field`,
+              name: `${field2}_2`,
+              type: field2,
+              required: randomChoice[true, false]
+            },
+            {
+              label: `${field3.charAt(0).toUpperCase() + field3.slice(1)} Field`,
+              name: `${field3}_3`,
+              type: field3,
+              required: randomChoice[true, false]
+            },
+          ],
+        },
+        {
+          name: sectionNames[1],
+          fields: [
+            {
+              label: `${field1.charAt(0).toUpperCase() + field1.slice(1)} Field`,
+              name: `${field1}_1`,
+              type: field1,
               required: randomChoice[true, false]
             },
           ],

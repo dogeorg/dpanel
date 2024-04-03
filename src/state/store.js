@@ -11,7 +11,7 @@ class Store {
     };
     this.networkContext = this.networkContext || {
       // Define network state here
-      useMocks: true,
+      useMocks: false,
       forceFailures: false,
       forceDelayInSeconds: 3,
       reqLogs: true,

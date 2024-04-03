@@ -7,7 +7,7 @@ export function renderSummary() {
     </div>
 
     <div class="center">
-      ${this.renderSummaryCharts()}
+      ${this.installed && this.renderSummaryCharts()}
     </div>
 
     <div class="right">

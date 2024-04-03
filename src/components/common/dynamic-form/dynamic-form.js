@@ -159,8 +159,6 @@ class DynamicForm extends LitElement {
         : this.shadowRoot.querySelector(`form#${this.activeFormId}`);
 
       if (!form) {
-        console.log(this.shadowRoot.querySelector(`form`));
-        console.log(this.shadowRoot.querySelector(`form#${this.activeFormId}`));
         return;
       }
 

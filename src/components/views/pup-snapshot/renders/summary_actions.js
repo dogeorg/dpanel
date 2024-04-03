@@ -1,35 +1,84 @@
-import { html, nothing } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
+import { html, css, nothing } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
 import { stopPup, startPup } from '/api/action/action.js';
 import { createAlert } from '/components/common/alert.js';
+import { asyncTimeout } from '/utils/timeout.js'
 
 export function renderSummaryActions() {
 
-  this.handleAction = handleAction
+  this.handleRunningAction = handleRunningAction
+  this.handleInstallAction = handleInstallAction
 
   return html`
-    
-    ${this.running ? html`
-      </sl-tooltip>
-        <sl-tooltip content="Stop">
-        <sl-button ?disabled=${this.disabled} @click=${(e) => this.handleAction(e, 'stop')} variant="danger" outline size="medium">
-          <sl-icon name="stop-fill" label="Stop"></sl-icon> Stop
-        </sl-button>
-      </sl-tooltip>
-      ` : nothing
-    }
 
-    ${!this.running ? html`
-      </sl-tooltip>
-        <sl-tooltip content="Start">
-        <sl-button ?disabled=${this.disabled} @click=${(e) => this.handleAction(e, 'start')} variant="success" outline size="medium">
-          <sl-icon name="play-fill" label="Start"></sl-icon> Start
+    ${!this.installed ? html`
+      <sl-button ?disabled=${this.disabled} @click=${(e) => this.handleInstallAction(e, 'install')} variant="primary" outline size="medium">
+        ${this._installed_dirty ? html`
+          <sl-icon name="check-square-fill" label="Installed"></sl-icon> 
+          <span class="btn-text">Installed</span>
+          `
+        : html`
+          <sl-icon name="arrow-down-square-fill" label="Install"></sl-icon> 
+          <span class="btn-text">Install</span>
+        `
+        }
+        
       </sl-button>
       ` : nothing
     }
+    
+    ${this.installed && this.running ? html`
+      <sl-button ?disabled=${this.disabled} @click=${(e) => this.handleRunningAction(e, 'stop')} variant="danger" outline size="medium">
+        <sl-icon name="stop-fill" label="Stop"></sl-icon> <span class="btn-text">Stop</span>
+      </sl-button>
+      ` : nothing
+    }
+
+    ${this.installed && !this.running ? html`
+      <sl-button ?disabled=${this.disabled} @click=${(e) => this.handleRunningAction(e, 'start')} variant="success" outline size="medium">
+        <sl-icon name="play-fill" label="Start"></sl-icon> <span class="btn-text">Start</span>
+      </sl-button>
+      ` : nothing
+    }
+    <style>${actionStyles}</style>
   `
 }
 
-export async function handleAction (event, action) {  
+const actionStyles = css`
+  .btn-text {
+    display: inline-block;
+    margin-left: 0.5rem;
+  }
+`;
+
+export async function handleInstallAction (event, action) {
+  event.stopPropagation();
+  if (action !== 'install') return
+  if (event.target.disabled) return;
+
+  let actionFailed;
+  let button = event.currentTarget;
+
+  button.loading = true;
+  button.disabled = true;
+
+  await asyncTimeout(1500, () => {
+    button.loading = false;
+    button.disabled = true;
+    this._installed_dirty = true;
+    this.requestUpdate();
+  });
+  
+  await asyncTimeout(750, () => {
+    // Shift to installed list.
+    this.dispatchEvent(new CustomEvent('pup-installed', {
+      detail: { pupId: this.pupId },
+      bubbles: true,
+      composed: true
+    }));
+  });
+}
+
+export async function handleRunningAction (event, action) {  
   // Prevent event bubbling to parent
   // Because we don't want any parent handling this click and doing things
   event.stopPropagation();

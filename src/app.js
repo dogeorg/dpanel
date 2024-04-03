@@ -36,7 +36,7 @@ class DPanelApp extends LitElement {
     super.connectedCallback();
 
     // Fetch main manifest (for pup listing)
-    this.fetchManifestData();
+    // this.fetchManifestData();
 
     // Add the resize event listener
     window.addEventListener('resize', this._debouncedHandleResize);
@@ -107,12 +107,12 @@ class DPanelApp extends LitElement {
       font-style: normal;
     }
     .pushed-right {
-      margin-left: 250px;
+      margin-left: 0px;
     }
     #Side {
       position: absolute;
       z-index: 1;
-      width:250px;
+      width:0px;
       height: 100%;
     }
     #Outlet {

@@ -1,4 +1,4 @@
-import { LitElement, html } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
+import { LitElement, html, nothing } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
 import { bindToClass } from '/utils/class-bind.js'
 import { styles } from './pup-snapshot.styles.js';
 import '/components/common/dynamic-form/dynamic-form.js'
@@ -24,6 +24,8 @@ class PupSnapshot extends LitElement {
       config: { type: Object },
       focus: { type: String, reflect: true },
       activeTab: { type: String },
+      installed: { type: Boolean },
+      docs: { type: Object }
     }
   }
 
@@ -72,9 +74,20 @@ class PupSnapshot extends LitElement {
 
         <div class="content">
           <sl-tab-group id="PupTabs">
-            ${this.renderSectionLogs()}
-            ${this.renderSectionStats()}
-            ${this.renderSectionConfig()}
+            ${this.installed ? html`
+              ${this.renderSectionLogs()}
+              ${this.renderSectionStats()}
+              ${this.renderSectionConfig()}
+              ${this.renderSectionDesc()}
+              ${this.renderSectionScreens()}
+            ` : nothing
+            }
+
+            ${!this.installed ? html`
+              ${this.renderSectionDesc()}
+              ${this.renderSectionScreens()}
+            ` : nothing
+            }
           </sl-tab-group>
         </div>
       </sl-details>

@@ -9,7 +9,6 @@ export class PaginationController {
   setData(newData) {
     this.data = newData;
     this.currentPage = 1;
-    console.log(this.data);
     this.host.requestUpdate();
   }
 

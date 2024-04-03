@@ -54,23 +54,27 @@ export async function handleInstallAction (event, action) {
   event.stopPropagation();
   if (action !== 'install') return
   if (event.target.disabled) return;
-  
+
   let actionFailed;
   let button = event.currentTarget;
 
   button.loading = true;
   button.disabled = true;
 
-  await asyncTimeout(2000, () => {
+  await asyncTimeout(1500, () => {
     button.loading = false;
     button.disabled = true;
     this._installed_dirty = true;
     this.requestUpdate();
   });
   
-  await asyncTimeout(1000, () => {
+  await asyncTimeout(750, () => {
     // Shift to installed list.
-    this.dispatchEvent(new CustomEvent('pup-installed', { detail: { pupId: this.pupId }}));
+    this.dispatchEvent(new CustomEvent('pup-installed', {
+      detail: { pupId: this.pupId },
+      bubbles: true,
+      composed: true
+    }));
   });
 }
 

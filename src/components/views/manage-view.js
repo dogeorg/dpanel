@@ -1,7 +1,8 @@
-import { LitElement, html, css, nothing } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
+import { LitElement, html, css, nothing, repeat } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
 import '/components/views/pup-snapshot/pup-snapshot.js'
 import '/components/views/pup-snapshot/pup-snapshot-skeleton.js'
 import { getPackageList } from '/api/packages/packages.js';
+import { PkgController } from '/models/package/index.js'
 import { PaginationController } from '/components/common/paginator/paginator-controller.js';
 import '/components/common/paginator/paginator-ui.js';
 
@@ -21,6 +22,7 @@ class ManageView extends LitElement {
     this.fetchLoading = true;
     this.fetchError = false;
     this.itemsPerPage = 20;
+    this.pkgController = new PkgController(this);
     this.installedList = new PaginationController(this, undefined, this.itemsPerPage);
     this.availableList = new PaginationController(this, undefined, this.itemsPerPage);
   }
@@ -66,8 +68,28 @@ class ManageView extends LitElement {
     }, 500);
   }
 
-  handlePupInstalled() {
-    
+  handlePupInstalled(event) {
+    event.stopPropagation();
+    this.pkgController.installPkg(event.detail.pupId)
+  }
+
+  async fetchPackageListOrig() {
+    this.reset();
+    // Emit busy start event which adds this action to a busy-queue.
+    this.dispatchEvent(new CustomEvent('busy-start', {}));
+
+    try {
+      const res = await getPackageList()
+      this.installedList.setData(res.local.installed)
+      this.availableList.setData(res.local.available)
+    } catch (err) {
+      console.log(err);
+      this.fetchError = true;
+    } finally {
+      // Emit a busy stop event which removes this action from the busy-queue.
+      this.dispatchEvent(new CustomEvent('busy-stop', {}));
+      this.fetchLoading = false
+    }
   }
 
   async fetchPackageList() {
@@ -77,8 +99,9 @@ class ManageView extends LitElement {
 
     try {
       const res = await getPackageList()
-      this.installedList.setData(res.local.installed)
-      this.availableList.setData(res.local.available)
+      this.pkgController.setData(res);
+      this.installedList.setData(this.pkgController.installed);
+      this.availableList.setData(this.pkgController.available);
     } catch (err) {
       console.log(err);
       this.fetchError = true;
@@ -117,7 +140,7 @@ class ManageView extends LitElement {
       }
     }
 
-    const SKELS = Array.from({ length: 3 })
+    const SKELS = Array.from({ length: 1 })
 
     return html`
       <div class="padded">
@@ -147,7 +170,9 @@ class ManageView extends LitElement {
 
         ${this.fetchLoading ? html`
           <div class="details-group">
-            ${SKELS.map(() => html`<pup-snapshot-skeleton></pup-snapshot-skeleton>`)}
+            ${repeat(SKELS, (_, index) => index, () => html`
+              <pup-snapshot-skeleton></pup-snapshot-skeleton>
+            `)}
           </div>
         ` : nothing }
 
@@ -170,18 +195,20 @@ class ManageView extends LitElement {
 
         ${ready && hasItems('installed') ? html`
           <div class="details-group">
-            ${this.installedList.getCurrentPageData().map(pkg => html`
+            ${repeat(this.installedList.getCurrentPageData(), (pkg) => `${pkg.package}-${pkg.version}-installed`, (pkg) => html`
               <pup-snapshot
                 pupId=${pkg.package}
                 pupName=${pkg.package}
                 version=${pkg.version}
                 status=${pkg.command.status}
                 .config=${pkg.command.config}
+                .docs=${pkg.docs}
                 icon="box"
                 ?disabled=${this.busy}
                 installed>
               </pup-snapshot>
-            `)}
+            `)
+          }
           </div>
           <paginator-ui
             ?disabled=${this.busy}
@@ -213,14 +240,24 @@ class ManageView extends LitElement {
           </div>
         </header>
 
+        ${this.fetchLoading ? html`
+          <div class="details-group">
+            ${repeat(SKELS, (_, index) => index, () => html`
+              <pup-snapshot-skeleton></pup-snapshot-skeleton>
+            `)}
+          </div>
+        ` : nothing }
+
         ${ready && !hasItems('available') ? html`
-          No pups installed
+          <div class="empty">
+            Such empty.  No pups available in this repository.
+          </div>
           ` : nothing 
         }
 
         ${ready && hasItems('available') ? html`
           <div class="details-group">
-            ${this.availableList.getCurrentPageData().map(pkg => html`
+            ${repeat(this.availableList.getCurrentPageData(), (pkg) => `${pkg.package}-${pkg.version}`, (pkg) => html`
               <pup-snapshot
                 pupId=${pkg.package}
                 pupName=${pkg.package}
@@ -228,6 +265,7 @@ class ManageView extends LitElement {
                 status="${pkg.command.status}"
                 .config=${pkg.command.config}
                 icon="box"
+                .docs=${pkg.docs}
                 ?disabled=${this.busy}>
               </pup-snapshot>
             `)}
@@ -253,7 +291,7 @@ class ManageView extends LitElement {
       overflow-y: auto;
     }
     .padded {
-      padding: 0.5em;
+      padding: 1em;
       @media (min-width: 768px) {
         padding: 1.4em;
       }

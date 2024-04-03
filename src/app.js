@@ -36,7 +36,7 @@ class DPanelApp extends LitElement {
     super.connectedCallback();
 
     // Fetch main manifest (for pup listing)
-    this.fetchManifestData();
+    // this.fetchManifestData();
 
     // Add the resize event listener
     window.addEventListener('resize', this._debouncedHandleResize);

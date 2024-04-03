@@ -65,6 +65,23 @@ export function generatePackageList(input) {
     .join('.');
 
   const names = Array.isArray(input) ? input : Array.from({ length: input }, (_, index) => `Package_${index + 1}`);
+
+  const AVAILABLE = names.map((name) => ({
+    package: name,
+    version: randomSemver(),
+    hash: Math.random().toString(36).substring(2, 15),
+    command: {
+      path: `/path/to/${name}`,
+      args: '',
+      cwd: `/current/working/directory/${name}`,
+      env: null,
+      status: generateRandomStatus(),
+      stats: generateRandomStats(),
+      config: generateRandomConfig(),
+      configFiles: null,
+    },
+  }));
+
   return names.map((name) => ({
     package: name,
     version: randomSemver(),

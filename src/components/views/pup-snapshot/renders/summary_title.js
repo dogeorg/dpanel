@@ -6,7 +6,7 @@ export function renderSummaryTitle() {
       <sl-icon name="${this.icon}"></sl-icon>
       ${this.pupName}
     </span>
-    <span class="tags">
+    <span class="tags" ?hidden=${!this.version}>
       <sl-tag size="small" pill>${this.version}</sl-tag>
     </span>
     <style>${summaryTitleStyles}</style>
@@ -20,5 +20,8 @@ const summaryTitleStyles = css`
     align-items: center;
     gap: 0.8em;
     text-transform: capitlize;
+  }
+  .tags[hidden] {
+    display: none;
   }
 `;

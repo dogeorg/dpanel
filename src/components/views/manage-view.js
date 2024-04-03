@@ -21,19 +21,22 @@ class ManageView extends LitElement {
     this.fetchLoading = true;
     this.fetchError = false;
     this.itemsPerPage = 20;
-    this.pc = new PaginationController(this, undefined, this.itemsPerPage);
+    this.installedList = new PaginationController(this, undefined, this.itemsPerPage);
+    this.availableList = new PaginationController(this, undefined, this.itemsPerPage);
   }
 
   connectedCallback() {
     super.connectedCallback();
     this.addEventListener('busy-start', this.handleBusyStart.bind(this));
     this.addEventListener('busy-stop', this.handleBusyStop.bind(this));
+    this.addEventListener('pup-installed', this.handlePupInstalled.bind(this));
     this.fetchPackageList();
   }
 
   disconnectedCallback() {
     this.removeEventListener('busy-start', this.handleBusyStart.bind(this));
     this.removeEventListener('busy-stop', this.handleBusyStop.bind(this));
+    this.removeEventListener('pup-installed', this.handlePupInstalled.bind(this));
     super.disconnectedCallback();
   }
 
@@ -63,15 +66,21 @@ class ManageView extends LitElement {
     }, 500);
   }
 
-  async fetchPackageList() {
+  handlePupInstalled() {
+    
+  }
 
+  async fetchPackageList() {
     this.reset();
     // Emit busy start event which adds this action to a busy-queue.
     this.dispatchEvent(new CustomEvent('busy-start', {}));
 
     try {
-      this.pc.setData(await getPackageList())
+      const res = await getPackageList()
+      this.installedList.setData(res.local.installed)
+      this.availableList.setData(res.local.available)
     } catch (err) {
+      console.log(err);
       this.fetchError = true;
     } finally {
       // Emit a busy stop event which removes this action from the busy-queue.
@@ -90,14 +99,25 @@ class ManageView extends LitElement {
   }
 
   render() {
-
     const ready = (
       !this.fetchLoading &&
       !this.fetchError &&
-      this.pc.data
+      this.installedList.data &&
+      this.availableList.data
     )
 
-    const skeletons = Array.from({ length: this.itemsPerPage })
+    const hasItems = (listNickname) => {
+      switch(listNickname) {
+        case 'installed':
+          return Boolean(this.installedList.data.length)
+          break;
+        case 'available':
+          return Boolean(this.availableList.data.length)
+          break;
+      }
+    }
+
+    const SKELS = Array.from({ length: 3 })
 
     return html`
       <div class="padded">
@@ -112,7 +132,7 @@ class ManageView extends LitElement {
           ` : nothing }
 
           ${ready ? html`
-            <sl-tag pill>${this.pc.data.length}</sl-tag>
+            <sl-tag pill>${this.installedList.data.length}</sl-tag>
           ` : nothing }
 
           <div class="actions">
@@ -127,7 +147,7 @@ class ManageView extends LitElement {
 
         ${this.fetchLoading ? html`
           <div class="details-group">
-            ${skeletons.map(() => html`<pup-snapshot-skeleton></pup-snapshot-skeleton>`)}
+            ${SKELS.map(() => html`<pup-snapshot-skeleton></pup-snapshot-skeleton>`)}
           </div>
         ` : nothing }
 
@@ -141,14 +161,71 @@ class ManageView extends LitElement {
           <sl-button outline @click=${this.fetchPackageList}>Retry</sl-button>
         ` : nothing }
 
-        ${ready ? html`
+        ${ready && !hasItems('installed') ? html`
+          <div class="empty">
+            Such empty.  Try install a Pup
+          </div>
+          ` : nothing 
+        }
+
+        ${ready && hasItems('installed') ? html`
           <div class="details-group">
-            ${this.pc.getCurrentPageData().map(pkg => html`
+            ${this.installedList.getCurrentPageData().map(pkg => html`
               <pup-snapshot
                 pupId=${pkg.package}
                 pupName=${pkg.package}
                 version=${pkg.version}
                 status=${pkg.command.status}
+                .config=${pkg.command.config}
+                icon="box"
+                ?disabled=${this.busy}
+                installed>
+              </pup-snapshot>
+            `)}
+          </div>
+          <paginator-ui
+            ?disabled=${this.busy}
+            @go-next=${this.installedList.nextPage}
+            @go-prev=${this.installedList.previousPage}
+            currentPage=${this.installedList.currentPage}
+            totalPages=${this.installedList.getTotalPages()}
+          ></paginator-ui>
+        ` : nothing}
+
+        <header>
+          <h2>Available Pups</h2>
+
+          ${this.fetchLoading ? html`
+            <sl-spinner></sl-spinner>
+          ` : nothing }
+
+          ${ready ? html`
+            <sl-tag pill>${this.availableList.data.length}</sl-tag>
+          ` : nothing }
+
+          <div class="actions">
+            <sl-dropdown>
+              <sl-button slot="trigger" ?disabled=${this.busy}><sl-icon name="three-dots-vertical"></sl-icon></sl-button>
+              <sl-menu @sl-select=${this.handleActionsMenuSelect}>
+                <sl-menu-item value="refresh">Refresh</sl-menu-item>
+              </sl-menu>
+            </sl-dropdown>
+          </div>
+        </header>
+
+        ${ready && !hasItems('available') ? html`
+          No pups installed
+          ` : nothing 
+        }
+
+        ${ready && hasItems('available') ? html`
+          <div class="details-group">
+            ${this.availableList.getCurrentPageData().map(pkg => html`
+              <pup-snapshot
+                pupId=${pkg.package}
+                pupName=${pkg.package}
+                version=${pkg.version}
+                status="${pkg.command.status}"
                 .config=${pkg.command.config}
                 icon="box"
                 ?disabled=${this.busy}>
@@ -157,12 +234,13 @@ class ManageView extends LitElement {
           </div>
           <paginator-ui
             ?disabled=${this.busy}
-            @go-next=${this.pc.nextPage}
-            @go-prev=${this.pc.previousPage}
-            currentPage=${this.pc.currentPage}
-            totalPages=${this.pc.getTotalPages()}
+            @go-next=${this.availableList.nextPage}
+            @go-prev=${this.availableList.previousPage}
+            currentPage=${this.availableList.currentPage}
+            totalPages=${this.availableList.getTotalPages()}
           ></paginator-ui>
         ` : nothing}
+
       </div>
     `;
   }
@@ -201,6 +279,16 @@ class ManageView extends LitElement {
     .details-group pup-snapshot:not(:last-of-type),
     .details-group pup-snapshot-skeleton:not(:last-of-type) {
       margin-bottom: var(--sl-spacing-x-small);
+    }
+
+    .empty {
+      width: 100%;
+      color: var(--sl-color-neutral-600);
+      box-sizing: border-box;
+      border: dashed 1px var(--sl-color-neutral-200);
+      border-radius: var(--sl-border-radius-medium);
+      padding: var(--sl-spacing-x-large) var(--sl-spacing-medium);
+
     }
   `
 }

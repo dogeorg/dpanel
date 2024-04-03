@@ -8,8 +8,8 @@ import {
 const client = new ApiClient('http://localhost:3000', store.networkContext)
 
 export async function getPackageList() {
-  return client.get('/packages', { mock: generatePackageList(
-    300
+  return client.get('/manifest/', { mock: generatePackageList(
+    1
     // ['Core', 'GigaWallet', 'Identity']
   ) });
 }

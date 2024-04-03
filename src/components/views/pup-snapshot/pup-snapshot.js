@@ -24,6 +24,7 @@ class PupSnapshot extends LitElement {
       config: { type: Object },
       focus: { type: String, reflect: true },
       activeTab: { type: String },
+      installed: { type: Boolean },
     }
   }
 

@@ -39,12 +39,12 @@ class SparklineChart extends LitElement {
     }
 
     .sparkline--cursor {
-      stroke: orange;
+      stroke: rgb(67, 96, 255);
     }
 
     .sparkline--spot {
-      fill: red;
-      stroke: red;
+      fill: #ff07c1;
+      stroke: #ff07c1;
     }
   `;
 
@@ -70,14 +70,14 @@ class SparklineChart extends LitElement {
   }
 
   render() {
-    const fill = this.disabled ? "rgba(255, 255, 255, 0.1)" :"rgba(0, 0, 255, .2)"
+    const fill = this.disabled ? "rgba(255, 255, 255, 0.1)" :"rgb(7, 255, 174, 0.2)"
     return html`
       ${this.label ? html`<span class="label" ?disabled=${this.disabled}>${this.label}</span>` : ''}
       <svg
         part="sparkline-svg"
         width="100" height="30" // Adjust size as needed
         stroke-width="2"
-        stroke="${this.disabled ? 'grey' : 'blue'}"
+        stroke="${this.disabled ? 'grey' : 'rgb(7, 255, 174)'}"
         fill="${fill}"
         @mousemove="${this.handleMouseMove}"
         @mouseout="${this.handleMouseOut}">

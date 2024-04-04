@@ -4,6 +4,8 @@ import '/components/views/pup-snapshot/pup-snapshot-skeleton.js'
 import { getPackageList } from '/api/packages/packages.js';
 import { PkgController } from '/models/package/index.js'
 import { PaginationController } from '/components/common/paginator/paginator-controller.js';
+import { bindToClass } from '/utils/class-bind.js'
+import * as renderMethods from './renders/index.js';
 import '/components/common/paginator/paginator-ui.js';
 
 class ManageView extends LitElement {
@@ -25,6 +27,7 @@ class ManageView extends LitElement {
     this.pkgController = new PkgController(this);
     this.installedList = new PaginationController(this, undefined, this.itemsPerPage);
     this.availableList = new PaginationController(this, undefined, this.itemsPerPage);
+    bindToClass(renderMethods, this);
   }
 
   connectedCallback() {
@@ -143,142 +146,29 @@ class ManageView extends LitElement {
     const SKELS = Array.from({ length: 1 })
 
     return html`
+
+      <div style="margin:2.5em 2em 2em 2em; max-width: 50vw;">
+        <sl-alert variant="warning" open closable>
+          <img style="position:absolute;bottom:-10px;left:10px;width:110px;" src="/static/img/doge-thumb.png" />
+          <div style="margin-left: 120px">
+            <strong>Much Pups!</strong><br />
+            Pups are software packages that you can install and run.
+          </div>
+        </sl-alert>
+      </div>
+
       <div class="padded">
-
-        <h1>Manage</h1>
-
         <header>
-          <h2>Installed Pups</h2>
-
-          ${this.fetchLoading ? html`
-            <sl-spinner></sl-spinner>
-          ` : nothing }
-
-          ${ready ? html`
-            <sl-tag pill>${this.installedList.data.length}</sl-tag>
-          ` : nothing }
-
-          <div class="actions">
-            <sl-dropdown>
-              <sl-button slot="trigger" ?disabled=${this.busy}><sl-icon name="three-dots-vertical"></sl-icon></sl-button>
-              <sl-menu @sl-select=${this.handleActionsMenuSelect}>
-                <sl-menu-item value="refresh">Refresh</sl-menu-item>
-              </sl-menu>
-            </sl-dropdown>
-          </div>
+          ${this.renderSectionInstalledHeader(ready)}
         </header>
+          ${this.renderSectionInstalledBody(ready, SKELS, hasItems)}
+      </div>
 
-        ${this.fetchLoading ? html`
-          <div class="details-group">
-            ${repeat(SKELS, (_, index) => index, () => html`
-              <pup-snapshot-skeleton></pup-snapshot-skeleton>
-            `)}
-          </div>
-        ` : nothing }
-
-        ${this.fetchError ? html`
-          <sl-alert variant="danger" open>
-            <sl-icon slot="icon" name="exclamation-octagon"></sl-icon>
-            <strong>An error occurred<br />
-            Sorry, the package list could not be obtained.
-          </sl-alert>
-          <br>
-          <sl-button outline @click=${this.fetchPackageList}>Retry</sl-button>
-        ` : nothing }
-
-        ${ready && !hasItems('installed') ? html`
-          <div class="empty">
-            Such empty.  Try install a Pup
-          </div>
-          ` : nothing 
-        }
-
-        ${ready && hasItems('installed') ? html`
-          <div class="details-group">
-            ${repeat(this.installedList.getCurrentPageData(), (pkg) => `${pkg.package}-${pkg.version}-installed`, (pkg) => html`
-              <pup-snapshot
-                pupId=${pkg.package}
-                pupName=${pkg.package}
-                version=${pkg.version}
-                status=${pkg.command.status}
-                .config=${pkg.command.config}
-                .docs=${pkg.docs}
-                icon="box"
-                ?disabled=${this.busy}
-                installed>
-              </pup-snapshot>
-            `)
-          }
-          </div>
-          <paginator-ui
-            ?disabled=${this.busy}
-            @go-next=${this.installedList.nextPage}
-            @go-prev=${this.installedList.previousPage}
-            currentPage=${this.installedList.currentPage}
-            totalPages=${this.installedList.getTotalPages()}
-          ></paginator-ui>
-        ` : nothing}
-
+      <div class="padded">
         <header>
-          <h2>Available Pups</h2>
-
-          ${this.fetchLoading ? html`
-            <sl-spinner></sl-spinner>
-          ` : nothing }
-
-          ${ready ? html`
-            <sl-tag pill>${this.availableList.data.length}</sl-tag>
-          ` : nothing }
-
-          <div class="actions">
-            <sl-dropdown>
-              <sl-button slot="trigger" ?disabled=${this.busy}><sl-icon name="three-dots-vertical"></sl-icon></sl-button>
-              <sl-menu @sl-select=${this.handleActionsMenuSelect}>
-                <sl-menu-item value="refresh">Refresh</sl-menu-item>
-              </sl-menu>
-            </sl-dropdown>
-          </div>
+          ${this.renderSectionAvailableHeader(ready)}
         </header>
-
-        ${this.fetchLoading ? html`
-          <div class="details-group">
-            ${repeat(SKELS, (_, index) => index, () => html`
-              <pup-snapshot-skeleton></pup-snapshot-skeleton>
-            `)}
-          </div>
-        ` : nothing }
-
-        ${ready && !hasItems('available') ? html`
-          <div class="empty">
-            Such empty.  No pups available in this repository.
-          </div>
-          ` : nothing 
-        }
-
-        ${ready && hasItems('available') ? html`
-          <div class="details-group">
-            ${repeat(this.availableList.getCurrentPageData(), (pkg) => `${pkg.package}-${pkg.version}`, (pkg) => html`
-              <pup-snapshot
-                pupId=${pkg.package}
-                pupName=${pkg.package}
-                version=${pkg.version}
-                status="${pkg.command.status}"
-                .config=${pkg.command.config}
-                icon="box"
-                .docs=${pkg.docs}
-                ?disabled=${this.busy}>
-              </pup-snapshot>
-            `)}
-          </div>
-          <paginator-ui
-            ?disabled=${this.busy}
-            @go-next=${this.availableList.nextPage}
-            @go-prev=${this.availableList.previousPage}
-            currentPage=${this.availableList.currentPage}
-            totalPages=${this.availableList.getTotalPages()}
-          ></paginator-ui>
-        ` : nothing}
-
+          ${this.renderSectionAvailableBody(ready, SKELS, hasItems)}
       </div>
     `;
   }
@@ -288,18 +178,23 @@ class ManageView extends LitElement {
       display: block;
       height: 100vh;
       width: 100%;
-      overflow-y: auto;
+      overflow-y: hidden;
     }
     .padded {
+      background: #1a191f;
+      border: 1px solid rgb(32, 31, 36);
+      border-radius: 16px;
+      margin: 2em;
       padding: 1em;
       @media (min-width: 768px) {
         padding: 1.4em;
+        padding-top: 0em;
       }
     }
 
     h1, h2 {
       font-family: 'Comic Neue', sans-serif;
-      color: #ffc107;
+      color: #07ffae;
     }
 
     header {
@@ -310,6 +205,9 @@ class ManageView extends LitElement {
     }
 
     header .actions {
+      display: flex;
+      flex-direction: row;
+      gap: 0.85em;
       margin-left: auto;
     }
 

@@ -6,19 +6,21 @@ import '/vendor/@shoelace/cdn@2.14.0/shoelace.js';
 
 // App state (singleton)
 import { store } from '/state/store.js';
+import { StoreSubscriber } from '/state/subscribe.js';
 
 // Data fetching
 import { getManifests } from '/api/manifest/index.js';
 
 // Views
 import '/components/views/index.js';
+import '/components/views/welcome-dialog/index.js';
 
 // Components
 import '/utils/debug-panel.js'; 
 
 // Router (singleton)
 import { getRouter } from '/router/router.js'
-import { loadPupContext } from '/router/middleware.js'
+import { wrapActions, loadPupContext } from '/router/middleware.js'
 
 // Utils
 import debounce from '/utils/debounce.js';
@@ -27,8 +29,17 @@ import debounce from '/utils/debounce.js';
 setBasePath('/vendor/@shoelace/cdn@2.14.0/');
 
 class DPanelApp extends LitElement {
+
+  static properties = {
+    menuVisible: { type: Boolean },
+    currentPath: { type: String },
+  }
+
   constructor() {
     super();
+    this.context = new StoreSubscriber(this, store);
+    this.menuVisible = true;
+    this.currentPath = '';
     this._debouncedHandleResize = debounce(this._handleResize.bind(this), 50);
   }
 
@@ -55,14 +66,14 @@ class DPanelApp extends LitElement {
 
     // Set out routes
     router.setRoutes([
-      { path: '/', component: 'home-view' },
-      { path: '/pups', component: 'pups-view' },
-      { path: '/stats', component: 'stats-view' },
-      { path: '/config', component: 'config-view' },
-      { path: '/config', component: 'config-view' },
-      { path: '/form', component: 'form-view' },
-      { path: '/manage', component: 'manage-view' },
-      { path: '/pup/:path*', action: loadPupContext, component: 'iframe-view' },
+      { path: '/',           action: wrapActions(),               component: 'home-view' },
+      { path: '/pups',       action: wrapActions(),               component: 'manage-view' },
+      { path: '/stats',      action: wrapActions(),               component: 'stats-view' },
+      { path: '/config',     action: wrapActions(),               component: 'config-view' },
+      { path: '/config',     action: wrapActions(),               component: 'config-view' },
+      { path: '/form',       action: wrapActions(),               component: 'form-view' },
+      { path: '/manage',     action: wrapActions(),               component: 'manage-view' },
+      { path: '/pup/:path*', action: wrapActions(loadPupContext), component: 'iframe-view' },
     ]);
 
     // For demonstration
@@ -99,6 +110,7 @@ class DPanelApp extends LitElement {
       display: block;
       height: 100vh;
       overflow: hidden;
+      box-sizing: border-box;
     }
     @font-face {
       font-family: 'Comic Neue';
@@ -106,15 +118,128 @@ class DPanelApp extends LitElement {
       font-weight: normal;
       font-style: normal;
     }
-    .pushed-right {
-      margin-left: 0px;
+
+    #Main {
+      background: #0000008f;
+      /*background: #121215;*/
+      margin-left: 60px;
     }
-    #Side {
+
+    #Main[pushed] {
+      margin-left: 300px;
+    }
+
+    #GutterNav {
       position: absolute;
-      z-index: 1;
-      width:0px;
+      z-index: 2;
+      width:60px;
       height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1em;
+      padding: 0.75em 0.2em;
+      background: #1c1b22;
     }
+
+    #GutterNav[open] {
+      background: #282731;
+      border-right: 1px solid var(--sl-panel-border-color);
+    }
+
+    #GutterNav #logo {
+      background: rgb(255, 208, 67);
+      border: 1px solid rgb(255, 208, 67);
+    }
+
+    #GutterNav .gnav-menu-item {
+      background: grey;
+      width: 30px;
+      height: 30px;
+      border: 1px solid grey;
+    }
+
+    #GutterNav .gnav-menu-item:hover {
+      background: lightgrey;
+      border: 1px solid lightgrey;
+      cursor: pointer;
+    }
+
+    #Side[open] {
+      background: #1a191f;
+      display: flex;
+    }
+
+    #Side {
+      display: none;
+      position: absolute;
+      left: 67px;
+      z-index: 1;
+      width: 240px;
+      flex-direction: column;
+      justify-content: space-between;
+      box-sizing: border-box;
+      gap: 1em;
+      height: 100%;
+      background: #1a191f;
+    }
+
+    #Side .menu-item {
+      padding: 0.5em 1em;
+      margin: 0.2em 0em 0.2em 0.5em;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 1em;
+      font-family: 'Comic Neue';
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+
+    #Side .menu-item:hover {
+      background: rgba(255,255,255,0.1);
+    }
+
+    #Side .menu-label {
+      padding: 0.5em 1.5em;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      color: #5e74eb;
+      font-weight: bold;
+      font-family: 'Comic Neue';
+    }
+
+    #Side .menu-item.active {
+      background: #4360ff;
+    }
+
+    #Side .menu-item.active a,
+    #Side .menu-item.active sl-icon {
+      text-decoration: none;
+      color: white;
+    }
+
+    #Side .menu-item a {
+      color: rgba(255,255,255,0.5);
+    }
+
+    #Side .menu-item sl-icon {
+      font-size: 1.3rem;
+      color: rgba(255,255,255,0.5);
+    }
+
+    .pad-sides {
+      padding: 0em var(--sl-spacing-x-large);
+    }
+
+    .pad-top {
+      padding-top: var(--sl-spacing-x-large);
+    }
+
+    .pad-bottom {
+      padding-bottom: var(--sl-spacing-x-large);
+    }
+
     #Outlet {
       overflow: hidden;
     }
@@ -130,6 +255,10 @@ class DPanelApp extends LitElement {
     }
   `
 
+  handleMenuClick() {
+    this.menuVisible = !this.menuVisible;
+  }
+
   renderList() {
     if (!this.manifest) return;
     return html`
@@ -143,46 +272,51 @@ class DPanelApp extends LitElement {
   }
 
   render() {
+
+    const CURPATH = this.context.store.appContext.pathname
+
     return html`
-      <div id="Side">
-        <sl-drawer 
-          class="app-drawer"
-          label="Dogebox dPanel"
-          placement="start"
-          style="--size: 270px;"
-          contained
-          no-header
-          open
-          >
-          <sl-menu-label>Dogebox</sl-menu-label>
-          <sl-menu-item value="home">
-            <sl-icon slot="prefix" name="house-heart"></sl-icon>
-            <a href="/">Such Home</a>
-          </sl-menu-item>
-          <sl-menu-item value="apps">
-            <sl-icon slot="prefix" name="box-seam"></sl-icon>
-            <a href="/pups">Much Pups</a>
-            <sl-badge slot="suffix" variant="warning" pill>3</sl-badge>
-          </sl-menu-item>
-          <sl-menu-item value="stats">
-            <sl-icon slot="prefix" name="heart-pulse"></sl-icon>
-            <a href="/stats">Very Stats</a>
-          </sl-menu-item>
-          <sl-menu-item value="config">
-            <sl-icon slot="prefix" name="sliders"></sl-icon>
-            <a href="/config">So Config</a>
-          </sl-menu-item>
-          
-          <sl-divider></sl-divider>
-          
-          <sl-menu-label>Recent</sl-menu-label>
-          
-          ${this.renderList()}
-          
-        </sl-drawer>
+      <div id="GutterNav" ?open=${this.menuVisible}>
+        <div id="logo" class="gnav-menu-item"></div>
+        <div id="menu" class="gnav-menu-item" @click=${this.handleMenuClick}></div>
       </div>
 
-      <main class="pushed-right">
+      <div id="Side" ?open=${this.menuVisible}>
+        <nav>
+          <div>
+            <div class="menu-label">dpanel v0.0.2</div>
+            <div class="menu-item ${CURPATH === '/' ? 'active' : ''}">
+              <sl-icon name="house-heart-fill"></sl-icon>
+              <a href="/">Such Home</a>
+            </div>
+
+            <div class="menu-item ${CURPATH.startsWith('/pups') ? 'active' : ''}">
+              <sl-icon name="box-seam"></sl-icon>
+              <a href="/pups">Much Pups</a>
+            </div>
+
+            <div class="menu-item ${CURPATH.startsWith('/stats') ? 'active' : ''}">
+              <sl-icon name="heart-pulse-fill"></sl-icon>
+              <a href="/stats">Very Stats</a>
+            </div>
+
+            <div class="menu-item ${CURPATH.startsWith('/config') ? 'active' : ''}">
+              <sl-icon name="sliders"></sl-icon>
+              <a href="/config">So Config</a>
+            </div>
+          </div>
+        </nav>
+
+        <div class="nav-footer">
+          <sl-divider></sl-divider>
+          <div class="pad-sides pad-bottom">
+            <p>Velit duis ullamco ad anim nostrud cillum pariatur minim excepteur irure.</p>
+            <sl-button outline>Get Started</sl-button>
+          </div>
+        </div>
+      </div>
+
+      <main id="Main" ?pushed=${this.menuVisible}>
         <div id="Alerts">
           <sl-alert id="AlertExample" closable>
             <sl-icon slot="icon" name="gear"></sl-icon>
@@ -194,6 +328,8 @@ class DPanelApp extends LitElement {
           <!-- Views injected here as users navigate -->
         </div>
       </main>
+
+      <welcome-dialog></welcome-dialog>
 
       <!-- Debugger Widget -->
       <debug-panel></debug-panel>

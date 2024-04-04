@@ -4,4 +4,4 @@ import './home-view.js';
 import './iframe-view.js';
 import './stats-view.js';
 import './form-view.js';
-import './manage-view.js';
+import './manage-view/index.js';

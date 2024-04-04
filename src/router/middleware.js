@@ -1,6 +1,19 @@
 import { getManifest } from "/api/manifest/index.js";
 import { store } from '/state/store.js';
 
+export const wrapActions = (...actions) => async (context, commands) => {
+  // Execute each action in sequence
+  for (const action of actions) {
+    const result = await action(context, commands);
+    // If an action returns a command (like redirect), return it immediately
+    if (result instanceof commands.Command) {
+      return result;
+    }
+  }
+  // After all actions have completed, call setMenu
+  return setMenu(context, commands);
+};
+
 // Example middleware
 export function logPathMiddleware(context, commands) {
   console.log('Navigating to path:', context.pathname);
@@ -24,4 +37,11 @@ export async function loadPupContext(context, commands) {
   }
 
   return commands.redirect('/error?type="pup-loading-error');
+}
+
+function setMenu(context, commands) {
+  store.updateState({ appContext: {
+    pathname: context.pathname,
+  }})
+  return undefined;
 }

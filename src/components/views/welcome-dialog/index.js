@@ -31,7 +31,18 @@ class WelcomeDialog extends LitElement {
       padding-top: 0px;
       margin-top: 0px;
     }
+
+    .footer-button-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+    }
   `
+
+  closeWelcomeDialog() {
+    const dialog = this.shadowRoot.querySelector('sl-dialog')
+    dialog.hide();
+  }
 
   render() {
     return html`
@@ -41,11 +52,14 @@ class WelcomeDialog extends LitElement {
       </div>
       <div class="welcome-footer" slot="footer">
         <div class="footer-text-wrap">
-          <p class="heading"><b>Introducing Dogebox 🎉</b></p>
-          Amet adipisicing sint duis cillum pariatur aliqua anim eu in cupidatat occaecat et tempor sit excepteur tempor ullamco sit magna non amet excepteur do anim est.
+          <p class="heading"><b>Welcome Dogebox-Alpha-Shibe! 🎉</b></p>
+          <p>You have in your four dirty paws a pre-beta Dogebox appliance (0.1.2)</p>
+          <p>The mission — if you choose the accept it — is to run your Dogebox on the internet, following updates and providing feedback at forum.dogecoin.org.</p>
         </div>
         <sl-divider></sl-divider>
-        <sl-button variant="warning">MUCH WOW</sl-button>
+        <div class="footer-button-wrap">
+          <sl-button variant="warning" @click=${this.closeWelcomeDialog}>MUCH WOW</sl-button>
+        <div>
       </div>
       </sl-dialog>
     `;

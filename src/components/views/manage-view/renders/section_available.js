@@ -1,7 +1,6 @@
 import { html, css, nothing, repeat } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
 
 export function renderSectionAvailableHeader(ready) {
-
   return html`
     <h2>Available Pups</h2>
     ${this.fetchLoading ? html`
@@ -31,7 +30,6 @@ export function renderSectionAvailableHeader(ready) {
 }
 
 export function renderSectionAvailableBody(ready, SKELS, hasItems) {
-
   return html`
     ${this.fetchLoading ? html`
       <div class="details-group">

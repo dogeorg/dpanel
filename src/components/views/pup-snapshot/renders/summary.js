@@ -2,15 +2,15 @@ import { html } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
 
 export function renderSummary() {
   return html`
-    <div class="title-wrap">
+    <div class="summary-section summary-section-title">
       ${this.renderSummaryTitle()}
     </div>
 
-    <div class="center">
+    <div class="summary-section summary-section-charts">
       ${this.installed && this.renderSummaryCharts()}
     </div>
 
-    <div class="right">
+    <div class="summary-section summary-section-actions">
       ${this.renderSummaryActions()}
     </div>
   `

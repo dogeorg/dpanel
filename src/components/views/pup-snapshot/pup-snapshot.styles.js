@@ -21,7 +21,7 @@ export const styles = css`
   .summary {
     display: flex;
     flex-direction: column;
-    gap: 1em;
+    gap: 0.5em;
     width: 100%;
 
     @media (min-width: 768px) {
@@ -31,34 +31,37 @@ export const styles = css`
     }
   }
 
-  .summary > div {
+  .summary .summary-section {
     display: flex;
     flex-direction: row;
     gap: 0.5em;
   }
 
-  .summary div.center {
-    display: flex;
-    justify-content: space-between;
+  .summary-section.summary-section-title {
+    max-width: 120px;
+  }
+
+  .summary-section.summary-section-charts {
+    flex-grow: 1;
+    flex-shrink: 1;
     @media (min-width: 768px) {
-      justify-content: center;
-      gap: 10px;
+
     }
   }
 
-  .summary div.right {
+  .summary .summary-section.summary-section-actions {
+    display: flex;
+    flex-grow: 1;
+    justify-content: end;
+    gap: 0.25em;
+
     border-top: 1px solid var(--sl-color-neutral-200);
     padding-top: var(--sl-spacing-medium);
     @media (min-width: 768px) {
+      flex-grow: 0;
       border-top: none;
       padding-top: 0;
     }
-  }
-
-  .summary > div:last-of-type {
-    display: flex;
-    justify-content: end;
-    gap: 0.25em;
   }
 
   sl-tab-group::part(tabs) {

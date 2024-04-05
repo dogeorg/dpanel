@@ -39,12 +39,12 @@ class SparklineChart extends LitElement {
     }
 
     .sparkline--cursor {
-      stroke: rgb(67, 96, 255);
+      stroke: #ffbd11;
     }
 
     .sparkline--spot {
-      fill: #ff07c1;
-      stroke: #ff07c1;
+      fill: white;
+      stroke: white;
     }
   `;
 

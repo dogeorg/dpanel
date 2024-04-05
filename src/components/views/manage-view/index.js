@@ -147,14 +147,8 @@ class ManageView extends LitElement {
 
     return html`
 
-      <div style="margin:2.5em 2em 2em 2em; max-width: 50vw;">
-        <sl-alert variant="warning" open closable>
-          <img style="position:absolute;bottom:-10px;left:10px;width:110px;" src="/static/img/doge-thumb.png" />
-          <div style="margin-left: 120px">
-            <strong>Much Pups!</strong><br />
-            Pups are software packages that you can install and run.
-          </div>
-        </sl-alert>
+      <div class="top">
+        ${this.renderSectionTop()}
       </div>
 
       <div class="padded">
@@ -178,8 +172,13 @@ class ManageView extends LitElement {
       display: block;
       height: 100vh;
       width: 100%;
-      overflow-y: hidden;
+      overflow-y: auto;
     }
+
+    .top {
+      margin: 1.5em 2em 2em 2em; 
+    }
+
     .padded {
       background: #1a191f;
       border: 1px solid rgb(32, 31, 36);
@@ -224,7 +223,6 @@ class ManageView extends LitElement {
       border: dashed 1px var(--sl-color-neutral-200);
       border-radius: var(--sl-border-radius-medium);
       padding: var(--sl-spacing-x-large) var(--sl-spacing-medium);
-
     }
   `
 }

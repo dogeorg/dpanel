@@ -112,6 +112,9 @@ class DPanelApp extends LitElement {
       overflow: hidden;
       box-sizing: border-box;
     }
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
     @font-face {
       font-family: 'Comic Neue';
       src: url('../../vendor/@gfont/Comic_Neue/ComicNeue-Regular.ttf') format('truetype');
@@ -126,7 +129,10 @@ class DPanelApp extends LitElement {
     }
 
     #Main[pushed] {
-      margin-left: 300px;
+      margin-left: 60px;
+      @media (min-width: 768px) {
+        margin-left: 300px;
+      }
     }
 
     #GutterNav {
@@ -137,9 +143,11 @@ class DPanelApp extends LitElement {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 1em;
+      gap: 1.5em;
       padding: 0.75em 0.2em;
       background: #1c1b22;
+      overflow-y: auto;
+      border-right: 1px solid #1c1b22;
     }
 
     #GutterNav[open] {
@@ -148,8 +156,39 @@ class DPanelApp extends LitElement {
     }
 
     #GutterNav #logo {
+      background: #f9e7b5;
+      border: 1px solid #f9e7b5;
+      transform: rotate(-3deg);
+      border-radius: 4px;
+      position: relative;
+      height:28px;
+      top: 4px;
+
+      img {
+        width: 44px;
+        position:absolute;
+        transform: rotate(0deg);
+        left: -8px;
+        top:-7px;
+      }
+    }
+
+    #GutterNav #logo:hover {
       background: rgb(255, 208, 67);
       border: 1px solid rgb(255, 208, 67);
+    }
+
+    #GutterNav #menu {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      transform: rotate(-3deg);
+      border-radius: 4px;
+    }
+
+    #GutterNav #menu sl-icon {
+      transform: rotate(6deg);
     }
 
     #GutterNav .gnav-menu-item {
@@ -160,20 +199,24 @@ class DPanelApp extends LitElement {
     }
 
     #GutterNav .gnav-menu-item:hover {
-      background: lightgrey;
-      border: 1px solid lightgrey;
+      background: #a2a2a2;
+      border: 1px solid #a2a2a2;
       cursor: pointer;
     }
 
     #Side[open] {
       background: #1a191f;
       display: flex;
+      box-shadow: 10px 0 5px -5px rgba(0, 0, 0, 0.2);
+      @media (min-width: 768px) {
+        box-shadow: none;
+      }
     }
 
     #Side {
       display: none;
       position: absolute;
-      left: 67px;
+      left: 60px;
       z-index: 1;
       width: 240px;
       flex-direction: column;
@@ -182,6 +225,7 @@ class DPanelApp extends LitElement {
       gap: 1em;
       height: 100%;
       background: #1a191f;
+      overflow-y: auto;
     }
 
     #Side .menu-item {
@@ -273,12 +317,16 @@ class DPanelApp extends LitElement {
 
   render() {
 
-    const CURPATH = this.context.store.appContext.pathname
+    const CURPATH = this.context.store.appContext.pathname || ''
 
     return html`
       <div id="GutterNav" ?open=${this.menuVisible}>
-        <div id="logo" class="gnav-menu-item"></div>
-        <div id="menu" class="gnav-menu-item" @click=${this.handleMenuClick}></div>
+        <div id="logo" class="gnav-menu-item" @click=${() => window.location.reload(true)}>
+          <img src="/static/img/dogebox-logo-small.png" />
+        </div>
+        <div id="menu" class="gnav-menu-item" @click=${this.handleMenuClick}>
+          <sl-icon name="grid-fill"></sl-icon>
+        </div>
       </div>
 
       <div id="Side" ?open=${this.menuVisible}>
@@ -310,8 +358,8 @@ class DPanelApp extends LitElement {
         <div class="nav-footer">
           <sl-divider></sl-divider>
           <div class="pad-sides pad-bottom">
-            <p>Velit duis ullamco ad anim nostrud cillum pariatur minim excepteur irure.</p>
-            <sl-button outline>Get Started</sl-button>
+            <p>Propel the people's currency using your Dogebox.</p>
+            <sl-button outline>Read Docs</sl-button>
           </div>
         </div>
       </div>

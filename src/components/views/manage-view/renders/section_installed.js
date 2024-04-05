@@ -1,7 +1,6 @@
 import { html, css, nothing, repeat } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
 
 export function renderSectionInstalledHeader(ready) {
-
   return html`
     <h2>Installed Pups</h2>
     ${this.fetchLoading ? html`
@@ -24,7 +23,6 @@ export function renderSectionInstalledHeader(ready) {
 }
 
 export function renderSectionInstalledBody(ready, SKELS, hasItems) {
-
   return html`
     ${this.fetchLoading ? html`
       <div class="details-group">

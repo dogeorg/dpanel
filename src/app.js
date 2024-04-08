@@ -4,6 +4,13 @@ import { LitElement, html, css } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
 import { setBasePath } from '/vendor/@shoelace/cdn@2.14.0/utilities/base-path.js';
 import '/vendor/@shoelace/cdn@2.14.0/shoelace.js';
 
+// Import stylesheets
+import {
+  mainStyles,
+  navStyles,
+  utilStyles
+} from '/styles/app.index.styles.js';
+
 // App state (singleton)
 import { store } from '/state/store.js';
 import { StoreSubscriber } from '/state/subscribe.js';
@@ -38,7 +45,7 @@ class DPanelApp extends LitElement {
   constructor() {
     super();
     this.context = new StoreSubscriber(this, store);
-    this.menuVisible = true;
+    this.menuVisible = false;
     this.currentPath = '';
     this._debouncedHandleResize = debounce(this._handleResize.bind(this), 50);
   }
@@ -105,200 +112,6 @@ class DPanelApp extends LitElement {
     drawer.show();
   }
 
-  static styles = css`
-    :host {
-      display: block;
-      height: 100vh;
-      overflow: hidden;
-      box-sizing: border-box;
-    }
-    *, *::before, *::after {
-      box-sizing: border-box;
-    }
-    @font-face {
-      font-family: 'Comic Neue';
-      src: url('../../vendor/@gfont/Comic_Neue/ComicNeue-Regular.ttf') format('truetype');
-      font-weight: normal;
-      font-style: normal;
-    }
-
-    #Main {
-      background: #0000008f;
-      /*background: #121215;*/
-      margin-left: 60px;
-    }
-
-    #Main[pushed] {
-      margin-left: 60px;
-      @media (min-width: 768px) {
-        margin-left: 300px;
-      }
-    }
-
-    #GutterNav {
-      position: absolute;
-      z-index: 2;
-      width:60px;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 1.5em;
-      padding: 0.75em 0.2em;
-      background: #1c1b22;
-      overflow-y: auto;
-      border-right: 1px solid #1c1b22;
-    }
-
-    #GutterNav[open] {
-      background: #282731;
-      border-right: 1px solid var(--sl-panel-border-color);
-    }
-
-    #GutterNav #logo {
-      background: #f9e7b5;
-      border: 1px solid #f9e7b5;
-      transform: rotate(-3deg);
-      border-radius: 4px;
-      position: relative;
-      height:28px;
-      top: 4px;
-
-      img {
-        width: 44px;
-        position:absolute;
-        transform: rotate(0deg);
-        left: -8px;
-        top:-7px;
-      }
-    }
-
-    #GutterNav #logo:hover {
-      background: rgb(255, 208, 67);
-      border: 1px solid rgb(255, 208, 67);
-    }
-
-    #GutterNav #menu {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.1rem;
-      transform: rotate(-3deg);
-      border-radius: 4px;
-    }
-
-    #GutterNav #menu sl-icon {
-      transform: rotate(6deg);
-    }
-
-    #GutterNav .gnav-menu-item {
-      background: grey;
-      width: 30px;
-      height: 30px;
-      border: 1px solid grey;
-    }
-
-    #GutterNav .gnav-menu-item:hover {
-      background: #a2a2a2;
-      border: 1px solid #a2a2a2;
-      cursor: pointer;
-    }
-
-    #Side[open] {
-      background: #1a191f;
-      display: flex;
-      box-shadow: 10px 0 5px -5px rgba(0, 0, 0, 0.2);
-      @media (min-width: 768px) {
-        box-shadow: none;
-      }
-    }
-
-    #Side {
-      display: none;
-      position: absolute;
-      left: 60px;
-      z-index: 1;
-      width: 240px;
-      flex-direction: column;
-      justify-content: space-between;
-      box-sizing: border-box;
-      gap: 1em;
-      height: 100%;
-      background: #1a191f;
-      overflow-y: auto;
-    }
-
-    #Side .menu-item {
-      padding: 0.5em 1em;
-      margin: 0.2em 0em 0.2em 0.5em;
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      gap: 1em;
-      font-family: 'Comic Neue';
-      font-weight: 600;
-      font-size: 1.1rem;
-    }
-
-    #Side .menu-item:hover {
-      background: rgba(255,255,255,0.1);
-    }
-
-    #Side .menu-label {
-      padding: 0.5em 1.5em;
-      font-size: 0.85rem;
-      text-transform: uppercase;
-      color: #5e74eb;
-      font-weight: bold;
-      font-family: 'Comic Neue';
-    }
-
-    #Side .menu-item.active {
-      background: #4360ff;
-    }
-
-    #Side .menu-item.active a,
-    #Side .menu-item.active sl-icon {
-      text-decoration: none;
-      color: white;
-    }
-
-    #Side .menu-item a {
-      color: rgba(255,255,255,0.5);
-    }
-
-    #Side .menu-item sl-icon {
-      font-size: 1.3rem;
-      color: rgba(255,255,255,0.5);
-    }
-
-    .pad-sides {
-      padding: 0em var(--sl-spacing-x-large);
-    }
-
-    .pad-top {
-      padding-top: var(--sl-spacing-x-large);
-    }
-
-    .pad-bottom {
-      padding-bottom: var(--sl-spacing-x-large);
-    }
-
-    #Outlet {
-      overflow: hidden;
-    }
-    #Alerts {
-      position: fixed;
-      z-index: 500; /* mid zheight */
-      top: 0;
-      right: 0;
-      width: 500px;
-      box-sizing: border-box;
-      margin-top: 10px;
-      margin-right: 25px;
-    }
-  `
-
   handleMenuClick() {
     this.menuVisible = !this.menuVisible;
   }
@@ -320,67 +133,66 @@ class DPanelApp extends LitElement {
     const CURPATH = this.context.store.appContext.pathname || ''
 
     return html`
-      <div id="GutterNav" ?open=${this.menuVisible}>
-        <div id="logo" class="gnav-menu-item" @click=${() => window.location.reload(true)}>
-          <img src="/static/img/dogebox-logo-small.png" />
-        </div>
-        <div id="menu" class="gnav-menu-item" @click=${this.handleMenuClick}>
-          <sl-icon name="grid-fill"></sl-icon>
-        </div>
-      </div>
+      <div id="App">
+        <nav id="Nav">
+          <div id="GutterNav" ?open=${this.menuVisible}>
+            <div id="logo" class="gutter-menu-item" @click=${() => window.location.reload(true)}>
+              <img src="/static/img/dogebox-logo-small.png" />
+            </div>
+            <div id="menu" class="gutter-menu-item" @click=${this.handleMenuClick}>
+              <sl-icon name="grid-fill"></sl-icon>
+            </div>
+          </div>
 
-      <div id="Side" ?open=${this.menuVisible}>
-        <nav>
-          <div>
-            <div class="menu-label">dpanel v0.0.2</div>
-            <div class="menu-item ${CURPATH === '/' ? 'active' : ''}">
-              <sl-icon name="house-heart-fill"></sl-icon>
-              <a href="/">Such Home</a>
+          <div id="Side" ?open=${this.menuVisible}>
+            <div class"nav-body">
+              <div class="menu-label">dpanel v0.0.2</div>
+              <div class="menu-item ${CURPATH === '/' ? 'active' : ''}">
+                <sl-icon name="house-heart-fill"></sl-icon>
+                <a href="/">Such Home</a>
+              </div>
+
+              <div class="menu-item ${CURPATH.startsWith('/pups') ? 'active' : ''}">
+                <sl-icon name="box-seam"></sl-icon>
+                <a href="/pups">Much Pups</a>
+              </div>
+
+              <div class="menu-item ${CURPATH.startsWith('/stats') ? 'active' : ''}">
+                <sl-icon name="heart-pulse-fill"></sl-icon>
+                <a href="/stats">Very Stats</a>
+              </div>
+
+              <div class="menu-item ${CURPATH.startsWith('/config') ? 'active' : ''}">
+                <sl-icon name="sliders"></sl-icon>
+                <a href="/config">So Config</a>
+              </div>
             </div>
 
-            <div class="menu-item ${CURPATH.startsWith('/pups') ? 'active' : ''}">
-              <sl-icon name="box-seam"></sl-icon>
-              <a href="/pups">Much Pups</a>
-            </div>
-
-            <div class="menu-item ${CURPATH.startsWith('/stats') ? 'active' : ''}">
-              <sl-icon name="heart-pulse-fill"></sl-icon>
-              <a href="/stats">Very Stats</a>
-            </div>
-
-            <div class="menu-item ${CURPATH.startsWith('/config') ? 'active' : ''}">
-              <sl-icon name="sliders"></sl-icon>
-              <a href="/config">So Config</a>
+            <div class="nav-footer">
+              <sl-divider></sl-divider>
+              <div class="nav-footer-content">
+                <p>Propel the people's currency using your Dogebox.</p>
+                <sl-button outline>Read Docs</sl-button>
+              </div>
             </div>
           </div>
         </nav>
 
-        <div class="nav-footer">
-          <sl-divider></sl-divider>
-          <div class="pad-sides pad-bottom">
-            <p>Propel the people's currency using your Dogebox.</p>
-            <sl-button outline>Read Docs</sl-button>
+        <main id="Main">
+          <div id="Outlet">
+            <!-- Views injected here as users navigate -->
           </div>
-        </div>
+        </main>
       </div>
 
-      <main id="Main" ?pushed=${this.menuVisible}>
-        <div id="Alerts">
-          <sl-alert id="AlertExample" closable>
-            <sl-icon slot="icon" name="gear"></sl-icon>
-            <strong>Your settings have been updated</strong><br />
-            Services are being restarted.
-          </sl-alert>
-        </div>
-        <div id="Outlet">
-          <!-- Views injected here as users navigate -->
-        </div>
-      </main>
+      <aside>
+        <welcome-dialog></welcome-dialog>
+        <debug-panel></debug-panel>
+      </aside>
 
-      <welcome-dialog></welcome-dialog>
-
-      <!-- Debugger Widget -->
-      <debug-panel></debug-panel>
+      <style>${mainStyles}</style>
+      <style>${navStyles}</style>
+      <style>${utilStyles}</style>
     `;
   }
 }

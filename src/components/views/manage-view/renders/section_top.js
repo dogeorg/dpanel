@@ -19,7 +19,7 @@ const infoAlertStyles = css`
     margin-top: -1em;
     margin-bottom: -0.8em;
     width: 50px;
-    @media (min-width: 768px) {
+    @media (min-width: 1024px) {
       width: 100px;
     }
   }

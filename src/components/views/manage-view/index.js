@@ -170,12 +170,14 @@ class ManageView extends LitElement {
   static styles = css`
     :host {
       display: block;
-      height: 100vh;
+      height: 100%;
       width: 100%;
       overflow-y: auto;
+      overflow-x: hidden;
     }
 
     .top {
+      display: none;
       margin: 1.5em 2em 2em 2em; 
     }
 
@@ -183,9 +185,9 @@ class ManageView extends LitElement {
       background: #1a191f;
       border: 1px solid rgb(32, 31, 36);
       border-radius: 16px;
-      margin: 2em;
+      margin: 1em;
       padding: 1em;
-      @media (min-width: 768px) {
+      @media (min-width: 1024px) {
         padding: 1.4em;
         padding-top: 0em;
       }
@@ -199,11 +201,25 @@ class ManageView extends LitElement {
     header {
       display: flex;
       flex-direction: row;
-      align-items: center;
+      align-items: baseline;
+      justify-content: space-between;
       gap: 0.8rem;
     }
 
-    header .actions {
+    header .heading-wrap {
+      display: flex;
+      gap: 0.8rem;
+      align-items: baseline;
+    }
+
+    header .heading-wrap h2 {
+      margin-top: 0px;
+      @media (min-width: 1024px) {
+        margin-top: 1em;
+      }
+    }
+
+    header .header-actions {
       display: flex;
       flex-direction: row;
       gap: 0.85em;

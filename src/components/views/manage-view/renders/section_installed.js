@@ -2,14 +2,16 @@ import { html, css, nothing, repeat } from '/vendor/@lit/all@3.1.2/lit-all.min.j
 
 export function renderSectionInstalledHeader(ready) {
   return html`
-    <h2>Installed Pups</h2>
-    ${this.fetchLoading ? html`
-      <sl-spinner></sl-spinner>
-    ` : nothing }
+    <div class="heading-wrap">
+      <h2>Installed Pups</h2>
+      ${this.fetchLoading ? html`
+        <sl-spinner></sl-spinner>
+      ` : nothing }
 
-    ${ready ? html`
-      <sl-tag pill>${this.installedList.data.length}</sl-tag>
-    ` : nothing }
+      ${ready ? html`
+        <sl-tag pill>${this.installedList.data.length}</sl-tag>
+      ` : nothing }
+    </div>
 
     <div class="actions">
       <sl-dropdown>

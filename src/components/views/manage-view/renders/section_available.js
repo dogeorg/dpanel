@@ -2,26 +2,30 @@ import { html, css, nothing, repeat } from '/vendor/@lit/all@3.1.2/lit-all.min.j
 
 export function renderSectionAvailableHeader(ready) {
   return html`
-    <h2>Available Pups</h2>
-    ${this.fetchLoading ? html`
-      <sl-spinner></sl-spinner>
-    ` : nothing }
+    <div class="heading-wrap">
+      <h2>Available Pups</h2>
+      ${this.fetchLoading ? html`
+        <sl-spinner></sl-spinner>
+      ` : nothing }
 
-    ${ready ? html`
-      <sl-tag pill>${this.availableList.data.length}</sl-tag>
-    ` : nothing }
+      ${ready ? html`
+        <sl-tag pill>${this.availableList.data.length}</sl-tag>
+      ` : nothing }
+    </div>
 
     <div class="actions">
-      <sl-select placeholder="Select repository" value="local" hoist style="max-width:200px;">
-        <sl-icon name="hdd-network" slot="prefix"></sl-icon>
-        <sl-option value="local">Local</sl-option>
-        <sl-option value="remote-a" disabled>Remote A</sl-option>
-        <sl-option value="remote-b" disabled>Remote B</sl-option>
-        <sl-option value="remote-b" disabled>Remote C</sl-option>
-      </sl-select>
       <sl-dropdown>
         <sl-button slot="trigger" ?disabled=${this.busy}><sl-icon name="three-dots-vertical"></sl-icon></sl-button>
         <sl-menu @sl-select=${this.handleActionsMenuSelect}>
+          <sl-menu-item>
+            Repository
+            <sl-menu slot="submenu">
+              <sl-menu-item value="repository-local">Local</sl-menu-item>
+              <sl-menu-item value="repository-remote-a">Remote A</sl-menu-item>
+              <sl-menu-item value="repository-remote-b">Remote B</sl-menu-item>
+              <sl-menu-item value="repository-remote-c">Remote C</sl-menu-item>
+            </sl-menu>
+          </sl-menu-item>
           <sl-menu-item value="refresh">Refresh</sl-menu-item>
         </sl-menu>
       </sl-dropdown>

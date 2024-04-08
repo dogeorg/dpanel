@@ -24,7 +24,7 @@ export const styles = css`
     gap: 0.5em;
     width: 100%;
 
-    @media (min-width: 768px) {
+    @media (min-width: 1024px) {
       flex-direction: row;
       justify-content: space-between;
       align-items: center;
@@ -44,7 +44,7 @@ export const styles = css`
   .summary-section.summary-section-charts {
     flex-grow: 1;
     flex-shrink: 1;
-    @media (min-width: 768px) {
+    @media (min-width: 1024px) {
 
     }
   }
@@ -57,7 +57,7 @@ export const styles = css`
 
     border-top: 1px solid var(--sl-color-neutral-200);
     padding-top: var(--sl-spacing-medium);
-    @media (min-width: 768px) {
+    @media (min-width: 1024px) {
       flex-grow: 0;
       border-top: none;
       padding-top: 0;

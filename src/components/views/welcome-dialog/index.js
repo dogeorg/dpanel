@@ -46,7 +46,7 @@ class WelcomeDialog extends LitElement {
 
   render() {
     return html`
-      <sl-dialog open no-header style="--body-spacing: 0;">
+      <sl-dialog no-header style="--body-spacing: 0;">
       <div class="welcome-body">
         <img src="/static/img/dogebox-logo.jpg" />
       </div>

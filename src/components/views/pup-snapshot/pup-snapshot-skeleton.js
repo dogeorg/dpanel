@@ -32,7 +32,7 @@ class PupSnapshotSkeleton extends LitElement {
 
     sl-skeleton.stats {
       display: none;
-      @media (min-width: 768px) {
+      @media (min-width: 1024px) {
         display: flex;
         width: auto;
         height: 30px;

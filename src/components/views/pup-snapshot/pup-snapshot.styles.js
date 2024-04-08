@@ -2,9 +2,9 @@ import { css } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
 
 export const styles = css`
   :host {
+    display: block;
     opacity: 1;
     transition: opacity 500ms;
-    display: block;
   }
 
   :host([disabled]:not([focus="true"])) {
@@ -21,11 +21,12 @@ export const styles = css`
   .summary {
     display: flex;
     flex-direction: column;
-    gap: 0.5em;
+    column-gap: 0.5em;
     width: 100%;
 
     @media (min-width: 1024px) {
       flex-direction: row;
+      row-gap: 0.5em;
       justify-content: space-between;
       align-items: center;
     }
@@ -34,7 +35,7 @@ export const styles = css`
   .summary .summary-section {
     display: flex;
     flex-direction: row;
-    gap: 0.5em;
+    row-gap: 0.5em;
   }
 
   .summary-section.summary-section-title {
@@ -44,16 +45,13 @@ export const styles = css`
   .summary-section.summary-section-charts {
     flex-grow: 1;
     flex-shrink: 1;
-    @media (min-width: 1024px) {
-
-    }
   }
 
   .summary .summary-section.summary-section-actions {
     display: flex;
     flex-grow: 1;
     justify-content: end;
-    gap: 0.25em;
+    row-gap: 0.25em;
 
     border-top: 1px solid var(--sl-color-neutral-200);
     padding-top: var(--sl-spacing-medium);

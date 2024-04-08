@@ -21,12 +21,12 @@ export const styles = css`
   .summary {
     display: flex;
     flex-direction: column;
-    column-gap: 0.5em;
+    row-gap: 0.5em;
     width: 100%;
 
     @media (min-width: 1024px) {
       flex-direction: row;
-      row-gap: 0.5em;
+      column-gap: 0.5em;
       justify-content: space-between;
       align-items: center;
     }
@@ -35,7 +35,7 @@ export const styles = css`
   .summary .summary-section {
     display: flex;
     flex-direction: row;
-    row-gap: 0.5em;
+    column-gap: 0.5em;
   }
 
   .summary-section.summary-section-title {
@@ -51,7 +51,7 @@ export const styles = css`
     display: flex;
     flex-grow: 1;
     justify-content: end;
-    row-gap: 0.25em;
+    column-gap: 0.25em;
 
     border-top: 1px solid var(--sl-color-neutral-200);
     padding-top: var(--sl-spacing-medium);

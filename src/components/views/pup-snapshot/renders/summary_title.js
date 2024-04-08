@@ -18,7 +18,7 @@ const summaryTitleStyles = css`
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 0.8em;
+    column-gap: 0.8em;
     text-transform: capitlize;
   }
   .tags[hidden] {

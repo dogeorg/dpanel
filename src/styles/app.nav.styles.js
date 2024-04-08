@@ -132,7 +132,7 @@ export const navStyles = css`
     
     flex-direction: column;
     justify-content: space-between;
-    column-gap: 1em;
+    row-gap: 1em;
     
     width: 100%;
     height: calc(100vh - 50px);
@@ -156,7 +156,7 @@ export const navStyles = css`
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 1em;
+    column-gap: 1em;
     
     margin: 0.2em 0em 0.2em 0.5em;
     padding: 0.5em 1em;

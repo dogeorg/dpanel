@@ -2,9 +2,9 @@ import { css } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
 
 export const styles = css`
   :host {
+    display: block;
     opacity: 1;
     transition: opacity 500ms;
-    display: block;
   }
 
   :host([disabled]:not([focus="true"])) {
@@ -21,44 +21,45 @@ export const styles = css`
   .summary {
     display: flex;
     flex-direction: column;
-    gap: 1em;
+    column-gap: 0.5em;
     width: 100%;
 
-    @media (min-width: 768px) {
+    @media (min-width: 1024px) {
       flex-direction: row;
+      row-gap: 0.5em;
       justify-content: space-between;
       align-items: center;
     }
   }
 
-  .summary > div {
+  .summary .summary-section {
     display: flex;
     flex-direction: row;
-    gap: 0.5em;
+    row-gap: 0.5em;
   }
 
-  .summary div.center {
+  .summary-section.summary-section-title {
+    max-width: 120px;
+  }
+
+  .summary-section.summary-section-charts {
+    flex-grow: 1;
+    flex-shrink: 1;
+  }
+
+  .summary .summary-section.summary-section-actions {
     display: flex;
-    justify-content: space-between;
-    @media (min-width: 768px) {
-      justify-content: center;
-      gap: 10px;
-    }
-  }
+    flex-grow: 1;
+    justify-content: end;
+    row-gap: 0.25em;
 
-  .summary div.right {
     border-top: 1px solid var(--sl-color-neutral-200);
     padding-top: var(--sl-spacing-medium);
-    @media (min-width: 768px) {
+    @media (min-width: 1024px) {
+      flex-grow: 0;
       border-top: none;
       padding-top: 0;
     }
-  }
-
-  .summary > div:last-of-type {
-    display: flex;
-    justify-content: end;
-    gap: 0.25em;
   }
 
   sl-tab-group::part(tabs) {

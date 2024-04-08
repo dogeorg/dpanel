@@ -7,11 +7,12 @@ class Store {
     // If there's no persisted state, initialize with defaults.
     this.appContext = this.appContext || {
       // Define application state here
-      orienation: 'landscape'
+      orienation: 'landscape',
+      pathname: '/'
     };
     this.networkContext = this.networkContext || {
       // Define network state here
-      useMocks: false,
+      useMocks: true,
       forceFailures: false,
       forceDelayInSeconds: 3,
       reqLogs: true,

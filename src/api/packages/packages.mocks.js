@@ -91,7 +91,7 @@ export function generatePackageList(input) {
     return {
       local: {
         installed: produce(['Core']),
-        available: produce(['Identity', 'GigaWallet', 'ShibeShop'])
+        available: produce(['Identity' /*, 'GigaWallet', 'ShibeShop'*/])
       }
     }
   }

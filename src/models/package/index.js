@@ -1,5 +1,6 @@
 export class PkgController {
   host;
+  pups = {};
   installed = [];
   available = [];
 
@@ -8,9 +9,10 @@ export class PkgController {
     host.addController(this);
   }
 
-  setData(data) {
-    this.installed = data.local.installed;
-    this.available = data.local.available;
+  setData(bootstrapResponse) {
+    this.pups = toAssembledPup(bootstrapResponse);
+    this.installed = toArray(toAssembledPup(bootstrapResponse))
+    this.available = bootstrapResponse.manifests.local.available;
     this.host.requestUpdate();
   }
 
@@ -34,4 +36,22 @@ export class PkgController {
       this.host.requestUpdate();
     }
   }
+}
+function toAssembledPup(bootstrapResponse) {
+  const sources = Object.keys(bootstrapResponse.manifests)
+  const out = {}
+  sources.forEach((source) => {
+    // sources such as "local", "remote" etc..
+    bootstrapResponse.manifests[source].installed.forEach((entry) => {
+      out[entry] = {
+        manifest: entry,
+        state: bootstrapResponse.states[entry.package]
+      }
+    })
+  })
+  return out;
+}
+
+function toArray(object) {
+  return Object.values(object);
 }

@@ -1,7 +1,7 @@
 import { LitElement, html, css, nothing, repeat } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
 import '/components/views/pup-snapshot/pup-snapshot.js'
 import '/components/views/pup-snapshot/pup-snapshot-skeleton.js'
-import { getPackageList } from '/api/packages/packages.js';
+import { getBootstrap } from '/api/bootstrap/bootstrap.js';
 import { PkgController } from '/models/package/index.js'
 import { PaginationController } from '/components/common/paginator/paginator-controller.js';
 import { bindToClass } from '/utils/class-bind.js'
@@ -35,7 +35,7 @@ class ManageView extends LitElement {
     this.addEventListener('busy-start', this.handleBusyStart.bind(this));
     this.addEventListener('busy-stop', this.handleBusyStop.bind(this));
     this.addEventListener('pup-installed', this.handlePupInstalled.bind(this));
-    this.fetchPackageList();
+    this.fetchBootstrap();
   }
 
   disconnectedCallback() {
@@ -76,32 +76,13 @@ class ManageView extends LitElement {
     this.pkgController.installPkg(event.detail.pupId)
   }
 
-  async fetchPackageListOrig() {
+  async fetchBootstrap() {
     this.reset();
     // Emit busy start event which adds this action to a busy-queue.
     this.dispatchEvent(new CustomEvent('busy-start', {}));
 
     try {
-      const res = await getPackageList()
-      this.installedList.setData(res.local.installed)
-      this.availableList.setData(res.local.available)
-    } catch (err) {
-      console.log(err);
-      this.fetchError = true;
-    } finally {
-      // Emit a busy stop event which removes this action from the busy-queue.
-      this.dispatchEvent(new CustomEvent('busy-stop', {}));
-      this.fetchLoading = false
-    }
-  }
-
-  async fetchPackageList() {
-    this.reset();
-    // Emit busy start event which adds this action to a busy-queue.
-    this.dispatchEvent(new CustomEvent('busy-start', {}));
-
-    try {
-      const res = await getPackageList()
+      const res = await getBootstrap()
       this.pkgController.setData(res);
       this.installedList.setData(this.pkgController.installed);
       this.availableList.setData(this.pkgController.available);
@@ -119,7 +100,7 @@ class ManageView extends LitElement {
     const selectedItemValue = event.detail.item.value;
     switch (selectedItemValue) {
       case 'refresh':
-        this.fetchPackageList();
+        this.fetchBootstrap();
         break;
     }
   }

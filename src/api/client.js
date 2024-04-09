@@ -41,7 +41,7 @@ async function returnMockedResponse(path, config, networkContext) {
   const { forceFailures, reqLogs } = networkContext;
 
   reqLogs && console.group('Mock Request', path)
-  reqLogs && console.log('Req:', config.method, (config.body || '--no-body'));
+  reqLogs && console.log(`Req (${config.method}):`, config.body || '--no-body');
 
   const response = (typeof config.mock === 'function')
     ? mock(path, { forceFailures })

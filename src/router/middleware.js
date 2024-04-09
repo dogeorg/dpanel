@@ -1,4 +1,4 @@
-import { getManifest } from "/api/manifest/index.js";
+// import { getManifest } from "/api/manifest/index.js";
 import { store } from '/state/store.js';
 
 export const wrapActions = (...actions) => async (context, commands) => {
@@ -24,7 +24,8 @@ export function logPathMiddleware(context, commands) {
 export async function loadPupContext(context, commands) {
   try {
     const pupId = context.pathname.replace('/pup/', '')
-    const manifest = await getManifest(pupId);
+    // TODO: broken.
+    const manifest = false /*await getManifest(pupId);*/
     
     if (!manifest || !manifest.source) {
       throw new Error('manifest empty')

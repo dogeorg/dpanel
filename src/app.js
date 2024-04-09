@@ -15,9 +15,6 @@ import {
 import { store } from '/state/store.js';
 import { StoreSubscriber } from '/state/subscribe.js';
 
-// Data fetching
-import { getManifests } from '/api/manifest/index.js';
-
 // Views
 import '/components/views/index.js';
 import '/components/views/welcome-dialog/index.js';
@@ -97,15 +94,15 @@ class DPanelApp extends LitElement {
     store.updateState({ appContext: { orientation }});
   }
 
-  async fetchManifestData() {
-    try {
-      const manifestData = await getManifests();
-      this.manifest = manifestData;
-      this.requestUpdate();
-    } catch (error) {
-      console.error('Error fetching manifest:', error);
-    }
-  }
+  // async fetchManifestData() {
+  //   try {
+  //     const manifestData = await getManifests();
+  //     this.manifest = manifestData;
+  //     this.requestUpdate();
+  //   } catch (error) {
+  //     console.error('Error fetching manifest:', error);
+  //   }
+  // }
 
   openDrawer() {
     const drawer = this.shadowRoot.querySelector('sl-drawer');

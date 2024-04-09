@@ -13,19 +13,23 @@ class PupSnapshot extends LitElement {
 
   static get properties() {
     return {
+      // From manifest
       pupId: { type: String },
       pupName: { type: String },
       version: { type: String },
       icon: { type: String },
-      stats: { type: Object },
-      status: { type: String },
-      running: { type: Boolean },
       disabled: { type: Boolean },
       config: { type: Object },
       focus: { type: String, reflect: true },
       activeTab: { type: String },
       installed: { type: Boolean },
-      docs: { type: Object }
+      docs: { type: Object },
+
+      // From state
+      status: { type: String },
+      running: { type: Boolean },
+      stats: { type: Object },
+      options: { type: Object },
     }
   }
 
@@ -59,10 +63,22 @@ class PupSnapshot extends LitElement {
   }
 
   handleTabChange(event) {
-    const tabGroup = this.shadowRoot.querySelector('#PupTabs');
+    const tabGroup = this.shadowRoot.querySelector('sl-tab-group#PupTabs');
     if (event.originalTarget === tabGroup) {
       this.activeTab = event.detail.name
     }
+  }
+
+  jumpToTab(tabName) {
+    // Expand details (if not expanded already)
+    const detailsPanel = this.shadowRoot.querySelector('sl-details')
+    detailsPanel.show();
+
+    // Reveal specific tab
+    if (!tabName) return;
+    const tabGroup = this.shadowRoot.querySelector('sl-tab-group#PupTabs');
+    tabGroup.show(tabName);
+
   }
 
   render() {

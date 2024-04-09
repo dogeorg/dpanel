@@ -5,7 +5,13 @@ export function renderSectionConfig() {
     <sl-tab slot="nav" panel="config">Config</sl-tab>
     <sl-tab-panel name="config">
       ${this.activeTab === 'config'
-        ? html`<dynamic-form pupId=${this.pupId} .data=${this.config} orientation="landscape"></dynamic-form>`
+        ? html`
+        <dynamic-form
+          pupId=${this.pupId}
+          .fields=${this.config}
+          .values=${this.options}
+          orientation="landscape">
+        </dynamic-form>`
         : nothing
       }
     </sl-tab-panel>

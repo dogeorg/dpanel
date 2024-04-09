@@ -57,8 +57,6 @@ export function renderSectionAvailableBody(ready, SKELS, hasItems) {
             pupId=${pkg.package}
             pupName=${pkg.package}
             version=${pkg.version}
-            status="${pkg.command.status}"
-            .config=${pkg.command.config}
             icon="box"
             .docs=${pkg.docs}
             ?disabled=${this.busy}>

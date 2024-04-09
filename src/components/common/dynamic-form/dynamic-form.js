@@ -10,7 +10,8 @@ class DynamicForm extends LitElement {
   static get properties() {
     return {
       pupId: { type: String },
-      data: { type: Object },
+      fields: { type: Object },
+      values: { type: Object },
       activeFormId: { type: String },
       isSubmitting: { type: Boolean },
       orientation: { type: String }
@@ -37,6 +38,7 @@ class DynamicForm extends LitElement {
     super();
     this.formValid = true;
     this.activeFormId = null;
+    this.values = {};
   }
 
   createFormControls(options = {}) {
@@ -107,7 +109,7 @@ class DynamicForm extends LitElement {
       if (field.hidden) return '';
       return html`
         <div class="form-control">
-          ${i[field.type](field)}
+          ${i[field.type](field, this.values[field.name])}
         </div>
       `
     } catch (fieldRenderError) {
@@ -131,8 +133,8 @@ class DynamicForm extends LitElement {
   }
 
   render() {
-    if (!this.data || !this.data.sections) return;
-    return this.createMultipleForms(this.data)
+    if (!this.fields || !this.fields.sections) return;
+    return this.createMultipleForms(this.fields)
   }
 
   handleTabChange(event, tabName) {
@@ -143,10 +145,10 @@ class DynamicForm extends LitElement {
   async updated(changedProperties) {
     // Check if `data` OR 'activeFormId' is the property that changed
 
-    const dataInitialized = changedProperties.has('data') 
+    const dataInitialized = changedProperties.has('fields') 
       && (!changedProperties.has('activeFormId') || !changedProperties.activeFormId)
 
-    if (changedProperties.has('data') || changedProperties.has('activeFormId')) {
+    if (changedProperties.has('fields') || changedProperties.has('activeFormId')) {
       // The `dataSet` has been initialized or updated OR, the activeFormId has changed, both
       // result in some number of shoelace components being added to the DOM. 
       
@@ -180,11 +182,9 @@ class DynamicForm extends LitElement {
       // Collect data
       const form = this.shadowRoot.querySelector(`form#${this.activeFormId}`);
       const data = serialize(form);
-      console.log('Attempting to submit:', data);
 
       // Submit data
       const res = await postConfig(this.pupId, data);
-      console.log('Response.. ', res);
     } catch (error) {
 
       // Display errors

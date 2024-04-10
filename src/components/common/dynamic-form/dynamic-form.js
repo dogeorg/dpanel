@@ -19,7 +19,7 @@ class DynamicForm extends LitElement {
 
       // State
       isSubmitting: { type: Boolean },
-      isDirty: { type: Boolean },
+      isDirty: { type: Boolean, reflect: true },
 
       // Presentation
       orientation: { type: String }

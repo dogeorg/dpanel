@@ -63,10 +63,10 @@ class PupSnapshot extends LitElement {
   }
 
   handleTabChange(event) {
+    // Check if tab change event originated from #PupTabs
     const tabGroup = this.shadowRoot.querySelector('sl-tab-group#PupTabs');
-    if (event.originalTarget === tabGroup) {
-      this.activeTab = event.detail.name
-    }
+    if (event.originalTarget !== tabGroup) return
+    this.activeTab = event.detail.name
   }
 
   jumpToTab(tabName) {

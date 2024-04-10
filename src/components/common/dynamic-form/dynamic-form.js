@@ -1,4 +1,4 @@
-import { LitElement, html, css, ifDefined } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
+import { LitElement, html, css, ifDefined, nothing } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
 import { serialize } from '/vendor/@shoelace/cdn@2.14.0/utilities/form.js';
 import * as i from '/components/common/dynamic-form/renders/index.js'
 import { createAlert } from '/components/common/alert.js';
@@ -9,11 +9,19 @@ class DynamicForm extends LitElement {
 
   static get properties() {
     return {
+      // Context
       pupId: { type: String },
+      activeFormId: { type: String },
+
+      // Fields and values
       fields: { type: Object },
       values: { type: Object },
-      activeFormId: { type: String },
+
+      // State
       isSubmitting: { type: Boolean },
+      isDirty: { type: Boolean },
+
+      // Presentation
       orientation: { type: String }
     };
   }
@@ -32,6 +40,14 @@ class DynamicForm extends LitElement {
       display: flex;
       justify-content: flex-end;
     }
+
+    .footer-controls sl-button.discard-button::part(base) {
+      color: var(--sl-color-neutral-700);
+      text-decoration: underline;
+    }
+    .footer-controls sl-button.discard-button::part(base):hover {
+      color: var(--sl-color-neutral-900);
+    }
   `;
 
   constructor() {
@@ -39,17 +55,46 @@ class DynamicForm extends LitElement {
     this.formValid = true;
     this.activeFormId = null;
     this.values = {};
+    this.initialValues = {};
+    this.isDirty = false;
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    this.initialValues = { ... this.values };
+  }
+
+  getFormValues() {
+    const forms = this.shadowRoot.querySelectorAll('form');
+    let out = {}
+    forms.forEach((form) => {
+      out = {
+        ...out,
+        ...serialize(form)
+      }
+    })
+    return out
   }
 
   createFormControls(options = {}) {
     return html`
       <div class="footer-controls">
+        ${this.isDirty ? html`
+          <sl-button
+            class="discard-button"
+            variant="text"
+            @click=${this.handleClearChanges}>
+              Discard changes
+          </sl-button>
+        ` : nothing
+        }
         <sl-button
           id="${options.formId}__save_button"
           variant=primary
           type="submit"
           form=${options.formId}
-          ?loading=${this.isSubmitting}>
+          ?loading=${this.isSubmitting}
+          ?disabled=${!this.isDirty}>
         ${options.submitLabel || 'Save' }
       </sl-button>
       </div>
@@ -106,7 +151,7 @@ class DynamicForm extends LitElement {
 
   generateField(field) {
     try {
-      if (field.hidden) return '';
+      if (field.hidden) return nothing;
       return html`
         <div class="form-control">
           ${i[field.type](field, this.values[field.name])}
@@ -175,6 +220,34 @@ class DynamicForm extends LitElement {
     }
   }
 
+  handleFormChange = () => {
+    const currentValues = this.getFormValues();
+    this.isDirty = !this.areValuesEqual(this.initialValues, currentValues);
+    console.log(this.isDirty);
+  }
+
+  handleClearChanges() {
+    // Reset the values to their initial state
+    this.values = { ...this.initialValues };
+
+    // Reset the form to its initial state
+    const forms = this.shadowRoot.querySelectorAll('form');
+    forms.forEach(form => form.reset())
+
+    // Update the isDirty flag
+    this.isDirty = false;
+
+    // Request an update to re-render buttons and inputs.
+    this.requestUpdate();
+  }
+
+  areValuesEqual(objectA, objectB) {
+    if (!objectA || !objectB) return false;
+    console.log(Object.keys(objectA).length, Object.keys(objectA), { objectA });
+    console.log(Object.keys(objectB).length, Object.keys(objectB), { objectB });
+    return JSON.stringify(objectA) === JSON.stringify(objectB);
+  }
+
   _formSubmitHandler = async (event) => {
     event.preventDefault();
     this.isSubmitting = true;
@@ -208,6 +281,7 @@ class DynamicForm extends LitElement {
 
   _attachFormSubmitListener(form) {
     form.addEventListener('submit', this._formSubmitHandler);
+    form.addEventListener('sl-change', this.handleFormChange);
   }
 
   _removeFormSubmitListeners() {
@@ -215,6 +289,7 @@ class DynamicForm extends LitElement {
     const forms = this.shadowRoot.querySelectorAll('form');
     forms.forEach((form) => {
       form.removeEventListener('submit', this._formSubmitHandler);
+      form.removeEventListener('sl-change', this.handleFormChange);
     });
   }
 

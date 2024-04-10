@@ -14,7 +14,7 @@ export const number = function(field, value) {
       max=${ifd(field.max)}
       step=${ifd(field.step)}
       size=${ifd(field.size)}
-      value=${ifd(value)}
+      value=${ifd(valueParser(value))}
       ?clearable=${field.clearable}
       ?noSpinButtons=${field.noSpinButtons}
       ?autofocus=${field.autofocus}
@@ -23,4 +23,8 @@ export const number = function(field, value) {
       >
     </sl-input>
   `;
+}
+
+function valueParser(value) {
+  return value.toString()
 }

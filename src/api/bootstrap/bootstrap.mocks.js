@@ -39,7 +39,7 @@ function generateValue(fieldName) {
   }
 
   if (fieldName.includes('number_')) {
-    return Math.round(69 * Math.random());
+    return Math.round(69 * Math.random()).toString();
   }
 
   if (fieldName.includes('checkbox_')) {
@@ -55,11 +55,11 @@ function generateValue(fieldName) {
   }
 
   if (fieldName.includes('rating_')) {
-    return 4;
+    return "4";
   }
 
   if (fieldName.includes('range_')) {
-    return Math.round(69 * Math.random());
+    return Math.round(69 * Math.random()).toString();
   }
 
   if (fieldName.includes('radio_')) {

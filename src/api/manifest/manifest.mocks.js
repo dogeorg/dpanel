@@ -12,7 +12,7 @@ export function generateManifests(input) {
     radio: 'Radio',
     range: 'Range',
     date: 'Date',
-    rating: 'Rating',
+    // rating: 'Rating',
     color: 'Color',
   };
 

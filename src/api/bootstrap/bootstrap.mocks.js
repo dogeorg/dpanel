@@ -1,4 +1,4 @@
-import { generateManifests } from "/api/packages/packages.mocks.js";
+import { generateManifests } from "/api/manifest/manifest.mocks.js";
 
 export function generateBootstrap(input) {
   const manifests = generateManifests();

@@ -41,7 +41,7 @@ export function renderSectionInstalledBody(ready, SKELS, hasItems) {
         Sorry, the package list could not be obtained.
       </sl-alert>
       <br>
-      <sl-button outline @click=${this.fetchPackageList}>Retry</sl-button>
+      <sl-button outline @click=${this.fetchBootstrap}>Retry</sl-button>
     ` : nothing }
 
     ${ready && !hasItems('installed') ? html`

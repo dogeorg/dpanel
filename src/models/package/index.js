@@ -1,6 +1,6 @@
 export class PkgController {
   host;
-  pups = {};
+  pupIndex = {};
   installed = [];
   available = [];
 
@@ -10,15 +10,16 @@ export class PkgController {
   }
 
   setData(bootstrapResponse) {
-    this.pups = toAssembledPup(bootstrapResponse);
-    this.installed = toArray(toAssembledPup(bootstrapResponse))
-    this.available = bootstrapResponse.manifests.local.available;
+    const { installed, available } = toAssembledPup(bootstrapResponse)
+    this.installed = toArray(installed)
+    this.available = toArray(available)
+    this.pupIndex = { ...available, ...installed }
     this.host.requestUpdate();
   }
 
   installPkg(pupId) {
     // Find the pup in the available list
-    const index = this.available.findIndex(pup => pup.package === pupId);
+    const index = this.available.findIndex(pup => pup.manifest.package === pupId);
     if (index !== -1) {
       // Move the pup from the available list to the installed list
       const [pup] = this.available.splice(index, 1);
@@ -39,13 +40,28 @@ export class PkgController {
 }
 function toAssembledPup(bootstrapResponse) {
   const sources = Object.keys(bootstrapResponse.manifests)
-  const out = {}
+  const out = {
+    installed: {},
+    available: {},
+  }
   sources.forEach((source) => {
     // sources such as "local", "remote" etc..
     bootstrapResponse.manifests[source].installed.forEach((entry) => {
-      out[entry] = {
+      out.installed[entry.package] = {
         manifest: entry,
-        state: bootstrapResponse.states[entry.package]
+        state: bootstrapResponse.states[entry.package] || {
+          status: undefined,
+          stats: undefined,
+          options: {},
+        }
+      }
+    })
+    bootstrapResponse.manifests[source].available.forEach((entry) => {
+      out.available[entry.package] = {
+        manifest: entry,
+        state: {
+          ...defaultPupState()
+        },
       }
     })
   })
@@ -54,4 +70,12 @@ function toAssembledPup(bootstrapResponse) {
 
 function toArray(object) {
   return Object.values(object);
+}
+
+function defaultPupState() {
+  return {
+    status: undefined,
+    stats: undefined,
+    options: {}
+  }
 }

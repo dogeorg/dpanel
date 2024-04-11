@@ -2,12 +2,12 @@ import { html, ifDefined } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
 
 const ifd = ifDefined
 
-export const select = function(field, value) {
+export const select = function(field, values) {
   return html`
     <sl-select
       name=${field.name}
       label=${ifd(field.label)}
-      value=${ifd(value)}
+      value=${ifd(values[field.name])}
       placeholder=${ifd(field.placeholder)}
       ?multiple=${field.multiple}
       size=${ifd(field.size)}

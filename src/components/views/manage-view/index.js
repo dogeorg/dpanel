@@ -2,7 +2,7 @@ import { LitElement, html, css, nothing, repeat } from '/vendor/@lit/all@3.1.2/l
 import '/components/views/pup-snapshot/pup-snapshot.js'
 import '/components/views/pup-snapshot/pup-snapshot-skeleton.js'
 import { getBootstrap } from '/api/bootstrap/bootstrap.js';
-import { PkgController } from '/models/package/index.js'
+import { pkgController } from '/models/package/index.js'
 import { PaginationController } from '/components/common/paginator/paginator-controller.js';
 import { bindToClass } from '/utils/class-bind.js'
 import * as renderMethods from './renders/index.js';
@@ -24,7 +24,7 @@ class ManageView extends LitElement {
     this.fetchLoading = true;
     this.fetchError = false;
     this.itemsPerPage = 20;
-    this.pkgController = new PkgController(this);
+    this.pkgController = pkgController;
     this.installedList = new PaginationController(this, undefined, this.itemsPerPage);
     this.availableList = new PaginationController(this, undefined, this.itemsPerPage);
     bindToClass(renderMethods, this);
@@ -32,6 +32,7 @@ class ManageView extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
+    this.pkgController.addObserver(this);
     this.addEventListener('busy-start', this.handleBusyStart.bind(this));
     this.addEventListener('busy-stop', this.handleBusyStop.bind(this));
     this.addEventListener('pup-installed', this.handlePupInstalled.bind(this));
@@ -42,6 +43,7 @@ class ManageView extends LitElement {
     this.removeEventListener('busy-start', this.handleBusyStart.bind(this));
     this.removeEventListener('busy-stop', this.handleBusyStop.bind(this));
     this.removeEventListener('pup-installed', this.handlePupInstalled.bind(this));
+    this.pkgController.removeObserver(this);
     super.disconnectedCallback();
   }
 
@@ -74,6 +76,7 @@ class ManageView extends LitElement {
   handlePupInstalled(event) {
     event.stopPropagation();
     this.pkgController.installPkg(event.detail.pupId)
+    this.requestUpdate();
   }
 
   async fetchBootstrap() {

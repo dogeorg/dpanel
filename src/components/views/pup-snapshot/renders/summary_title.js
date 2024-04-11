@@ -9,8 +9,11 @@ export function renderSummaryTitle() {
     <span class="tags" ?hidden=${!this.version}>
       <sl-tag size="small" pill>${this.version}</sl-tag>
     </span>
+    <span class="fade-tags ${this.dirty ? 'visible' : ''}">
+      <sl-tag size="small" pill variant="warning">Unsaved Changed</sl-tag>
+    </span>
     <style>${summaryTitleStyles}</style>
-  `
+  `;
 }
 
 const summaryTitleStyles = css`
@@ -19,9 +22,16 @@ const summaryTitleStyles = css`
     flex-direction: row;
     align-items: center;
     column-gap: 0.8em;
-    text-transform: capitlize;
+    text-transform: capitalize;
+    opacity: 1;
   }
-  .tags[hidden] {
-    display: none;
+  .fade-tags {
+    transition: opacity 300ms ease-in-out, visibility 300ms ease-in-out;
+    opacity: 0;
+    visibility: hidden;
+  }
+  .fade-tags.visible {
+    opacity: 1;
+    visibility: visible;
   }
 `;

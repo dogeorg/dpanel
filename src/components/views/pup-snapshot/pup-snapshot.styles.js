@@ -39,7 +39,8 @@ export const styles = css`
   }
 
   .summary-section.summary-section-title {
-    max-width: 120px;
+    max-width: 300px;
+    flex-shrink: 1;
   }
 
   .summary-section.summary-section-charts {

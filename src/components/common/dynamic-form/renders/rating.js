@@ -4,11 +4,11 @@ const ifd = ifDefined
 
 // TODO. Bug. Value is not being included in serialized form data.
 
-export const rating = function(field, value) {
+export const rating = function(field, values) {
   return html`
     <sl-rating
       name=${field.name}
-      value=${ifd(value)}
+      value=${ifd(values[field.name])}
       label=${ifd(field.label)}
       max=${ifd(field.max)}
       precision=${ifd(field.precision)}

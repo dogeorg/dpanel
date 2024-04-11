@@ -2,7 +2,7 @@ import { html, ifDefined } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
 
 const ifd = ifDefined
 
-export const date = function(field, value) {
+export const date = function(field, values) {
   return html`
     <sl-input
       type="date"
@@ -13,7 +13,7 @@ export const date = function(field, value) {
       min=${ifd(field.minDate)}
       max=${ifd(field.maxDate)}
       size=${ifd(field.size)}
-      value=${ifd(value)}
+      value=${ifd(values[field.name])}
       ?clearable=${field.clearable}
       ?required=${field.required}
       ?disabled=${field.disabled}

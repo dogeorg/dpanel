@@ -10,7 +10,7 @@ export function renderSummaryTitle() {
       <sl-tag size="small" pill>${this.version}</sl-tag>
     </span>
     <span class="fade-tags ${this.dirty ? 'visible' : ''}">
-      <sl-tag size="small" pill variant="warning">Unsaved Changed</sl-tag>
+      <sl-tag size="small" pill variant="warning">Unsaved Changes</sl-tag>
     </span>
     <style>${summaryTitleStyles}</style>
   `;

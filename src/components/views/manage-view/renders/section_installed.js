@@ -41,7 +41,7 @@ export function renderSectionInstalledBody(ready, SKELS, hasItems) {
         Sorry, the package list could not be obtained.
       </sl-alert>
       <br>
-      <sl-button outline @click=${this.fetchPackageList}>Retry</sl-button>
+      <sl-button outline @click=${this.fetchBootstrap}>Retry</sl-button>
     ` : nothing }
 
     ${ready && !hasItems('installed') ? html`
@@ -53,16 +53,17 @@ export function renderSectionInstalledBody(ready, SKELS, hasItems) {
 
     ${ready && hasItems('installed') ? html`
       <div class="details-group">
-        ${repeat(this.installedList.getCurrentPageData(), (pkg) => `${pkg.package}-${pkg.version}-installed`, (pkg) => html`
+        ${repeat(this.installedList.getCurrentPageData(), (pkg) => `${pkg.manifest.package}-${pkg.manifest.version}-installed`, (pkg) => html`
           <pup-snapshot
-            pupId=${pkg.package}
-            pupName=${pkg.package}
-            version=${pkg.version}
-            status=${pkg.command.status}
-            .config=${pkg.command.config}
-            .docs=${pkg.docs}
-            icon="box"
+            pupId=${pkg.manifest.package}
+            pupName=${pkg.manifest.package}
+            version=${pkg.manifest.version}
+            .config=${pkg.manifest.command.config}
+            .docs=${pkg.manifest.docs}
+            status=${pkg.state.status}
+            .options=${pkg.state.options}
             ?disabled=${this.busy}
+            icon="box"
             installed>
           </pup-snapshot>
         `)

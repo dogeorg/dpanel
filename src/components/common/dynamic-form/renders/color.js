@@ -2,11 +2,11 @@ import { html, ifDefined } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
 
 const ifd = ifDefined
 
-export const color = function(field) {
+export const color = function(field, values) {
   return html`
     <sl-color-picker
       name=${field.name}
-      value=${ifd(field.value)}
+      value=${ifd(values[field.name])}
       ?disabled=${field.disabled}
       ?inline=${field.inline}
       ?opacity=${field.opacity}

@@ -39,7 +39,8 @@ export const styles = css`
   }
 
   .summary-section.summary-section-title {
-    max-width: 120px;
+    max-width: 300px;
+    flex-shrink: 1;
   }
 
   .summary-section.summary-section-charts {
@@ -51,7 +52,7 @@ export const styles = css`
     display: flex;
     flex-grow: 1;
     justify-content: end;
-    column-gap: 0.25em;
+    column-gap: 0.75em;
 
     border-top: 1px solid var(--sl-color-neutral-200);
     padding-top: var(--sl-spacing-medium);

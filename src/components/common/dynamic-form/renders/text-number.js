@@ -2,7 +2,7 @@ import { html, ifDefined } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
 
 const ifd = ifDefined
 
-export const number = function(field) {
+export const number = function(field, values) {
   return html`
     <sl-input
       type="number"
@@ -14,7 +14,7 @@ export const number = function(field) {
       max=${ifd(field.max)}
       step=${ifd(field.step)}
       size=${ifd(field.size)}
-      value=${ifd(field.value)}
+      value=${ifd(values[field.name])}
       ?clearable=${field.clearable}
       ?noSpinButtons=${field.noSpinButtons}
       ?autofocus=${field.autofocus}
@@ -23,4 +23,8 @@ export const number = function(field) {
       >
     </sl-input>
   `;
+}
+
+function valueParser(value) {
+  return value.toString()
 }

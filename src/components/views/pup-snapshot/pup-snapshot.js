@@ -5,6 +5,7 @@ import '/components/common/dynamic-form/dynamic-form.js'
 import '/components/common/animated-dots.js'
 import '/components/common/sparkline-chart/sparkline-chart.js'
 import * as mockConfig from '/components/common/dynamic-form/mocks/index.js'
+import { pkgController } from '/models/package/index.js';
 
 // Import component chunks
 import * as renderMethods from './renders/index.js';
@@ -13,19 +14,26 @@ class PupSnapshot extends LitElement {
 
   static get properties() {
     return {
+      // From manifest
       pupId: { type: String },
       pupName: { type: String },
       version: { type: String },
       icon: { type: String },
-      stats: { type: Object },
-      status: { type: String },
-      running: { type: Boolean },
       disabled: { type: Boolean },
       config: { type: Object },
       focus: { type: String, reflect: true },
       activeTab: { type: String },
       installed: { type: Boolean },
-      docs: { type: Object }
+      docs: { type: Object },
+
+      // From state
+      status: { type: String },
+      running: { type: Boolean },
+      stats: { type: Object },
+      options: { type: Object },
+
+      // internal state
+      dirty: { type: Boolean, attribute: false }
     }
   }
 
@@ -34,6 +42,8 @@ class PupSnapshot extends LitElement {
     this.stats = {}
     this.running = false;
     this.activeTab = null;
+    this.dirty = false;
+    this.pkgController = pkgController;
     // Bind all imported renderMehtods to 'this'
     bindToClass(renderMethods, this)
   }
@@ -50,19 +60,57 @@ class PupSnapshot extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
-    this.addEventListener('sl-tab-show', this.handleTabChange.bind(this));
+    this.pkgController.addObserver(this);
+    this.addEventListener('dirty-change', this.handleDirtyChange.bind(this), { composed: true })
+  }
+
+  firstUpdated() {
+    const tabs = this.shadowRoot.querySelectorAll('#PupTabs sl-tab')
+    tabs.forEach(tab => {
+      tab.addEventListener('click', this.handleTabClick.bind(this));
+    });
   }
 
   disconnectedCallback() {
-    this.removeEventListener('sl-tab-show', this.handleTabChange.bind(this));
+    this.removeEventListener('dirty-change', this.handleDirtyChange.bind(this))
+    this.pkgController.removeObserver(this);
     super.disconnectedCallback();
   }
 
-  handleTabChange(event) {
-    const tabGroup = this.shadowRoot.querySelector('#PupTabs');
-    if (event.originalTarget === tabGroup) {
-      this.activeTab = event.detail.name
+  handleDirtyChange(event) {
+    this.dirty = event.detail.dirty;
+  }
+
+  handleTabClick(event) {
+    // Interupt tab change for a quick check whether there are
+    // unsaved changes.
+    event.stopPropagation();
+
+    // If not dirty, force tab change.
+    if (!this.dirty) {
+      this.jumpToTab(event.target.panel)
+      return
     }
+
+    // When dirty, ask the user if they want to stay or leave (abaonding changes)
+    if (window.confirm("Do you really want to leave?")) {
+      this.jumpToTab(event.target.panel)
+
+      // Changes abandoned. Clear the dirt.
+      this.dirty = false;
+    }
+  }
+
+  jumpToTab(tabName) {
+    // Expand details (if not expanded already)
+    const detailsPanel = this.shadowRoot.querySelector('sl-details')
+    detailsPanel.show();
+
+    // Reveal specific tab
+    if (!tabName) return;
+    this.activeTab = tabName;
+    const tabGroup = this.shadowRoot.querySelector('sl-tab-group#PupTabs');
+    tabGroup.show(tabName);
   }
 
   render() {

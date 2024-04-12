@@ -25,6 +25,13 @@ export function renderSummaryActions() {
       </sl-button>
       ` : nothing
     }
+
+    ${this.installed ? html`
+      <sl-button ?disabled=${this.disabled} @click=${(e) => this.handleConfigureAction(e)} outline size="medium">
+        <sl-icon name="gear-fill" label="Configure"></sl-icon> <span class="btn-text">Configure</span>
+      </sl-button>
+      ` : nothing
+    }
     
     ${this.installed && this.running ? html`
       <sl-button ?disabled=${this.disabled} @click=${(e) => this.handleRunningAction(e, 'stop')} variant="danger" outline size="medium">
@@ -145,4 +152,9 @@ export async function handleRunningAction (event, action) {
       this.focus = false;
     }, 500);
   }
+}
+
+export async function handleConfigureAction (event) {
+  event.stopPropagation();
+  this.jumpToTab('config')
 }

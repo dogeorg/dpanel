@@ -10,12 +10,17 @@ export function generateBootstrap(input) {
 }
 
 function generateStates(manifests) {
-  return manifests.local.installed.reduce((out, p) => {
-    out[p.package] = {
-      status: p.package === 'Core' ? 'running' : 'stopped',
-      stats: generateRandomStats(),
-      options: generateConfigOptions(p.command.config)
-    };
+  const sources = [...manifests.local.available, ...manifests.internal.available]
+  return sources.reduce((out, p) => {
+    if (['Core', 'Dogeboxd'].includes(p.package)) {
+      out[p.package] = {
+        package: p.package,
+        source: 'local',
+        status: ['Core', 'Dogeboxd'].includes(p.package) ? 'running' : 'stopped',
+        stats: generateRandomStats(),
+        options: generateConfigOptions(p.command.config)
+      };
+    }
     return out;
   }, {});
 }

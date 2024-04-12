@@ -44,7 +44,7 @@ async function returnMockedResponse(path, config, networkContext) {
   reqLogs && console.log(`Req (${config.method}):`, config.body || '--no-body');
 
   const response = (typeof config.mock === 'function')
-    ? mock(path, { forceFailures })
+    ? config.mock(path, { forceFailures })
     : getMockedSuccessOrError(path, config.mock, forceFailures);
     reqLogs && console.log('Res:', response);
     reqLogs && console.groupEnd();

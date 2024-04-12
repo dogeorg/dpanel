@@ -62,11 +62,6 @@ export function generateManifests(input) {
     };
   };
 
-  const generateRandomStats = () => ({
-    CPU_PERCENT_30: Array.from({ length: 6 }, Math.random),
-    MEM_PERCENT_30: Array.from({ length: 6 }, Math.random)
-  });
-
   const randomSemver = () => `${Math.floor(Math.random() * 10)}.${Math.floor(Math.random() * 10)}.${Math.floor(Math.random() * 10)}`;
 
   const names = Array.isArray(input) ? input : Array.from({ length: input }, (_, index) => `Package_${index + 1}`);
@@ -89,9 +84,19 @@ export function generateManifests(input) {
   // 'Mock a hardcoded set'
   if (!input) {
     return {
+      internal: {
+        id: "internal",
+        label: "Internal",
+        url: "",
+        lastUpdated: "2024-04-12T12:02:49.956991+10:00",
+        available: produce(['Dogeboxd']),
+      },
       local: {
-        installed: produce(['Core']),
-        available: produce(['Identity', 'GigaWallet', 'ShibeShop'])
+        id: "local",
+        label: "Local Filesystem",
+        url: "",
+        lastUpdated: "2024-04-12T12:02:49.956055+10:00",
+        available: produce(['Core', 'Identity', 'GigaWallet', 'ShibeShop'])
       }
     };
   }
@@ -100,7 +105,6 @@ export function generateManifests(input) {
   return {
     local: {
       available: produce(names),
-      installed: []
     }
   };
 }

@@ -95,30 +95,39 @@ export const pkgController = getInstance();
 
 function toAssembledPup(bootstrapResponse) {
   const sources = Object.keys(bootstrapResponse.manifests)
+  const states = bootstrapResponse.states
+  const stateKeys = Object.keys(states);
   const out = {
+    internal: {},
     installed: {},
     available: {},
   }
+
+  // Populate available index.
   sources.forEach((source) => {
     // sources such as "local", "remote" etc..
-    bootstrapResponse.manifests[source].installed.forEach((entry) => {
-      out.installed[entry.package] = {
-        manifest: entry,
-        state: bootstrapResponse.states[entry.package] || {
-          status: undefined,
-          stats: undefined,
-          options: {},
-        }
-      }
-    })
-    bootstrapResponse.manifests[source].available.forEach((entry) => {
-      out.available[entry.package] = {
-        manifest: entry,
+    bootstrapResponse.manifests[source].available.forEach((m) => {
+      out.available[m.package] = {
+        manifest: m,
         state: {
+          package: m.package,
           ...defaultPupState()
         },
       }
     })
+  })
+
+  // Popupate installed index.
+  Object.values(states).forEach((s) => {
+    out.installed[s.package] = {
+      manifest: out.available[s.package].manifest,
+      state: s
+    }
+  })
+
+  // Remove installed pups from available index.
+  stateKeys.forEach(k => {
+    delete out.available[k];
   })
   return out;
 }

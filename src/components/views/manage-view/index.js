@@ -14,7 +14,8 @@ class ManageView extends LitElement {
     fetchLoading: { type: Boolean },
     fetchError: { type: Boolean },
     packageList: { type: Array },
-    busy: { type: Boolean }
+    busy: { type: Boolean },
+    inspectedPup: { type: String }
   }
 
   constructor() {
@@ -27,6 +28,7 @@ class ManageView extends LitElement {
     this.pkgController = pkgController;
     this.installedList = new PaginationController(this, undefined, this.itemsPerPage);
     this.availableList = new PaginationController(this, undefined, this.itemsPerPage);
+    this.inspectedPup;
     bindToClass(renderMethods, this);
   }
 
@@ -36,6 +38,7 @@ class ManageView extends LitElement {
     this.addEventListener('busy-start', this.handleBusyStart.bind(this));
     this.addEventListener('busy-stop', this.handleBusyStop.bind(this));
     this.addEventListener('pup-installed', this.handlePupInstalled.bind(this));
+    this.addEventListener('forced-tab-show', this.handleForcedTabShow.bind(this));
     this.fetchBootstrap();
   }
 
@@ -43,6 +46,7 @@ class ManageView extends LitElement {
     this.removeEventListener('busy-start', this.handleBusyStart.bind(this));
     this.removeEventListener('busy-stop', this.handleBusyStop.bind(this));
     this.removeEventListener('pup-installed', this.handlePupInstalled.bind(this));
+    this.removeEventListener('forced-tab-show', this.handleForcedTabShow.bind(this));
     this.pkgController.removeObserver(this);
     super.disconnectedCallback();
   }
@@ -77,6 +81,14 @@ class ManageView extends LitElement {
     event.stopPropagation();
     this.pkgController.installPkg(event.detail.pupId)
     this.requestUpdate();
+  }
+
+  handlePupClick(event) {
+    this.inspectedPup = event.currentTarget.pupId
+  }
+
+  handleForcedTabShow(event) {
+    this.inspectedPup = event.detail.pupId
   }
 
   async fetchBootstrap() {

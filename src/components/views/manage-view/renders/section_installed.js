@@ -63,6 +63,8 @@ export function renderSectionInstalledBody(ready, SKELS, hasItems) {
             status=${pkg.state.status}
             .options=${pkg.state.options}
             ?disabled=${this.busy}
+            @click=${this.handlePupClick}
+            ?inspected=${this.inspectedPup === pkg.manifest.package}
             icon="box"
             installed>
           </pup-snapshot>

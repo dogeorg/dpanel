@@ -4,6 +4,7 @@ import { styles } from './pup-snapshot.styles.js';
 import '/components/common/dynamic-form/dynamic-form.js'
 import '/components/common/animated-dots.js'
 import '/components/common/sparkline-chart/sparkline-chart.js'
+import '/components/views/log-viewer/log-viewer.js'
 import * as mockConfig from '/components/common/dynamic-form/mocks/index.js'
 import { pkgController } from '/models/package/index.js';
 
@@ -31,6 +32,7 @@ class PupSnapshot extends LitElement {
       running: { type: Boolean },
       stats: { type: Object },
       options: { type: Object },
+      inspected: { type: Boolean },
 
       // internal state
       dirty: { type: Boolean, attribute: false }
@@ -69,6 +71,11 @@ class PupSnapshot extends LitElement {
     tabs.forEach(tab => {
       tab.addEventListener('click', this.handleTabClick.bind(this));
     });
+    
+    // TODO, TEMP.
+    // if (this.pupId === 'Core') {
+    //   this.jumpToTab('config');
+    // }
   }
 
   disconnectedCallback() {
@@ -102,9 +109,14 @@ class PupSnapshot extends LitElement {
   }
 
   jumpToTab(tabName) {
-    // Expand details (if not expanded already)
-    const detailsPanel = this.shadowRoot.querySelector('sl-details')
-    detailsPanel.show();
+    // Emit forced-tab-show event
+    this.dispatchEvent(new CustomEvent(
+      'forced-tab-show', {
+        detail: { tabName, pupId: this.pupId },
+        bubbles: true,
+        composed: true
+      }
+    ));
 
     // Reveal specific tab
     if (!tabName) return;
@@ -115,7 +127,7 @@ class PupSnapshot extends LitElement {
 
   render() {
     return html`
-      <sl-details>
+      <sl-details ?open=${this.inspected}>
         <div class="summary" slot="summary">
           ${this.renderSummary()}
         </div>
@@ -123,8 +135,8 @@ class PupSnapshot extends LitElement {
         <div class="content">
           <sl-tab-group id="PupTabs">
             ${this.installed ? html`
-              ${this.renderSectionLogs()}
               ${this.renderSectionStats()}
+              ${this.renderSectionLogs()}
               ${this.renderSectionConfig()}
               ${this.renderSectionDesc()}
               ${this.renderSectionScreens()}

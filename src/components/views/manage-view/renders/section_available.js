@@ -59,6 +59,8 @@ export function renderSectionAvailableBody(ready, SKELS, hasItems) {
             version=${pkg.manifest.version}
             icon="box"
             .docs=${pkg.manifest.docs}
+            @click=${this.handlePupClick}
+            ?inspected=${this.inspectedPup === pkg.manifest.package}
             ?disabled=${this.busy}>
           </pup-snapshot>
         `)}

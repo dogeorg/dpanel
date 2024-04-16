@@ -85,6 +85,25 @@ class DebugSettingsDialog extends LitElement {
                 Force Network Delay
             </sl-switch>
           </div>
+          <div class="form-control">
+            <sl-switch
+              name="overrideBaseUrl"
+              help-text="Force API calls to use base URL below"
+              .checked=${networkContext.overrideBaseUrl}
+              @sl-change=${this.handleToggle}>
+                Override Base URL
+            </sl-input>
+          </div>
+          <div class="form-control">
+            <sl-input
+              type="text"
+              name="apiBaseUrl"
+              help-text="API calls will use this base URL"
+              value=${networkContext.apiBaseUrl}
+              @sl-change=${this.handleInput}>
+                API Base URL
+            </sl-input>
+          </div>
         </form>
         <div slot="footer">
           <sl-button @click=${this.closeDialog}>Close</sl-button>

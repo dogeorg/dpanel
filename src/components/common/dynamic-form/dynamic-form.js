@@ -49,6 +49,9 @@ class DynamicForm extends LitElement {
     .footer-controls sl-button.discard-button::part(base):hover {
       color: var(--sl-color-neutral-900);
     }
+    sl-tab.capitalize::part(base) {
+      text-transform: capitalize;
+    }
   `;
 
   constructor() {
@@ -109,6 +112,7 @@ class DynamicForm extends LitElement {
         <sl-tab
           @click=${(event ) => this.handleTabChange(event, sectionId)}
           slot="nav"
+          class="capitalize"
           panel="${sectionId}">
             ${section.name}
         </sl-tab>

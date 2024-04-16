@@ -12,6 +12,8 @@ class Store {
     };
     this.networkContext = this.networkContext || {
       // Define network state here
+      apiBaseUrl: 'http://localhost:3000',
+      overrideBaseUrl: false,
       useMocks: true,
       forceFailures: false,
       forceDelayInSeconds: 3,

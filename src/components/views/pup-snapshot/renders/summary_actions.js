@@ -59,6 +59,7 @@ const actionStyles = css`
 
 export async function handleInstallAction (event, action) {
   event.stopPropagation();
+  event.preventDefault();
   if (action !== 'install') return
   if (event.target.disabled) return;
 
@@ -89,6 +90,7 @@ export async function handleRunningAction (event, action) {
   // Prevent event bubbling to parent
   // Because we don't want any parent handling this click and doing things
   event.stopPropagation();
+  event.preventDefault();
 
   // Prevent issuing another request if already loading
   if (event.target.disabled) return;
@@ -156,5 +158,6 @@ export async function handleRunningAction (event, action) {
 
 export async function handleConfigureAction (event) {
   event.stopPropagation();
+  event.preventDefault();
   this.jumpToTab('config')
 }

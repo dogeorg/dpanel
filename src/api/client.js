@@ -1,7 +1,11 @@
 export default class ApiClient {
-  constructor(baseURL, networkContext) {
-    this.baseURL = baseURL;
+  constructor(baseURL, networkContext = {}) {
+    this.baseURL = baseURL
     this.networkContext = networkContext;
+
+    if (networkContext && networkContext.overrideBaseUrl) {
+      this.baseURL = networkContext.apiBaseUrl || 'http://nope.localhost:6969';
+    }
   }
 
   async get(path, config = {}) {

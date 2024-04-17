@@ -15,13 +15,12 @@ export function renderSectionConfig() {
       `: nothing }
 
       ${isActiveTab && hasConfig ? html`
-          <dynamic-form
-            pupId=${this.pupId}
+          <dynamic-form-reuse
             .fields=${this.config}
             .values=${this.options}
+            .onSubmit=${this.submitPupConfigChanges}
             orientation="landscape">
-          </dynamic-form>
-        </sl-mutation-observer>
+          </dynamic-form-reuse>
       ` : nothing }
     </sl-tab-panel>
     <style>${emptyConfigStyles}</style>

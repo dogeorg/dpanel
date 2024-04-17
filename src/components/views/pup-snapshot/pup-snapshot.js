@@ -1,12 +1,13 @@
 import { LitElement, html, nothing } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
 import { bindToClass } from '/utils/class-bind.js'
 import { styles } from './pup-snapshot.styles.js';
-import '/components/common/dynamic-form/dynamic-form.js'
+import '/components/common/dynamic-form/dynamic-form-reuse.js'
 import '/components/common/animated-dots.js'
 import '/components/common/sparkline-chart/sparkline-chart.js'
 import '/components/views/log-viewer/log-viewer.js'
 import * as mockConfig from '/components/common/dynamic-form/mocks/index.js'
 import { pkgController } from '/models/package/index.js';
+import { postConfig } from '/api/config/config.js';
 
 // Import component chunks
 import * as renderMethods from './renders/index.js';
@@ -63,7 +64,7 @@ class PupSnapshot extends LitElement {
   connectedCallback() {
     super.connectedCallback();
     this.pkgController.addObserver(this);
-    this.addEventListener('dirty-change', this.handleDirtyChange.bind(this), { composed: true })
+    this.addEventListener('form-dirty-change', this.handleDirtyChange.bind(this), { composed: true })
   }
 
   firstUpdated() {
@@ -79,13 +80,18 @@ class PupSnapshot extends LitElement {
   }
 
   disconnectedCallback() {
-    this.removeEventListener('dirty-change', this.handleDirtyChange.bind(this))
+    this.removeEventListener('form-dirty-change', this.handleDirtyChange.bind(this))
     this.pkgController.removeObserver(this);
     super.disconnectedCallback();
   }
 
   handleDirtyChange(event) {
     this.dirty = event.detail.dirty;
+  }
+
+  async submitPupConfigChanges(data) {
+    const res = await postConfig(this.pupId, data);
+    await pkgController.savePupChanges(this.pupId, data);
   }
 
   handleTabClick(event) {

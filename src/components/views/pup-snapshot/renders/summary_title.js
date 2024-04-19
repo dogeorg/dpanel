@@ -9,8 +9,11 @@ export function renderSummaryTitle() {
     <span class="tags" ?hidden=${!this.version}>
       <sl-tag size="small" pill>${this.version}</sl-tag>
     </span>
-    <span class="fade-tags ${this.dirty ? 'visible' : ''}">
-      <sl-tag size="small" pill variant="warning">Unsaved Changes</sl-tag>
+    <span class="fade-tags ${this._dirty && !this._saved ? 'visible' : ''}">
+      <sl-tag size="small" pill variant="warning">Unsaved Changes (${this._dirty})</sl-tag>
+    </span>
+    <span class="fade-tags ${this._saved ? 'visible' : ''}">
+      <sl-tag size="small" pill variant="success">Saved</sl-tag>
     </span>
     <style>${summaryTitleStyles}</style>
   `;
@@ -29,9 +32,11 @@ const summaryTitleStyles = css`
     transition: opacity 300ms ease-in-out, visibility 300ms ease-in-out;
     opacity: 0;
     visibility: hidden;
+    display: none;
   }
   .fade-tags.visible {
     opacity: 1;
     visibility: visible;
+    display: inline-block;
   }
 `;

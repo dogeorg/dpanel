@@ -1,4 +1,4 @@
-import { html, css, nothing } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
+import { html, css, nothing, guard } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
 
 export function renderSectionConfig() {
   const isActiveTab = this.activeTab === 'config';
@@ -15,12 +15,14 @@ export function renderSectionConfig() {
       `: nothing }
 
       ${isActiveTab && hasConfig ? html`
+        ${guard([this.options, this.config], () => html`
           <dynamic-form-reuse
-            .fields=${this.config}
             .values=${this.options}
+            .fields=${this.config}
             .onSubmit=${this.submitPupConfigChanges}
             orientation="landscape">
           </dynamic-form-reuse>
+        `)}
       ` : nothing }
     </sl-tab-panel>
     <style>${emptyConfigStyles}</style>

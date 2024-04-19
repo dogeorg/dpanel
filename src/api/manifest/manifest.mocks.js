@@ -4,7 +4,6 @@ export function generateManifests(input) {
   const fieldLabels = {
     number: 'Number',
     text: 'Text',
-    textarea: 'Textarea',
     select: 'Select',
     toggle: 'Toggle',
     checkbox: 'Checkbox',
@@ -14,6 +13,7 @@ export function generateManifests(input) {
     date: 'Date',
     // rating: 'Rating',
     color: 'Color',
+    textarea: 'Textarea',
   };
 
   const generateRandomConfig = () => {
@@ -53,7 +53,7 @@ export function generateManifests(input) {
             label: fieldLabels[field],
             name: `${field}_${sectionIndex}_${fieldIndex}`,
             type: field,
-            ...(field === 'checkbox' || field === 'toggle' || field === 'rating' ? { required: false } : { required: randomChoice([true, false]) }),
+            ...(field === 'checkbox' || field === 'toggle' || field === 'rating' ? { required: false } : { required: randomChoice([true, true]) }),
             ...(field === 'select' || field === 'radio' || field === 'radioButton' ? { options: [...options[field]] } : {}),
             ...(field === 'range' ? { min: 1, max: 69, step: 1 } : {})
           }))

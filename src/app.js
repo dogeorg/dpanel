@@ -42,7 +42,7 @@ class DPanelApp extends LitElement {
   constructor() {
     super();
     this.context = new StoreSubscriber(this, store);
-    this.menuVisible = true;
+    this.menuVisible = false;
     this.currentPath = '';
     this._debouncedHandleResize = debounce(this._handleResize.bind(this), 50);
   }

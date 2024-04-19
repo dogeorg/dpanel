@@ -2,11 +2,11 @@ import { html, ifDefined } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
 
 const ifd = ifDefined
 
-export const textarea = function(field, values) {
+export function _render_textarea(field) {
   return html`
     <sl-textarea
       name=${field.name}
-      value=${ifd(values[field.name])}
+      .value=${this[field.name]}
       size=${ifd(field.size)}
       ?filled=${field.filled}
       label=${ifd(field.label)}
@@ -26,7 +26,8 @@ export const textarea = function(field, values) {
       enterkeyhint=${ifd(field.enterkeyhint)}
       ?spellcheck=${field.spellcheck}
       inputmode=${ifd(field.inputmode)}
-      defaultValue=${ifd(field.defaultValue)}
+      ?data-dirty-field=${this[this._dirtyFlagField(field.name)]}
+      @input=${this.handleInput}
     ></sl-textarea>
   `;
 }

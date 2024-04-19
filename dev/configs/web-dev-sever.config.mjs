@@ -1,8 +1,7 @@
 export default {
-  port: 9090,
+  port: 8080,
   rootDir: '../src',
   appIndex: '../src/index.html',
-  open: 'http://dogebox.local:9090',
   watch: true,
   middleware: [
     function corsMiddleware(ctx, next) {

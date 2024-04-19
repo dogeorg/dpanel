@@ -2,16 +2,18 @@ import { html, ifDefined } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
 
 const ifd = ifDefined
 
-export const radioButton = function(field, values) {
+export function _render_radioButton(field) {
   return html`
     <sl-radio-group
       label=${ifd(field.label)}
       help-text=${ifd(field.helpText)}
       name=${field.name}
       size=${ifd(field.size)}
-      value=${ifd(values[field.name])}
+      .value=${this[field.name]}
       ?disabled=${field.disabled}
       ?required=${field.required}
+      ?data-dirty-field=${this[this._dirtyFlagField(field.name)]}
+      @sl-change=${this.handleChoice}
     >
       ${field.options.map(
         (option) => html`

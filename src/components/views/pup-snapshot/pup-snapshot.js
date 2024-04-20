@@ -152,7 +152,10 @@ class PupSnapshot extends LitElement {
         </div>
 
         <div class="content">
-          <sl-tab-group id="PupTabs">
+          <sl-tab-group
+            id="PupTabs"
+            style="--indicator-color: #07ffae;"
+          >
             ${this.installed ? html`
               ${this.renderSectionStats()}
               ${this.renderSectionLogs()}

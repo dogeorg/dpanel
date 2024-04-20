@@ -20,7 +20,7 @@ export function renderSectionConfig() {
             .values=${this.options}
             .fields=${this.config}
             .onSubmit=${this.submitPupConfigChanges}
-            orientation="landscape">
+          >
           </dynamic-form-reuse>
         `)}
       ` : nothing }

@@ -56,6 +56,10 @@ class DynamicForm extends LitElement {
       position: absolute;
       left: -1rem;
     }
+
+    .tag-change-indicator {
+      margin-left: 0.5em;
+    }
   `;
 
   constructor() {
@@ -67,6 +71,7 @@ class DynamicForm extends LitElement {
     this._activeFormId = null;
     this._dirty = 0;
     this._loading = false;
+    this.orientation = 'portrait';
 
     bindToClass(inputRenderMethods, this)
   }
@@ -175,10 +180,12 @@ class DynamicForm extends LitElement {
           ?disabled=${this._loading}
           class="capitalize"
           panel="${section.name}">
-            ${section.name}&nbsp;&nbsp;
-            <sl-tag pill size="small" variant="neutral"
-              style="${changeCount ? 'visibility: visible;' : 'visibility: hidden;'}"
-            >${changeCount}
+            ${section.name}
+            ${changeCount ? html`
+              <sl-tag pill size="small" 
+                class="tag-change-indicator" 
+                variant="neutral"
+              >${changeCount}` : nothing }
               </sl-tag>
         </sl-tab>
       `
@@ -206,7 +213,8 @@ class DynamicForm extends LitElement {
     // if mutliple sections, render tabs and panels
     if (data.sections.length > 1)
     return html`
-      <sl-tab-group placement=${this.orientation === 'landscape' ? 'start' : 'top' }>
+      <sl-tab-group 
+        placement=${this.orientation === 'portrait' ? 'top' : 'start' }>
         ${tabs}
         ${panels}
       </sl-tab-group>
@@ -257,7 +265,19 @@ class DynamicForm extends LitElement {
 
   render() {
     if (!this.fields || !this.fields.sections) return;
-    return this.createMultipleForms(this.fields)
+    return html`
+      <sl-resize-observer @sl-resize=${this.handleResize}>
+        <div class="dynamic-form-wrapper">
+          ${this.createMultipleForms(this.fields)}
+        </div>
+      </sl-resize-observer>
+    `
+  }
+
+  handleResize(event) {
+    // this.orientation = width >= 680 ? 'landscape' : 'portrait';
+    const width = event.detail.entries[0].contentRect.width;
+    this.orientation = width >= 680 ? 'landscape' : 'portrait';
   }
 
   handleInput(event) {

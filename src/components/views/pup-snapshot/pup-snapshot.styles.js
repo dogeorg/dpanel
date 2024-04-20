@@ -63,11 +63,11 @@ export const styles = css`
     }
   }
 
-  sl-tab-group::part(tabs) {
-    color: tomato;
+  sl-tab::part(base):hover {
+    color: #07ffae;
   }
 
-  sl-tab-group::part(active-tab-indicator) {
-    background-color: tomato;
+  sl-tab[active]::part(base) {
+    color: #07ffae;
   }
 `

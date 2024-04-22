@@ -16,7 +16,7 @@ export function _render_color (field) {
       swatches=${ifd(field.swatches)}
       size=${ifd(field.size)}
       ?data-dirty-field=${this[this._dirtyFlagField(field.name)]}
-      @sl-change=${this.handleChoice}>
+      @sl-change=${this._handleChoice}>
     </sl-color-picker>
   `;
 }

@@ -13,7 +13,7 @@ export function _render_toggle(field) {
       size=${ifd(field.size)}
       help-text=${ifd(field.helpText)}
       ?data-dirty-field=${this[this._dirtyFlagField(field.name)]}
-      @sl-change=${this.handleToggle}>
+      @sl-change=${this._handleToggle}>
       ${field.label}
     </sl-switch>
   `;

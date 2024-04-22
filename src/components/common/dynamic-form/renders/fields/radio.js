@@ -11,7 +11,7 @@ export function _render_radio(field) {
       size=${ifd(field.size)}
       .value=${this[field.name]}
       ?data-dirty-field=${this[this._dirtyFlagField(field.name)]}
-      @sl-change=${this.handleChoice}
+      @sl-change=${this._handleChoice}
     >
       ${field.options.map(option => html`
         <sl-radio

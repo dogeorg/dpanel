@@ -9,7 +9,7 @@ export function _render_checkbox(field) {
     ?indeterminate=${field.indeterminate}
     ?required=${field.required}
     ?data-dirty-field=${this[this._dirtyFlagField(field.name)]}
-    @sl-change=${this.handleToggle}>
+    @sl-change=${this._handleToggle}>
     ${field.label}
   </sl-checkbox>
   `;

@@ -14,7 +14,7 @@ export function _render_range(field) {
       ?disabled=${field.disabled}
       ?showTooltip=${field.showTooltip}
       ?data-dirty-field=${this[this._dirtyFlagField(field.name)]}
-      @sl-change=${this.handleChoice}>
+      @sl-change=${this._handleChoice}>
     </sl-range>
   `;
 }

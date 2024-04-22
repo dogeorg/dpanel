@@ -18,7 +18,7 @@ export function _render_text(field) {
       ?clearable=${field.clearable}
       ?required=${field.required}
       ?data-dirty-field=${this[this._dirtyFlagField(field.name)]}
-      @input=${this.handleInput}
+      @input=${this._handleInput}
       >
     </sl-input>
   `;

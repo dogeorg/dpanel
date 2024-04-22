@@ -16,12 +16,12 @@ export function renderSectionConfig() {
 
       ${isActiveTab && hasConfig ? html`
         ${guard([this.options, this.config], () => html`
-          <dynamic-form-reuse
+          <dynamic-form
             .values=${this.options}
             .fields=${this.config}
             .onSubmit=${this.submitPupConfigChanges}
           >
-          </dynamic-form-reuse>
+          </dynamic-form>
         `)}
       ` : nothing }
     </sl-tab-panel>

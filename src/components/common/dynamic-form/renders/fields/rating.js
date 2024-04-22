@@ -15,7 +15,7 @@ export function _render_rating(field) {
       ?disabled=${field.disabled}
       ?readonly=${field.readonly}
       ?data-dirty-field=${this[this._dirtyFlagField(field.name)]}
-      @sl-change=${this.handleChoice}>
+      @sl-change=${this._handleChoice}>
     </sl-rating>
   `;
 }

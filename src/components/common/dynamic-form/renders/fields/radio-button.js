@@ -13,7 +13,7 @@ export function _render_radioButton(field) {
       ?disabled=${field.disabled}
       ?required=${field.required}
       ?data-dirty-field=${this[this._dirtyFlagField(field.name)]}
-      @sl-change=${this.handleChoice}
+      @sl-change=${this._handleChoice}
     >
       ${field.options.map(
         (option) => html`

@@ -27,7 +27,7 @@ export function _render_textarea(field) {
       ?spellcheck=${field.spellcheck}
       inputmode=${ifd(field.inputmode)}
       ?data-dirty-field=${this[this._dirtyFlagField(field.name)]}
-      @input=${this.handleInput}
+      @input=${this._handleInput}
     ></sl-textarea>
   `;
 }

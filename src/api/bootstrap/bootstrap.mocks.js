@@ -48,11 +48,11 @@ function generateValue(fieldName) {
   }
 
   if (fieldName.includes('checkbox_')) {
-    return "on";
+    return true;
   }
 
   if (fieldName.includes('toggle_')) {
-    return "on";
+    return false;
   }
 
   if (fieldName.includes('select_')) {
@@ -64,7 +64,7 @@ function generateValue(fieldName) {
   }
 
   if (fieldName.includes('range_')) {
-    return Math.round(69 * Math.random()).toString();
+    return Math.round(69 * Math.random());
   }
 
   if (fieldName.includes('radio_')) {

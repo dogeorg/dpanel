@@ -2,7 +2,7 @@ import { html, ifDefined } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
 
 const ifd = ifDefined
 
-export const text = function(field, values) {
+export function _render_text(field) {
   return html`
     <sl-input
       type="text"
@@ -14,9 +14,11 @@ export const text = function(field, values) {
       maxlength=${ifd(field.maxlength)}
       pattern=${ifd(field.pattern)}
       size=${ifd(field.size)}
-      value=${ifd(values[field.name])}
+      .value=${this[field.name]}
       ?clearable=${field.clearable}
       ?required=${field.required}
+      ?data-dirty-field=${this[this._dirtyFlagField(field.name)]}
+      @input=${this._handleInput}
       >
     </sl-input>
   `;

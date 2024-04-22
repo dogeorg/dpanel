@@ -191,7 +191,7 @@ class ManageView extends LitElement {
 
     h1, h2 {
       font-family: 'Comic Neue', sans-serif;
-      color: #07ffae;
+      color: #ffd807;
     }
 
     header {

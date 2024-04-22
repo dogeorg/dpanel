@@ -1,5 +1,6 @@
 import { LitElement, html, nothing } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
 import { bindToClass } from '/utils/class-bind.js'
+import { asyncTimeout } from '/utils/timeout.js'
 import { styles } from './pup-snapshot.styles.js';
 import '/components/common/dynamic-form/dynamic-form.js'
 import '/components/common/animated-dots.js'
@@ -7,6 +8,7 @@ import '/components/common/sparkline-chart/sparkline-chart.js'
 import '/components/views/log-viewer/log-viewer.js'
 import * as mockConfig from '/components/common/dynamic-form/mocks/index.js'
 import { pkgController } from '/models/package/index.js';
+import { postConfig } from '/api/config/config.js';
 
 // Import component chunks
 import * as renderMethods from './renders/index.js';
@@ -35,7 +37,8 @@ class PupSnapshot extends LitElement {
       inspected: { type: Boolean },
 
       // internal state
-      dirty: { type: Boolean, attribute: false }
+      _dirty: { type: Number, attribute: false },
+      _saved: { type: Boolean, state: true }
     }
   }
 
@@ -44,8 +47,10 @@ class PupSnapshot extends LitElement {
     this.stats = {}
     this.running = false;
     this.activeTab = null;
-    this.dirty = false;
+    this._dirty = 0;
     this.pkgController = pkgController;
+    this.options = {};
+    this.config = {};
     // Bind all imported renderMehtods to 'this'
     bindToClass(renderMethods, this)
   }
@@ -63,7 +68,8 @@ class PupSnapshot extends LitElement {
   connectedCallback() {
     super.connectedCallback();
     this.pkgController.addObserver(this);
-    this.addEventListener('dirty-change', this.handleDirtyChange.bind(this), { composed: true })
+    this.addEventListener('form-dirty-change', this.handleDirtyChange.bind(this), { composed: true })
+    this.addEventListener('form-submit-success', this.handleFormSubmitSuccess.bind(this), { composed: true })
   }
 
   firstUpdated() {
@@ -71,21 +77,34 @@ class PupSnapshot extends LitElement {
     tabs.forEach(tab => {
       tab.addEventListener('click', this.handleTabClick.bind(this));
     });
-    
-    // TODO, TEMP.
-    // if (this.pupId === 'Core') {
-    //   this.jumpToTab('config');
-    // }
   }
 
   disconnectedCallback() {
-    this.removeEventListener('dirty-change', this.handleDirtyChange.bind(this))
+    this.removeEventListener('form-dirty-change', this.handleDirtyChange.bind(this))
+    this.removeEventListener('form-submit-success', this.handleFormSubmitSuccess.bind(this), { composed: true })
     this.pkgController.removeObserver(this);
     super.disconnectedCallback();
   }
 
   handleDirtyChange(event) {
-    this.dirty = event.detail.dirty;
+    this._dirty = event.detail.dirty;
+  }
+
+  async handleFormSubmitSuccess(event) {
+    this._saved = true;
+    await asyncTimeout(2000)
+    this._saved = false;
+  }
+
+  submitPupConfigChanges = async (data) => {
+    const res = await postConfig(this.pupId, data);
+    await pkgController.savePupChanges(this.pupId, data);
+    // Updated PupSnapshots copy of options
+    // This will trigger a re-render of the dynamic-form
+    await asyncTimeout(4000);
+
+    console.log('--injecting new state returned from server');
+    this.options = { ...this.options, ...data }
   }
 
   handleTabClick(event) {
@@ -94,7 +113,7 @@ class PupSnapshot extends LitElement {
     event.stopPropagation();
 
     // If not dirty, force tab change.
-    if (!this.dirty) {
+    if (!this._dirty) {
       this.jumpToTab(event.target.panel)
       return
     }
@@ -104,7 +123,7 @@ class PupSnapshot extends LitElement {
       this.jumpToTab(event.target.panel)
 
       // Changes abandoned. Clear the dirt.
-      this.dirty = false;
+      this._dirty = false;
     }
   }
 
@@ -133,7 +152,10 @@ class PupSnapshot extends LitElement {
         </div>
 
         <div class="content">
-          <sl-tab-group id="PupTabs">
+          <sl-tab-group
+            id="PupTabs"
+            style="--indicator-color: #07ffae;"
+          >
             ${this.installed ? html`
               ${this.renderSectionStats()}
               ${this.renderSectionLogs()}

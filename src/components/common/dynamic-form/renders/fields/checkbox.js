@@ -1,14 +1,15 @@
 import { html } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
 
-export const checkbox = function(field, values) {
+export function _render_checkbox(field) {
   return html`<sl-checkbox
     name=${field.name}
-    ?checked=${checkedParser(values[field.name])}
-    value=${valueParser(values[field.name])}
+    ?checked=${this[field.name]}
+    .value=${this[field.name]}
     ?disabled=${field.disabled}
     ?indeterminate=${field.indeterminate}
     ?required=${field.required}
-    ?defaultChecked=${field.defaultChecked}>
+    ?data-dirty-field=${this[this._dirtyFlagField(field.name)]}
+    @sl-change=${this._handleToggle}>
     ${field.label}
   </sl-checkbox>
   `;

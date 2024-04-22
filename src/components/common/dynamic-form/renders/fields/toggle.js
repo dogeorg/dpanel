@@ -2,16 +2,18 @@ import { html, ifDefined } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
 
 const ifd = ifDefined
 
-export const toggle = function(field, values) {
+export function _render_toggle(field) {
   return html`
     <sl-switch
       name=${field.name}
-      ?checked=${checkedParser(values[field.name])}
-      value=${valueParser(values[field.name])}
+      ?checked=${this[field.name]}
+      .value=${this[field.name]}
       ?disabled=${field.disabled}
       ?required=${field.required}
       size=${ifd(field.size)}
-      help-text=${ifd(field.helpText)}>
+      help-text=${ifd(field.helpText)}
+      ?data-dirty-field=${this[this._dirtyFlagField(field.name)]}
+      @sl-change=${this._handleToggle}>
       ${field.label}
     </sl-switch>
   `;

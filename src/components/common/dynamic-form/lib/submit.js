@@ -1,5 +1,16 @@
+import { getFormControls } from '/vendor/@shoelace/cdn@2.14.0/utilities/form.js';
+
 export async function _handleSubmit(event) {
   event.preventDefault();
+
+  // Test if form is valid.
+  const formControls = getFormControls(event.currentTarget)
+  const isValid = [...formControls].every(control => control.checkValidity());
+
+  if (!isValid) {
+    console.log('FORM AHS VALIASDSD ISSUESSUS!');
+    return;
+  }
   
   // Set submitting state
   this._loading = true;
@@ -13,7 +24,7 @@ export async function _handleSubmit(event) {
     .map(node => node.name)
     .forEach(fieldName => formData[fieldName] = this[fieldName]);
 
-  // // Attempt save.
+  // Attempt save.
   await this.onSubmit(formData).catch((err) => {
     // ## ON ERROR
     console.warn('Form submission failed:', err);

@@ -67,6 +67,7 @@ export function generateManifests(input) {
   const names = Array.isArray(input) ? input : Array.from({ length: input }, (_, index) => `Package_${index + 1}`);
 
   const produce = (array) => array.map(name => ({
+    id: name,
     package: name,
     version: randomSemver(),
     hash: Math.random().toString(36).substring(2, 15),

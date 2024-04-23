@@ -6,7 +6,7 @@ export function _render_textarea(field) {
   return html`
     <sl-textarea
       name=${field.name}
-      .value=${this[field.name]}
+      .value=${ifd(this[field.name])}
       size=${ifd(field.size)}
       ?filled=${field.filled}
       label=${ifd(field.label)}

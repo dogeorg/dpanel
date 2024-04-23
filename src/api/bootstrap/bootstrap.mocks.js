@@ -14,11 +14,12 @@ function generateStates(manifests) {
   return sources.reduce((out, p) => {
     if (['Core', 'Dogeboxd'].includes(p.package)) {
       out[p.package] = {
+        id: p.id,
         package: p.package,
         source: 'local',
         status: ['Core', 'Dogeboxd'].includes(p.package) ? 'running' : 'stopped',
         stats: generateRandomStats(),
-        options: generateConfigOptions(p.command.config)
+        config: generateConfigOptions(p.command.config)
       };
     }
     return out;

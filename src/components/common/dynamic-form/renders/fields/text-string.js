@@ -14,7 +14,7 @@ export function _render_text(field) {
       maxlength=${ifd(field.maxlength)}
       pattern=${ifd(field.pattern)}
       size=${ifd(field.size)}
-      .value=${this[field.name]}
+      .value=${ifd(this[field.name])}
       ?clearable=${field.clearable}
       ?required=${field.required}
       ?data-dirty-field=${this[this._dirtyFlagField(field.name)]}

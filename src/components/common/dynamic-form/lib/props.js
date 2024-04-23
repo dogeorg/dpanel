@@ -23,20 +23,20 @@ export function _initializeFormFieldProperties(newValue) {
 
 export function _initializeValuesPreservingEdits(newValue) {
   let _newValue = {}
-    // When dynamic-form is provided new values via an external actor
-    // We should not immediately adopt them as the user may have edits.
-    // Preserve edits.
-    Object.keys(newValue).forEach(key => {
-      if (this[this._dirtyFlagField(key)]) {
-        // If the field is dirty, retain the current value
-        _newValue[key] = this[key]
-      } else {
-        // If the field is not dirty, update it with the new value
-        this[key] = newValue[key];
-        this[`__${key}`] = newValue[key];
-        _newValue[key] = newValue[key]
-      }
-    });
+  // When dynamic-form is provided new values via an external actor
+  // We should not immediately adopt them as the user may have edits.
+  // Preserve edits.
+  Object.keys(newValue).forEach(key => {
+    if (this[this._dirtyFlagField(key)]) {
+      // If the field is dirty, retain the current value
+      _newValue[key] = this[key]
+    } else {
+      // If the field is not dirty, update it with the new value
+      this[key] = newValue[key];
+      this[`__${key}`] = newValue[key];
+      _newValue[key] = newValue[key]
+    }
+  });
 
-    this._values = _newValue;
+  this._values = _newValue;
 }

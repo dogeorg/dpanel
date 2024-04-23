@@ -32,6 +32,9 @@ import debounce from '/utils/debounce.js';
 // Do this once to set the location of shoelace assets (icons etc..)
 setBasePath('/vendor/@shoelace/cdn@2.14.0/');
 
+// Main web socket channel (singleton)
+import { mainChannel } from '/controllers/sockets/main-channel.js'
+
 class DPanelApp extends LitElement {
 
   static properties = {
@@ -45,6 +48,7 @@ class DPanelApp extends LitElement {
     this.menuVisible = false;
     this.currentPath = '';
     this._debouncedHandleResize = debounce(this._handleResize.bind(this), 50);
+    this.mainChannel = mainChannel;
   }
 
   connectedCallback() {
@@ -57,10 +61,14 @@ class DPanelApp extends LitElement {
     window.addEventListener('resize', this._debouncedHandleResize);
     // Initial check to set orientation on load
     this._handleResize();
+
+    // Instanciate a web socket connection and add app as an observer
+    this.mainChannel.addObserver(this);
   }
 
   disconnectedCallback() {
     window.removeEventListener('resize', this._debouncedHandleResize);
+    this.mainChannel.removeObserver(this);
     super.disconnectedCallback();
   }
 

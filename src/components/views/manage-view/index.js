@@ -2,7 +2,7 @@ import { LitElement, html, css, nothing, repeat } from '/vendor/@lit/all@3.1.2/l
 import '/components/views/pup-snapshot/pup-snapshot.js'
 import '/components/views/pup-snapshot/pup-snapshot-skeleton.js'
 import { getBootstrap } from '/api/bootstrap/bootstrap.js';
-import { pkgController } from '/models/package/index.js'
+import { pkgController } from '/controllers/package/index.js'
 import { PaginationController } from '/components/common/paginator/paginator-controller.js';
 import { bindToClass } from '/utils/class-bind.js'
 import * as renderMethods from './renders/index.js';
@@ -79,7 +79,7 @@ class ManageView extends LitElement {
 
   handlePupInstalled(event) {
     event.stopPropagation();
-    this.pkgController.installPkg(event.detail.pupId)
+    this.pkgController.installPkg(event.detail.pupid)
     this.requestUpdate();
   }
 

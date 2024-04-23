@@ -35,15 +35,3 @@ export function _handleDiscardChanges(event) {
 
   this._checkForChanges();
 }
-
-export function _attachFormSubmitListener(form) {
-  form.addEventListener('submit', this._handleSubmit.bind(this));
-}
-
-export function _removeFormSubmitListeners() {
-  // Remove event listeners from all forms.
-  const forms = this.shadowRoot.querySelectorAll('form');
-  forms.forEach((form) => {
-    form.removeEventListener('submit', this._handleSubmit.bind(this));
-  });
-}

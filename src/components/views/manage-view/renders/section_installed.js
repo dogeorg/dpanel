@@ -53,18 +53,18 @@ export function renderSectionInstalledBody(ready, SKELS, hasItems) {
 
     ${ready && hasItems('installed') ? html`
       <div class="details-group">
-        ${repeat(this.installedList.getCurrentPageData(), (pkg) => `${pkg.manifest.package}-${pkg.manifest.version}-installed`, (pkg) => html`
+        ${repeat(this.installedList.getCurrentPageData(), (pkg) => `${pkg.manifest.id}-${pkg.manifest.version}-installed`, (pkg) => html`
           <pup-snapshot
-            pupId=${pkg.manifest.package}
+            pupId=${pkg.manifest.id}
             pupName=${pkg.manifest.package}
             version=${pkg.manifest.version}
             .config=${pkg.manifest.command.config}
             .docs=${pkg.manifest.docs}
             status=${pkg.state.status}
-            .options=${pkg.state.options}
+            .options=${pkg.state.config}
             ?disabled=${this.busy}
             @click=${this.handlePupClick}
-            ?inspected=${this.inspectedPup === pkg.manifest.package}
+            ?inspected=${this.inspectedPup === pkg.manifest.id}
             icon="box"
             installed>
           </pup-snapshot>

@@ -3,11 +3,12 @@ import { html, ifDefined } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
 const ifd = ifDefined
 
 export function _render_select(field) {
+  const { currentKey, isDirtyKey } = this.propKeys(field.name);
   return html`
     <sl-select
       name=${field.name}
       label=${ifd(field.label)}
-      .value=${this[field.name]}
+      .value=${this[currentKey]}
       placeholder=${ifd(field.placeholder)}
       ?multiple=${field.multiple}
       size=${ifd(field.size)}
@@ -16,7 +17,7 @@ export function _render_select(field) {
       ?required=${field.required}
       ?clearable=${field.clearable}
       ?disabled=${field.disabled}
-      ?data-dirty-field=${this[this._dirtyFlagField(field.name)]}
+      ?data-dirty-field=${this[isDirtyKey]}
       @sl-change=${this._handleChoice}>
       ${field.options.map(option => html`
         <sl-option value=${option.value}>${option.label}</sl-option>

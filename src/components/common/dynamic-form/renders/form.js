@@ -25,7 +25,7 @@ export function _generateOneOrManyForms(data) {
     const formFields = repeat(section.fields, (field) => field.name, (field) => this._generateField(field))
     const formControls = this._generateFormControls({ formId: section.name, submitLabel: 'Save' })
     return html`
-      <form id=${section.name}>
+      <form id=${section.name} @submit=${this._handleSubmit}>
         ${formFields}
         ${formControls}
       </form>

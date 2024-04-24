@@ -4,10 +4,6 @@ export async function _onUpdate(changedProperties) {
   if (!this._shouldUpdateForm(changedProperties)) {
     return;
   }
-
-  // Remove previous form submit listeners
-  this._removeFormSubmitListeners();
-
   // Determine the appropriate form to target
   const form = this._getTargetForm(changedProperties);
   if (!form) {
@@ -20,9 +16,6 @@ export async function _onUpdate(changedProperties) {
 
   // Ensure all custom elements within the form are fully defined
   await customElementsReady(form);
-
-  // Attach a new submit listener to the form
-  this._attachFormSubmitListener(form);
 }
 
 export function _shouldUpdateForm(changedProperties) {

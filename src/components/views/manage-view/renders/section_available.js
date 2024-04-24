@@ -52,15 +52,15 @@ export function renderSectionAvailableBody(ready, SKELS, hasItems) {
 
     ${ready && hasItems('available') ? html`
       <div class="details-group">
-        ${repeat(this.availableList.getCurrentPageData(), (pkg) => `${pkg.manifest.package}-${pkg.manifest.version}`, (pkg) => html`
+        ${repeat(this.availableList.getCurrentPageData(), (pkg) => `${pkg.manifest.id}-${pkg.manifest.version}`, (pkg) => html`
           <pup-snapshot
-            pupId=${pkg.manifest.package}
+            pupId=${pkg.manifest.id}
             pupName=${pkg.manifest.package}
             version=${pkg.manifest.version}
             icon="box"
             .docs=${pkg.manifest.docs}
             @click=${this.handlePupClick}
-            ?inspected=${this.inspectedPup === pkg.manifest.package}
+            ?inspected=${this.inspectedPup === pkg.manifest.id}
             ?disabled=${this.busy}>
           </pup-snapshot>
         `)}

@@ -41,7 +41,7 @@ class PkgController {
 
   installPkg(pupId) {
     // Find the pup in the available list
-    const index = this.available.findIndex(pup => pup.manifest.package === pupId);
+    const index = this.available.findIndex(pup => pup.manifest.id === pupId);
     if (index !== -1) {
       // Move the pup from the available list to the installed list
       const [pup] = this.available.splice(index, 1);
@@ -62,7 +62,7 @@ class PkgController {
 
   savePupChanges(pupId, newData) {
     // Update the pup in the installed list
-    const installedIndex = this.installed.findIndex(pup => pup.manifest.package === pupId);
+    const installedIndex = this.installed.findIndex(pup => pup.manifest.id === pupId);
     if (installedIndex !== -1) {
       const installedPup = this.installed[installedIndex];
       // Update the installed pup with new data
@@ -107,9 +107,10 @@ function toAssembledPup(bootstrapResponse) {
   sources.forEach((source) => {
     // sources such as "local", "remote" etc..
     bootstrapResponse.manifests[source].available.forEach((m) => {
-      out.available[m.package] = {
+      out.available[m.id] = {
         manifest: m,
         state: {
+          id: m.id,
           package: m.package,
           ...defaultPupState()
         },
@@ -119,8 +120,8 @@ function toAssembledPup(bootstrapResponse) {
 
   // Popupate installed index.
   Object.values(states).forEach((s) => {
-    out.installed[s.package] = {
-      manifest: out.available[s.package].manifest,
+    out.installed[s.id] = {
+      manifest: out.available[s.id].manifest,
       state: s
     }
   })
@@ -140,6 +141,6 @@ function defaultPupState() {
   return {
     status: undefined,
     stats: undefined,
-    options: {}
+    config: {}
   }
 }

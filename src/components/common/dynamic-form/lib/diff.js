@@ -20,26 +20,15 @@ export function _checkForChanges() {
 }
 
 export function _checkAndSetFieldDirtyStatus(fieldName) {
-  const curr = this._getCurrent(fieldName)
-  const orig = this._getOriginal(fieldName)
-  const isDirty = curr !== orig
+  const { currentKey, originalKey, isDirtyKey } = this.propKeys(fieldName);
 
-  this[this._dirtyFlagField(fieldName)] = isDirty;
+  // Replace undefined with an empty string for comparison
+  // to handle the situation where a user has backspaced an input to "".
+  const curr = this[currentKey] ?? "";
+  const orig = this[originalKey] ?? "";
+  const isDirty = curr !== orig;
+
+  // Update the isDirty flag and return its value
+  this[isDirtyKey] = isDirty;
   return isDirty;
-}
-
-export function _dirtyFlagField(fieldName) {
-  return `__${fieldName}_is_dirty`
-}
-
-export function _dirtyFlagValue(fieldName) {
-  return this[this._dirtyFlagField(fieldName)];
-}
-
-export function _getOriginal(fieldName) {
-  return this[`__${fieldName}`]
-}
-
-export function _getCurrent(fieldName) {
-  return this[fieldName]
 }

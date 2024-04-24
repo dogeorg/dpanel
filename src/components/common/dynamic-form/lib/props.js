@@ -10,15 +10,12 @@ export function _initializeFormFieldProperties(newValue) {
 
       // Create the standard property
       this.constructor.createProperty(currentKey, { type: String });
-      console.log('CREATED', currentKey);
 
       // Create the prefixed property (used for change tracking)
       this.constructor.createProperty(originalKey, { type: String });
-      console.log('CREATED', originalKey);
 
       // Create a property for dirty tracking
       this.constructor.createProperty(isDirtyKey, { type: Boolean });
-      console.log('CREATED', isDirtyKey);
     });
   });
 }

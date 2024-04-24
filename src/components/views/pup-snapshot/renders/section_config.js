@@ -20,6 +20,7 @@ export function renderSectionConfig() {
             .values=${this.options}
             .fields=${this.config}
             .onSubmit=${this.submitPupConfigChanges}
+            .onError=${this.displayTxnFailAlert}
           >
           </dynamic-form>
         `)}

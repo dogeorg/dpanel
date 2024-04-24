@@ -1,8 +1,10 @@
-export function createAlert(variant, message, icon = 'info-circle', duration = 3000) {
+export function createAlert(variant, message, icon = 'info-circle', duration) {
   const alert = document.createElement('sl-alert');
   alert.variant = variant;
   alert.closable = true;
-  alert.duration = duration;
+  if (duration) {
+    alert.duration = duration;
+  }
   alert.innerHTML = `
     <sl-icon name="${icon}" slot="icon"></sl-icon>
     ${escapeHtml(message)}

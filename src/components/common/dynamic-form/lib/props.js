@@ -5,18 +5,20 @@ export function _initializeFormFieldProperties(newValue) {
     this[`_form_${section.name}_count`] = 0;
 
     section.fields.forEach(field => {
-      const propertyOptions = { type: String };
+
+      const { currentKey, originalKey, isDirtyKey } = this.propKeys(field.name);
 
       // Create the standard property
-      this.constructor.createProperty(field.name, propertyOptions);
+      this.constructor.createProperty(currentKey, { type: String });
+      console.log('CREATED', currentKey);
 
       // Create the prefixed property (used for change tracking)
-      const prefixedField = `__${field.name}`;
-      this.constructor.createProperty(prefixedField, propertyOptions);
+      this.constructor.createProperty(originalKey, { type: String });
+      console.log('CREATED', originalKey);
 
       // Create a property for dirty tracking
-      const dirtyFlagFieldName = `__${field.name}_is_dirty`;
-      this.constructor.createProperty(dirtyFlagFieldName, { type: Boolean });
+      this.constructor.createProperty(isDirtyKey, { type: Boolean });
+      console.log('CREATED', isDirtyKey);
     });
   });
 }
@@ -27,16 +29,27 @@ export function _initializeValuesPreservingEdits(newValue) {
   // We should not immediately adopt them as the user may have edits.
   // Preserve edits.
   Object.keys(newValue).forEach(key => {
-    if (this[this._dirtyFlagField(key)]) {
+
+    const { currentKey, originalKey, isDirtyKey } = this.propKeys(key);
+
+    if (this[isDirtyKey]) {
       // If the field is dirty, retain the current value
-      _newValue[key] = this[key]
+      _newValue[key] = this[currentKey]
     } else {
       // If the field is not dirty, update it with the new value
-      this[key] = newValue[key];
-      this[`__${key}`] = newValue[key];
+      this[currentKey] = newValue[key];
+      this[originalKey] = newValue[key];
       _newValue[key] = newValue[key]
     }
   });
 
   this._values = _newValue;
+}
+
+export function propKeys(fieldName) {
+  return {
+    currentKey: `_${fieldName.toLowerCase()}`,
+    originalKey: `__${fieldName.toLowerCase()}`,
+    isDirtyKey: `__${fieldName.toLowerCase()}_is_dirty`
+  }
 }

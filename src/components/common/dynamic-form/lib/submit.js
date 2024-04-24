@@ -22,7 +22,10 @@ export async function _handleSubmit(event) {
   Array
     .from(modifiedFieldNodes)
     .map(node => node.name)
-    .forEach(fieldName => formData[fieldName] = this[fieldName]);
+    .forEach((fieldName) => {
+      const { currentKey } = this.propKeys(fieldName);
+      formData[fieldName] = this[currentKey]
+    });
 
   // Attempt save.
   await this.onSubmit(formData).catch((err) => {
@@ -36,8 +39,9 @@ export async function _handleSubmit(event) {
   console.log('Done submitting');
 
   // Sync the prefixed properties
-  Object.keys(formData).forEach(field => {
-    this[`__${field}`] = this[field];
+  Object.keys(formData).forEach((fieldName) => {
+    const { currentKey, originalKey } = this.propKeys(fieldName);
+    this[originalKey] = this[currentKey];
   });
 
   // Reset

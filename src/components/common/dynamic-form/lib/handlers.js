@@ -5,17 +5,20 @@ export function _handleResize(event) {
 }
 
 export function _handleInput(event) {
-  this[event.target.name] = event.target.value;
+  const { currentKey } = this.propKeys(event.target.name);
+  this[currentKey] = event.target.value;
   this._checkForChanges(event.target.name, event.target.value)
 }
 
 export function _handleToggle(event) {
-  this[event.target.name] = event.target.checked;
+  const { currentKey } = this.propKeys(event.target.name);
+  this[currentKey] = event.target.checked;
   this._checkForChanges(event.target.name, event.target.checked)
 }
 
 export function _handleChoice(event) {
-  this[event.target.name] = event.target.value;
+  const { currentKey } = this.propKeys(event.target.name);
+  this[currentKey] = event.target.value;
   this._checkForChanges(event.target.name, event.target.value)
 }
 
@@ -31,7 +34,10 @@ export function _handleDiscardChanges(event) {
   Array
     .from(modifiedFieldNodes)
     .map(node => node.name)
-    .forEach(fieldName => this[fieldName] = this[`__${fieldName}`])
+    .forEach((fieldName) => {
+      const { currentKey, originalKey } = this.propKeys(fieldName);
+      this[currentKey] = this[originalKey];
+    });
 
   this._checkForChanges();
 }

@@ -1,24 +1,20 @@
 import { getFormControls } from '/vendor/@shoelace/cdn@2.14.0/utilities/form.js';
 
-export async function _handleSubmit(event) {
-  event.preventDefault();
-
-  // Test if form is valid.
-  const formControls = getFormControls(event.currentTarget)
-  const isValid = [...formControls].every(control => control.checkValidity());
-
-  if (!isValid) {
-    console.log('FORM AHS VALIASDSD ISSUESSUS!');
-    return;
+export function checkValidity(form) {
+  if (!form) {
+    throw new Error('dynamic-form checkValidity called without providing form Node')
   }
-  
-  // Set submitting state
-  this._loading = true;
+  const formControls = getFormControls(form)
+  const isValid = [...formControls].every(control => control.checkValidity());
+  return isValid;
+}
 
-  console.log('EVENT TARGET THING', event.target.id);
-  const formId = event.target.id
+export function getChanges(form) {
+  if (!form) {
+    throw new Error('dynamic-form getChanges called without providing form Node')
+  }
 
-  const modifiedFieldNodes = this.shadowRoot.querySelectorAll(`#${event.target.id} [data-dirty-field]`)
+  const modifiedFieldNodes = form.querySelectorAll('[data-dirty-field]');
 
   // Collect data
   let formData = {};
@@ -30,57 +26,48 @@ export async function _handleSubmit(event) {
       formData[fieldName] = this[currentKey]
     });
 
-  let err = false;
-
-  // Attempt submit.
-  const requestSubmitSuccess = await this.onSubmit(
-    formData, {
-      onSuccess: () => this.commit(formId),
-      onError: this._handleError
-    }
-  ).catch((err) => {
-    // ## ON ERROR
-    console.warn('Error occurred within provided onSubmit fn', err);
-    this._loading = false;
-  })
-
-  if (!requestSubmitSuccess) {
-    // Error submitting change request.
-    // Not continuining.
-    console.warn('Error submitting changes, changes not saved.', { requestSubmitSuccess });
-    this._loading = false;
-    return;
-  }
-
-  console.log('Done submitting');
-
+  return formData;
 }
 
-export async function commit(formId) {
-  // In this scenario, the form submitted successfully and the txn resolved successfully.
-  // We should not mark the form as clean.
+export async function _handleSubmit(event) {
+  event.preventDefault();
+  const isValid = this.checkValidity(event.currentTarget);
+  const stagedChanges = this.getChanges(event.currentTarget);
 
-  console.log('COMMIT CALLED!', { formId });
+  if (!isValid) {
+    // Form has validation issues.
+    return
+  }
 
-  const modifiedFieldNodes = this.shadowRoot.querySelectorAll(`#${formId} [data-dirty-field]`)
+  this._loading = true;
+  const res = await this.onSubmit(stagedChanges, event.currentTarget, this);
 
-  let formData = {};
-  Array
-    .from(modifiedFieldNodes)
-    .map(node => node.name)
-    .forEach((fieldName) => {
-      const { currentKey } = this.propKeys(fieldName);
-      formData[fieldName] = this[currentKey]
-    });
+  if (!res || res.error) {
+    console.warn('Error submitting changes, changes not saved.', { res });
+  }
+
+  // If requireCommit is true, commitChanges must be called separately
+  if (!this.requireCommit) {
+    this.commitChanges(event.currentTarget);
+    this._loading = false;
+  }
+}
+
+export function commitChanges(form) {
+  if (!form) {
+    throw new Error('dynamic-form commitChanges called without providing form Node')
+  }
+
+  // Get changes.
+  const stagedChanges = this.getChanges(form);
 
   // Sync the prefixed properties
-  Object.keys(formData).forEach((fieldName) => {
+  Object.keys(stagedChanges).forEach((fieldName) => {
     const { currentKey, originalKey } = this.propKeys(fieldName);
     this[originalKey] = this[currentKey];
   });
 
-  // Reset
-  this._loading = false;
+  // Reset dirty flags on fields
   this._checkForChanges();
 
   // Dispatch a form success event.
@@ -89,18 +76,10 @@ export async function commit(formId) {
     composed: true,
     bubbles: true
   }));
+
+  this._loading = false;
 }
 
-export async function _handleError(payload) {
-  // In this scenario, the form submitted successfully but the txn resolved with an error.
-  // We should not mark the form as clean.
+export function retainChanges() {
   this._loading = false;
-
-  if (this.onError && typeof this.onError === 'function') {
-    try {
-      this.onError(payload)
-    } catch(err) {
-      console.warn('onError function provided to dynamic-form threw an error', err)
-    }
-  }
 }

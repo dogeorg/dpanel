@@ -19,8 +19,9 @@ export function renderSectionConfig() {
           <dynamic-form
             .values=${this.options}
             .fields=${this.config}
-            .onSubmit=${this.submitPupConfigChanges}
-            .onError=${this.displayTxnFailAlert}
+            .onSubmit=${this.submitConfig}
+            .onError=${this.displayConfigUpdateErr}
+            requireCommit
           >
           </dynamic-form>
         `)}

@@ -60,27 +60,27 @@ class DebugPanel extends LitElement {
     super();
     this.isVisible = false;
     this.logMessages = [];
-    this.originalConsoleLog = console.log;
-    this.originalConsoleInfo = console.info;
-    this.originalConsoleError = console.error;
+    // this.originalConsoleLog = console.log;
+    // this.originalConsoleInfo = console.info;
+    // this.originalConsoleError = console.error;
 
-    console.log = (...args) => {
-      this.logMessages.push({ type: 'log', args });
-      this.originalConsoleLog(...args);
-      this.requestUpdate();
-    };
+    // console.log = (...args) => {
+    //   this.logMessages.push({ type: 'log', args });
+    //   this.originalConsoleLog(...args);
+    //   this.requestUpdate();
+    // };
 
-    console.info = (...args) => {
-      this.logMessages.push({ type: 'info', args });
-      this.originalConsoleInfo(...args);
-      this.requestUpdate();
-    };
+    // console.info = (...args) => {
+    //   this.logMessages.push({ type: 'info', args });
+    //   this.originalConsoleInfo(...args);
+    //   this.requestUpdate();
+    // };
 
-    console.error = (...args) => {
-      this.logMessages.push({ type: 'error', args });
-      this.originalConsoleError(...args);
-      this.requestUpdate();
-    }
+    // console.error = (...args) => {
+    //   this.logMessages.push({ type: 'error', args });
+    //   this.originalConsoleError(...args);
+    //   this.requestUpdate();
+    // }
   }
 
   firstUpdated() {
@@ -160,9 +160,9 @@ class DebugPanel extends LitElement {
   // Disconnect custom methods when element is removed to avoid memory leaks
   disconnectedCallback() {
     super.disconnectedCallback();
-    console.log = this.originalConsoleLog;
-    console.info = this.originalConsoleInfo;
-    console.error = this.originalConsoleError;
+    // console.log = this.originalConsoleLog;
+    // console.info = this.originalConsoleInfo;
+    // console.error = this.originalConsoleError;
   }
 }
 

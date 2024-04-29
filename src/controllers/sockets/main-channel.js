@@ -34,7 +34,16 @@ class SocketChannel {
 
     this.wsClient.onMessage = async (event) => {
       console.log('MSSSGSG!~', event);
-      const data = JSON.parse(event.data);
+
+      let err, data;
+      try {
+        data = JSON.parse(event.data)
+      } catch(err) {
+        console.warn('failed to JSON.parse incoming event', event);
+        err = true;
+      };
+
+      if (err || !data) return;
 
       // Switch on message type
       if (!data.type) {

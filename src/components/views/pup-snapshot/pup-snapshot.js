@@ -106,25 +106,30 @@ class PupSnapshot extends LitElement {
     }
   }
 
-  submitPupConfigChanges = async (data, callbacks) => {
-    console.log('submitPupConfigChanges CALLED', this.pupId);
+  submitConfig = async (stagedChanges, formNode, dynamicForm) => {
+    // prepare callbacks
+    const callbacks = {
+      onSuccess: () => dynamicForm.commitChanges(formNode),
+      onError: (errorPayload) => {
+        // To cease the form from spinning
+        dynamicForm.retainChanges();
+        // Display a failure banner
+        this.displayConfigUpdateErr(errorPayload)
+      }
+    }
 
-    // UP TO HERE, requestPupChanges not expecting callbacks to be an object yet.
-    const res = await pkgController.requestPupChanges(this.pupId, data, callbacks); // <-- !! HERE.
+    // invoke pkgContrller model update, supplying data and callbacks
+    const res = await pkgController.requestPupChanges(this.pupId, stagedChanges, callbacks);
 
-    console.log('GOT TO HERE', { res });
-    // Return truth if successful.
     if (res && !res.error) {
       return true;
     }
   }
 
-  displayTxnFailAlert(failedTxnPayload) {
-    createAlert('danger', `
-      Sad doge. Failed to save changes (see console for logs).`,
-      'exclamation-diamond'
-    );
-    console.warn('Sad doge.', failedTxnPayload)
+  displayConfigUpdateErr(failedTxnPayload) {
+    const failedTxnId = failedTxnPayload?.id ? `(${failedTxnPayload.id})` : '';
+    createAlert('danger', ['Failed to update Pup configuration', `Refer to logs ${failedTxnId}`], 'exclamation-diamond');
+    console.warn(`Doge is sad because ${failedTxnId}: `, failedTxnPayload)
   }
 
   handleTabClick(event) {

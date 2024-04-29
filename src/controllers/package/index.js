@@ -100,18 +100,20 @@ class PkgController {
 
     // Txn failed, invoke error callback.
     if (!payload || payload.error) {
-      console.warn('txn contained error', { txn, payload });
-      foundAction.callbacks.onError(payload).catch((err) => {
-        console.warn('pkgController: ERROR CALLBACK ENCOUNTERED AN ERROR', err);
-      });
+      try {
+        foundAction.callbacks.onError(payload);
+      } catch (err) {
+        console.warn('the provided onError callback function threw an error');
+      }
       return;
     }
 
     // Txn succeeded, invoke success callback.
-    console.log('Proceeding to call registered action onSuccess callback');
-    foundAction.callbacks.onSuccess(payload).catch((err) => {
-      console.warn('pkgController: SUCCESS CALLBACK ENCOUNTERED AN ERROR', err);
-    })
+    try {
+      foundAction.callbacks.onSuccess(payload);
+    } catch (err) {
+      console.warn('the provided onSuccess callback function threw an error');
+    }
 
     switch (foundAction.actionType) {
       case 'UPDATE-PUP':
@@ -129,8 +131,6 @@ class PkgController {
     //   this.installed[installedIndex] = { ...installedPup, ...newData };
     // }
 
-    console.log('UPDATE PUP MODEL CALLED WITH', { pupId, newPupStateData });
-
     // Update the pup in the pupIndex
     if (this.pupIndex[pupId]) {
       const indexedPup = this.pupIndex[pupId];
@@ -145,7 +145,6 @@ class PkgController {
     }
 
     // Request an update to re-render the host with new data
-    console.log('Pup Now looks like', this.pupIndex[pupId]);
     this.notify(pupId);
   }
 
@@ -163,7 +162,7 @@ class PkgController {
     });
 
     if (!res || res.error) {
-      callbacks.onError({ error: true });
+      callbacks.onError({ error: true, message: 'failure occured when calling postConfig' });
       return false;
     }
 

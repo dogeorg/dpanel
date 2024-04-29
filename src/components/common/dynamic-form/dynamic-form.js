@@ -10,6 +10,7 @@ class DynamicForm extends LitElement {
       values: { type: Object },
       fields: { type: Object },
       onSubmit: { type: Object },
+      requireCommit: { type: Boolean },
       _activeFormId: { type: String, state: true },
       _dirty: { type: Number, state: true },
       _loading: { type: Boolean, state: true },
@@ -24,6 +25,7 @@ class DynamicForm extends LitElement {
     bindToClass(methods, this);
     this.values = {};
     this.fields = {};
+    this.requireCommit = false;
     this._activeFormId = null;
     this._dirty = 0;
     this._loading = false;
@@ -92,10 +94,6 @@ class DynamicForm extends LitElement {
 
   async updated(changedProperties) {
     await this._onUpdate(changedProperties);
-  }
-
-  disconnectedCallback() {
-    this._removeFormSubmitListeners();
   }
 }
 

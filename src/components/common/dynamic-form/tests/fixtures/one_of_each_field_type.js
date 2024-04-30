@@ -36,7 +36,7 @@ export const ONE_OF_EACH_FIELD_TYPE = [
   // Color
   { name: 'bannerColour', label: 'Banner Colour', type: 'color' },
   // Range
-  { name: 'handicap', label: 'Handicap (0 - 100)', type: 'range' },
+  // { name: 'handicap', label: 'Handicap (0 - 100)', type: 'range' },
   // Rating
   { name: 'score', label: 'Score (out of 5)', type: 'rating' },
 ]

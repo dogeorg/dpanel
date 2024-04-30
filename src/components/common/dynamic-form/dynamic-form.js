@@ -2,6 +2,7 @@ import { LitElement, html, css } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
 import * as methods from '/components/common/dynamic-form/index.js';
 import { bindToClass } from '/utils/class-bind.js';
 import { styles } from './styles.js';
+import debounce from '/utils/debounce.js';
 
 class DynamicForm extends LitElement {
 
@@ -84,7 +85,7 @@ class DynamicForm extends LitElement {
     if (!this.fields?.sections) return;
 
     return html`
-      <sl-resize-observer @sl-resize=${this._handleResize}>
+      <sl-resize-observer @sl-resize=${debounce(this._handleResize, 300)}>
         <div class="dynamic-form-wrapper">
           ${this._generateOneOrManyForms(this.fields)}
         </div>

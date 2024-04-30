@@ -12,6 +12,5 @@ export function focus(fieldName) {
     return
   }
 
-  console.log(`forcing focus to: ${fieldName}`);
   node.focus();
 }

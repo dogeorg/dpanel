@@ -2,6 +2,7 @@ import { LitElement, html, css } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
 import * as methods from '/components/common/dynamic-form/index.js';
 import { bindToClass } from '/utils/class-bind.js';
 import { styles } from './styles.js';
+import debounce from '/utils/debounce.js';
 
 class DynamicForm extends LitElement {
 
@@ -10,6 +11,7 @@ class DynamicForm extends LitElement {
       values: { type: Object },
       fields: { type: Object },
       onSubmit: { type: Object },
+      requireCommit: { type: Boolean },
       _activeFormId: { type: String, state: true },
       _dirty: { type: Number, state: true },
       _loading: { type: Boolean, state: true },
@@ -24,6 +26,7 @@ class DynamicForm extends LitElement {
     bindToClass(methods, this);
     this.values = {};
     this.fields = {};
+    this.requireCommit = false;
     this._activeFormId = null;
     this._dirty = 0;
     this._loading = false;
@@ -82,7 +85,7 @@ class DynamicForm extends LitElement {
     if (!this.fields?.sections) return;
 
     return html`
-      <sl-resize-observer @sl-resize=${this._handleResize}>
+      <sl-resize-observer @sl-resize=${debounce(this._handleResize, 300)}>
         <div class="dynamic-form-wrapper">
           ${this._generateOneOrManyForms(this.fields)}
         </div>
@@ -92,10 +95,6 @@ class DynamicForm extends LitElement {
 
   async updated(changedProperties) {
     await this._onUpdate(changedProperties);
-  }
-
-  disconnectedCallback() {
-    this._removeFormSubmitListeners();
   }
 }
 

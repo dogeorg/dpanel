@@ -6,11 +6,17 @@
   "scripts": {
     "setup": "./scripts/setup.sh",
     "check": "./scripts/check.sh",
-    "start": "./scripts/check.sh && node ./example-pups/run.js & node ./scripts/start.js"
+    "start": "./scripts/check.sh && node ./example-pups/run.js & node ./scripts/start.js",
+    "test": "web-test-runner --config ./configs/web-test-runner.config.mjs",
+    "test:watch": "web-test-runner --config ./configs/web-test-runner.config.mjs --watch"
   },
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "@web/dev-server": "^0.4.3"
+    "@open-wc/testing": "^4.0.0",
+    "@web/dev-server": "^0.4.4",
+    "@web/test-runner": "^0.18.1",
+    "@web/test-runner-commands": "^0.9.0",
+    "@web/test-runner-playwright": "^0.11.0"
   }
 }

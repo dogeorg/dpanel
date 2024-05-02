@@ -1,21 +1,20 @@
 import { getFormControls } from '/vendor/@shoelace/cdn@2.14.0/utilities/form.js';
 
-export async function _handleSubmit(event) {
-  event.preventDefault();
-
-  // Test if form is valid.
-  const formControls = getFormControls(event.currentTarget)
-  const isValid = [...formControls].every(control => control.checkValidity());
-
-  if (!isValid) {
-    console.log('FORM AHS VALIASDSD ISSUESSUS!');
-    return;
+export function checkValidity(form) {
+  if (!form) {
+    throw new Error('dynamic-form checkValidity called without providing form Node')
   }
-  
-  // Set submitting state
-  this._loading = true;
+  const formControls = getFormControls(form)
+  const isValid = [...formControls].every(control => control.checkValidity());
+  return isValid;
+}
 
-  const modifiedFieldNodes = this.shadowRoot.querySelectorAll(`#${event.target.id} [data-dirty-field]`)
+export function getChanges(form) {
+  if (!form) {
+    throw new Error('dynamic-form getChanges called without providing form Node')
+  }
+
+  const modifiedFieldNodes = form.querySelectorAll('[data-dirty-field]');
 
   // Collect data
   let formData = {};
@@ -27,30 +26,60 @@ export async function _handleSubmit(event) {
       formData[fieldName] = this[currentKey]
     });
 
-  // Attempt save.
-  await this.onSubmit(formData).catch((err) => {
-    // ## ON ERROR
-    console.warn('Form submission failed:', err);
-    this._loading = false;
-    return;
-  })
+  return formData;
+}
 
-  // // ## ON SUCCESS
-  console.log('Done submitting');
+export async function _handleSubmit(event) {
+  event.preventDefault();
+  const isValid = this.checkValidity(event.currentTarget);
+  const stagedChanges = this.getChanges(event.currentTarget);
+
+  if (!isValid) {
+    // Form has validation issues.
+    return
+  }
+
+  this._loading = true;
+  const res = await this.onSubmit(stagedChanges, event.currentTarget, this);
+
+  if (!res || res.error) {
+    console.warn('Error submitting changes, changes not saved.', { res });
+  }
+
+  // If requireCommit is true, commitChanges must be called separately
+  if (!this.requireCommit) {
+    this.commitChanges(event.currentTarget);
+    this._loading = false;
+  }
+}
+
+export function commitChanges(form) {
+  if (!form) {
+    throw new Error('dynamic-form commitChanges called without providing form Node')
+  }
+
+  // Get changes.
+  const stagedChanges = this.getChanges(form);
 
   // Sync the prefixed properties
-  Object.keys(formData).forEach((fieldName) => {
+  Object.keys(stagedChanges).forEach((fieldName) => {
     const { currentKey, originalKey } = this.propKeys(fieldName);
     this[originalKey] = this[currentKey];
   });
 
-  // Reset
-  this._loading = false;
+  // Reset dirty flags on fields
   this._checkForChanges();
 
+  // Dispatch a form success event.
   this.dispatchEvent(new CustomEvent('form-submit-success', {
     detail: {},
     composed: true,
     bubbles: true
   }));
+
+  this._loading = false;
+}
+
+export function retainChanges() {
+  this._loading = false;
 }

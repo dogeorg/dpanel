@@ -30,12 +30,29 @@ export default class ApiClient {
     // Otherwise, perform the fetch request
     const url = new URL(path, this.baseURL).href;
     const headers = { 'Content-Type': 'application/json', ...config.headers };
+    let response, data
 
-    const response = await fetch(url, { ...config, headers });
-    const data = await response.json();
-    if (!response.ok) {
-      throw new Error(data.message || 'An error occurred while fetching data');
+    try {
+      response = await fetch(url, { ...config, headers });
+    } catch (fetchErr) {
+      throw new Error('An error occurred while fetching data, refer to network logs');
     }
+
+    if (response.status === 404) {
+      throw new Error(`Resource not found: ${url}`);
+    }
+
+    if (!response.ok) {
+      throw new Error('Fetching returned an unsuccessful response', { ok, status: repsonse.status });
+    }
+
+    try {
+      data = await response.json();
+    } catch (jsonParseErr) {
+      console.warn('Could not JSON parse response from server', jsonParseErr);
+      throw new Error('Could not JSON parse response from server');
+    }
+
     return data;
   }
 }

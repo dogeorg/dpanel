@@ -9,6 +9,7 @@ import '/components/views/log-viewer/log-viewer.js'
 import * as mockConfig from '/components/common/dynamic-form/mocks/index.js'
 import { pkgController } from '/controllers/package/index.js';
 import { postConfig } from '/api/config/config.js';
+import { createAlert } from '/components/common/alert.js';
 
 // Import component chunks
 import * as renderMethods from './renders/index.js';
@@ -69,7 +70,7 @@ class PupSnapshot extends LitElement {
     super.connectedCallback();
     this.pkgController.addObserver(this);
     this.addEventListener('form-dirty-change', this.handleDirtyChange.bind(this), { composed: true })
-    this.addEventListener('form-submit-success', this.handleFormSubmitSuccess.bind(this), { composed: true })
+    this.addEventListener('form-submit-success', this.handlePupUpdateSuccess.bind(this), { composed: true })
   }
 
   firstUpdated() {
@@ -81,7 +82,7 @@ class PupSnapshot extends LitElement {
 
   disconnectedCallback() {
     this.removeEventListener('form-dirty-change', this.handleDirtyChange.bind(this))
-    this.removeEventListener('form-submit-success', this.handleFormSubmitSuccess.bind(this), { composed: true })
+    this.removeEventListener('form-submit-success', this.handlePupUpdateSuccess.bind(this), { composed: true })
     this.pkgController.removeObserver(this);
     super.disconnectedCallback();
   }
@@ -90,21 +91,45 @@ class PupSnapshot extends LitElement {
     this._dirty = event.detail.dirty;
   }
 
-  async handleFormSubmitSuccess(event) {
+  async handlePupUpdateSuccess() {
+    // Celebrate successful update of pup config.
     this._saved = true;
     await asyncTimeout(2000)
     this._saved = false;
   }
 
-  submitPupConfigChanges = async (data) => {
-    const res = await postConfig(this.pupId, data);
-    await pkgController.savePupChanges(this.pupId, data);
-    // Updated PupSnapshots copy of options
-    // This will trigger a re-render of the dynamic-form
-    await asyncTimeout(4000);
+  async handlePupConfigSubmitResponse(res) {
+    console.log('handlePupConfigSubmitResponse CALLED', res);
+    if (!res || res.error) {
+      console.log('handlePupConfigSubmitResponse massive error', { res });
+      return;
+    }
+  }
 
-    console.log('--injecting new state returned from server');
-    this.options = { ...this.options, ...data }
+  submitConfig = async (stagedChanges, formNode, dynamicForm) => {
+    // prepare callbacks
+    const callbacks = {
+      onSuccess: () => dynamicForm.commitChanges(formNode),
+      onError: (errorPayload) => {
+        // To cease the form from spinning
+        dynamicForm.retainChanges();
+        // Display a failure banner
+        this.displayConfigUpdateErr(errorPayload)
+      }
+    }
+
+    // invoke pkgContrller model update, supplying data and callbacks
+    const res = await pkgController.requestPupChanges(this.pupId, stagedChanges, callbacks);
+
+    if (res && !res.error) {
+      return true;
+    }
+  }
+
+  displayConfigUpdateErr(failedTxnPayload) {
+    const failedTxnId = failedTxnPayload?.id ? `(${failedTxnPayload.id})` : '';
+    createAlert('danger', ['Failed to update Pup configuration', `Refer to logs ${failedTxnId}`], 'exclamation-diamond');
+    console.warn(`Doge is sad because ${failedTxnId}: `, failedTxnPayload)
   }
 
   handleTabClick(event) {

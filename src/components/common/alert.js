@@ -1,12 +1,24 @@
-export function createAlert(variant, message, icon = 'info-circle', duration = 3000) {
+export function createAlert(variant, message, icon = 'info-circle', duration) {
   const alert = document.createElement('sl-alert');
   alert.variant = variant;
   alert.closable = true;
-  alert.duration = duration;
-  alert.innerHTML = `
-    <sl-icon name="${icon}" slot="icon"></sl-icon>
-    ${escapeHtml(message)}
-  `;
+  if (duration) {
+    alert.duration = duration;
+  }
+
+  if (Array.isArray(message)) {
+    const messageHtml = `<strong>${escapeHtml(message[0])}</strong>` + message.slice(1).map(item => `<br>${escapeHtml(item)}`).join('');
+    alert.innerHTML = `
+      <sl-icon name="${icon}" slot="icon"></sl-icon>
+      ${messageHtml}
+    `;
+  } else {
+    alert.innerHTML = `
+      <sl-icon name="${icon}" slot="icon"></sl-icon>
+      ${escapeHtml(message)}
+    `;
+  }
+
   document.body.append(alert);
   alert.toast();
 }

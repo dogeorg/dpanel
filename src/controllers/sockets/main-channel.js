@@ -1,5 +1,7 @@
 import WebSocketClient from '/api/sockets.js';
 import { store } from '/state/store.js';
+import { pkgController } from '/controllers/package/index.js';
+import { asyncTimeout } from '/utils/timeout.js';
 
 class SocketChannel {
   observers = [];
@@ -32,6 +34,33 @@ class SocketChannel {
 
     this.wsClient.onMessage = async (event) => {
       console.log('MSSSGSG!~', event);
+
+      let err, data;
+      try {
+        data = JSON.parse(event.data)
+      } catch(err) {
+        console.warn('failed to JSON.parse incoming event', event);
+        err = true;
+      };
+
+      if (err || !data) return;
+
+      // Switch on message type
+      if (!data.type) {
+        console.warn('received an event that lacks an event type', event)
+        return
+      }
+
+      switch (data.type) {
+        case 'PupStatus':
+
+          // TODO: determine why.
+          // Receiving completed txns before the txn has been registered in the client.
+          await asyncTimeout(500);
+
+          pkgController.resolveAction(data.id, data);
+          break;
+      }
     };
 
     this.wsClient.onError = (event) => {

@@ -1,5 +1,8 @@
+import { postConfig } from '/api/config/config.js';
+
 class PkgController {
   observers = [];
+  actions = [];
   pupIndex = {};
   installed = [];
   available = [];
@@ -60,24 +63,118 @@ class PkgController {
     }
   }
 
-  savePupChanges(pupId, newData) {
-    // Update the pup in the installed list
-    const installedIndex = this.installed.findIndex(pup => pup.manifest.id === pupId);
-    if (installedIndex !== -1) {
-      const installedPup = this.installed[installedIndex];
-      // Update the installed pup with new data
-      this.installed[installedIndex] = { ...installedPup, ...newData };
+  registerAction(txn, callbacks, actionType, pupId) {
+    if (!txn || !callbacks || !actionType || !pupId) {
+      console.warn(`
+        pkgController: MALFORMED REGISTER ACTION REQUEST.
+        Expecting: txn, callbacks, actionType & pupId`,
+        { txn, callbacks, actionType, pupId }
+      )
+      return;
     }
+
+    if (typeof callbacks.onSuccess !== 'function') {
+      console.warn('pkgController: ACTION SUCCESS CALLBACK NOT A FUNCTION.', { txn, callbacks })
+      return;
+    }
+
+    if (typeof callbacks.onError !== 'function') {
+      console.warn('pkgController: ACTION ERROR CALLBACK NOT A FUNCTION.', { txn, callbacks })
+      return;
+    }
+
+    this.actions.push({
+      txn,
+      callbacks,
+      actionType,
+      pupId
+    })
+  }
+
+  resolveAction(txn, payload) {
+    const foundAction = this.actions.find(action => action.txn === txn);
+    if (!foundAction) {
+      console.warn('pkgController: ACTION NOT FOUND.', { txn })
+      return;
+    }
+
+    // Txn failed, invoke error callback.
+    if (!payload || payload.error) {
+      try {
+        foundAction.callbacks.onError(payload);
+      } catch (err) {
+        console.warn('the provided onError callback function threw an error');
+      }
+      return;
+    }
+
+    // Txn succeeded, invoke success callback.
+    try {
+      foundAction.callbacks.onSuccess(payload);
+    } catch (err) {
+      console.warn('the provided onSuccess callback function threw an error');
+    }
+
+    switch (foundAction.actionType) {
+      case 'UPDATE-PUP':
+        this.updatePupModel(foundAction.pupId, payload.update);
+        break;
+    }
+  }
+
+  updatePupModel(pupId, newPupStateData) {
+    // Update the pup in the installed list
+    // const installedIndex = this.installed.findIndex(pup => pup.manifest.id === pupId);
+    // if (installedIndex !== -1) {
+    //   const installedPup = this.installed[installedIndex];
+    //   // Update the installed pup with new data
+    //   this.installed[installedIndex] = { ...installedPup, ...newData };
+    // }
 
     // Update the pup in the pupIndex
     if (this.pupIndex[pupId]) {
       const indexedPup = this.pupIndex[pupId];
       // Update the indexed pup with new data
-      this.pupIndex[pupId] = { ...indexedPup, ...newData };
+      this.pupIndex[pupId] = {
+        ...indexedPup,
+        state: {
+          ...indexedPup.state,
+          ...newPupStateData
+        }
+      };
     }
 
     // Request an update to re-render the host with new data
     this.notify(pupId);
+  }
+
+  async requestPupChanges(pupId, newData, callbacks) {
+
+    if (!pupId || !newData || !callbacks) {
+      console.warn('Error. requestPupChanges expected pupId, newData, callbacks', { pupId, newData, callbacks});
+    }
+
+    const actionType = 'UPDATE-PUP';
+
+    // Make a network call
+    const res = await postConfig(pupId, newData).catch((err) => {
+      console.error(err);
+    });
+
+    if (!res || res.error) {
+      callbacks.onError({ error: true, message: 'failure occured when calling postConfig' });
+      return false;
+    }
+
+    // Submitting changes succeeded, carry on.
+    const txn = res.id
+    if (txn && callbacks) {
+      // Register transaction in actions register.
+      this.registerAction(txn, callbacks, actionType, pupId)
+    }
+
+    // Return truthy to caller
+    return true;
   }
 }
 

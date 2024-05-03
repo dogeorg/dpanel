@@ -79,6 +79,7 @@ class DPanelApp extends LitElement {
     // Set out routes
     router.setRoutes([
       { path: '/',           action: wrapActions(),               component: 'home-view' },
+      { path: '/login',      action: wrapActions(),               component: 'login-view' },
       { path: '/pups',       action: wrapActions(),               component: 'manage-view' },
       { path: '/stats',      action: wrapActions(),               component: 'stats-view' },
       { path: '/config',     action: wrapActions(),               component: 'config-view' },

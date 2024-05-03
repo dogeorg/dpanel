@@ -2,7 +2,7 @@ import { css } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
 
 export const styles = css`
   form {
-    padding: 0em 1em;
+    padding: 0em 0em;
   }
 
   /* Form tabs */
@@ -16,11 +16,9 @@ export const styles = css`
   }
 
   /* Highlighting edits */
-  [data-dirty-field] {
-    position: relative;
-  }
-  [data-dirty-field]::part(form-control-label)::before,
-  [data-dirty-field]::part(label)::before {
+  form[data-mark-modified] [data-dirty-field] { position: relative; }
+  form[data-mark-modified] [data-dirty-field]::part(form-control-label)::before,
+  form[data-mark-modified] [data-dirty-field]::part(label)::before {
     content: "~";
     color: var(--sl-color-neutral-500);
     display: inline-block;

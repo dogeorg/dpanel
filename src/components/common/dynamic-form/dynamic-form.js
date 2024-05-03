@@ -12,6 +12,8 @@ class DynamicForm extends LitElement {
       fields: { type: Object },
       onSubmit: { type: Object },
       requireCommit: { type: Boolean },
+      markModifiedFields: { type: Boolean },
+      allowDiscardChanges: { type: Boolean },
       _activeFormId: { type: String, state: true },
       _dirty: { type: Number, state: true },
       _loading: { type: Boolean, state: true },
@@ -27,6 +29,8 @@ class DynamicForm extends LitElement {
     this.values = {};
     this.fields = {};
     this.requireCommit = false;
+    this.markModifiedFields = false;
+    this.allowDiscardChanges = false;
     this._activeFormId = null;
     this._dirty = 0;
     this._loading = false;

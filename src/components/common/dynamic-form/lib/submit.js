@@ -14,7 +14,7 @@ export function getChanges(form) {
     throw new Error('dynamic-form getChanges called without providing form Node')
   }
 
-  const modifiedFieldNodes = form.querySelectorAll('[data-dirty-field]');
+  const modifiedFieldNodes = form.querySelectorAll('[data-dirty-field]:not([data-repeat-field])');
 
   // Collect data
   let formData = {};
@@ -43,7 +43,7 @@ export async function _handleSubmit(event) {
   const res = await this.onSubmit(stagedChanges, event.currentTarget, this);
 
   if (!res || res.error) {
-    console.warn('Error submitting changes, changes not saved.', { res });
+    // console.warn('Error submitting changes, changes not saved.', { res });
   }
 
   // If requireCommit is true, commitChanges must be called separately

@@ -18,7 +18,8 @@ class Store {
       forceFailures: false,
       forceDelayInSeconds: 3,
       reqLogs: true,
-      status: 'online'
+      status: 'online',
+      token: false,
     };
     this.pupContext = {
       // Define pup state here

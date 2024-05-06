@@ -1,4 +1,4 @@
-import { LitElement, html, css } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
+import { LitElement, html, css, nothing } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
 
 // Add shoelace once. Use components anywhere.
 import { setBasePath } from '/vendor/@shoelace/cdn@2.14.0/utilities/base-path.js';
@@ -15,6 +15,9 @@ import {
 import { store } from '/state/store.js';
 import { StoreSubscriber } from '/state/subscribe.js';
 
+// Layouts
+import '/components/layouts/default-layout.js';
+
 // Views
 import '/components/views/index.js';
 import '/components/views/welcome-dialog/index.js';
@@ -24,7 +27,6 @@ import '/utils/debug-panel.js';
 
 // Router (singleton)
 import { getRouter } from '/router/router.js'
-import { wrapActions, loadPupContext } from '/router/middleware.js'
 
 // Utils
 import debounce from '/utils/debounce.js';
@@ -40,6 +42,7 @@ class DPanelApp extends LitElement {
   static properties = {
     menuVisible: { type: Boolean },
     currentPath: { type: String },
+    routerState: { type: Object }
   }
 
   constructor() {
@@ -47,6 +50,7 @@ class DPanelApp extends LitElement {
     this.context = new StoreSubscriber(this, store);
     this.menuVisible = false;
     this.currentPath = '';
+    this.routerState = null;
     this._debouncedHandleResize = debounce(this._handleResize.bind(this), 50);
     this.mainChannel = mainChannel;
   }
@@ -64,6 +68,7 @@ class DPanelApp extends LitElement {
 
     // Instanciate a web socket connection and add app as an observer
     this.mainChannel.addObserver(this);
+
   }
 
   disconnectedCallback() {
@@ -75,19 +80,6 @@ class DPanelApp extends LitElement {
   firstUpdated() {
     // Initialise our router singleton and provide it a target elemenet.
     const router = getRouter(this.shadowRoot.querySelector('#Outlet'));
-
-    // Set out routes
-    router.setRoutes([
-      { path: '/',           action: wrapActions(),               component: 'home-view' },
-      { path: '/login',      action: wrapActions(),               component: 'login-view' },
-      { path: '/pups',       action: wrapActions(),               component: 'manage-view' },
-      { path: '/stats',      action: wrapActions(),               component: 'stats-view' },
-      { path: '/config',     action: wrapActions(),               component: 'config-view' },
-      { path: '/config',     action: wrapActions(),               component: 'config-view' },
-      { path: '/form',       action: wrapActions(),               component: 'form-view' },
-      { path: '/manage',     action: wrapActions(),               component: 'manage-view' },
-      { path: '/pup/:path*', action: wrapActions(loadPupContext), component: 'iframe-view' },
-    ]);
 
     // For demonstration
     const alertExample = this.shadowRoot.querySelector('#AlertExample');
@@ -135,60 +127,60 @@ class DPanelApp extends LitElement {
   }
 
   render() {
-
     const CURPATH = this.context.store.appContext.pathname || ''
+    const hideNav = !CURPATH.startsWith('/login');
 
     return html`
       <div id="App">
-        <nav id="Nav">
-          <div id="GutterNav" ?open=${this.menuVisible}>
-            <div id="logo" class="gutter-menu-item" @click=${() => window.location.reload(true)}>
-              <img src="/static/img/dogebox-logo-small.png" />
-            </div>
-            <div id="menu" class="gutter-menu-item" @click=${this.handleMenuClick}>
-              <sl-icon name="grid-fill"></sl-icon>
-            </div>
-          </div>
 
-          <div id="Side" ?open=${this.menuVisible}>
-            <div class"nav-body">
-              <div class="menu-label">dpanel v0.0.2</div>
-              <div class="menu-item ${CURPATH === '/' ? 'active' : ''}">
-                <sl-icon name="house-heart-fill"></sl-icon>
-                <a href="/">Such Home</a>
+        ${hideNav ? html `
+          <nav id="Nav">
+            <div id="GutterNav" ?open=${this.menuVisible}>
+              <div id="logo" class="gutter-menu-item" @click=${() => window.location.reload(true)}>
+                <img src="/static/img/dogebox-logo-small.png" />
               </div>
-
-              <div class="menu-item ${CURPATH.startsWith('/pups') ? 'active' : ''}">
-                <sl-icon name="box-seam"></sl-icon>
-                <a href="/pups">Much Pups</a>
-              </div>
-
-              <div class="menu-item ${CURPATH.startsWith('/stats') ? 'active' : ''}">
-                <sl-icon name="heart-pulse-fill"></sl-icon>
-                <a href="/stats">Very Stats</a>
-              </div>
-
-              <div class="menu-item ${CURPATH.startsWith('/config') ? 'active' : ''}">
-                <sl-icon name="sliders"></sl-icon>
-                <a href="/config">So Config</a>
+              <div id="menu" class="gutter-menu-item" @click=${this.handleMenuClick}>
+                <sl-icon name="grid-fill"></sl-icon>
               </div>
             </div>
 
-            <div class="nav-footer">
-              <sl-divider></sl-divider>
-              <div class="nav-footer-content">
-                <p>Propel the people's currency using your Dogebox.</p>
-                <sl-button outline>Read Docs</sl-button>
+            <div id="Side" ?open=${this.menuVisible}>
+              <div class"nav-body">
+                <div class="menu-label">dpanel v0.0.2</div>
+                <div class="menu-item ${CURPATH === '/' ? 'active' : ''}">
+                  <sl-icon name="house-heart-fill"></sl-icon>
+                  <a href="/">Such Home</a>
+                </div>
+
+                <div class="menu-item ${CURPATH.startsWith('/pups') ? 'active' : ''}">
+                  <sl-icon name="box-seam"></sl-icon>
+                  <a href="/pups">Much Pups</a>
+                </div>
+
+                <div class="menu-item ${CURPATH.startsWith('/stats') ? 'active' : ''}">
+                  <sl-icon name="heart-pulse-fill"></sl-icon>
+                  <a href="/stats">Very Stats</a>
+                </div>
+
+                <div class="menu-item ${CURPATH.startsWith('/config') ? 'active' : ''}">
+                  <sl-icon name="sliders"></sl-icon>
+                  <a href="/config">So Config</a>
+                </div>
+              </div>
+
+              <div class="nav-footer">
+                <sl-divider></sl-divider>
+                <div class="nav-footer-content">
+                  <p>Propel the people's currency using your Dogebox.</p>
+                  <sl-button outline>Read Docs</sl-button>
+                </div>
               </div>
             </div>
-          </div>
-        </nav>
-
-        <main id="Main">
-          <div id="Outlet">
-            <!-- Views injected here as users navigate -->
-          </div>
-        </main>
+          </nav>
+        ` : nothing }
+          <main id="Main">
+            <div id="Outlet"></div>
+          </main>
       </div>
 
       <aside>

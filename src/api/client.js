@@ -30,6 +30,11 @@ export default class ApiClient {
     // Otherwise, perform the fetch request
     const url = new URL(path, this.baseURL).href;
     const headers = { 'Content-Type': 'application/json', ...config.headers };
+
+    if (this.networkContext.token) {
+      headers.Authorization = this.networkContext.token
+    }
+
     let response, data
 
     try {

@@ -23,7 +23,7 @@ export function renderSectionConfig() {
             .onError=${this.displayConfigUpdateErr}
             requireCommit
             markModifiedFields
-            allowDisacrdChanges
+            allowDiscardChanges
           >
           </dynamic-form>
         `)}

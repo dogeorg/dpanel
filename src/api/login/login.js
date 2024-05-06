@@ -8,5 +8,9 @@ import {
 const client = new ApiClient('http://localhost:3000', store.networkContext)
 
 export async function postLogin(body) {
-  return client.post(`/auth/login`, body, { mock: postResponse });
+  const res = await client.post(`/auth/login`, body, { mock: postResponse });
+  if (res && res.token) {
+    store.updateState({ networkContext: { token: res.token }})
+  }
+  return res
 }

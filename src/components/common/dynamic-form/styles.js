@@ -43,4 +43,10 @@ export const styles = css`
   .footer-controls sl-button.discard-button::part(base):hover {
     color: var(--sl-color-neutral-900);
   }
+
+  /* Wider buttons on small screens */
+  sl-button { width: 100%; }
+  @media (min-width:480px) {
+    sl-button { width: auto }
+  }
 `;

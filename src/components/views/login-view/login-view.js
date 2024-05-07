@@ -3,6 +3,9 @@ import { asyncTimeout } from "/utils/timeout.js";
 import { postLogin } from "/api/login/login.js";
 import { getRouter } from "/router/router.js";
 
+// Components
+import "/components/common/dynamic-form/dynamic-form.js";
+
 class LoginView extends LitElement {
   static styles = css`
     :host {
@@ -32,6 +35,8 @@ class LoginView extends LitElement {
     return {
       _server_fault: { type: Boolean },
       _invalid_creds: { type: Boolean },
+      _loginFields: { type: Object },
+      _attemptLogin: { type: Object },
     };
   }
 
@@ -39,7 +44,12 @@ class LoginView extends LitElement {
     super();
     this._server_fault = false;
     this._invalid_creds = false;
-    this.loginFields = {
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    this.addEventListener("sl-hide", this.dismissErrors);
+    this._loginFields = {
       sections: [
         {
           name: "login",
@@ -57,10 +67,9 @@ class LoginView extends LitElement {
     };
   }
 
-  connectedCallback() {
-    super.connectedCallback();
-    this.addEventListener("sl-hide", this.dismissErrors);
-    this.router = getRouter();
+  disconnectedCallback() {
+    this.removeEventListener("sl-hide", this.dismissErrors);
+    super.disconnectedCallback();
   }
 
   dismissErrors() {
@@ -68,9 +77,9 @@ class LoginView extends LitElement {
     this._server_fault = false;
   }
 
-  attemptLogin = async (data, form, dynamicFormInstance) => {
+  _attemptLogin = async (data, form, dynamicFormInstance) => {
     // Do a thing
-    const loginResponse = await postLogin(data);
+    const loginResponse = await postLogin(data).catch(this.handleFault);
 
     if (!loginResponse) {
       dynamicFormInstance.retainChanges(); // stops spinner
@@ -98,11 +107,11 @@ class LoginView extends LitElement {
     }
   };
 
-  handleFault(loginFault) {
+  handleFault = (loginFault) => {
     this._server_fault = true;
     console.warn(loginFault);
     window.alert("boo. something went wrong");
-  }
+  };
 
   handleError(loginResponseError) {
     switch (loginResponseError) {
@@ -132,8 +141,8 @@ class LoginView extends LitElement {
           </sl-alert>
 
           <dynamic-form
-            .fields=${this.loginFields}
-            .onSubmit=${this.attemptLogin}
+            .fields=${this._loginFields}
+            .onSubmit=${this._attemptLogin}
             requireCommit
           >
           </dynamic-form>

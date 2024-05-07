@@ -1,10 +1,9 @@
-import { LitElement, html, css } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
-import { asyncTimeout } from '/utils/timeout.js';
-import { postLogin } from '/api/login/login.js';
-import { getRouter } from '/router/router.js';
+import { LitElement, html, css } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
+import { asyncTimeout } from "/utils/timeout.js";
+import { postLogin } from "/api/login/login.js";
+import { getRouter } from "/router/router.js";
 
 class LoginView extends LitElement {
-
   static styles = css`
     :host {
       display: flex;
@@ -22,18 +21,18 @@ class LoginView extends LitElement {
       padding: 20px;
     }
     h1 {
-      font-family: 'Comic Neue', sans-serif;
+      font-family: "Comic Neue", sans-serif;
     }
     sl-alert {
       margin-bottom: 1em;
     }
-  `
+  `;
 
   static get properties() {
     return {
       _server_fault: { type: Boolean },
-      _invalid_creds: { type: Boolean }
-    }
+      _invalid_creds: { type: Boolean },
+    };
   }
 
   constructor() {
@@ -43,27 +42,28 @@ class LoginView extends LitElement {
     this.loginFields = {
       sections: [
         {
-          name: 'login',
-          submitLabel: 'Login',
-          fields: [{
-            name: 'password',
-            label: 'Enter Password',
-            type: 'password',
-            passwordToggle: true
-          }]
-        }
-      ]
-    }
+          name: "login",
+          submitLabel: "Login",
+          fields: [
+            {
+              name: "password",
+              label: "Enter Password",
+              type: "password",
+              passwordToggle: true,
+            },
+          ],
+        },
+      ],
+    };
   }
 
   connectedCallback() {
     super.connectedCallback();
-    this.addEventListener('sl-hide', this.dismissErrors)
+    this.addEventListener("sl-hide", this.dismissErrors);
     this.router = getRouter();
   }
 
   dismissErrors() {
-    console.log('CALLED');
     this._invalid_creds = false;
     this._server_fault = false;
   }
@@ -86,7 +86,7 @@ class LoginView extends LitElement {
 
     if (!loginResponse.token) {
       dynamicFormInstance.retainChanges(); // stops spinner
-      this.handleError('MISSING-TOKEN');
+      this.handleError("MISSING-TOKEN");
       return;
     }
 
@@ -96,29 +96,29 @@ class LoginView extends LitElement {
       this.handleSuccess();
       return;
     }
-  }
+  };
 
   handleFault(loginFault) {
     this._server_fault = true;
     console.warn(loginFault);
-    window.alert('boo. something went wrong')
+    window.alert("boo. something went wrong");
   }
 
   handleError(loginResponseError) {
-    switch(loginResponseError) {
-      case 'CHECK-CREDS':
+    switch (loginResponseError) {
+      case "CHECK-CREDS":
         this._invalid_creds = true;
         break;
-      case 'MISSING-TOKEN':
+      case "MISSING-TOKEN":
         this.handleFault({ error: loginResponseError });
         break;
-      default: 
+      default:
         this.handleFault({ unhandledError: loginResponseError });
     }
   }
 
   handleSuccess() {
-    window.location = '/pups';
+    window.location = "/pups";
   }
 
   render() {
@@ -137,12 +137,10 @@ class LoginView extends LitElement {
             requireCommit
           >
           </dynamic-form>
-
+        </div>
       </div>
     `;
   }
 }
 
-customElements.define('login-view', LoginView);
-
-
+customElements.define("login-view", LoginView);

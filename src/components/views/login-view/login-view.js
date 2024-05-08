@@ -1,10 +1,11 @@
 import { LitElement, html, css } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
-import { asyncTimeout } from "/utils/timeout.js";
 import { postLogin } from "/api/login/login.js";
-import { getRouter } from "/router/router.js";
 
 // Components
 import "/components/common/dynamic-form/dynamic-form.js";
+
+// Render chunks
+import { renderBanner } from "./renders/banner.js";
 
 class LoginView extends LitElement {
   static styles = css`
@@ -28,6 +29,14 @@ class LoginView extends LitElement {
     }
     sl-alert {
       margin-bottom: 1em;
+    }
+
+    .padded {
+      background: #1a191f;
+      border: 1px solid rgb(32, 31, 36);
+      border-radius: 16px;
+      margin: 1em;
+      padding: 1em;
     }
   `;
 
@@ -134,7 +143,7 @@ class LoginView extends LitElement {
     return html`
       <div class="page">
         <div class="padded">
-          <h1>Such Login</h1>
+          ${renderBanner()}
           <sl-alert variant="danger" ?open=${this._invalid_creds} closable>
             <sl-icon slot="icon" name="exclamation-triangle"></sl-icon>
             Incorrect password

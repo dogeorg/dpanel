@@ -23,9 +23,16 @@ export function _generateOneOrManyForms(data) {
 
   const form = (section, index = 0) => {
     const formFields = repeat(section.fields, (field) => field.name, (field) => this._generateField(field))
-    const formControls = this._generateFormControls({ formId: section.name, submitLabel: 'Save' })
+    const formControls = this._generateFormControls({
+      formId: section.name,
+      submitLabel: section.submitLabel || 'Save'
+    })
     return html`
-      <form id=${section.name} @submit=${this._handleSubmit}>
+      <form
+        id=${section.name}
+        @submit=${this._handleSubmit}
+        ?data-mark-modified=${this.markModifiedFields}
+      >
         ${formFields}
         ${formControls}
       </form>
@@ -97,7 +104,7 @@ export function _generateFormControls(options = {}) {
   const changeCount = this[`_form_${options.formId}_count`];
   return html`
     <div class="footer-controls">
-      ${changeCount ? html`
+      ${this.allowDiscardChanges && changeCount ? html`
         <sl-button
           variant="text"
           id="${options.formId}__reset_button"

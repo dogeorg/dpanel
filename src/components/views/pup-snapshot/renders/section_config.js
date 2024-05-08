@@ -22,6 +22,8 @@ export function renderSectionConfig() {
             .onSubmit=${this.submitConfig}
             .onError=${this.displayConfigUpdateErr}
             requireCommit
+            markModifiedFields
+            allowDiscardChanges
           >
           </dynamic-form>
         `)}

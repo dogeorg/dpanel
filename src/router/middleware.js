@@ -6,7 +6,7 @@ export const wrapActions = (...actions) => async (context, commands) => {
   for (const action of actions) {
     const result = await action(context, commands);
     // If an action returns a command (like redirect), return it immediately
-    if (result instanceof commands.Command) {
+    if (result) {
       return result;
     }
   }
@@ -45,4 +45,17 @@ function setMenu(context, commands) {
     pathname: context.pathname,
   }})
   return undefined;
+}
+
+export function isAuthed(context, commands) {
+  if (store.networkContext.token) {
+    return undefined;
+  } else {
+    return commands.redirect('/login');
+  }
+}
+
+export function performLogout(context, commands) {
+  store.updateState({ networkContext: { token:  false }});
+  return commands.redirect('/login');
 }

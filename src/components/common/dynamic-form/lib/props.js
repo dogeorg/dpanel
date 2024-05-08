@@ -6,7 +6,7 @@ export function _initializeFormFieldProperties(newValue) {
 
     section.fields.forEach(field => {
 
-      const { currentKey, originalKey, isDirtyKey } = this.propKeys(field.name);
+      const { currentKey, originalKey, isDirtyKey, repeatKey } = this.propKeys(field.name);
 
       // Create the standard property
       this.constructor.createProperty(currentKey, { type: String });
@@ -16,6 +16,10 @@ export function _initializeFormFieldProperties(newValue) {
 
       // Create a property for dirty tracking
       this.constructor.createProperty(isDirtyKey, { type: Boolean });
+
+      if (field.type === 'password' && field.requireConfirmation) {
+        this.constructor.createProperty(repeatKey, { type: String });
+      }
     });
   });
 }
@@ -47,6 +51,7 @@ export function propKeys(fieldName) {
   return {
     currentKey: `_${fieldName.toLowerCase()}`,
     originalKey: `__${fieldName.toLowerCase()}`,
-    isDirtyKey: `__${fieldName.toLowerCase()}_is_dirty`
+    isDirtyKey: `__${fieldName.toLowerCase()}_is_dirty`,
+    repeatKey: `_${fieldName.toLowerCase()}_repeat`
   }
 }

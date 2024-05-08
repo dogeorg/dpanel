@@ -18,7 +18,7 @@ describe("LoginView", () => {
 
     // Heading
     const heading = el.shadowRoot.querySelector("h1");
-    expect(heading.textContent).to.equal("Such Login");
+    expect(heading.textContent).to.equal("Such Login!");
 
     // DynamicForm
     const dynamicForm = el.shadowRoot.querySelector("dynamic-form");

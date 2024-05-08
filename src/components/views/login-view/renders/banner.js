@@ -48,7 +48,7 @@ export function renderBanner() {
     <div class="banner">
       <main>
         <h1>Such Login!</h1>
-        <p>Enter you Dogebox admin password to continue</p>
+        <p>Enter your Dogebox admin password to continue</p>
       </main>
       <aside>
         <img class="doge-store-bg" src="/static/img/locked-box.png" />

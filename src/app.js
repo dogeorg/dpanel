@@ -22,11 +22,15 @@ import "/components/views/welcome-dialog/index.js";
 // Components
 import "/utils/debug-panel.js";
 
+// Render chunks
+import * as renderMethods from "/components/views/app-view/renders/index.js";
+
 // Router (singleton)
 import { getRouter } from "/router/router.js";
 
 // Utils
 import debounce from "/utils/debounce.js";
+import { bindToClass } from "/utils/class-bind.js";
 
 // Do this once to set the location of shoelace assets (icons etc..)
 setBasePath("/vendor/@shoelace/cdn@2.14.0/");
@@ -47,6 +51,7 @@ class DPanelApp extends LitElement {
     this.currentPath = "";
     this._debouncedHandleResize = debounce(this._handleResize.bind(this), 50);
     this.mainChannel = mainChannel;
+    bindToClass(renderMethods, this);
   }
 
   connectedCallback() {
@@ -90,60 +95,15 @@ class DPanelApp extends LitElement {
 
   render() {
     const CURPATH = this.context.store.appContext.pathname || "";
-    const hideNav = !CURPATH.startsWith("/login");
+    const showChrome = !CURPATH.startsWith("/login");
 
     return html`
       <div id="App">
-        ${hideNav
-          ? html`
-          <nav id="Nav">
-            <div id="GutterNav" ?open=${this.menuVisible}>
-              <div id="logo" class="gutter-menu-item" @click=${() => window.location.reload(true)}>
-                <img src="/static/img/dogebox-logo-small.png" />
-              </div>
-              <div id="menu" class="gutter-menu-item" @click=${this.handleMenuClick}>
-                <sl-icon name="grid-fill"></sl-icon>
-              </div>
-            </div>
-
-            <div id="Side" ?open=${this.menuVisible}>
-              <div class"nav-body">
-                <div class="menu-label">dpanel v0.0.2</div>
-                <div class="menu-item ${CURPATH === "/" ? "active" : ""}">
-                  <sl-icon name="house-heart-fill"></sl-icon>
-                  <a href="/">Such Home</a>
-                </div>
-
-                <div class="menu-item ${CURPATH.startsWith("/pups") ? "active" : ""}">
-                  <sl-icon name="box-seam"></sl-icon>
-                  <a href="/pups">Much Pups</a>
-                </div>
-
-                <div class="menu-item ${CURPATH.startsWith("/stats") ? "active" : ""}">
-                  <sl-icon name="heart-pulse-fill"></sl-icon>
-                  <a href="/stats">Very Stats</a>
-                </div>
-
-                <div class="menu-item ${CURPATH.startsWith("/config") ? "active" : ""}">
-                  <sl-icon name="sliders"></sl-icon>
-                  <a href="/config">So Config</a>
-                </div>
-              </div>
-
-              <div class="nav-footer">
-                <sl-divider></sl-divider>
-                <div class="nav-footer-content">
-                  <p>Propel the people's currency using your Dogebox.</p>
-                  <sl-button outline>Read Docs</sl-button>
-                </div>
-              </div>
-            </div>
-          </nav>
-        `
-          : nothing}
+        ${showChrome ? this.renderNav(CURPATH) : nothing}
         <main id="Main">
           <div id="Outlet"></div>
         </main>
+        ${showChrome ? this.renderFooter() : nothing}
       </div>
 
       <aside>

@@ -1,8 +1,11 @@
-import { css } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
+import { css } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 
 export const styles = css`
   form {
-    padding: 0em 0em;
+    padding: 0em 0.5em;
+  }
+  form[data-mark-modified] {
+    padding: 0em 1em;
   }
 
   /* Form tabs */
@@ -16,7 +19,9 @@ export const styles = css`
   }
 
   /* Highlighting edits */
-  form[data-mark-modified] [data-dirty-field] { position: relative; }
+  form[data-mark-modified] [data-dirty-field] {
+    position: relative;
+  }
   form[data-mark-modified] [data-dirty-field]::part(form-control-label)::before,
   form[data-mark-modified] [data-dirty-field]::part(label)::before {
     content: "~";
@@ -28,6 +33,21 @@ export const styles = css`
 
   .tag-change-indicator {
     margin-left: 0.5em;
+    display: none;
+  }
+  .tag-change-indicator[data-active] {
+    display: inline-block;
+  }
+
+  @media (min-width: 680px) {
+    .tag-change-indicator {
+      display: inline-block;
+      visibility: hidden;
+    }
+    .tag-change-indicator[data-active] {
+      display: inline-block;
+      visibility: visible;
+    }
   }
 
   /* Footer buttons (submit, discard etc) */
@@ -45,8 +65,12 @@ export const styles = css`
   }
 
   /* Wider buttons on small screens */
-  sl-button { width: 100%; }
-  @media (min-width:480px) {
-    sl-button { width: auto }
+  sl-button {
+    width: 100%;
+  }
+  @media (min-width: 480px) {
+    sl-button {
+      width: auto;
+    }
   }
 `;

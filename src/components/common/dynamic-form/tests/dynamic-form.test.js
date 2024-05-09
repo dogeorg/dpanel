@@ -143,14 +143,14 @@ describe("DynamicForm", () => {
     const formControls = form.querySelectorAll('.form-control');
 
     // Should be 1 form-control element
-    expect(formControls.length).to.equal(13);
+    expect(formControls.length).to.equal(14);
     
     // Expect correct shoelace component usage
     const tags = [...formControls].map(c => c.children[0].tagName);
     expect(tags).to.deep.equal([
       'SL-INPUT', 'SL-INPUT', 'SL-INPUT', 'SL-INPUT', 'SL-INPUT',
       'SL-CHECKBOX', 'SL-SWITCH', 'SL-SELECT', 'SL-RADIO-GROUP', 'SL-RADIO-GROUP', 
-      'SL-TEXTAREA', 'SL-COLOR-PICKER', 'SL-RATING']);
+      'SL-TEXTAREA', 'SL-COLOR-PICKER', 'SL-RANGE', 'SL-RATING']);
 
     // Expect correct type attribute set for the SL-INPUT (because it can be one of many)
     const textInputs = [...formControls]

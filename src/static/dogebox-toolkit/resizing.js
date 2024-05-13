@@ -2,7 +2,7 @@
 window.addEventListener("message", handleBodyResize);
 
 function handleBodyResize(event) {
-  if (event.origin !== 'http://localhost:9000') {
+  if (event.origin !== 'http://dogebox.local:8080') {
     console.warn('Received message from unauthorized origin:', event.origin);
     return;
   }
@@ -116,7 +116,7 @@ class DogeboxDebugPanel extends HTMLElement {
 
   // Update dimensions in the debug panel
   handleResizeMessage(event) {
-    if (event.origin !== 'http://localhost:9000') {
+    if (event.origin !== 'http://dogebox.local:8080') {
       console.warn('Received message from unauthorized origin:', event.origin);
       return;
     }

@@ -41,6 +41,21 @@ export function renderNav(CURPATH) {
             <sl-icon name="sliders"></sl-icon>
             <a href="/config">So Config</a>
           </div>
+
+          <div class="menu-label">Recent</div>
+          <div class="menu-item ${CURPATH.startsWith("/pup/Map") ? "active" : ""}">
+            <sl-icon name="map"></sl-icon>
+            <a href="/pup/Map">Dogemap</a>
+          </div>
+          <div class="menu-item ${CURPATH.startsWith("/pup/Tipjar") ? "active" : ""}">
+            <sl-icon name="database-gear"></sl-icon>
+            <a href="/pup/Tipjar">Tipjar</a>
+          </div>
+          <div class="menu-item ${CURPATH.startsWith("/pup/Identity") ? "active" : ""}">
+            <sl-icon name="person-circle"></sl-icon>
+            <a href="/pup/Identity">Identity</a>
+          </div>
+
         </div>
 
         <div class="nav-footer">

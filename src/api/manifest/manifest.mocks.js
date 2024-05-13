@@ -78,8 +78,9 @@ export function generateManifests(input) {
       cwd: `/current/working/directory/${name}`,
       env: null,
       config: generateRandomConfig(),
-      configFiles: null
-    }
+      configFiles: null,
+    },
+    gui: produceGuiSegment(name)
   }));
 
   // 'Mock a hardcoded set'
@@ -97,7 +98,7 @@ export function generateManifests(input) {
         label: "Local Filesystem",
         url: "",
         lastUpdated: "2024-04-12T12:02:49.956055+10:00",
-        available: produce(['Core', 'Identity', 'GigaWallet', 'ShibeShop'])
+        available: produce(['Core', 'Identity', 'GigaWallet', 'ShibeShop', 'Map'])
       }
     };
   }
@@ -108,6 +109,14 @@ export function generateManifests(input) {
       available: produce(names),
     }
   };
+}
+
+const produceGuiSegment = (pupName) => {
+  if (pupName === 'Map') {
+    return {
+      source: 'http://map.pup.dogebox.local:9090'
+    }
+  }
 }
 
 const mockDocs = {

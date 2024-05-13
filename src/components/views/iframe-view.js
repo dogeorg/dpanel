@@ -31,7 +31,7 @@ class IframeView extends LitElement {
   updated(changedProperties) {
     super.updated(changedProperties);
     if (changedProperties.has('pupContext')) {
-      this.ready = !!this.context.store.pupContext.manifest.source;
+      this.ready = !!this.context.store.pupContext.manifest.gui.source;
       this.requestUpdate();
     }
   }
@@ -43,7 +43,7 @@ class IframeView extends LitElement {
     this.context = new StoreSubscriber(this, store)
 
     // Ready state is dependent on the pupContext having an iframe source.
-    this.ready = !!this.context.store.pupContext.manifest.source
+    this.ready = !!this.context.store.pupContext.manifest.gui.source
 
     this.iframeElement = null;
     this.debouncedHandleResize = debounce(this.handleResize, 300);
@@ -129,7 +129,7 @@ class IframeView extends LitElement {
       return html`
 
         <div id="IframeContainer">
-          <iframe src="${pupContext.manifest.source}" frameBorder="0"></iframe>
+          <iframe src="${pupContext.manifest.gui.source}" frameBorder="0"></iframe>
         </div>
       `;
     }

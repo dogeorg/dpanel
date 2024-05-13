@@ -42,6 +42,11 @@ class PkgController {
     this.notify();
   }
 
+  getPup(id) {
+    if (!id) return
+    return this.pupIndex[id]
+  }
+
   installPkg(pupId) {
     // Find the pup in the available list
     const index = this.available.findIndex(pup => pup.manifest.id === pupId);

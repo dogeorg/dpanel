@@ -12,12 +12,11 @@ export const getRouter = (targetElement) => {
       { path: '/logout', action: wrapActions(performLogout) },
       { path: '/login', action: wrapActions(), component: 'login-view' },
       { path: '/', action: wrapActions(isAuthed), component: 'home-view' },
-      { path: '/pups', action: wrapActions(isAuthed), component: 'manage-view' },
+      { path: '/library', action: wrapActions(isAuthed), component: 'library-view' },
+      { path: '/store', action: wrapActions(isAuthed), component: 'store-view' },
       { path: '/stats', action: wrapActions(isAuthed), component: 'stats-view' },
-      { path: '/config', action: wrapActions(isAuthed), component: 'config-view' },
-      { path: '/config', action: wrapActions(isAuthed), component: 'config-view' },
+      { path: '/config', action: wrapActions(isAuthed), component: 'manage-view' },
       { path: '/form', action: wrapActions(isAuthed), component: 'form-view' },
-      { path: '/manage', action: wrapActions(isAuthed), component: 'manage-view' },
       { path: '/pup/:path*', action: wrapActions(isAuthed, loadPupContext), component: 'iframe-view' },
     ]);
   }

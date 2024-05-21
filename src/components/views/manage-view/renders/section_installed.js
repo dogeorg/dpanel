@@ -3,7 +3,7 @@ import { html, css, nothing, repeat } from '/vendor/@lit/all@3.1.2/lit-all.min.j
 export function renderSectionInstalledHeader(ready) {
   return html`
     <div class="heading-wrap">
-      <h2>Installed Pups</h2>
+      <h2>Configure Pups</h2>
       ${this.fetchLoading ? html`
         <sl-spinner></sl-spinner>
       ` : nothing }

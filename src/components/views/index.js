@@ -6,3 +6,5 @@ import "./iframe-view.js";
 import "./stats-view.js";
 import "./form-view.js";
 import "./manage-view/index.js";
+import "./library-view/index.js";
+import "./store-view/index.js";

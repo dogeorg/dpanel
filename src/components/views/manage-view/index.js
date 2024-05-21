@@ -153,13 +153,6 @@ class ManageView extends LitElement {
         </header>
           ${this.renderSectionInstalledBody(ready, SKELS, hasItems)}
       </div>
-
-      <div class="padded">
-        <header>
-          ${this.renderSectionAvailableHeader(ready)}
-        </header>
-          ${this.renderSectionAvailableBody(ready, SKELS, hasItems)}
-      </div>
     `;
   }
 

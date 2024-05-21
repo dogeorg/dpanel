@@ -27,9 +27,21 @@ export function renderNav(CURPATH) {
             <a href="/">Such Home</a>
           </div>
 
-          <div class="menu-item ${CURPATH.startsWith("/pups") ? "active" : ""}">
-            <sl-icon name="box-seam"></sl-icon>
-            <a href="/pups">Much Pups</a>
+          <div class="menu-item-wrap ${(CURPATH.startsWith("/library") || CURPATH.startsWith("/store")) ? "expand sub-active" : ""}">
+            <div name="pups" @click=${this.handleExpandableMenuClick} class="menu-item">              
+              <sl-icon name="box-seam"></sl-icon>
+              <a href="/library">Much Pups</a>
+            </div>
+            <div for="pups" class="sub-menu-list ${(CURPATH.startsWith("/library") || CURPATH.startsWith("/store")) ? "" : "hidden"}">
+              <div class="sub-menu-item ${CURPATH.startsWith("/library") ? "active" : ""}">
+                <sl-icon name="collection"></sl-icon>
+                <a href="/library">Library</a>
+              </div>
+              <div class="sub-menu-item ${CURPATH.startsWith("/store") ? "active" : ""}">
+                <sl-icon name="search"></sl-icon>
+                <a href="/store">Store</a>
+                </div>
+            </div>
           </div>
 
           <div class="menu-item ${CURPATH.startsWith("/stats") ? "active" : ""}">
@@ -42,7 +54,7 @@ export function renderNav(CURPATH) {
             <a href="/config">So Config</a>
           </div>
 
-          <div class="menu-label">Recent</div>
+          <div class="menu-label">Installed</div>
           <div class="menu-item ${CURPATH.startsWith("/pup/Map") ? "active" : ""}">
             <sl-icon name="map"></sl-icon>
             <a href="/pup/Map">Dogemap</a>
@@ -68,4 +80,14 @@ export function renderNav(CURPATH) {
       </div>
     </nav>
   `;
+}
+
+export function handleExpandableMenuClick(e) {
+  console.log('yes');
+  e.preventDefault();
+  const sourceEl = e.currentTarget;
+  const targetEl = this.shadowRoot.querySelector(`.sub-menu-list[for=${sourceEl.getAttribute('name')}]`)
+  sourceEl.parentNode.classList.toggle('expand');
+  targetEl.classList.toggle('hidden');
+
 }

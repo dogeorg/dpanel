@@ -9,7 +9,7 @@ import { setBasePath } from "/vendor/@shoelace/cdn@2.14.0/utilities/base-path.js
 import "/vendor/@shoelace/cdn@2.14.0/shoelace.js";
 
 // Import stylesheets
-import { mainStyles, navStyles, utilStyles } from "/styles/app.index.styles.js";
+import { mainStyles, navStyles, utilStyles } from "/components/views/app-view/styles/index.styles.js";
 
 // App state (singleton)
 import { store } from "/state/store.js";

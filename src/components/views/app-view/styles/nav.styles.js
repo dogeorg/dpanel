@@ -24,7 +24,6 @@ export const navStyles = css`
     display: none;
     @media (min-width: 566px) {
       display: flex;
-      border-top: border-right: 1px solid #1c1b22;
       width: 100%;
       justify-content: center;
       padding: 0.7em 0em;
@@ -292,6 +291,10 @@ export const navStyles = css`
 
   #Side .menu-item-wrap.expand .menu-item:hover {
     background: rgba(255, 255, 255, 0.2);
+  }
+
+  #Side section.section-installed .menu-item.active {
+    background: #4360ff;
   }
 `;
 

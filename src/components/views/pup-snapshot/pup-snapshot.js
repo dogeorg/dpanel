@@ -10,6 +10,7 @@ import * as mockConfig from '/components/common/dynamic-form/mocks/index.js'
 import { pkgController } from '/controllers/package/index.js';
 import { postConfig } from '/api/config/config.js';
 import { createAlert } from '/components/common/alert.js';
+import { getRouter } from "/router/router.js";
 
 // Import component chunks
 import * as renderMethods from './renders/index.js';
@@ -28,6 +29,8 @@ class PupSnapshot extends LitElement {
       focus: { type: String, reflect: true },
       activeTab: { type: String },
       installed: { type: Boolean },
+      markInstalled: { type: Boolean },
+      allowManage: { type: Boolean },
       docs: { type: Object },
 
       // From state
@@ -52,6 +55,7 @@ class PupSnapshot extends LitElement {
     this.pkgController = pkgController;
     this.options = {};
     this.config = {};
+    this.router = getRouter().Router;
     // Bind all imported renderMehtods to 'this'
     bindToClass(renderMethods, this)
   }
@@ -171,32 +175,31 @@ class PupSnapshot extends LitElement {
 
   render() {
     return html`
-      <sl-details ?open=${this.inspected}>
+      <sl-details ?open=${this.allowInspect && this.inspected}>
         <div class="summary" slot="summary">
           ${this.renderSummary()}
         </div>
+          <div class="content">
+            <sl-tab-group
+              id="PupTabs"
+              style="--indicator-color: #07ffae;"
+            >
+              ${this.installed && !this.markInstalled ? html`
+                ${this.renderSectionDesc()}
+                ${this.renderSectionStats()}
+                ${this.renderSectionLogs()}
+                ${this.renderSectionConfig()}
+                ${this.renderSectionScreens()}
+              ` : nothing
+              }
 
-        <div class="content">
-          <sl-tab-group
-            id="PupTabs"
-            style="--indicator-color: #07ffae;"
-          >
-            ${this.installed ? html`
-              ${this.renderSectionStats()}
-              ${this.renderSectionLogs()}
-              ${this.renderSectionConfig()}
-              ${this.renderSectionDesc()}
-              ${this.renderSectionScreens()}
-            ` : nothing
-            }
-
-            ${!this.installed ? html`
-              ${this.renderSectionDesc()}
-              ${this.renderSectionScreens()}
-            ` : nothing
-            }
-          </sl-tab-group>
-        </div>
+              ${!this.installed || this.markInstalled ? html`
+                ${this.renderSectionDesc()}
+                ${this.renderSectionScreens()}
+              ` : nothing
+              }
+            </sl-tab-group>
+          </div>
       </sl-details>
     `;
   }

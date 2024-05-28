@@ -1,9 +1,15 @@
 import { html, css, nothing, repeat } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
 
+var pupCardStyles = css`
+  .pup-card {}
+`
+
 export function renderSectionInstalledHeader(ready) {
+
+
   return html`
     <div class="heading-wrap">
-      <h2>Configure Pups</h2>
+      <h2>Installed Pups</h2>
       ${this.fetchLoading ? html`
         <sl-spinner></sl-spinner>
       ` : nothing }
@@ -17,6 +23,15 @@ export function renderSectionInstalledHeader(ready) {
       <sl-dropdown>
         <sl-button slot="trigger" ?disabled=${this.busy}><sl-icon name="three-dots-vertical"></sl-icon></sl-button>
         <sl-menu @sl-select=${this.handleActionsMenuSelect}>
+          <sl-menu-item>
+            Repository
+            <sl-menu slot="submenu">
+              <sl-menu-item value="repository-local">Local</sl-menu-item>
+              <sl-menu-item value="repository-remote-a">Remote A</sl-menu-item>
+              <sl-menu-item value="repository-remote-b">Remote B</sl-menu-item>
+              <sl-menu-item value="repository-remote-c">Remote C</sl-menu-item>
+            </sl-menu>
+          </sl-menu-item>
           <sl-menu-item value="refresh">Refresh</sl-menu-item>
         </sl-menu>
       </sl-dropdown>
@@ -34,45 +49,31 @@ export function renderSectionInstalledBody(ready, SKELS, hasItems) {
       </div>
     ` : nothing }
 
-    ${this.fetchError ? html`
-      <sl-alert variant="danger" open>
-        <sl-icon slot="icon" name="exclamation-octagon"></sl-icon>
-        <strong>An error occurred<br />
-        Sorry, the package list could not be obtained.
-      </sl-alert>
-      <br>
-      <sl-button outline @click=${this.fetchBootstrap}>Retry</sl-button>
-    ` : nothing }
-
     ${ready && !hasItems('installed') ? html`
       <div class="empty">
-        Such empty.  Try install a Pup
+        Such empty.  No pups available in this repository.
       </div>
       ` : nothing 
     }
 
     ${ready && hasItems('installed') ? html`
       <div class="details-group">
-        ${repeat(this.installedList.getCurrentPageData(), (pkg) => `${pkg.manifest.id}-${pkg.manifest.version}-installed`, (pkg) => html`
+        ${repeat(this.installedList.getCurrentPageData(), (pkg) => `${pkg.manifest.id}-${pkg.manifest.version}`, (pkg) => html`
           <pup-snapshot
             pupId=${pkg.manifest.id}
             pupName=${pkg.manifest.package}
             version=${pkg.manifest.version}
-            .config=${pkg.manifest.command.config}
-            .docs=${pkg.manifest.docs}
-            .gui=${pkg.manifest.gui}
-            status=${pkg.state.status}
-            .options=${pkg.state.config}
-            ?disabled=${this.busy}
-            @click=${this.handlePupClick}
-            ?inspected=${this.inspectedPup === pkg.manifest.id}
             icon="box"
             installed
-            allowManage>
+            .docs=${pkg.manifest.docs}
+            .gui=${pkg.manifest.gui}
+            @click=${this.handlePupClick}
+            ?inspected=${this.inspectedPup === pkg.manifest.id}
+            ?disabled=${this.busy}>
           </pup-snapshot>
-        `)
-      }
+        `)}
       </div>
+
       <paginator-ui
         ?disabled=${this.busy}
         @go-next=${this.installedList.nextPage}
@@ -81,5 +82,6 @@ export function renderSectionInstalledBody(ready, SKELS, hasItems) {
         totalPages=${this.installedList.getTotalPages()}
       ></paginator-ui>
     ` : nothing}
+    <style>${pupCardStyles}</style>
   `
 }

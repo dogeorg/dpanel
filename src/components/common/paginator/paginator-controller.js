@@ -1,13 +1,22 @@
 export class PaginationController {
-  constructor(host, data = [], itemsPerPage = 10) {
+  constructor(host, data = [], itemsPerPage = 10, options) {
     this.host = host;
     this.data = data;
+    this.initial_data = data;
     this.itemsPerPage = itemsPerPage;
     this.currentPage = 1;
+    this.options = options;
   }
 
   setData(newData) {
-    this.data = newData;
+    if (this?.options?.initialSort) {
+      const sorted = newData.sort(this.options.initialSort)
+      this.data = sorted;
+      this.initial_data = sorted;
+    } else {
+      this.data = newData;
+      this.initial_data = newData;
+    }
     this.currentPage = 1;
     this.host.requestUpdate();
   }
@@ -43,5 +52,15 @@ export class PaginationController {
       this.currentPage = page;
       this.host.requestUpdate();
     }
+  }
+
+  setFilter(filterFn) {
+    if (!filterFn) {
+      this.data = this.initial_data;
+      this.host.requestUpdate();
+      return;
+    }
+    this.data = this.initial_data.filter(filterFn);
+    this.host.requestUpdate();
   }
 }

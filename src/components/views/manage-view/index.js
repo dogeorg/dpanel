@@ -13,7 +13,6 @@ class ManageView extends LitElement {
   static properties = {
     fetchLoading: { type: Boolean },
     fetchError: { type: Boolean },
-    packageList: { type: Array },
     busy: { type: Boolean },
     inspectedPup: { type: String }
   }

@@ -7,7 +7,7 @@ export function renderSummary() {
     </div>
 
     <div class="summary-section summary-section-charts">
-      ${this.installed && this.renderSummaryCharts()}
+      ${this.installed && this.allowManage && this.renderSummaryCharts()}
     </div>
 
     <div class="summary-section summary-section-actions">

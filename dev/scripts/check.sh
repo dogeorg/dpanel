@@ -12,6 +12,7 @@ expected_entries=(
     "127.0.0.1 basic.pup.dogebox.local"
     "127.0.0.1 spa.pup.dogebox.local"
     "127.0.0.1 map.pup.dogebox.local"
+    "127.0.0.1 identity.pup.dogebox.local"
 )
 
 # Path to the hosts file

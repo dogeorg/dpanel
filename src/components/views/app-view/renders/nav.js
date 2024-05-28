@@ -27,19 +27,19 @@ export function renderNav(CURPATH) {
             <a href="/">Such Home</a>
           </div>
 
-          <div class="menu-item-wrap ${(CURPATH.startsWith("/library") || CURPATH.startsWith("/store")) ? "expand sub-active" : ""}">
+          <div class="menu-item-wrap ${(CURPATH.startsWith("/pups/library") || CURPATH.startsWith("/pups/discover")) ? "expand sub-active" : ""}">
             <div name="pups" @click=${this.handleExpandableMenuClick} class="menu-item">              
               <sl-icon name="box-seam"></sl-icon>
               <a href="/library">Much Pups</a>
             </div>
-            <div for="pups" class="sub-menu-list ${(CURPATH.startsWith("/library") || CURPATH.startsWith("/store")) ? "" : "hidden"}">
-              <div class="sub-menu-item ${CURPATH.startsWith("/library") ? "active" : ""}">
+            <div for="pups" class="sub-menu-list ${(CURPATH.startsWith("/pups/library") || CURPATH.startsWith("/pups/discover")) ? "" : "hidden"}">
+              <div class="sub-menu-item ${CURPATH.startsWith("/pups/library") ? "active" : ""}">
                 <sl-icon name="collection"></sl-icon>
-                <a href="/library">Library</a>
+                <a href="/pups/library">Installed</a>
               </div>
-              <div class="sub-menu-item ${CURPATH.startsWith("/store") ? "active" : ""}">
+              <div class="sub-menu-item ${CURPATH.startsWith("/pups/discover") ? "active" : ""}">
                 <sl-icon name="search"></sl-icon>
-                <a href="/store">Store</a>
+                <a href="/pups/discover">Discover</a>
                 </div>
             </div>
           </div>
@@ -55,7 +55,7 @@ export function renderNav(CURPATH) {
           </div>
 
           <section class="section-installed">
-            <div class="menu-label">Installed</div>
+            <div class="menu-label">Pinned</div>
             <div class="menu-item ${CURPATH.startsWith("/pup/Map") ? "active" : ""}">
               <sl-icon name="map"></sl-icon>
               <a href="/pup/Map">Dogemap</a>

@@ -6,6 +6,7 @@ class PkgController {
   pupIndex = {};
   installed = [];
   available = [];
+  packages = [];
 
   // Register an observer
   addObserver(observer) {
@@ -37,7 +38,8 @@ class PkgController {
   setData(bootstrapResponse) {
     const { installed, available } = toAssembledPup(bootstrapResponse)
     this.installed = toArray(installed)
-    this.available = toArray(available)
+    this.available = toArray(available);
+    this.packages = [...toArray(available), ...toArray(installed)];
     this.pupIndex = { ...available, ...installed }
     this.notify();
   }

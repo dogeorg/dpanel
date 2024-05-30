@@ -5,21 +5,31 @@ let router;
 
 export const getRouter = (targetElement) => {
   if (!router) {
+    console.log('floople', Router.go);
     router = new Router(targetElement);
+    console.log('doople', Router.go);
+    console.log('woople', router.go);
 
     // Configure routes
     router.setRoutes([
+      // Auth
       { path: '/logout', action: wrapActions(performLogout) },
       { path: '/login', action: wrapActions(), component: 'login-view' },
+      
+      // Home
       { path: '/', action: wrapActions(isAuthed), component: 'home-view' },
-      { path: '/pups', action: wrapActions(isAuthed), component: 'manage-view' },
-      { path: '/stats', action: wrapActions(isAuthed), component: 'stats-view' },
-      { path: '/config', action: wrapActions(isAuthed), component: 'config-view' },
-      { path: '/config', action: wrapActions(isAuthed), component: 'config-view' },
-      { path: '/form', action: wrapActions(isAuthed), component: 'form-view' },
-      { path: '/manage', action: wrapActions(isAuthed), component: 'manage-view' },
+
+      // Pups
       { path: '/pup/:path*', action: wrapActions(isAuthed, loadPupContext), component: 'iframe-view' },
+      { path: '/pups/library', action: wrapActions(isAuthed), component: 'library-view' },
+      { path: '/pups/discover', action: wrapActions(isAuthed), component: 'store-view' },
+
+      // Settings
+      { path: '/config', action: wrapActions(isAuthed), component: 'manage-view' },
+
+      // Charts
+      { path: '/stats', action: wrapActions(isAuthed), component: 'stats-view' },
     ]);
   }
-  return router;
+  return { router, Router };
 };

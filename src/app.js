@@ -9,7 +9,7 @@ import { setBasePath } from "/vendor/@shoelace/cdn@2.14.0/utilities/base-path.js
 import "/vendor/@shoelace/cdn@2.14.0/shoelace.js";
 
 // Import stylesheets
-import { mainStyles, navStyles, utilStyles } from "/styles/app.index.styles.js";
+import { mainStyles, navStyles, utilStyles } from "/components/views/app-view/styles/index.styles.js";
 
 // App state (singleton)
 import { store } from "/state/store.js";
@@ -47,7 +47,7 @@ class DPanelApp extends LitElement {
   constructor() {
     super();
     this.context = new StoreSubscriber(this, store);
-    this.menuVisible = false;
+    this.menuVisible = true;
     this.currentPath = "";
     this._debouncedHandleResize = debounce(this._handleResize.bind(this), 50);
     this.mainChannel = mainChannel;

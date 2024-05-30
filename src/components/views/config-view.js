@@ -15,7 +15,7 @@ class ConfigView extends LitElement {
 
   firstUpdated() {
     // Demonstration of accessing the router within other components
-    const router = getRouter();
+    const { router } = getRouter();
     console.log(router.location.pathname);
   }
 

@@ -1,19 +1,28 @@
 import { html, css, nothing, repeat } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
+import debounce from "/utils/debounce.js";
 
-export function renderSectionAvailableHeader(ready) {
+export function renderSectionHeader(ready) {
   return html`
     <div class="heading-wrap">
-      <h2>Available Pups</h2>
+      <h2>Much Pups</h2>
       ${this.fetchLoading ? html`
         <sl-spinner></sl-spinner>
       ` : nothing }
 
       ${ready ? html`
-        <sl-tag pill>${this.availableList.data.length}</sl-tag>
+        <sl-tag pill>${this.packageList.data.length}</sl-tag>
       ` : nothing }
     </div>
 
-    <div class="actions">
+    <div class="header-actions">
+      <sl-input
+        type="search"
+        @sl-input=${this.handleDebouncedSearchInput}
+        value=${this.searchValue}
+        clearable
+      >
+        <sl-icon name="search" slot="prefix"></sl-icon>
+      </sl-input>
       <sl-dropdown>
         <sl-button slot="trigger" ?disabled=${this.busy}><sl-icon name="three-dots-vertical"></sl-icon></sl-button>
         <sl-menu @sl-select=${this.handleActionsMenuSelect}>
@@ -33,7 +42,7 @@ export function renderSectionAvailableHeader(ready) {
   `
 }
 
-export function renderSectionAvailableBody(ready, SKELS, hasItems) {
+export function renderSectionBody(ready, SKELS, hasItems) {
   return html`
     ${this.fetchLoading ? html`
       <div class="details-group">
@@ -43,24 +52,24 @@ export function renderSectionAvailableBody(ready, SKELS, hasItems) {
       </div>
     ` : nothing }
 
-    ${ready && !hasItems('available') ? html`
+    ${ready && !hasItems('packages') ? html`
       <div class="empty">
         Such empty.  No pups available in this repository.
       </div>
       ` : nothing 
     }
 
-    ${ready && hasItems('available') ? html`
+    ${ready && hasItems('packages') ? html`
       <div class="details-group">
-        ${repeat(this.availableList.getCurrentPageData(), (pkg) => `${pkg.manifest.id}-${pkg.manifest.version}`, (pkg) => html`
+        ${repeat(this.packageList.getCurrentPageData(), (pkg) => `${pkg.manifest.id}-${pkg.manifest.version}`, (pkg) => html`
           <pup-snapshot
             pupId=${pkg.manifest.id}
             pupName=${pkg.manifest.package}
             version=${pkg.manifest.version}
             icon="box"
+            ?installed=${pkg.state.status}
+            ?markInstalled=${pkg.state.status}
             .docs=${pkg.manifest.docs}
-            .gui=${pkg.manifest.gui}
-            allowManage
             @click=${this.handlePupClick}
             ?inspected=${this.inspectedPup === pkg.manifest.id}
             ?disabled=${this.busy}>
@@ -69,11 +78,16 @@ export function renderSectionAvailableBody(ready, SKELS, hasItems) {
       </div>
       <paginator-ui
         ?disabled=${this.busy}
-        @go-next=${this.availableList.nextPage}
-        @go-prev=${this.availableList.previousPage}
-        currentPage=${this.availableList.currentPage}
-        totalPages=${this.availableList.getTotalPages()}
+        @go-next=${this.packageList.nextPage}
+        @go-prev=${this.packageList.previousPage}
+        currentPage=${this.packageList.currentPage}
+        totalPages=${this.packageList.getTotalPages()}
       ></paginator-ui>
     ` : nothing}
   `
+
+}
+
+export function handleDebouncedSearchInput(e) {
+  this.searchValue = e.target.value
 }

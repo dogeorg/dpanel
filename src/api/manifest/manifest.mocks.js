@@ -98,7 +98,7 @@ export function generateManifests(input) {
         label: "Local Filesystem",
         url: "",
         lastUpdated: "2024-04-12T12:02:49.956055+10:00",
-        available: produce(['Core', 'Identity', 'GigaWallet', 'ShibeShop', 'Map'])
+        available: produce(['Core', 'Identity', 'GigaWallet', 'ShibeShop', 'Map', 'Tipjar'])
       }
     };
   }
@@ -112,10 +112,13 @@ export function generateManifests(input) {
 }
 
 const produceGuiSegment = (pupName) => {
-  if (pupName === 'Map') {
-    return {
-      source: 'http://map.pup.dogebox.local:9090'
-    }
+  switch (pupName) {
+    case 'Map':
+      return { source: 'http://map.pup.dogebox.local:9090' }
+    case 'Identity':
+      return { source: 'http://identity.pup.dogebox.local:7070' }
+    case 'Tipjar':
+      return { source: 'http://tipjar.pup.dogebox.local:6060' }
   }
 }
 

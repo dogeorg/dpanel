@@ -10,6 +10,13 @@ export function renderSummaryActions() {
 
   return html`
 
+    ${this.installed && !this.allowManage && this.gui ? html`
+      <sl-button ?loading=${this.loading} ?disabled=${this.disabled} href="${`pup/${this.pupId}`}" @click="${(e) => this.handleLaunchAction(e)}" variant="primary" outline size="medium">
+        <sl-icon name="rocket-takeoff" label="launch"></sl-icon> <span class="btn-text">Launch</span>
+      </sl-button>
+      ` : nothing
+    }
+
     ${!this.installed ? html`
       <sl-button ?disabled=${this.disabled} @click=${(e) => this.handleInstallAction(e, 'install')} variant="primary" outline size="medium">
         ${this._installed_dirty ? html`
@@ -26,26 +33,35 @@ export function renderSummaryActions() {
       ` : nothing
     }
 
-    ${this.installed ? html`
+    ${this.installed && !this.markInstalled ? html`
       <sl-button ?disabled=${this.disabled} @click=${(e) => this.handleConfigureAction(e)} outline size="medium">
         <sl-icon name="gear-fill" label="Configure"></sl-icon> <span class="btn-text">Configure</span>
       </sl-button>
       ` : nothing
     }
+
+    ${this.installed && this.markInstalled ? html`
+      <sl-button disabled @click=${(e) => this.handleInstallAction(e, 'install')} variant="primary" outline size="medium">
+        <sl-icon name="check-square-fill" label="Installed"></sl-icon> 
+        <span class="btn-text">Installed</span>
+      </sl-button>
+      ` : nothing
+    }
     
-    ${this.installed && this.running ? html`
+    ${this.installed && this.allowManage && this.running ? html`
       <sl-button ?disabled=${this.disabled} @click=${(e) => this.handleRunningAction(e, 'stop')} variant="danger" outline size="medium">
         <sl-icon name="stop-fill" label="Stop"></sl-icon> <span class="btn-text">Stop</span>
       </sl-button>
       ` : nothing
     }
 
-    ${this.installed && !this.running ? html`
+    ${this.installed && this.allowManage && !this.running ? html`
       <sl-button ?disabled=${this.disabled} @click=${(e) => this.handleRunningAction(e, 'start')} variant="success" outline size="medium">
         <sl-icon name="play-fill" label="Start"></sl-icon> <span class="btn-text">Start</span>
       </sl-button>
       ` : nothing
     }
+
     <style>${actionStyles}</style>
   `
 }
@@ -160,4 +176,15 @@ export async function handleConfigureAction (event) {
   event.stopPropagation();
   event.preventDefault();
   this.jumpToTab('config')
+}
+
+export function handleLaunchAction (event) {
+  event.stopPropagation();
+  event.preventDefault();
+  
+  // Start button spinner
+  event.currentTarget.loading = true;
+
+  // Trigger SPA router to navigate
+  this.router.go(event.currentTarget.getAttribute('href'))
 }

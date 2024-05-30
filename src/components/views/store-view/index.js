@@ -8,13 +8,20 @@ import { bindToClass } from '/utils/class-bind.js'
 import * as renderMethods from './renders/index.js';
 import '/components/common/paginator/paginator-ui.js';
 
-class ManageView extends LitElement {
+const initialSort = (a, b) => {
+  if (a.manifest.package < b.manifest.package) { return -1; }
+  if (a.manifest.package > b.manifest.package) { return 1; }
+  return 0;
+}
+
+class StoreView extends LitElement {
 
   static properties = {
     fetchLoading: { type: Boolean },
     fetchError: { type: Boolean },
     busy: { type: Boolean },
-    inspectedPup: { type: String }
+    inspectedPup: { type: String },
+    searchValue: { type: String }
   }
 
   constructor() {
@@ -23,10 +30,10 @@ class ManageView extends LitElement {
     this.busyQueue = [];
     this.fetchLoading = true;
     this.fetchError = false;
-    this.itemsPerPage = 20;
+    this.itemsPerPage = 10;
     this.pkgController = pkgController;
-    this.installedList = new PaginationController(this, undefined, this.itemsPerPage);
-    this.availableList = new PaginationController(this, undefined, this.itemsPerPage);
+    this.packageList = new PaginationController(this, undefined, this.itemsPerPage,{ initialSort });
+    console.log(this.packageList.setData);
     this.inspectedPup;
     bindToClass(renderMethods, this);
   }
@@ -53,7 +60,6 @@ class ManageView extends LitElement {
   reset() {
     this.fetchLoading = true;
     this.fetchError = false;
-    this.packageList = null;
   }
 
   updateBusyState() {
@@ -98,8 +104,7 @@ class ManageView extends LitElement {
     try {
       const res = await getBootstrap()
       this.pkgController.setData(res);
-      this.installedList.setData(this.pkgController.installed);
-      this.availableList.setData(this.pkgController.available);
+      this.packageList.setData(this.pkgController.packages);
     } catch (err) {
       console.log(err);
       this.fetchError = true;
@@ -119,21 +124,32 @@ class ManageView extends LitElement {
     }
   }
 
+  updated(changedProperties) {
+    changedProperties.forEach((oldValue, propName) => {
+      if (propName === 'searchValue') {
+        this.filterPackageList();
+      }
+    });
+  }
+
+  filterPackageList() {
+    if (this.searchValue === "") {
+      this.packageList.setFilter();
+    }
+    this.packageList.setFilter((pkg) => pkg?.manifest?.package?.toLowerCase()?.includes(this.searchValue.toLowerCase()));
+  }
+
   render() {
     const ready = (
       !this.fetchLoading &&
       !this.fetchError &&
-      this.installedList.data &&
-      this.availableList.data
+      this.packageList.data
     )
 
     const hasItems = (listNickname) => {
       switch(listNickname) {
-        case 'installed':
-          return Boolean(this.installedList.data.length)
-          break;
-        case 'available':
-          return Boolean(this.availableList.data.length)
+        case 'packages':
+          return Boolean(this.packageList.data.length)
           break;
       }
     }
@@ -142,16 +158,15 @@ class ManageView extends LitElement {
 
     return html`
 
-      <div class="top">
-        ${this.renderSectionTop()}
-      </div>
+      ${this.renderSectionTop()}
 
       <div class="padded">
         <header>
-          ${this.renderSectionInstalledHeader(ready)}
+          ${this.renderSectionHeader(ready)}
         </header>
-          ${this.renderSectionInstalledBody(ready, SKELS, hasItems)}
+          ${this.renderSectionBody(ready, SKELS, hasItems)}
       </div>
+
     `;
   }
 
@@ -162,11 +177,6 @@ class ManageView extends LitElement {
       width: 100%;
       overflow-y: auto;
       overflow-x: hidden;
-    }
-
-    .top {
-      display: none;
-      margin: 1.5em 2em 2em 2em; 
     }
 
     .padded {
@@ -188,10 +198,14 @@ class ManageView extends LitElement {
 
     header {
       display: flex;
-      flex-direction: row;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 0.8rem;
+      flex-direction: column;
+      gap: 1em;
+      @media (min-width: 576px) {
+        flex-direction: row;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 0.8rem;  
+      }
     }
 
     header .heading-wrap {
@@ -211,7 +225,12 @@ class ManageView extends LitElement {
       display: flex;
       flex-direction: row;
       gap: 0.85em;
-      margin-left: auto;
+      justify-content: space-between;
+      margin-bottom:1em;
+      @media (min-width: 576px) {
+        margin-left: auto;
+        justify-content: flex-end;
+      }
     }
 
     /* Details toggle */
@@ -231,4 +250,4 @@ class ManageView extends LitElement {
   `
 }
 
-customElements.define('manage-view', ManageView);
+customElements.define('store-view', StoreView);

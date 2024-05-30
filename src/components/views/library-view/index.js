@@ -8,11 +8,18 @@ import { bindToClass } from '/utils/class-bind.js'
 import * as renderMethods from './renders/index.js';
 import '/components/common/paginator/paginator-ui.js';
 
-class ManageView extends LitElement {
+const initialSort = (a, b) => {
+  if (a.manifest.package < b.manifest.package) { return -1; }
+  if (a.manifest.package > b.manifest.package) { return 1; }
+  return 0;
+}
+
+class LibraryView extends LitElement {
 
   static properties = {
     fetchLoading: { type: Boolean },
     fetchError: { type: Boolean },
+    packageList: { type: Array },
     busy: { type: Boolean },
     inspectedPup: { type: String }
   }
@@ -25,8 +32,8 @@ class ManageView extends LitElement {
     this.fetchError = false;
     this.itemsPerPage = 20;
     this.pkgController = pkgController;
-    this.installedList = new PaginationController(this, undefined, this.itemsPerPage);
-    this.availableList = new PaginationController(this, undefined, this.itemsPerPage);
+    this.installedList = new PaginationController(this, undefined, this.itemsPerPage, { initialSort });
+    // this.availableList = new PaginationController(this, undefined, this.itemsPerPage);
     this.inspectedPup;
     bindToClass(renderMethods, this);
   }
@@ -99,7 +106,7 @@ class ManageView extends LitElement {
       const res = await getBootstrap()
       this.pkgController.setData(res);
       this.installedList.setData(this.pkgController.installed);
-      this.availableList.setData(this.pkgController.available);
+      // this.availableList.setData(this.pkgController.available);
     } catch (err) {
       console.log(err);
       this.fetchError = true;
@@ -123,17 +130,13 @@ class ManageView extends LitElement {
     const ready = (
       !this.fetchLoading &&
       !this.fetchError &&
-      this.installedList.data &&
-      this.availableList.data
+      this.installedList.data
     )
 
     const hasItems = (listNickname) => {
       switch(listNickname) {
         case 'installed':
           return Boolean(this.installedList.data.length)
-          break;
-        case 'available':
-          return Boolean(this.availableList.data.length)
           break;
       }
     }
@@ -152,6 +155,7 @@ class ManageView extends LitElement {
         </header>
           ${this.renderSectionInstalledBody(ready, SKELS, hasItems)}
       </div>
+
     `;
   }
 
@@ -179,6 +183,55 @@ class ManageView extends LitElement {
         padding: 1.4em;
         padding-top: 0em;
       }
+    }
+
+    .banner {
+      color: white;
+      background-color: var(--sl-color-indigo-400);
+      background-image: linear-gradient(to bottom right, var(--sl-color-indigo-400), var(--sl-color-indigo-300));
+      position: relative;
+      overflow: hidden;
+    }
+    .banner main {
+      max-width: 65%;
+      padding: 0.5em;
+    }
+
+    .banner main p {
+      font-family: unset;
+    }
+    .banner aside {
+      position: absolute;
+      right: -68%;
+      top: -35px;
+      width: 100%;
+      height: 128%;
+
+      @media (min-width: 768px) {
+        top: -65px;
+        height: 180%;
+      }
+
+      @media (min-width: 1024px) {
+        right: -55%;
+        top: -165px;
+        height: 280%;
+      }
+    }
+    .banner aside img.doge-store-bg {
+      height: 100%;
+      width: auto;
+      transform: rotate(-4deg);
+    }
+
+    .banner h1,
+    .banner h2 {
+      color: white;
+      font-family: 'Comic Neue', sans-serif;
+      margin: 0px;
+    }
+    .banner p:first-of-type {
+      margin-top: 0px;
     }
 
     h1, h2 {
@@ -231,4 +284,4 @@ class ManageView extends LitElement {
   `
 }
 
-customElements.define('manage-view', ManageView);
+customElements.define('library-view', LibraryView);

@@ -316,14 +316,14 @@ export const navStyles = css`
       border-color: #fd5a5a;
     }
   }
-  @keyframes color {
-    from {
-      background-color: rgb(44, 77, 255);
+    @keyframes color {
+      from {
+        background-color: rgb(44, 77, 255);
       }
-    to {
-      background-color: #4360ff;
+      to {
+        background-color: rgb(138, 156, 255);
       }
-  }
+    }
 
 `;
 

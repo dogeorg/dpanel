@@ -3,16 +3,22 @@ import { html } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 export function renderNav(CURPATH) {
   return html`
     <nav id="Nav">
-      <div id="GutterNav" ?open=${this.menuVisible}>
+      <div id="GutterNav" class="pulse" ?open=${this.menuVisible}>
         <div class="gutter-body">
           <div id="logo" class="gutter-menu-item" @click=${() => window.location.reload(true)}>
             <img src="/static/img/dogebox-logo-small.png" />
           </div>
           <div id="menu" class="gutter-menu-item bg" @click=${this.handleMenuClick}>
-            <sl-icon name="grid-fill"></sl-icon>
+            <sl-icon name="three-dots"></sl-icon>
           </div>
         </div>
         <div class="gutter-footer">
+          <div id="profile" class="gutter-menu-item">
+            <sl-icon name="person-circle"></sl-icon>
+          </div>
+          <div id="keys" class="gutter-menu-item">
+            <sl-icon name="file-lock2-fill"></sl-icon>
+          </div>
           <div id="connection" class="gutter-menu-item">
             <sl-icon name=${this.mainChannel.isConnected ? "hdd-network-fill" : "hdd-network"}></sl-icon>
           </div>

@@ -18,6 +18,7 @@ import { StoreSubscriber } from "/state/subscribe.js";
 // Views
 import "/components/views/index.js";
 import "/components/views/welcome-dialog/index.js";
+import "/components/views/system-prompt/index.js";
 
 // Components
 import "/utils/debug-panel.js";
@@ -109,6 +110,7 @@ class DPanelApp extends LitElement {
       <aside>
         <welcome-dialog></welcome-dialog>
         <debug-panel></debug-panel>
+        <system-prompt></system-prompt>
       </aside>
 
       <style>

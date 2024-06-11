@@ -129,7 +129,7 @@ class IframeView extends LitElement {
       return html`
 
         <div id="IframeContainer">
-          <iframe src="${pupContext.manifest.gui.source}" frameBorder="0"></iframe>
+          <iframe src="${pupContext.manifest.gui.source}" style="opacity: 0.1" frameBorder="0"></iframe>
         </div>
       `;
     }

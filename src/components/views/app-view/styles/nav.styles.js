@@ -24,7 +24,10 @@ export const navStyles = css`
     display: none;
     @media (min-width: 566px) {
       display: flex;
+      flex-direction: column;
       width: 100%;
+      gap: 10px;
+      align-items: center;
       justify-content: center;
       padding: 0.7em 0em;
     }
@@ -40,8 +43,8 @@ export const navStyles = css`
     opacity: 1;
     z-index: 2;
 
-    border-right: 1px solid #1c1b22;
-    background: #1c1b22;
+    /*border-right: 1px solid #1c1b22;*/
+    /*background: #1c1b22;*/
     padding: 0.75em;
 
     height: 100%;
@@ -74,7 +77,7 @@ export const navStyles = css`
     border-radius: 4px;
 
     height: 22px;
-    transform: rotate(-3deg);
+    // transform: rotate(-3deg);
 
     img {
       position: absolute;
@@ -82,7 +85,7 @@ export const navStyles = css`
       left: -6px;
 
       width: 36px;
-      transform: rotate(0deg);
+      // transform: rotate(0deg);
     }
   }
 
@@ -92,7 +95,7 @@ export const navStyles = css`
   }
 
   #GutterNav #menu,
-  #GutterNav #connection {
+  #GutterNav .tray-icon {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -100,12 +103,12 @@ export const navStyles = css`
     font-size: 1.1rem;
   }
 
-  #GutterNav #connection {
+  #GutterNav .tray-icon {
     color: #595959;
   }
 
   #GutterNav #menu sl-icon {
-    transform: rotate(6deg);
+    // transform: rotate(6deg);
   }
 
   #GutterNav .gutter-menu-item {
@@ -115,8 +118,6 @@ export const navStyles = css`
   }
 
   #GutterNav .gutter-menu-item.bg {
-    background: grey;
-    border: 1px solid grey;
   }
 
   #GutterNav .gutter-menu-item:hover {
@@ -296,5 +297,33 @@ export const navStyles = css`
   #Side section.section-installed .menu-item.active {
     background: #4360ff;
   }
+
+
+  /* Pulse / Prompt Mode */
+  #GutterNav.pulse {
+    animation-name: color;
+    animation-duration: 700ms;
+    animation-iteration-count: infinite;
+    animation-direction: alternate-reverse;
+    animation-timing-function: linear;
+
+    .gutter-footer {
+      color: white;
+    }
+
+    .gutter-footer #keys {
+      background: #fd5a5a;
+      border-color: #fd5a5a;
+    }
+  }
+  @keyframes color {
+    from {
+      background-color: rgb(44, 77, 255);
+      }
+    to {
+      background-color: #4360ff;
+      }
+  }
+
 `;
 

@@ -182,6 +182,10 @@ export const navStyles = css`
     }
   }
 
+  #Side .inner.opaque {
+    opacity: 0.1;
+  }
+
   #Side .menu-item {
     display: flex;
     flex-direction: row;

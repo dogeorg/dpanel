@@ -3,6 +3,17 @@ import { store } from "/state/store.js";
 import { pkgController } from "/controllers/package/index.js";
 import { asyncTimeout } from "/utils/timeout.js";
 
+function mockedMainChannelRunner(onMessageCallback) {
+  setTimeout(() => {
+    const mockData = {
+      type: "ShowPrompt",
+      name: "transaction_sign_prompt",
+    };
+    console.log("--mock runner executed");
+    onMessageCallback({ data: JSON.stringify(mockData) });
+  }, 10000);
+}
+
 class SocketChannel {
   observers = [];
   reconnectInterval = 500;
@@ -26,6 +37,7 @@ class SocketChannel {
     this.wsClient = new WebSocketClient(
       "ws://localhost:3000/ws/state/",
       store.networkContext,
+      mockedMainChannelRunner,
     );
 
     // Update component state based on WebSocket events
@@ -37,13 +49,13 @@ class SocketChannel {
     };
 
     this.wsClient.onMessage = async (event) => {
-      console.log("MSSSGSG!~", event);
+      console.log("MSSSGSG!~", event, event.data);
 
       let err, data;
       try {
         data = JSON.parse(event.data);
       } catch (err) {
-        console.warn("failed to JSON.parse incoming event", event);
+        console.warn("failed to JSON.parse incoming event", event, err);
         err = true;
       }
 
@@ -62,6 +74,14 @@ class SocketChannel {
           await asyncTimeout(500);
 
           pkgController.resolveAction(data.id, data);
+          break;
+        case "ShowPrompt":
+          store.updateState({
+            promptContext: {
+              display: true,
+              type: event.data.name,
+            },
+          });
           break;
       }
       this.notify();

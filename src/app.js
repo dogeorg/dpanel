@@ -2,6 +2,7 @@ import {
   LitElement,
   html,
   nothing,
+  classMap
 } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 
 // Add shoelace once. Use components anywhere.
@@ -42,6 +43,7 @@ import { mainChannel } from "/controllers/sockets/main-channel.js";
 class DPanelApp extends LitElement {
   static properties = {
     menuVisible: { type: Boolean },
+    systemPromptActive: { type: Boolean },
     currentPath: { type: String },
   };
 
@@ -49,6 +51,7 @@ class DPanelApp extends LitElement {
     super();
     this.context = new StoreSubscriber(this, store);
     this.menuVisible = true;
+    this.systemPromptActive = false;
     this.currentPath = "";
     this._debouncedHandleResize = debounce(this._handleResize.bind(this), 50);
     this.mainChannel = mainChannel;
@@ -94,14 +97,27 @@ class DPanelApp extends LitElement {
     this.menuVisible = !this.menuVisible;
   }
 
+  enableSystemPrompt() {
+    if (this.systemPromptActive) {
+      this.shadowRoot.querySelector('system-prompt').close();
+      setTimeout(() => { this.systemPromptActive = false; }, 400);
+    } else {
+      this.systemPromptActive = !this.systemPromptActive;
+    }
+  }
+
   render() {
     const CURPATH = this.context.store.appContext.pathname || "";
+    const showSystemPrompt = this.context.store.promptContext.display;
     const showChrome = !CURPATH.startsWith("/login");
+    const mainClasses = classMap({
+      opaque: showSystemPrompt
+    })
 
     return html`
       <div id="App">
         ${showChrome ? this.renderNav(CURPATH) : nothing}
-        <main id="Main">
+        <main id="Main" class=${mainClasses}>
           <div id="Outlet"></div>
         </main>
         ${showChrome ? this.renderFooter() : nothing}
@@ -110,7 +126,13 @@ class DPanelApp extends LitElement {
       <aside>
         <welcome-dialog></welcome-dialog>
         <debug-panel></debug-panel>
-        <system-prompt></system-prompt>
+        <system-prompt ?open=${showSystemPrompt}></system-prompt>
+
+        <!--button
+          @click=${this.enableSystemPrompt}
+          style="position:absolute;bottom:0px;right:0px;z-index:99999"
+          >Click
+        </button-->
       </aside>
 
       <style>

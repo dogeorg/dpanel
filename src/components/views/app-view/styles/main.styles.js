@@ -48,6 +48,10 @@ export const mainStyles = css`
     }
   }
 
+  #Main.opaque {
+    opacity: 0.2;
+  }
+
   #Outlet {
     height: 100%;
     width: 100%;

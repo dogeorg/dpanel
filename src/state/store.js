@@ -24,6 +24,10 @@ class Store {
     this.pupContext = {
       // Define pup state here
       manifest: {}
+    };
+    this.promptContext = {
+      display: false,
+      name: null,
     }
   }
 
@@ -90,6 +94,9 @@ class Store {
     }
     if (partialState.pupContext) {
       this.pupContext = { ...this.pupContext, ...partialState.pupContext };
+    }
+    if (partialState.promptContext) {
+      this.promptContext = { ...this.promptContext, ...partialState.promptContext };
     }
     // Other slices..
 

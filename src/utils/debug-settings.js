@@ -1,6 +1,11 @@
-import { LitElement, html, css, classMap } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
-import { StoreSubscriber } from '/state/subscribe.js';
-import { store } from '/state/store.js';
+import {
+  LitElement,
+  html,
+  css,
+  classMap,
+} from "/vendor/@lit/all@3.1.2/lit-all.min.js";
+import { StoreSubscriber } from "/state/subscribe.js";
+import { store } from "/state/store.js";
 
 class DebugSettingsDialog extends LitElement {
   constructor() {
@@ -20,27 +25,26 @@ class DebugSettingsDialog extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
-    
-    // Prevent the dialog from closing when the user clicks on the overlay
-    const dialog = this.shadowRoot.querySelector('.dialog-deny-close');
-    this.addEventListener('sl-request-close', this.denyClose);
 
+    // Prevent the dialog from closing when the user clicks on the overlay
+    const dialog = this.shadowRoot.querySelector(".dialog-deny-close");
+    this.addEventListener("sl-request-close", this.denyClose);
   }
 
   handleToggle(event) {
-    const changes = { networkContext: {}}
-    changes.networkContext[event.target.name] = event.target.checked
-    store.updateState(changes)
+    const changes = { networkContext: {} };
+    changes.networkContext[event.target.name] = event.target.checked;
+    store.updateState(changes);
   }
 
   handleInput(event) {
-    const changes = { networkContext: {} }
-    changes.networkContext[event.target.name] = event.target.value
-    store.updateState(changes)
+    const changes = { networkContext: {} };
+    changes.networkContext[event.target.name] = event.target.value;
+    store.updateState(changes);
   }
 
   render() {
-    const { networkContext, appContext } = this.context.store
+    const { networkContext, appContext } = this.context.store;
     return html`
       <sl-dialog ?open=${this.isOpen} class="dialog-deny-close" no-header>
         <form @submit=${this.handleSubmit}>
@@ -104,6 +108,17 @@ class DebugSettingsDialog extends LitElement {
                 API Base URL
             </sl-input>
           </div>
+          <div class="form-control">
+            <sl-input
+              type="text"
+              name="demoSystemPrompt"
+              help-text="Force Display of System Prompt"
+              value=${networkContext.demoSystemPrompt}
+              @sl-change=${this.handleInput}>
+                Force Prompt by Name
+            </sl-input>
+
+          </div>
         </form>
         <div slot="footer">
           <sl-button @click=${this.closeDialog}>Close</sl-button>
@@ -113,16 +128,16 @@ class DebugSettingsDialog extends LitElement {
   }
 
   disconnectedCallback() {
-    dialog = this.shadowRoot.querySelector('.dialog-deny-close');
-    dialog.removeEventListener('sl-request-close', this.denyClose);
+    dialog = this.shadowRoot.querySelector(".dialog-deny-close");
+    dialog.removeEventListener("sl-request-close", this.denyClose);
     super.disconnectedCallback();
   }
 
   denyClose = (event) => {
-    if (event.detail.source === 'overlay') {
+    if (event.detail.source === "overlay") {
       event.preventDefault();
     }
-  }
+  };
 
   handleSubmit(event) {
     // Prevent the form from submitting
@@ -141,9 +156,9 @@ class DebugSettingsDialog extends LitElement {
 
   saveSettings() {
     // Logic to save settings
-    console.log('Settings saved!');
+    console.log("Settings saved!");
     this.closeDialog();
   }
 }
 
-customElements.define('debug-settings-dialog', DebugSettingsDialog);
+customElements.define("debug-settings-dialog", DebugSettingsDialog);

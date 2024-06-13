@@ -1,20 +1,25 @@
-import { LitElement, html, css, classMap } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
+import {
+  LitElement,
+  html,
+  css,
+  classMap,
+} from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 
 // Import dependent components
-import './debug-settings.js'
+import "./debug-settings.js";
 
 class DebugPanel extends LitElement {
   static properties = {
-    isVisible: { type: Boolean }
-  }
-  
+    isVisible: { type: Boolean },
+  };
+
   static styles = css`
     :host {
       display: block;
       position: fixed;
       bottom: 0px;
       width: 100%;
-      z-index: 9999;
+      z-index: 99999;
     }
     .hidden {
       display: none;
@@ -23,7 +28,7 @@ class DebugPanel extends LitElement {
       position: relative;
       max-height: 140px;
       overflow-y: scroll;
-      background: rgba(0,0,0,0.9);
+      background: rgba(0, 0, 0, 0.9);
       box-sizing: border-box;
       padding: 15px;
     }
@@ -35,7 +40,7 @@ class DebugPanel extends LitElement {
     .text {
       padding: 1px 4px;
       box-sizing: border-box;
-      background: rgba(255,255,255, 0.15);
+      background: rgba(255, 255, 255, 0.15);
       display: inline-block;
     }
     .log {
@@ -49,7 +54,7 @@ class DebugPanel extends LitElement {
     }
 
     .floating-controls-container {
-      background: rgba(0,0,0,1);
+      background: rgba(0, 0, 0, 1);
       padding: 8px;
       display: flex;
       justify-content: space-between;
@@ -89,70 +94,73 @@ class DebugPanel extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
-    document.addEventListener('keydown', this.toggleVisibility);
-    
+    document.addEventListener("keydown", this.toggleVisibility);
+
     // Catch and log errors in custom logger ui & in browser console.
     window.onerror = (message, source, lineno, colno, error) => {
-      this.logMessages.push({ type: 'error', args: [message, source, lineno, colno, error] });
+      this.logMessages.push({
+        type: "error",
+        args: [message, source, lineno, colno, error],
+      });
       this.requestUpdate();
     };
   }
 
   disconnectedCallback() {
-    document.removeEventListener('keydown', this.toggleVisibility);
+    document.removeEventListener("keydown", this.toggleVisibility);
     super.disconnectedCallback();
   }
 
   toggleVisibility = (event, force) => {
-    if (!event && force === 'close') {
+    if (!event && force === "close") {
       this.isVisible = false;
     }
-    if (!event && force === 'open') {
+    if (!event && force === "open") {
       this.isVisible = true;
     }
-    if (!force && event.ctrlKey && event.key === 'l') {
+    if (!force && event.ctrlKey && event.key === "l") {
       this.isVisible = !this.isVisible;
     }
-  }
+  };
 
   showSettingsDialog() {
-    this.shadowRoot.querySelector('debug-settings-dialog').openDialog();
+    this.shadowRoot.querySelector("debug-settings-dialog").openDialog();
   }
 
   render() {
     const classes = {
-      'debugger-container': true,
-      'hidden': !this.isVisible
-    }
+      "debugger-container": true,
+      hidden: !this.isVisible,
+    };
     return html`
       <div class=${classMap(classes)}>
-        <div class="log-container">
-          ${this.logMessages.map(
-            (entry) => {
-              return html`
-                <div class="entry ${entry.type}">
-                  <div class="text">${entry.args.join(' ')}</div>
-                </div>
-              `
-            }
-          )}
+        <div class="log-container hidden">
+          ${this.logMessages.map((entry) => {
+            return html`
+              <div class="entry ${entry.type}">
+                <div class="text">${entry.args.join(" ")}</div>
+              </div>
+            `;
+          })}
         </div>
         <div class="floating-controls-container">
           <div class="left">
-            <sl-button size="small" @click=${() => this.toggleVisibility(null, 'close')}>
-                Close Debug Panel
+            <sl-button
+              size="small"
+              @click=${() => this.toggleVisibility(null, "close")}
+            >
+              Close Debug Panel
             </sl-button>
           </div>
           <div class="right">
             <sl-button size="small" @click=${this.showSettingsDialog}>
               <sl-icon name="tools" slot="prefix"></sl-icon>
-                Debugger Config
+              Debugger Config
             </sl-button>
           </div>
         </div>
 
         <debug-settings-dialog></debug-settings-dialog>
-
       </div>
     `;
   }
@@ -166,4 +174,4 @@ class DebugPanel extends LitElement {
   }
 }
 
-customElements.define('debug-panel', DebugPanel);
+customElements.define("debug-panel", DebugPanel);

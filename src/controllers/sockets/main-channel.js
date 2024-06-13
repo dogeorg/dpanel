@@ -4,14 +4,15 @@ import { pkgController } from "/controllers/package/index.js";
 import { asyncTimeout } from "/utils/timeout.js";
 
 function mockedMainChannelRunner(onMessageCallback) {
-  setTimeout(() => {
-    const mockData = {
-      type: "ShowPrompt",
-      name: "transaction_sign_prompt",
-    };
-    console.log("--mock runner executed");
-    onMessageCallback({ data: JSON.stringify(mockData) });
-  }, 10000);
+  if (store.networkContext.demoSystemPrompt) {
+    setTimeout(() => {
+      const mockData = {
+        type: "ShowPrompt",
+        name: store.networkContext.demoSystemPrompt,
+      };
+      onMessageCallback({ data: JSON.stringify(mockData) });
+    }, 2000);
+  }
 }
 
 class SocketChannel {
@@ -79,7 +80,7 @@ class SocketChannel {
           store.updateState({
             promptContext: {
               display: true,
-              type: event.data.name,
+              name: data.name,
             },
           });
           break;

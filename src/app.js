@@ -2,7 +2,7 @@ import {
   LitElement,
   html,
   nothing,
-  classMap
+  classMap,
 } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 
 // Add shoelace once. Use components anywhere.
@@ -10,7 +10,11 @@ import { setBasePath } from "/vendor/@shoelace/cdn@2.14.0/utilities/base-path.js
 import "/vendor/@shoelace/cdn@2.14.0/shoelace.js";
 
 // Import stylesheets
-import { mainStyles, navStyles, utilStyles } from "/components/views/app-view/styles/index.styles.js";
+import {
+  mainStyles,
+  navStyles,
+  utilStyles,
+} from "/components/views/app-view/styles/index.styles.js";
 
 // App state (singleton)
 import { store } from "/state/store.js";
@@ -99,8 +103,10 @@ class DPanelApp extends LitElement {
 
   enableSystemPrompt() {
     if (this.systemPromptActive) {
-      this.shadowRoot.querySelector('system-prompt').close();
-      setTimeout(() => { this.systemPromptActive = false; }, 400);
+      this.shadowRoot.querySelector("system-prompt").close();
+      setTimeout(() => {
+        this.systemPromptActive = false;
+      }, 400);
     } else {
       this.systemPromptActive = !this.systemPromptActive;
     }
@@ -109,10 +115,11 @@ class DPanelApp extends LitElement {
   render() {
     const CURPATH = this.context.store.appContext.pathname || "";
     const showSystemPrompt = this.context.store.promptContext.display;
+    const taskName = this.context.store.promptContext.name;
     const showChrome = !CURPATH.startsWith("/login");
     const mainClasses = classMap({
-      opaque: showSystemPrompt
-    })
+      opaque: showSystemPrompt,
+    });
 
     return html`
       <div id="App">
@@ -126,7 +133,10 @@ class DPanelApp extends LitElement {
       <aside>
         <welcome-dialog></welcome-dialog>
         <debug-panel></debug-panel>
-        <system-prompt ?open=${showSystemPrompt}></system-prompt>
+        <system-prompt
+          ?open=${showSystemPrompt}
+          task=${taskName}
+        ></system-prompt>
 
         <!--button
           @click=${this.enableSystemPrompt}

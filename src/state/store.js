@@ -1,5 +1,4 @@
 class Store {
-
   subscribers = [];
 
   constructor() {
@@ -7,28 +6,29 @@ class Store {
     // If there's no persisted state, initialize with defaults.
     this.appContext = this.appContext || {
       // Define application state here
-      orienation: 'landscape',
-      pathname: '/'
+      orienation: "landscape",
+      pathname: "/",
     };
     this.networkContext = this.networkContext || {
       // Define network state here
-      apiBaseUrl: 'http://localhost:3000',
+      apiBaseUrl: "http://localhost:3000",
       overrideBaseUrl: false,
       useMocks: true,
       forceFailures: false,
       forceDelayInSeconds: 3,
       reqLogs: true,
-      status: 'online',
+      status: "online",
       token: false,
+      demoSystemPrompt: "",
     };
     this.pupContext = {
       // Define pup state here
-      manifest: {}
+      manifest: {},
     };
     this.promptContext = {
       display: false,
       name: null,
-    }
+    };
   }
 
   subscribe(controller) {
@@ -46,14 +46,16 @@ class Store {
     if (this.supportsLocalStorage()) {
       try {
         // Attempt to parse the saved state from localStorage
-        const savedState = JSON.parse(localStorage.getItem('storeState'));
+        const savedState = JSON.parse(localStorage.getItem("storeState"));
         if (savedState) {
           this.appContext = savedState.appContext;
           this.networkContext = savedState.networkContext;
           // Load other slices as needed
         }
       } catch (error) {
-        console.warn('Failed to parse the store state from localStorage. Using defaults.');
+        console.warn(
+          "Failed to parse the store state from localStorage. Using defaults.",
+        );
       }
     }
   }
@@ -66,16 +68,16 @@ class Store {
           networkContext: this.networkContext,
           // Include other slices of state as needed
         };
-        localStorage.setItem('storeState', JSON.stringify(stateToPersist));
+        localStorage.setItem("storeState", JSON.stringify(stateToPersist));
       } catch (error) {
-        console.warn('Failed to save the store state to localStorage.');
+        console.warn("Failed to save the store state to localStorage.");
       }
     }
   }
 
   supportsLocalStorage() {
     try {
-      const testKey = 'testLocalStorage';
+      const testKey = "testLocalStorage";
       localStorage.setItem(testKey, testKey);
       localStorage.removeItem(testKey);
       return true;
@@ -90,13 +92,19 @@ class Store {
       this.appContext = { ...this.appContext, ...partialState.appContext };
     }
     if (partialState.networkContext) {
-      this.networkContext = { ...this.networkContext, ...partialState.networkContext };
+      this.networkContext = {
+        ...this.networkContext,
+        ...partialState.networkContext,
+      };
     }
     if (partialState.pupContext) {
       this.pupContext = { ...this.pupContext, ...partialState.pupContext };
     }
     if (partialState.promptContext) {
-      this.promptContext = { ...this.promptContext, ...partialState.promptContext };
+      this.promptContext = {
+        ...this.promptContext,
+        ...partialState.promptContext,
+      };
     }
     // Other slices..
 

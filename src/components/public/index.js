@@ -1,0 +1,1 @@
+export * as DogeEgo from './doge-ego/index.js';

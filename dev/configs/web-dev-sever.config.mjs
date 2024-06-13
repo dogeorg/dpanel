@@ -13,6 +13,13 @@ export default {
         ctx.response.set('Access-Control-Allow-Methods', 'GET');
         ctx.response.set('Access-Control-Allow-Headers', 'Content-Type');
       }
+      // TODO: review appropriateness, limit to pups.
+      // Below, we are allowing all origins to fetch resources
+      ctx.response.set('Access-Control-Allow-Origin', '*');
+      ctx.response.set('Access-Control-Allow-Methods', 'OPTIONS');
+      ctx.response.set('Access-Control-Allow-Methods', 'GET');
+      ctx.response.set('Access-Control-Allow-Headers', 'Content-Type');
+
       return next();
     }
   ]

@@ -148,6 +148,39 @@ class ManageView extends LitElement {
 
       <div class="padded">
         <header>
+          <div class="heading-wrap">
+            <h2>Network &amp; Security Settings</h2>
+          </div>
+        </header>
+
+        <div class="row">
+           <span><b>Admin Password</b>:  &nbsp; ********</span> <sl-button>Change Admin Password</sl-button>
+        </div>
+
+        <div class="row">
+          <span><b>Current Network</b>: &nbsp; HomeWifi</span> <sl-button>Change network</sl-button>
+        </div>
+      </div>
+
+      <div class="padded">
+        <header>
+          <div class="heading-wrap">
+            <h2>Key settings</h2>
+          </div>
+        </header>
+
+        <div class="row">
+          <span><b>Dogebox Master Private Key</b>: &nbsp; *******</span> <sl-button>More info</sl-button>
+        </div>
+
+        <div class="row">
+          <span><b>Dogebox Master Public Key</b>: &nbsp; <span class="unicode break">MEgCQQCo9+BpMRYQ/dL3DS2CyJxRF+j6ctbT3/Qp84+KeFhnii7NT7fELilKUSnx
+S30WAvQCCo2yU1orfgqr41mM70MBAgMBAAE=</span></span> <sl-button>Copy public key</sl-button>
+        </div>
+      </div>
+
+      <div class="padded">
+        <header>
           ${this.renderSectionInstalledHeader(ready)}
         </header>
           ${this.renderSectionInstalledBody(ready, SKELS, hasItems)}
@@ -179,6 +212,29 @@ class ManageView extends LitElement {
         padding: 1.4em;
         padding-top: 0em;
       }
+    }
+
+    .row {
+      display: flex;
+      flex-direction: row;
+      gap: 1em;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 0.5em;
+      padding-top: 0.5em;
+      border-bottom: 1px solid rgba(255,255,255, 0.05);
+    }
+
+    .row:last-of-type {
+      border-bottom: none;
+    }
+
+    .unicode {
+      font-family: 'Courier';
+    }
+
+    .break {
+      word-break: break-all;
     }
 
     h1, h2 {

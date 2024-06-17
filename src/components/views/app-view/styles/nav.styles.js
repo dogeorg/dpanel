@@ -22,7 +22,7 @@ export const navStyles = css`
 
   #GutterNav .gutter-footer {
     display: none;
-    @media (min-width: 566px) {
+    @media (min-width: 576px) {
       display: flex;
       flex-direction: column;
       width: 100%;

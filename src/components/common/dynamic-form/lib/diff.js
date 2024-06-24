@@ -2,11 +2,21 @@ export function _checkForChanges() {
   if (!this.fields?.sections) return;
 
   let dirty = 0;
+  let flattenedFields = [];
 
   this.fields.sections.forEach((section) => {
     let sectionChangeCount = 0;
 
     section.fields.forEach((field) => {
+      flattenedFields.push(field)
+      if (field.type === 'toggleField') {
+        field.fields.forEach((f) => {
+          flattenedFields.push(f);
+        })
+      }
+    });
+
+    flattenedFields.forEach((field) => {
       if (this._checkAndSetFieldDirtyStatus(field.name)) {
         sectionChangeCount++;
         dirty++;

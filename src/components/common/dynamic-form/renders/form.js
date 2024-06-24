@@ -110,6 +110,7 @@ export function _generateFormControls(options = {}) {
               variant="text"
               id="${options.formId}__reset_button"
               @click=${this._handleDiscardChanges}
+              class=${this.theme}
             >
               Discard changes
             </sl-button>
@@ -120,6 +121,7 @@ export function _generateFormControls(options = {}) {
         id="${options.formId}__save_button"
         variant="primary"
         type="submit"
+        class=${this.theme}
         ?loading=${this._loading}
         ?disabled=${!changeCount}
         form=${options.formId}

@@ -1,4 +1,4 @@
-import { LitElement, html } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
+import { LitElement, html, classMap } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 import * as methods from "/components/common/dynamic-form/index.js";
 import { bindToClass } from "/utils/class-bind.js";
 import { styles } from "./styles.js";
@@ -13,6 +13,7 @@ class DynamicForm extends LitElement {
       requireCommit: { type: Boolean },
       markModifiedFields: { type: Boolean },
       allowDiscardChanges: { type: Boolean },
+      theme: { type: String },
       _activeFormId: { type: String, state: true },
       _dirty: { type: Number, state: true },
       _loading: { type: Boolean, state: true },
@@ -34,6 +35,7 @@ class DynamicForm extends LitElement {
     this._dirty = 0;
     this._loading = false;
     this._orientation = "portrait";
+    this.theme = ''
   }
 
   set fields(newValue) {

@@ -4,9 +4,22 @@ export function _initializeFormFieldProperties(newValue) {
     this.constructor.createProperty(`_form_${section.name}_count`, { type: Number });
     this[`_form_${section.name}_count`] = 0;
 
+    let flattenedFields = []
     section.fields.forEach(field => {
+      // Push all field types.
+      flattenedFields.push(field);
 
-      const { currentKey, originalKey, isDirtyKey, repeatKey } = this.propKeys(field.name);
+      // Additionally, for toggleFields push nested fields.
+      if (field.type === 'toggleField') {
+        field.fields.forEach(f => {
+          flattenedFields.push(f);
+        })
+      }
+    })
+
+    flattenedFields.forEach(field => {
+
+      const { currentKey, originalKey, isDirtyKey, repeatKey, variantIndexKey } = this.propKeys(field.name);
 
       // Create the standard property
       this.constructor.createProperty(currentKey, { type: String });
@@ -19,6 +32,12 @@ export function _initializeFormFieldProperties(newValue) {
 
       if (field.type === 'password' && field.requireConfirmation) {
         this.constructor.createProperty(repeatKey, { type: String });
+      }
+
+      // Create a property to track field visibility (for A/B fields)
+      if (field.type === 'toggleField') {
+        this.constructor.createProperty(variantIndexKey, { type: Number });
+        this[variantIndexKey] = parseInt(field.defaultTo) || 0;
       }
     });
   });
@@ -52,6 +71,7 @@ export function propKeys(fieldName) {
     currentKey: `_${fieldName.toLowerCase()}`,
     originalKey: `__${fieldName.toLowerCase()}`,
     isDirtyKey: `__${fieldName.toLowerCase()}_is_dirty`,
-    repeatKey: `_${fieldName.toLowerCase()}_repeat`
+    repeatKey: `_${fieldName.toLowerCase()}_repeat`,
+    variantIndexKey: `_${fieldName.toLowerCase()}_variant`,
   }
 }

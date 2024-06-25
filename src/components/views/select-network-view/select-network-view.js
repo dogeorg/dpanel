@@ -1,4 +1,5 @@
 import { LitElement, html, css } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
+import { getNetworks } from "/api/network/get-networks.js";
 import { postNetwork } from "/api/network/set-network.js";
 
 // Components
@@ -39,8 +40,8 @@ class SelectNetwork extends LitElement {
       default_to: { type: String },
       _server_fault: { type: Boolean },
       _invalid_creds: { type: Boolean },
-      _loginFields: { type: Object },
-      _attemptLogin: { type: Object },
+      _setNetworkFields: { type: Object },
+      _attemptSetNetwork: { type: Object },
     };
   }
 
@@ -48,12 +49,15 @@ class SelectNetwork extends LitElement {
     super();
     this._server_fault = false;
     this._invalid_creds = false;
+    this._setNetworkFields = {}
   }
 
-  connectedCallback() {
+  async connectedCallback() {
     super.connectedCallback();
-    this.addEventListener("sl-hide", this.dismissErrors);
-    this._changePassFields = {
+
+    const networks = await this.fetchAvailableNetworks();
+
+    this._setNetworkFields = {
       sections: [
         {
           name: "Select Network",
@@ -72,8 +76,7 @@ class SelectNetwork extends LitElement {
               type: "select",
               required: true,
               options: [
-                { type: "ethernet", value: "ethernet", label: "Ethernet" },
-                { type: "wifi", value: "home-wifi", label: "Home Wifi" },
+                ...networks,
                 { type: "wifi", value: "hidden", label: "Hidden Network" },
               ]
             },
@@ -87,14 +90,23 @@ class SelectNetwork extends LitElement {
             {
               name: "network-pass",
               label: "Network Password",
-              type: "text",
+              type: "password",
               required: true,
+              passwordToggle: true,
               revealOn: ["network", "!=", "ethernet"]
             },
           ],
         },
       ],
     };
+
+    this.addEventListener("sl-hide", this.dismissErrors);
+  }
+
+  async fetchAvailableNetworks() {
+    const response = await getNetworks()
+    if (response.networks) return response.networks;
+    if (!response.networks) return [];
   }
 
   disconnectedCallback() {
@@ -107,7 +119,7 @@ class SelectNetwork extends LitElement {
     this._server_fault = false;
   }
 
-  _attemptChangePass = async (data, form, dynamicFormInstance) => {
+  _attemptSetNetwork = async (data, form, dynamicFormInstance) => {
     // Do a thing
     console.log(data);
 
@@ -163,8 +175,8 @@ class SelectNetwork extends LitElement {
           </sl-alert>
 
           <dynamic-form
-            .fields=${this._changePassFields}
-            .onSubmit=${this._attemptChangePass}
+            .fields=${this._setNetworkFields}
+            .onSubmit=${this._attemptSetNetwork}
             requireCommit
             theme="yellow"
             style="--submit-btn-width: 100%; --submit-btn-anchor: center;"

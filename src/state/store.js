@@ -15,7 +15,7 @@ class Store {
       overrideBaseUrl: false,
       useMocks: true,
       forceFailures: false,
-      forceDelayInSeconds: 3,
+      forceDelayInSeconds: 1,
       reqLogs: true,
       status: "online",
       token: false,

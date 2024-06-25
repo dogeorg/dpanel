@@ -1,6 +1,15 @@
 import { css } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 
 export const styles = css`
+
+  .loader-overlay {
+    min-height: 240px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
   form {
     padding: 0em 0.5em;
   }

@@ -17,6 +17,7 @@ class DynamicForm extends LitElement {
       theme: { type: String },
       _activeFormId: { type: String, state: true },
       _dirty: { type: Number, state: true },
+      _initializing: { type: Boolean },
       _loading: { type: Boolean, state: true },
       _orientation: { type: String, reflect: true },
       _rules: { type: Object, state: true },
@@ -35,6 +36,7 @@ class DynamicForm extends LitElement {
     this.allowDiscardChanges = false;
     this._activeFormId = null;
     this._dirty = 0;
+    this._initializing = false;
     this._loading = false;
     this._orientation = "portrait";
     this.theme = ''
@@ -89,8 +91,16 @@ class DynamicForm extends LitElement {
     return this.__loading;
   }
 
+  toggleLoader() {
+    this._initializing = !this._initializing;
+  }
+
   render() {
-    if (!this.fields?.sections) return;
+    if (!this?.fields?.sections) {
+      return html`<div class="loader-overlay">
+        <sl-spinner style="font-size: 2rem; --indicator-color: #bbb;"></sl-spinner>
+      </div>`
+    };
 
     return html`
       <sl-resize-observer

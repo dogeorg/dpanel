@@ -6,11 +6,11 @@ export function renderBanner() {
       border-radius: 16px;
       padding: 1em;
       color: white;
-      background-color: var(--sl-color-indigo-400);
+      background-color: var(--sl-color-yellow-500);
       background-image: linear-gradient(
         to bottom right,
-        var(--sl-color-indigo-400),
-        var(--sl-color-indigo-300)
+        var(--sl-color-yellow-500),
+        var(--sl-color-amber-600)
       );
       position: relative;
       overflow: hidden;
@@ -25,7 +25,7 @@ export function renderBanner() {
     }
     .banner aside {
       position: absolute;
-      right: -60%;
+      right: -57%;
       top: -25px;
       width: 100%;
       height: 120%;
@@ -47,11 +47,11 @@ export function renderBanner() {
   return html`
     <div class="banner">
       <main>
-        <h1>Such Login!</h1>
-        <p>Enter your Dogebox admin password to continue</p>
+        <h1>Select Network</h1>
+        <p>Get your Dogebox connected to your desired network</p>
       </main>
       <aside>
-        <img class="doge-store-bg" src="/static/img/locked-box.png" />
+        <img class="doge-store-bg" src="/static/img/wifi-box.png" />
       </aside>
     </div>
     <style>

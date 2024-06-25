@@ -1,25 +1,33 @@
 export function _initializeFormFieldProperties(newValue) {
   newValue.sections.forEach((section) => {
     // For each section, create a property to track modified field count
-    this.constructor.createProperty(`_form_${section.name}_count`, { type: Number });
+    this.constructor.createProperty(`_form_${section.name}_count`, {
+      type: Number,
+    });
     this[`_form_${section.name}_count`] = 0;
 
-    let flattenedFields = []
-    section.fields.forEach(field => {
+    let flattenedFields = [];
+    section.fields.forEach((field) => {
       // Push all field types.
       flattenedFields.push(field);
 
       // Additionally, for toggleFields push nested fields.
-      if (field.type === 'toggleField') {
-        field.fields.forEach(f => {
+      if (field.type === "toggleField") {
+        field.fields.forEach((f) => {
           flattenedFields.push(f);
-        })
+        });
       }
-    })
+    });
 
-    flattenedFields.forEach(field => {
-
-      const { currentKey, originalKey, isDirtyKey, repeatKey, variantIndexKey } = this.propKeys(field.name);
+    flattenedFields.forEach((field) => {
+      const {
+        currentKey,
+        originalKey,
+        isDirtyKey,
+        repeatKey,
+        variantIndexKey,
+        revealKey,
+      } = this.propKeys(field.name);
 
       // Create the standard property
       this.constructor.createProperty(currentKey, { type: String });
@@ -30,36 +38,52 @@ export function _initializeFormFieldProperties(newValue) {
       // Create a property for dirty tracking
       this.constructor.createProperty(isDirtyKey, { type: Boolean });
 
-      if (field.type === 'password' && field.requireConfirmation) {
+      if (field.type === "password" && field.requireConfirmation) {
         this.constructor.createProperty(repeatKey, { type: String });
       }
 
       // Create a property to track field visibility (for A/B fields)
-      if (field.type === 'toggleField') {
+      if (field.type === "toggleField") {
         this.constructor.createProperty(variantIndexKey, { type: Number });
         this[variantIndexKey] = parseInt(field.defaultTo) || 0;
+      }
+
+      // Create a property to track reveal condition
+      if (field.revealOn) {
+        this.constructor.createProperty(revealKey, { type: Boolean });
+        try {
+          const rule = {
+            self: field.name,
+            target: field.revealOn[0],
+            operator: field.revealOn[1],
+            value: field.revealOn[2],
+          }
+          this._rules.push(rule)
+          console.log(this._rules);
+        } catch (ruleErr) {
+          console.warn('Error with field rule', ruleErr, field.revealOn)
+        }
       }
     });
   });
 }
 
 export function _initializeValuesPreservingEdits(newValue) {
-  let _newValue = {}
+  let _newValue = {};
   // When dynamic-form is provided new values via an external actor
   // We should not immediately adopt them as the user may have edits.
   // Preserve edits.
-  Object.keys(newValue).forEach(key => {
-
+  Object.keys(newValue).forEach((key) => {
     const { currentKey, originalKey, isDirtyKey } = this.propKeys(key);
 
     if (this[isDirtyKey]) {
       // If the field is dirty, retain the current value
-      _newValue[key] = this[currentKey]
+      _newValue[key] = this[currentKey];
     } else {
       // If the field is not dirty, update it with the new value
       this[currentKey] = newValue[key];
       this[originalKey] = newValue[key];
-      _newValue[key] = newValue[key]
+      _newValue[key] = newValue[key];
     }
   });
 
@@ -73,5 +97,6 @@ export function propKeys(fieldName) {
     isDirtyKey: `__${fieldName.toLowerCase()}_is_dirty`,
     repeatKey: `_${fieldName.toLowerCase()}_repeat`,
     variantIndexKey: `_${fieldName.toLowerCase()}_variant`,
-  }
+    revealKey: `_${fieldName.toLowerCase()}_reveal_condition_met`,
+  };
 }

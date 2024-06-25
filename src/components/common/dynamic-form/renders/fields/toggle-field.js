@@ -14,7 +14,6 @@ const fieldToggleStyles = css`
 `;
 
 export function _render_toggleField(field) {
-  console.log('CALLED');
   const { variantIndexKey } = this.propKeys(field.name);
 
   const switchField = (showingIndex) => {

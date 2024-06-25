@@ -4,6 +4,12 @@ export function _checkForChanges() {
   let dirty = 0;
   let flattenedFields = [];
 
+  // Firstly, test whether any rule targeted fields have condition changes.
+  this._rules.forEach((rule) => {
+    this._checkAndSetConditionMetFlags(rule);
+  });
+
+  // Secondly, check if any field differs from prior state.
   this.fields.sections.forEach((section) => {
     let sectionChangeCount = 0;
 
@@ -27,6 +33,27 @@ export function _checkForChanges() {
   });
 
   this._dirty = dirty;
+}
+
+export function _checkAndSetConditionMetFlags(rule) {
+  // Obtain targets current value
+  const targetValue = this[this.propKeys(rule.target).currentKey]
+  const desiredValue = rule.value;
+  const revealKey = this.propKeys(rule.self).revealKey
+
+  // Test the rule
+  let newState;
+  switch (rule.operator) {
+    case "=":
+      newState = targetValue == desiredValue
+      break;
+    case "!=":
+      newState = targetValue && targetValue != desiredValue
+      break
+  }
+
+  // Toggle field flag (and being a reactive property, the UI will update);
+  this[revealKey] = newState;
 }
 
 export function _checkAndSetFieldDirtyStatus(fieldName) {

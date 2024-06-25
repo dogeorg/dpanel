@@ -21,7 +21,7 @@ class ApSetupView extends LitElement {
     return html`
       <main>
         <div class="padded">
-          <h1>Such Network</h1>
+          <select-network-view></select-network-view>
         </div>
       </main>
     `;

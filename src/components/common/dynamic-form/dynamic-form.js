@@ -2,6 +2,7 @@ import { LitElement, html, classMap } from "/vendor/@lit/all@3.1.2/lit-all.min.j
 import * as methods from "/components/common/dynamic-form/index.js";
 import { bindToClass } from "/utils/class-bind.js";
 import { styles } from "./styles.js";
+import { themes } from "./themes.js";
 import { onceThenDebounce } from "/utils/debounce.js";
 
 class DynamicForm extends LitElement {
@@ -18,10 +19,11 @@ class DynamicForm extends LitElement {
       _dirty: { type: Number, state: true },
       _loading: { type: Boolean, state: true },
       _orientation: { type: String, reflect: true },
+      _rules: { type: Object, state: true },
     };
   }
 
-  static styles = styles;
+  static styles = [styles, themes];
 
   constructor() {
     super();
@@ -36,6 +38,7 @@ class DynamicForm extends LitElement {
     this._loading = false;
     this._orientation = "portrait";
     this.theme = ''
+    this._rules = [];
   }
 
   set fields(newValue) {

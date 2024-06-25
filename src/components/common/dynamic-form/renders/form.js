@@ -1,4 +1,4 @@
-import { html, nothing, repeat } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
+import { html, nothing, repeat, classMap } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 
 export function _generateOneOrManyForms(data) {
   const tabs = data.sections.map((section, index) => {
@@ -70,16 +70,21 @@ export function _generateOneOrManyForms(data) {
 
 export function _generateField(field) {
   try {
+    // Hidden fields, never render HTML
     if (field.hidden) return nothing;
-    if (field.type === "number") {
-      return html`
-        <div class="form-control">${this[`_render_${field.type}`](field)}</div>
-      `;
-    } else {
-      return html`
-        <div class="form-control">${this[`_render_${field.type}`](field)}</div>
-      `;
+
+    // Fields with reveal rules render HTML if rule conditions are met
+    if (field.revealOn && !this[this.propKeys(field.name).revealKey]) return nothing;
+
+    // Stlyistic
+    const formControlClasses = {
+      'form-control': true,
+      'breakline': field.breakline
     }
+
+    return html`
+      <div class=${classMap(formControlClasses)}>${this[`_render_${field.type}`](field)}</div>
+    `;
   } catch (fieldRenderError) {
     console.error("Dynamic form field error:", { field, fieldRenderError });
     return this._generateErrorField(field);

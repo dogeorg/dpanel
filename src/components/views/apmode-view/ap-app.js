@@ -19,6 +19,7 @@ import "/components/views/apmode-view/view-ap-login.js";
 import "/components/views/apmode-view/view-ap-setup.js";
 import "/components/views/login-view/login-view.js";
 import "/components/views/change-pass-view/change-pass-view.js";
+import "/components/views/select-network-view/select-network-view.js";
 
 // Components
 import "/components/common/dynamic-form/dynamic-form.js";

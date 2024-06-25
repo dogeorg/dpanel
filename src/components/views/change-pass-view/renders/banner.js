@@ -14,7 +14,7 @@ export function renderBanner() {
       );
       position: relative;
       overflow: hidden;
-      margin-bottom: 1em;
+      margin-bottom: 2em;
     }
     .banner main {
       max-width: 65%;

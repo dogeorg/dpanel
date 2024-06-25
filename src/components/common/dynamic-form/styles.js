@@ -15,11 +15,16 @@ export const styles = css`
 
   /* Form element spacing */
   .form-control {
-    margin-bottom: 1.5em;
+    padding-bottom: 1.5em;
   }
 
   .form-control.no-margin {
-    margin-bottom: 0em;
+    padding-bottom: 0em;
+  }
+
+  .form-control.breakline {
+    border-bottom: 1px dashed var(--sl-input-border-color);
+    margin-bottom: 1em;
   }
 
   /* Highlighting edits */
@@ -69,25 +74,12 @@ export const styles = css`
   }
 
   /* Wider buttons on small screens unless overriden */
-  sl-button {
+  sl-button:not([variant="text"]) {
     width: var(--submit-btn-width, 100%);
   }
   @media (min-width: 480px) {
-    sl-button {
+    sl-button:not([variant="text"]) {
       width: var(--submit-btn-width, auto);
     }
-  }
-
-  /* PINK THEME */
-  sl-button.pink[variant="text"]::part(label) {
-    color: #e64e8f;
-  }
-  sl-button.pink:not([variant="text"])::part(base) {
-    background-color: #e64e8f;
-    border-color: #e64e8f;
-  }
-  sl-button.pink:not([disabled], variant="text")::part(base):hover {
-    background-color: #bd3c73;
-    border-color: #e64e8f;
   }
 `;

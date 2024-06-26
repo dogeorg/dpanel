@@ -1,4 +1,5 @@
 import { html, nothing, repeat, classMap } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
+import { generateActionLabel } from "./action.js";
 
 export function _generateOneOrManyForms(data) {
   const tabs = data.sections.map((section, index) => {
@@ -77,13 +78,32 @@ export function _generateField(field) {
     if (field.revealOn && !this[this.propKeys(field.name).revealKey]) return nothing;
 
     // Stlyistic
-    const formControlClasses = {
+    const formControlClasses = classMap({
       'form-control': true,
       'breakline': field.breakline
-    }
+    });
+
+    // Form Label
+    const actionEl = field.labelAction ? generateActionLabel(
+      this,
+      field.name,
+      field.labelAction.name,
+      field.labelAction.label
+    ) : nothing;
+
+    const labelEl = field.label ? html`
+      <span slot="label">
+        ${field.label}
+        ${actionEl}
+      </span>
+    ` : nothing;
+
+    const fieldElement = this[`_render_${field.type}`](field, { labelEl });
 
     return html`
-      <div class=${classMap(formControlClasses)}>${this[`_render_${field.type}`](field)}</div>
+      <div class=${formControlClasses}>
+        ${fieldElement}
+      </div>
     `;
   } catch (fieldRenderError) {
     console.error("Dynamic form field error:", { field, fieldRenderError });

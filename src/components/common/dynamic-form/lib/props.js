@@ -27,6 +27,7 @@ export function _initializeFormFieldProperties(newValue) {
         repeatKey,
         variantIndexKey,
         revealKey,
+        labelKey,
       } = this.propKeys(field.name);
 
       // Create the standard property
@@ -50,7 +51,12 @@ export function _initializeFormFieldProperties(newValue) {
 
       // Create a property to track reveal condition
       if (field.revealOn) {
+        const exists = this._rules.find(r => r.self === field.name);
+        if (exists) return;
+
         this.constructor.createProperty(revealKey, { type: Boolean });
+        this.constructor.createProperty(labelKey, { type: Boolean });
+
         try {
           const rule = {
             self: field.name,
@@ -98,5 +104,6 @@ export function propKeys(fieldName) {
     repeatKey: `_${fieldName.toLowerCase()}_repeat`,
     variantIndexKey: `_${fieldName.toLowerCase()}_variant`,
     revealKey: `_${fieldName.toLowerCase()}_reveal_condition_met`,
+    labelKey: `_${fieldName.toLowerCase()}_label`,
   };
 }

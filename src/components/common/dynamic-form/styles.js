@@ -91,4 +91,29 @@ export const styles = css`
       width: var(--submit-btn-width, auto);
     }
   }
+
+  /* Form Actions */
+  sl-input,
+  sl-select {
+    position: relative;
+  }
+
+  .label-action {
+    position: absolute;
+    right: 0;
+    top: 0;
+    color: #8c8cff;
+    text-align: right;
+  }
+
+  .label-action::part(label) {
+    padding: 0;
+    margin: 0;
+  }
+
+  .label-action::part(spinner) {
+    left: auto;
+    right: 3px;
+    --indicator-color: #bbb;
+  }
 `;

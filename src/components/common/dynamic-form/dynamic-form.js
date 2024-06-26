@@ -95,8 +95,20 @@ class DynamicForm extends LitElement {
     this._initializing = !this._initializing;
   }
 
+  toggleLabelLoader(fieldName) {
+    const { labelKey } = this.propKeys(fieldName);
+    this[labelKey] = !this[labelKey];
+    this.requestUpdate();
+  }
+
+  setValue(fieldName, newValue) {
+    const { currentKey } = this.propKeys(fieldName);
+    this[currentKey] = newValue;
+    this._checkForChanges();
+  }
+
   render() {
-    if (!this?.fields?.sections) {
+    if (!this?.fields?.sections || this._initializing) {
       return html`<div class="loader-overlay">
         <sl-spinner style="font-size: 2rem; --indicator-color: #bbb;"></sl-spinner>
       </div>`

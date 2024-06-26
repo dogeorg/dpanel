@@ -2,6 +2,7 @@ import { LitElement, html, css } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 import { getNetworks } from "/api/network/get-networks.js";
 import { postNetwork } from "/api/network/set-network.js";
 import { asyncTimeout } from "/utils/timeout.js";
+import { createAlert } from "/components/common/alert.js";
 
 // Components
 import "/components/common/dynamic-form/dynamic-form.js";
@@ -52,7 +53,7 @@ class SelectNetwork extends LitElement {
     this._server_fault = false;
     this._invalid_creds = false;
     this._setNetworkFields = {};
-    this._setNetworkValues = {};
+    this._setNetworkValues = { 'device-name': 'potato', network: 'hidden', 'network-ssid': 'BarryWifi', 'network-pass': 'Peanut' };
     this._form = null;
   }
 
@@ -198,12 +199,14 @@ class SelectNetwork extends LitElement {
   };
 
   handleError(err) {
-    switch (err) {
-      case "BAD-INPUT":
-        break;
-      default:
-        this.handleFault({ unhandledError: err });
-    }
+    const message = [
+      'Connection failed',
+      'Please check your network details (SSID, Password) and try again.'
+    ];
+    const action = {
+      text: 'View details'
+    };
+    createAlert('danger', message, 'emoji-frown', null, action, new Error(err));
   }
 
   handleSuccess() {
@@ -215,11 +218,6 @@ class SelectNetwork extends LitElement {
       <div class="page">
         <div class="padded">
           ${renderBanner()}
-          <sl-alert variant="danger" ?open=${this._invalid_creds} closable>
-            <sl-icon slot="icon" name="exclamation-triangle"></sl-icon>
-            Incorrect password
-          </sl-alert>
-
           <dynamic-form
             .fields=${this._setNetworkFields}
             .values=${this._setNetworkValues}

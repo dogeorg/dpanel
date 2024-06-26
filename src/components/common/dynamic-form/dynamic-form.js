@@ -107,6 +107,10 @@ class DynamicForm extends LitElement {
     this._checkForChanges();
   }
 
+  firstUpdated() {
+    this._checkForChanges()
+  }
+
   render() {
     if (!this?.fields?.sections || this._initializing) {
       return html`<div class="loader-overlay">

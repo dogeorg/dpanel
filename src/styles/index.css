@@ -11,3 +11,8 @@ body {
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
 }
+
+/* Elements will sit above toasts when given this class */
+sl-dialog.above-toasts::part(base) {
+  z-index: 960;
+}

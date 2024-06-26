@@ -1,4 +1,12 @@
-export function createAlert(variant, message, icon = 'info-circle', duration) {
+import { html, nothing } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
+
+export function createAlert(variant, message, icon = 'info-circle', duration = 0, action, errorDetail) {
+
+  if (!document.body.hasAttribute('listener-on-sl-after-hide')) {
+    document.body.addEventListener('sl-after-hide', closeErrorDialog);
+    document.body.setAttribute('listener-on-sl-after-hide', true);
+  }
+
   const alert = document.createElement('sl-alert');
   alert.variant = variant;
   alert.closable = true;
@@ -6,20 +14,28 @@ export function createAlert(variant, message, icon = 'info-circle', duration) {
     alert.duration = duration;
   }
 
-  if (Array.isArray(message)) {
-    const messageHtml = `<strong>${escapeHtml(message[0])}</strong>` + message.slice(1).map(item => `<br>${escapeHtml(item)}`).join('');
-    alert.innerHTML = `
-      <sl-icon name="${icon}" slot="icon"></sl-icon>
-      ${messageHtml}
-    `;
-  } else {
-    alert.innerHTML = `
-      <sl-icon name="${icon}" slot="icon"></sl-icon>
-      ${escapeHtml(message)}
-    `;
-  }
+  const iconEl = `<sl-icon name="${icon}" slot="icon"></sl-icon>`
+
+  const messageEl = Array.isArray(message)
+    ? `<strong>${escapeHtml(message[0])}</strong>` + message.slice(1).map(item => `<br>${escapeHtml(item)}`).join('')
+    : escapeHtml(message)
+
+  const actionEl = action ? `
+    <a class="more" href="#error-details">${action.text}</sl-button>
+    ` : nothing
+
+  alert.innerHTML = `
+    ${iconEl}
+    ${messageEl}
+    ${actionEl}
+  `
 
   document.body.append(alert);
+
+  if (action) {
+    const anchor = alert.querySelector("a.more")
+    anchor.addEventListener("click", () => createMoreDetailDialog(messageEl, errorDetail))
+  }
   alert.toast();
 }
 
@@ -28,4 +44,49 @@ function escapeHtml(html) {
   const div = document.createElement('div');
   div.textContent = html;
   return div.innerHTML;
+}
+
+function createMoreDetailDialog(messageEl, error) {
+  // Dialog element
+  const dialog = document.createElement('sl-dialog');
+  dialog.label = 'Error details'
+  dialog.classList.add("error-dialog");
+  dialog.classList.add('above-toasts') // Dialogs usually sit below toasts in terms of z-index. This class styles them to sit above.
+
+  // Limit stack trace
+  const maxLines = 4;
+  if (error.stack) {
+    let lines = error.stack.split("\n");
+    let limitedStack = lines.slice(0, maxLines + 1).join("\n");
+    error.stack = limitedStack;
+  }
+
+  // Dialog body content
+  const content = document.createElement('div');
+  content.innerHTML = `
+  <pre style="text-wrap: wrap; font-size: var(--sl-font-size-small); padding: 1em; background: #333;">${messageEl}</pre>
+  <pre style="text-wrap: wrap; font-size: var(--sl-font-size-small); padding: 1em; background: #a300ff70; margin-bottom: 0;">${error}</pre>
+  <pre style="font-size: var(--sl-font-size-x-small); padding: 1em; background: #c700ff21; overflow-x: scroll; margin-top: 0;">${error.stack}</pre>
+  `
+  dialog.appendChild(content);
+
+  // Dialog footer
+  const footer = document.createElement('div');
+  footer.slot = "footer"
+  footer.innerHTML = `<sl-button class="close">Close</sl-button>`
+  dialog.appendChild(footer)
+
+  // Close handling
+  const closeButton = dialog.querySelector('sl-button.close');
+  closeButton.addEventListener('click', () => dialog.hide());
+
+  document.body.append(dialog);
+  dialog.show();
+}
+
+// Responsible for cleaning up the DOM after closing an error dialog
+function closeErrorDialog(e) {
+  if (e.target.classList.contains('error-dialog')) {
+    e.target.remove();
+  }
 }

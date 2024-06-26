@@ -1,4 +1,5 @@
 export const postResponse = {
-  success: true,
+  success: false,
+  error: 'broke',
   message: "Network successfully set",
 }

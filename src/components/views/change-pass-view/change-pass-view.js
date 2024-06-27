@@ -1,5 +1,6 @@
 import { LitElement, html, css } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 import { postChangePass } from "/api/password/change-pass.js";
+import { createAlert } from "/components/common/alert.js";
 
 // Components
 import "/components/common/dynamic-form/dynamic-form.js";
@@ -23,20 +24,17 @@ class ChangePassView extends LitElement {
     }
     .padded {
       width: 100%;
-      margin: 0em 2em;
+      margin: 0em 0em;
     }
     h1 {
       font-family: "Comic Neue", sans-serif;
     }
-    sl-alert {
-      margin-bottom: 1em;
-    }
-
   `;
 
   static get properties() {
     return {
       default_to: { type: String },
+      label: { type: String },
       _server_fault: { type: Boolean },
       _invalid_creds: { type: Boolean },
       _loginFields: { type: Object },
@@ -48,6 +46,7 @@ class ChangePassView extends LitElement {
     super();
     this._server_fault = false;
     this._invalid_creds = false;
+    this.onsuccess = null;
   }
 
   connectedCallback() {
@@ -147,27 +146,29 @@ class ChangePassView extends LitElement {
     }
   }
 
-  handleSuccess() {
-    window.alert('Nice one.');
-    store.updateState({ networkContext: { token: null }});
-    window.location = "/";
+  handleSuccess = () => {
+    createAlert('success', 'Password updated.', 'check-square', 2000);
+    
+    if (this.onSuccess) {
+      this.onSuccess();
+    }
+
+    if (!this.onSuccess) {
+      store.updateState({ networkContext: { token: null }});
+      window.location = "/";
+    }
   }
 
   render() {
     return html`
       <div class="page">
         <div class="padded">
-          ${renderBanner()}
-          <sl-alert variant="danger" ?open=${this._invalid_creds} closable>
-            <sl-icon slot="icon" name="exclamation-triangle"></sl-icon>
-            Incorrect password
-          </sl-alert>
-
+          ${renderBanner(this.label)}
           <dynamic-form
             .fields=${this._changePassFields}
             .onSubmit=${this._attemptChangePass}
             requireCommit
-            theme="pink"
+            theme="purple"
           >
           </dynamic-form>
         </div>

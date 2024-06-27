@@ -37,6 +37,24 @@ const yellow = css`
   }
 `
 
+const purple = css`
+  sl-button.purple[variant="text"]::part(label) {
+    color: var(--sl-color-purple-600);
+  }
+  sl-button.purple:not([variant="text"])::part(base) {
+    background-color: var(--sl-color-purple-600);
+    border-color: var(--sl-color-purple-600);
+  }
+  sl-button.purple:is(:not([disabled], [loading], [variant="text"]))::part(base):hover {
+    background-color: var(--sl-color-purple-500);
+    border-color: var(--sl-color-purple-500);
+  }
+  sl-button.purple:is(:not([disabled], [loading], [variant="text"]))::part(base):active {
+    background-color: var(--sl-color-purple-400);
+    border-color: var(--sl-color-purple-400);
+  }
+`
+
 export const themes = [
-  pink, yellow
+  pink, yellow, purple
 ]

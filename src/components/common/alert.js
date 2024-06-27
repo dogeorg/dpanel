@@ -27,7 +27,6 @@ export function createAlert(variant, message, icon = 'info-circle', duration = 0
   alert.innerHTML = `
     ${iconEl}
     ${messageEl}
-    ${actionEl}
   `
 
   document.body.append(alert);

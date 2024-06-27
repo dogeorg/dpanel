@@ -7,20 +7,34 @@ export const appModeStyles = css`
     margin: 0 auto;
   }
 
+  .loader-overlay {
+    height: calc(100vh - 3em);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
   main {
     display: flex;
     justify-content: center;
-    margin-top: 5em;
+    max-width: 576px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .padded {
+    padding: 20px;
+  }
+  h1 {
+    font-family: 'Comic Neue', sans-serif;
+    text-align: center;
   }
 
-  nav {
-    padding: 1em;
-    box-sizing: border-box;
-    display: flex;
-    justify-content: flex-end;
-    position: fixed;
-    top: 0px;
-    width: 100%;
-    z-index: 99;
+  main .main-step-wrapper {
+    margin-top: 7em;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 480px;
   }
 `

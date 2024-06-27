@@ -1,16 +1,16 @@
 import { html, css } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 
-export function renderBanner() {
+export function renderBanner(label) {
   const bannerStyles = css`
     .banner {
       border-radius: 16px;
       padding: 1em;
       color: white;
-      background-color: var(--sl-color-pink-400);
+      background-color: var(--sl-color-purple-400);
       background-image: linear-gradient(
         to bottom right,
-        var(--sl-color-pink-400),
-        var(--sl-color-pink-300)
+        var(--sl-color-purple-500),
+        var(--sl-color-purple-300)
       );
       position: relative;
       overflow: hidden;
@@ -22,6 +22,7 @@ export function renderBanner() {
     }
     .banner main p {
       font-family: unset;
+      line-height: 1.5;
     }
     .banner aside {
       position: absolute;
@@ -39,15 +40,20 @@ export function renderBanner() {
     .banner h2 {
       font-family: "Comic Neue", sans-serif;
       margin: 0px;
+      line-height: 1.1;
+      margin-bottom: 1rem;
     }
     .banner p:first-of-type {
       margin-top: 0px;
+    }
+    .banner p:last-of-type {
+      margin-bottom: 0;
     }
   `;
   return html`
     <div class="banner">
       <main>
-        <h1>Reset Pass.</h1>
+        <h1>${label ? label : "Reset Password"}</h1>
         <p>Change your admin password using your current pass or seed phrase (12-words)</p>
       </main>
       <aside>

@@ -2,7 +2,6 @@ body {
   height: 100%;
   font: 16px var(--sl-font-sans);
   font-weight: var(--sl-font-weight-normal);
-  background-color: var(--docs-background-color);
   line-height: var(--sl-line-height-normal);
   color: var(--sl-color-neutral-900);
   padding: 0;

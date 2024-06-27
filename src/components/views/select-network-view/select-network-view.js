@@ -31,10 +31,6 @@ class SelectNetwork extends LitElement {
     h1 {
       font-family: "Comic Neue", sans-serif;
     }
-    sl-alert {
-      margin-bottom: 1em;
-    }
-
   `;
 
   static get properties() {
@@ -210,7 +206,10 @@ class SelectNetwork extends LitElement {
   }
 
   handleSuccess() {
-    window.alert('Network set. Nice one.');
+    createAlert('success', 'Network set.', 'check-square', 2000);
+    if (this.onSuccess) {
+      this.onSuccess();
+    }
   }
 
   render() {

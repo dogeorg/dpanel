@@ -35,7 +35,7 @@ class SelectNetwork extends LitElement {
 
   static get properties() {
     return {
-      default_to: { type: String },
+      showSuccessAlert: { type: Boolean },
       _server_fault: { type: Boolean },
       _invalid_creds: { type: Boolean },
       _setNetworkFields: { type: Object },
@@ -49,13 +49,17 @@ class SelectNetwork extends LitElement {
     this._server_fault = false;
     this._invalid_creds = false;
     this._setNetworkFields = {};
-    this._setNetworkValues = { 'device-name': 'potato', network: 'hidden', 'network-ssid': 'BarryWifi', 'network-pass': 'Peanut' };
+    // this._setNetworkValues = { 'device-name': 'potato', network: 'hidden', 'network-ssid': 'BarryWifi', 'network-pass': 'Peanut' };
+    this._setNetworkValues = { network: "ethernet" };
     this._form = null;
   }
 
   async connectedCallback() {
     super.connectedCallback();
-    this.addEventListener('action-label-triggered', this.handleLabelActionClick);
+    this.addEventListener(
+      "action-label-triggered",
+      this.handleLabelActionClick,
+    );
 
     const networks = [];
 
@@ -81,15 +85,16 @@ class SelectNetwork extends LitElement {
               required: true,
               options: [
                 ...networks,
+                { type: "ethernet", value: "ethernet", label: "Ethernet" },
                 { type: "wifi", value: "hidden", label: "Hidden Network" },
-              ]
+              ],
             },
             {
               name: "network-ssid",
               label: "Network SSID",
               type: "text",
               required: true,
-              revealOn: ["network", "=", "hidden"]
+              revealOn: ["network", "=", "hidden"],
             },
             {
               name: "network-pass",
@@ -97,7 +102,7 @@ class SelectNetwork extends LitElement {
               type: "password",
               required: true,
               passwordToggle: true,
-              revealOn: ["network", "!=", "ethernet"]
+              revealOn: ["network", "!=", "ethernet"],
             },
           ],
         },
@@ -108,30 +113,33 @@ class SelectNetwork extends LitElement {
   }
 
   firstUpdated() {
-    this._form = this.shadowRoot.querySelector('dynamic-form');
+    this._form = this.shadowRoot.querySelector("dynamic-form");
     this._fetchAvailableNetworks();
   }
 
   async _fetchAvailableNetworks() {
     // Start label spinner
-    this._form.toggleLabelLoader('network');
+    this._form.toggleLabelLoader("network");
 
-    const response = await getNetworks()
+    const response = await getNetworks();
     if (!response.networks) return [];
 
     const { networks } = response;
 
     this._setNetworkFields.sections[0].fields[1].options = [
       ...networks,
-      { type: "wifi", value: "hidden", label: "Hidden Network" }
-    ]
+      { type: "wifi", value: "hidden", label: "Hidden Network" },
+    ];
     // Stop label spinner
-    this._form.toggleLabelLoader('network');
+    this._form.toggleLabelLoader("network");
   }
 
   disconnectedCallback() {
     this.removeEventListener("sl-hide", this.dismissErrors);
-    this.removeEventListener('action-label-triggered', this.handleLabelActionClick);
+    this.removeEventListener(
+      "action-label-triggered",
+      this.handleLabelActionClick,
+    );
     super.disconnectedCallback();
   }
 
@@ -142,24 +150,24 @@ class SelectNetwork extends LitElement {
 
   async handleLabelActionClick(event) {
     event.stopPropagation();
-    switch(event.detail.actionName) {
-      case 'generate-name':
+    switch (event.detail.actionName) {
+      case "generate-name":
         this._form.toggleLabelLoader(event.detail.fieldName);
         await asyncTimeout(300);
         this._generateName();
         this._form.toggleLabelLoader(event.detail.fieldName);
         break;
-      case 'refresh':
+      case "refresh":
         await this._fetchAvailableNetworks();
         break;
       default:
-        console.warn('Unhandled form action received', event.detail)
+        console.warn("Unhandled form action received", event.detail);
     }
   }
 
   _generateName() {
-    const rando = Math.round(Math.random() * 100)
-    this._form.setValue('device-name', `Potato_${rando}`);
+    const rando = Math.round(Math.random() * 100);
+    this._form.setValue("device-name", `Potato_${rando}`);
   }
 
   _attemptSetNetwork = async (data, form, dynamicFormInstance) => {
@@ -196,17 +204,19 @@ class SelectNetwork extends LitElement {
 
   handleError(err) {
     const message = [
-      'Connection failed',
-      'Please check your network details (SSID, Password) and try again.'
+      "Connection failed",
+      "Please check your network details (SSID, Password) and try again.",
     ];
     const action = {
-      text: 'View details'
+      text: "View details",
     };
-    createAlert('danger', message, 'emoji-frown', null, action, new Error(err));
+    createAlert("danger", message, "emoji-frown", null, action, new Error(err));
   }
 
   handleSuccess() {
-    createAlert('success', 'Network set.', 'check-square', 2000);
+    if (this.showSuccessAlert) {
+      createAlert("success", "Network set.", "check-square", 2000);
+    }
     if (this.onSuccess) {
       this.onSuccess();
     }

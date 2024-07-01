@@ -25,8 +25,9 @@ export const appModeStyles = css`
   .padded {
     padding: 20px;
   }
-  h1 {
-    font-family: 'Comic Neue', sans-serif;
+  h1,
+  p {
+    font-family: "Comic Neue", sans-serif;
     text-align: center;
   }
 
@@ -37,4 +38,5 @@ export const appModeStyles = css`
     margin-right: auto;
     max-width: 480px;
   }
-`
+`;
+

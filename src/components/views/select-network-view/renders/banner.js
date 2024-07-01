@@ -26,10 +26,10 @@ export function renderBanner() {
     }
     .banner aside {
       position: absolute;
-      right: -57%;
-      top: -25px;
+      right: -59%;
+      top: -36px;
       width: 100%;
-      height: 120%;
+      height: 150%;
     }
     .banner aside img.doge-store-bg {
       height: 100%;

@@ -6,11 +6,11 @@ export function renderBanner(label, description) {
       border-radius: 16px;
       padding: 1em;
       color: white;
-      background-color: var(--sl-color-purple-400);
+      background-color: var(--sl-color-pink-400);
       background-image: linear-gradient(
         to bottom right,
-        var(--sl-color-purple-500),
-        var(--sl-color-purple-300)
+        var(--sl-color-pink-500),
+        var(--sl-color-pink-300)
       );
       position: relative;
       overflow: hidden;
@@ -26,7 +26,7 @@ export function renderBanner(label, description) {
     }
     .banner aside {
       position: absolute;
-      right: -60%;
+      right: -65%;
       top: -25px;
       width: 100%;
       height: 120%;

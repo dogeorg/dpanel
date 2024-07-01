@@ -4,7 +4,7 @@ export const navStyles = css`
   nav {
     padding: 1em;
     box-sizing: border-box;
-    background-color: #1c1b22;
+    background-color: var(--sl-color-neutral-0);
     position: fixed;
     top: 0px;
     width: 100%;
@@ -31,10 +31,18 @@ export const navStyles = css`
   }
 
   nav .center-steps .step {
-    display: flex;
+    display: none;
     flex-direction: row;
     align-items: center;
-    gap: .6em;
+    gap: 0.6em;
+
+    &[data-active-step] {
+      display: flex;
+    }
+
+    @media (min-width: 576px) {
+      display: flex;
+    }
   }
 
   nav .center-steps.hidden {
@@ -42,7 +50,7 @@ export const navStyles = css`
   }
 
   nav .center-steps .step .step-title {
-    font-size: .9rem;
+    font-size: 0.9rem;
     color: #777;
   }
 
@@ -95,36 +103,38 @@ export const navStyles = css`
     color: white;
     font-weight: bold;
   }
-`
+`;
 
 export function renderNav() {
-
   const centerStepClasses = classMap({
-    'center-steps': true,
-    hidden: !this.isLoggedIn
-  })
+    "center-steps": true,
+    hidden: !this.isLoggedIn,
+  });
 
   const steps = [
-    { name: 'pass', label: 'Set Password', theme: 'meow' },
-    { name: 'key', label: 'Create Key', theme: 'meow' },
-    { name: 'connect', label: 'Connect', theme: 'meow' }
-  ]
+    { name: "pass", label: "Set Password", theme: "meow" },
+    { name: "key", label: "Create Key", theme: "meow" },
+    { name: "connect", label: "Connect", theme: "meow" },
+  ];
 
   return html`
     <div class="nav-inner">
       <div class="logo"></div>
       <div class="${centerStepClasses}">
-        ${steps.map((s, i) => html`
-          <div class="step"
-            ?data-active-step=${this.activeStepNumber === i+1}
-            ?data-completed-step=${this.activeStepNumber > i+1}
+        ${steps.map(
+          (s, i) => html`
+            <div
+              class="step"
+              ?data-active-step=${this.activeStepNumber === i + 1}
+              ?data-completed-step=${this.activeStepNumber > i + 1}
             >
-            <sl-button size="small" circle class="${s.theme}">
-              ${this.activeStepNumber > i+1 ? "✓" : i+1}
-            </sl-button>
-            <span class="step-title">${s.label}</span>
-          </div>
-        `)}
+              <sl-button size="small" circle class="${s.theme}">
+                ${this.activeStepNumber > i + 1 ? "✓" : i + 1}
+              </sl-button>
+              <span class="step-title">${s.label}</span>
+            </div>
+          `,
+        )}
       </div>
       <div class="dropmenu">
         <sl-dropdown distance="7">
@@ -133,14 +143,18 @@ export function renderNav() {
           </sl-button>
           <sl-menu>
             <sl-menu-item>Visit Forum</sl-menu-item>
-            <sl-menu-item @click=${this.showResetPassDialog}>Reset Password</sl-menu-item>
+            <sl-menu-item @click=${this.showResetPassDialog}
+              >Reset Password</sl-menu-item
+            >
             <sl-divider></sl-divider>
-            <sl-menu-item>Factory Reset</sl-menu-item>
-            <sl-divider></sl-divider>
-            <sl-menu-item ?disabled=${!this.isLoggedIn} @click=${this.performLogout}>Logout</sl-menu-item>
+            <sl-menu-item
+              ?disabled=${!this.isLoggedIn}
+              @click=${this.performLogout}
+              >Logout</sl-menu-item
+            >
           </sl-menu>
         </sl-dropdown>
       </div>
     </div>
-  `
+  `;
 }

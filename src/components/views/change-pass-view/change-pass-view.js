@@ -33,8 +33,11 @@ class ChangePassView extends LitElement {
 
   static get properties() {
     return {
-      default_to: { type: String },
       label: { type: String },
+      description: { type: String },
+      resetMethod: { type: String },
+      fieldDefaults: { type: Object },
+      showSuccessAlert: { type: Boolean },
       _server_fault: { type: Boolean },
       _invalid_creds: { type: Boolean },
       _loginFields: { type: Object },
@@ -44,42 +47,25 @@ class ChangePassView extends LitElement {
 
   constructor() {
     super();
+    this.label = "Reset Password";
+    this.description = "Change your admin password using your current pass or seed phrase (12-words)";
+    this.onSuccess = null;
+    this.showSuccessAlert = false;
+    this.fieldDefaults = {};
     this._server_fault = false;
     this._invalid_creds = false;
-    this.onsuccess = null;
   }
 
   connectedCallback() {
     super.connectedCallback();
     this.addEventListener("sl-hide", this.dismissErrors);
-    this._changePassFields = {
+
+    const changePassFields = {
       sections: [
         {
           name: "Change password",
           submitLabel: "Update Password",
           fields: [
-            {
-              name: "reset-method",
-              type: "toggleField",
-              defaultTo: this.default_to || 0,
-              labels: ["Alternatively, enter seed-phrase (12 words)", "Alternatively, enter current password"],
-              fields: [
-                {
-                  name: "password",
-                  label: "Enter Current Password",
-                  type: "password",
-                  passwordToggle: true,
-                  required: true,
-                },
-                {
-                  name: "seedphrase",
-                  label: "Enter Seed Phrase (12-words)",
-                  type: "seedphrase",
-                  placeholder: "hungry tavern drumkit weekend dignified turmoil cucumber pants karate yacht treacle chump",
-                  required: true,
-                },
-              ],
-            },
             {
               name: "new_password",
               label: "Enter New Password",
@@ -92,6 +78,39 @@ class ChangePassView extends LitElement {
         },
       ],
     };
+
+    if (this.resetMethod === "credentials") {
+      // Construct the field
+      const resetByCredentialField = {
+        name: "reset-method",
+        type: "toggleField",
+        defaultTo: this.fieldDefaults.resetMethod || 0,
+        labels: ["Alternatively, enter seed-phrase (12 words)", "Alternatively, enter current password"],
+        fields: [
+          {
+            name: "password",
+            label: "Enter Current Password",
+            type: "password",
+            passwordToggle: true,
+            required: true,
+          },
+          {
+            name: "seedphrase",
+            label: "Enter Seed Phrase (12-words)",
+            type: "seedphrase",
+            placeholder: "hungry tavern drumkit weekend dignified turmoil cucumber pants karate yacht treacle chump",
+            required: true,
+          },
+        ]
+      }
+      
+      // Prepend to field set
+      changePassFields.sections[0].fields = [
+        resetByCredentialField,
+        ...changePassFields.sections[0].fields
+      ]
+    }
+    this._changePassFields = changePassFields;
   }
 
   disconnectedCallback() {
@@ -147,7 +166,9 @@ class ChangePassView extends LitElement {
   }
 
   handleSuccess = () => {
-    createAlert('success', 'Password updated.', 'check-square', 2000);
+    if (this.successAlert) {
+      createAlert('success', 'Password updated.', 'check-square', 2000);
+    }
     
     if (this.onSuccess) {
       this.onSuccess();
@@ -163,7 +184,7 @@ class ChangePassView extends LitElement {
     return html`
       <div class="page">
         <div class="padded">
-          ${renderBanner(this.label)}
+          ${renderBanner(this.label, this.description)}
           <dynamic-form
             .fields=${this._changePassFields}
             .onSubmit=${this._attemptChangePass}

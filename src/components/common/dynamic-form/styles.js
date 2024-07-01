@@ -1,6 +1,15 @@
 import { css } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 
 export const styles = css`
+
+  .loader-overlay {
+    min-height: 240px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
   form {
     padding: 0em 0.5em;
   }
@@ -15,7 +24,16 @@ export const styles = css`
 
   /* Form element spacing */
   .form-control {
-    margin-bottom: 1.5em;
+    padding-bottom: 1.5em;
+  }
+
+  .form-control.no-margin {
+    padding-bottom: 0em;
+  }
+
+  .form-control.breakline {
+    border-bottom: 1px dashed var(--sl-input-border-color);
+    margin-bottom: 1em;
   }
 
   /* Highlighting edits */
@@ -53,7 +71,7 @@ export const styles = css`
   /* Footer buttons (submit, discard etc) */
   .footer-controls {
     display: flex;
-    justify-content: flex-end;
+    justify-content: var(--submit-btn-anchor, flex-end);
   }
 
   .footer-controls sl-button.discard-button::part(base) {
@@ -64,13 +82,38 @@ export const styles = css`
     color: var(--sl-color-neutral-900);
   }
 
-  /* Wider buttons on small screens */
-  sl-button {
-    width: 100%;
+  /* Wider buttons on small screens unless overriden */
+  sl-button:not([variant="text"]) {
+    width: var(--submit-btn-width, 100%);
   }
   @media (min-width: 480px) {
-    sl-button {
-      width: auto;
+    sl-button:not([variant="text"]) {
+      width: var(--submit-btn-width, auto);
     }
+  }
+
+  /* Form Actions */
+  sl-input,
+  sl-select {
+    position: relative;
+  }
+
+  .label-action {
+    position: absolute;
+    right: 0;
+    top: 0;
+    color: #8c8cff;
+    text-align: right;
+  }
+
+  .label-action::part(label) {
+    padding: 0;
+    margin: 0;
+  }
+
+  .label-action::part(spinner) {
+    left: auto;
+    right: 3px;
+    --indicator-color: #bbb;
   }
 `;

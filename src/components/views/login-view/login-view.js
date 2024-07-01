@@ -11,18 +11,11 @@ class LoginView extends LitElement {
   static styles = css`
     :host {
       display: flex;
-      width: 100%;
-      height: 100vh;
     }
     .page {
-      max-width: 480px;
       display: flex;
       align-self: center;
       justify-content: center;
-      margin: -10vh auto 0 auto;
-    }
-    .padded {
-      padding: 20px;
     }
     h1 {
       font-family: "Comic Neue", sans-serif;
@@ -32,10 +25,9 @@ class LoginView extends LitElement {
     }
 
     .padded {
-      background: #1a191f;
-      border: 1px solid rgb(32, 31, 36);
+      // background: #1a191f;
+      // border: 1px solid rgb(32, 31, 36);
       border-radius: 16px;
-      margin: 1em;
       padding: 1em;
     }
   `;
@@ -136,7 +128,7 @@ class LoginView extends LitElement {
   }
 
   handleSuccess() {
-    window.location = "/pups";
+    window.location = "/";
   }
 
   render() {
@@ -153,6 +145,7 @@ class LoginView extends LitElement {
             .fields=${this._loginFields}
             .onSubmit=${this._attemptLogin}
             requireCommit
+            style="--submit-btn-width: 100%; --submit-btn-anchor: center;"
           >
           </dynamic-form>
         </div>

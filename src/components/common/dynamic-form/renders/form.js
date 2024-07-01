@@ -1,4 +1,5 @@
-import { html, nothing, repeat } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
+import { html, nothing, repeat, classMap } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
+import { generateActionLabel } from "./action.js";
 
 export function _generateOneOrManyForms(data) {
   const tabs = data.sections.map((section, index) => {
@@ -70,16 +71,40 @@ export function _generateOneOrManyForms(data) {
 
 export function _generateField(field) {
   try {
+    // Hidden fields, never render HTML
     if (field.hidden) return nothing;
-    if (field.type === "number") {
-      return html`
-        <div class="form-control">${this[`_render_${field.type}`](field)}</div>
-      `;
-    } else {
-      return html`
-        <div class="form-control">${this[`_render_${field.type}`](field)}</div>
-      `;
-    }
+
+    // Fields with reveal rules render HTML if rule conditions are met
+    if (field.revealOn && !this[this.propKeys(field.name).revealKey]) return nothing;
+
+    // Stlyistic
+    const formControlClasses = classMap({
+      'form-control': true,
+      'breakline': field.breakline
+    });
+
+    // Form Label
+    const actionEl = field.labelAction ? generateActionLabel(
+      this,
+      field.name,
+      field.labelAction.name,
+      field.labelAction.label
+    ) : nothing;
+
+    const labelEl = field.label ? html`
+      <span slot="label">
+        ${field.label}
+        ${actionEl}
+      </span>
+    ` : nothing;
+
+    const fieldElement = this[`_render_${field.type}`](field, { labelEl });
+
+    return html`
+      <div class=${formControlClasses}>
+        ${fieldElement}
+      </div>
+    `;
   } catch (fieldRenderError) {
     console.error("Dynamic form field error:", { field, fieldRenderError });
     return this._generateErrorField(field);
@@ -110,6 +135,7 @@ export function _generateFormControls(options = {}) {
               variant="text"
               id="${options.formId}__reset_button"
               @click=${this._handleDiscardChanges}
+              class=${this.theme}
             >
               Discard changes
             </sl-button>
@@ -120,6 +146,7 @@ export function _generateFormControls(options = {}) {
         id="${options.formId}__save_button"
         variant="primary"
         type="submit"
+        class=${this.theme}
         ?loading=${this._loading}
         ?disabled=${!changeCount}
         form=${options.formId}

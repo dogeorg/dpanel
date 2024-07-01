@@ -1,16 +1,16 @@
 import { html, css } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 
-export function renderBanner() {
+export function renderBanner(label) {
   const bannerStyles = css`
     .banner {
       border-radius: 16px;
       padding: 1em;
       color: white;
-      background-color: var(--sl-color-indigo-400);
+      background-color: var(--sl-color-purple-400);
       background-image: linear-gradient(
         to bottom right,
-        var(--sl-color-indigo-400),
-        var(--sl-color-indigo-300)
+        var(--sl-color-purple-500),
+        var(--sl-color-purple-300)
       );
       position: relative;
       overflow: hidden;
@@ -53,8 +53,8 @@ export function renderBanner() {
   return html`
     <div class="banner">
       <main>
-        <h1>Such Login!</h1>
-        <p>Enter your Dogebox admin password to continue</p>
+        <h1>${label ? label : "Reset Password"}</h1>
+        <p>Change your admin password using your current pass or seed phrase (12-words)</p>
       </main>
       <aside>
         <img class="doge-store-bg" src="/static/img/locked-box.png" />

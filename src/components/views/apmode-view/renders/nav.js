@@ -69,30 +69,6 @@ export const navStyles = css`
     font-weight: bold;
   }
 
-  /* PURPLE */
-  nav .center-steps .step[data-active-step] sl-button.purple::part(base) {
-    background: var(--sl-color-purple-400);
-    border-color: var(--sl-color-purple-400);
-    color: white;
-    font-weight: bold;
-  }
-
-  /* YELLOW */
-  nav .center-steps .step[data-active-step] sl-button.yellow::part(base) {
-    background: var(--sl-color-yellow-500);
-    border-color: var(--sl-color-yellow-500);
-    color: white;
-    font-weight: bold;
-  }
-
-  /* PINK */
-  nav .center-steps .step[data-active-step] sl-button.pink::part(base) {
-    background: var(--sl-color-pink-400);
-    border-color: var(--sl-color-pink-400);
-    color: white;
-    font-weight: bold;
-  }
-
   /* COMPLETED STEP */
   nav .center-steps .step[data-completed-step] .step-title {
     color: white;
@@ -103,6 +79,13 @@ export const navStyles = css`
     color: white;
     font-weight: bold;
   }
+
+  nav .center-steps .step.mobile-only {
+    display: flex;
+    @media (min-width: 576px) {
+      display: none;
+    }
+  }
 `;
 
 export function renderNav() {
@@ -112,9 +95,9 @@ export function renderNav() {
   });
 
   const steps = [
-    { name: "pass", label: "Set Password", theme: "meow" },
-    { name: "key", label: "Create Key", theme: "meow" },
-    { name: "connect", label: "Connect", theme: "meow" },
+    { name: "pass", label: "Set Password" },
+    { name: "key", label: "Create Key" },
+    { name: "connect", label: "Connect" },
   ];
 
   return html`
@@ -135,6 +118,10 @@ export function renderNav() {
             </div>
           `,
         )}
+        <div class="step mobile-only" data-completed-step>
+          <sl-button size="small" circle>✓</sl-button>
+          <span class="step-title">Ready!</span>
+        </div>
       </div>
       <div class="dropmenu">
         <sl-dropdown distance="7">

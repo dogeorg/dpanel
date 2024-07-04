@@ -20,16 +20,18 @@ class TextLoader extends LitElement {
 
   static styles = css`
     :host {
-      font-family: "Comic Neue";
+      font-family: inherit;
+      font-size: inherit;
       display: block;
       height: 100%;
       width: 100%;
+      min-width: 100px;
     }
     #text-container {
       display: flex;
       align-items: center;
-      justify-content: center;
-      font-size: 1.5rem;
+      justify-content: flex-start;
+      font-size: inherit;
       transition: opacity 300ms;
       opacity: 0;
     }

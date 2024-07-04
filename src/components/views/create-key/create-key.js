@@ -6,6 +6,7 @@ import {
 } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 
 // APIs
+import { createKey } from "/api/keys/create-key.js";
 import { getKeylist } from "/api/keys/get-keylist.js";
 import { getMockList } from "/api/keys/get-keylist.mocks.js";
 
@@ -42,21 +43,23 @@ class CreateKey extends LitElement {
       _keyReady: { type: Boolean },
       _revealPhrase: { type: Boolean },
       _termsChecked: { type: Boolean },
+      _phrase: { type: String },
       onSuccess: { type: Object },
     };
   }
 
   constructor() {
     super();
-    this.showSuccessAlert = false;
     this._server_fault = false;
     this._invalid_creds = false;
     this._setNetworkFields = {};
     this._form = null;
     this._keyList = [];
     this._keyListLoading = false;
-    this.label = "Create your key";
+    this._phrase = "";
     this.onSuccess = null;
+    this.showSuccessAlert = false;
+    this.label = "Create your key";
     this.description =
       "This key is used to encrypt the content of your Dogebox, establish and prove your unique identity.";
   }
@@ -109,17 +112,41 @@ class CreateKey extends LitElement {
     }
   }
 
+  handleError() {
+    // Create alert
+    window.alert('Nope');
+  }
+
+
+
   async handleGenKeyClick() {
     const genKeyBtn = this.shadowRoot.querySelector("#GenKeyBtn");
     const dialog = this.shadowRoot.querySelector("#KeyGenDialog");
 
     genKeyBtn.loading = true;
-
     await asyncTimeout(1000);
-    dialog.show();
-    genKeyBtn.loading = false;
 
-    await asyncTimeout(3600);
+    // Key is encrypted with user set password
+    // If user password unknown, prompt for authentication.
+    if (!store.setupContext.hashedPassword) {
+      this._authenticationRequired
+      dialog.show();
+      return;
+    }
+
+    // If user password retained, attempt to create key
+    dialog.show();
+
+    const res = await createKey(store.setupContext.hashedPassword)
+    if (!res || !res.success || res.error || !res.phrase) {
+      this.handleError();
+    }
+    
+    // Remove hashedPassword from application state
+    store.updateState({ setupContext: { hashedPassword: null }});
+
+    // Key is ready, recovery phrase available.
+    this._phrase = res.phrase;
     this._keyReady = true;
   }
 
@@ -147,6 +174,7 @@ class CreateKey extends LitElement {
       "hungry tavern drumkit weekend dignified turmoil cucumber pants karate yacht treacle chump";
     const emptyPhrase =
       "one two three four five six seven eight nine ten eleven twelve";
+    const phrase = this._phrase || "";
 
     const phraseGridClasses = classMap({
       "phrase-grid": true,
@@ -172,7 +200,7 @@ class CreateKey extends LitElement {
           >
         </div>
         <div class=${phraseGridClasses}>
-          ${(this._keyReady ? dummyPhrase : emptyPhrase)
+          ${(this._keyReady ? phrase : emptyPhrase)
             .split(" ")
             .map(
               (w, i) => html`
@@ -196,7 +224,7 @@ class CreateKey extends LitElement {
         </sl-button>
 
         <sl-button variant="text">
-          <sl-copy-button id="PhraseCopyBtn" value=${dummyPhrase}
+          <sl-copy-button id="PhraseCopyBtn" value=${this._phrase}
             ><span slot="copy-icon"
               >Copy to clipboard &nbsp;<sl-icon name="copy"></sl-icon></span
           ></sl-copy-button>

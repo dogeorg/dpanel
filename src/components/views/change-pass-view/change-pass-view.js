@@ -1,6 +1,7 @@
 import { LitElement, html, css } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 import { postChangePass } from "/api/password/change-pass.js";
 import { createAlert } from "/components/common/alert.js";
+import { hash } from "/utils/hash.js"
 
 // Components
 import "/components/common/dynamic-form/dynamic-form.js";
@@ -38,10 +39,9 @@ class ChangePassView extends LitElement {
       resetMethod: { type: String },
       fieldDefaults: { type: Object },
       showSuccessAlert: { type: Boolean },
+      retainHash: { type: Boolean },
       _server_fault: { type: Boolean },
       _invalid_creds: { type: Boolean },
-      _loginFields: { type: Object },
-      _attemptLogin: { type: Object },
     };
   }
 
@@ -51,6 +51,7 @@ class ChangePassView extends LitElement {
     this.description = "Change your admin password using your current pass or seed phrase (12-words)";
     this.onSuccess = null;
     this.showSuccessAlert = false;
+    this.retainHash = false;
     this.fieldDefaults = {};
     this._server_fault = false;
     this._invalid_creds = false;
@@ -125,8 +126,7 @@ class ChangePassView extends LitElement {
 
   _attemptChangePass = async (data, form, dynamicFormInstance) => {
     // Do a thing
-    console.log(data);
-
+    data.new_password = await hash(data.new_password);
     const response = await postChangePass(data).catch(this.handleFault);
 
     if (!response) {
@@ -144,6 +144,11 @@ class ChangePassView extends LitElement {
     // Handle success
     if (!response.error) {
       dynamicFormInstance.retainChanges(); // stops spinner
+      
+      if (this.retainHash) {
+        store.updateState({ setupContext: { hashedPassword: data.new_password }});
+      }
+
       this.handleSuccess();
       return;
     }
@@ -152,7 +157,6 @@ class ChangePassView extends LitElement {
   handleFault = (fault) => {
     this._server_fault = true;
     console.warn(fault);
-    window.alert("boo. something went wrong");
   };
 
   handleError(err) {

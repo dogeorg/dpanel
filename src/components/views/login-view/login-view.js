@@ -1,5 +1,7 @@
 import { LitElement, html, css } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 import { postLogin } from "/api/login/login.js";
+import { hash } from "/utils/hash.js";
+import { store } from "/state/store.js";
 
 // Components
 import "/components/common/dynamic-form/dynamic-form.js";
@@ -38,6 +40,7 @@ class LoginView extends LitElement {
       _invalid_creds: { type: Boolean },
       _loginFields: { type: Object },
       _attemptLogin: { type: Object },
+      retainHash: { type: Boolean },
     };
   }
 
@@ -45,6 +48,7 @@ class LoginView extends LitElement {
     super();
     this._server_fault = false;
     this._invalid_creds = false;
+    this.retainHash = false;
   }
 
   connectedCallback() {
@@ -80,6 +84,7 @@ class LoginView extends LitElement {
 
   _attemptLogin = async (data, form, dynamicFormInstance) => {
     // Do a thing
+    data.password = await hash(data.password);
     const loginResponse = await postLogin(data).catch(this.handleFault);
 
     if (!loginResponse) {
@@ -103,6 +108,12 @@ class LoginView extends LitElement {
     // Credential success
     if (loginResponse.token) {
       dynamicFormInstance.retainChanges(); // stops spinner
+
+      if (this.retainHash) {
+        console.log('CALLED', { hashedPassword: data.password });
+        store.updateState({ setupContext: { hashedPassword: data.password }});
+      }
+
       this.handleSuccess();
       return;
     }

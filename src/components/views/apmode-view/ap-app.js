@@ -20,6 +20,7 @@ import "/components/views/login-view/login-view.js";
 import "/components/views/change-pass-view/change-pass-view.js";
 import "/components/views/create-key/create-key.js";
 import "/components/views/select-network-view/select-network-view.js";
+import "/components/views/setup-complete-view/setup-complete-view.js";
 
 // Components
 import "/components/common/dynamic-form/dynamic-form.js";
@@ -51,7 +52,7 @@ class AppModeApp extends LitElement {
   constructor() {
     super();
     this.dialog = null;
-    this.isLoggedIn = false;
+    this.isLoggedIn = true;
     this.activeStepNumber = 0;
     this.setupState = null;
     bindToClass(renderChunks, this);
@@ -72,7 +73,7 @@ class AppModeApp extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
-    this.isLoggedIn = store.networkContext.token;
+    this.isLoggedIn = true || store.networkContext.token;
   }
 
   async fetchSetupState() {
@@ -151,6 +152,7 @@ class AppModeApp extends LitElement {
                         () =>
                           html`<view-ap-login
                             .onForgotPass=${() => this.showResetPassDialog()}
+                            retainHash
                           ></view-ap-login>`,
                       ],
                       [
@@ -160,6 +162,7 @@ class AppModeApp extends LitElement {
                             label="Secure your Dogebox"
                             description="Set your admin password.  This is also used in generating your Dogebox master key."
                             resetMethod="token"
+                            retainHash
                             .onSuccess=${this._nextStep}
                           ></change-pass-view>`,
                       ],
@@ -179,10 +182,7 @@ class AppModeApp extends LitElement {
                       ],
                       [
                         4,
-                        () =>
-                          html`<h1>Congrats</h1>
-                            <br /><br />
-                            <p>Confetti and stuff. Initial setup complete</p>`,
+                        () => html`<setup-complete-view></setup-complete-view>`,
                       ],
                     ],
                     () => html`<h1>Error</h1>`,

@@ -4,12 +4,14 @@ class ApLoginView extends LitElement {
   static get properties() {
     return {
       onForgotPass: { type: Object },
+      retainHash: { type: Boolean },
     };
   }
 
   constructor() {
     super();
     this.onForgotPass = () => console.log("Not defined");
+    this.retainHash = false;
     this.loginFields = {
       sections: [
         {
@@ -54,7 +56,7 @@ class ApLoginView extends LitElement {
   render() {
     return html`
       <div class="padded">
-        <login-view></login-view>
+        <login-view ?retainHash=${this.retainHash}></login-view>
         <sl-button variant="text" @click="${this.handleForgotPass}"
           >I forgot my password</sl-button
         >

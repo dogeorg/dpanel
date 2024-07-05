@@ -30,6 +30,7 @@ import * as renderChunks from "./renders/index.js";
 
 // Store
 import { store } from "/state/store.js";
+import { StoreSubscriber } from "/state/subscribe.js";
 
 // Utils
 import { bindToClass } from "/utils/class-bind.js";
@@ -52,17 +53,17 @@ class AppModeApp extends LitElement {
   constructor() {
     super();
     this.dialog = null;
-    this.isLoggedIn = true;
+    this.isLoggedIn = false;
     this.activeStepNumber = 0;
     this.setupState = null;
     bindToClass(renderChunks, this);
+    this.context = new StoreSubscriber(this, store);
   }
 
   set setupState(newValue) {
     this._setupState = newValue;
     if (newValue) {
       const stepNumber = this._determineStartingStep(newValue);
-      console.log("stepNumber", stepNumber);
       this.activeStepNumber = stepNumber;
     }
   }
@@ -73,7 +74,7 @@ class AppModeApp extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
-    this.isLoggedIn = true || store.networkContext.token;
+    this.isLoggedIn = !!store.networkContext.token;
   }
 
   async fetchSetupState() {
@@ -87,11 +88,11 @@ class AppModeApp extends LitElement {
   }
 
   _determineStartingStep(setupState) {
-    const { isLoggedIn, hasPassword, hasKey, hasConnection } = setupState;
-    if (!isLoggedIn || !this.isLoggedIn) return 0;
+    const { hasPassword, hasKey, hasConnection } = setupState;
+    if (hasPassword && !this.isLoggedIn) return 0;
     if (!hasPassword) return 1;
-    if (hasPassword && !hasKey) return 2;
-    if (hasPassword && hasKey && !hasConnection) return 3;
+    if (hasPassword && this.isLoggedIn && !hasKey) return 2;
+    if (hasPassword && this.isLoggedIn && hasKey && !hasConnection) return 3;
     return 4;
   }
 
@@ -108,6 +109,7 @@ class AppModeApp extends LitElement {
   }
 
   _nextStep = () => {
+    this.isLoggedIn = this.context.store.networkContext.token;
     this.activeStepNumber++;
   };
 
@@ -115,9 +117,11 @@ class AppModeApp extends LitElement {
     super.disconnectedCallback();
   }
 
-  performLogout() {
-    store.updateState({ networkContext: { token: null } });
-    window.location.reload();
+  performLogout(e) {
+    if (!e.currentTarget.disabled) {
+      store.updateState({ networkContext: { token: null } });
+      window.location.reload();
+    }
   }
 
   showResetPassDialog() {
@@ -126,7 +130,7 @@ class AppModeApp extends LitElement {
 
   render() {
     const navClasses = classMap({
-      solid: this.isLoggedIn,
+      solid: true,
     });
     return html`
       ${!this.setupState

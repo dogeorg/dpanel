@@ -34,6 +34,24 @@ class SetupCompleteView extends LitElement {
       .lower h2 {
         line-height: 1rem;
       }
+
+      .pictoral-instruction {
+        display: none;
+        flex-direction: row;
+        align-items: center;
+        padding: .5em;
+        justify-content: center;
+        border: 1px dashed var(--sl-panel-border-color);
+        gap: 0.5em;
+        margin-bottom: 1.5em;
+
+        & sl-icon.usb {
+          font-size: 2rem;
+          position: relative;
+          top: -1px;
+          transform: rotateZ(90deg);
+        }
+      }
     `,
   ];
   render() {
@@ -41,15 +59,24 @@ class SetupCompleteView extends LitElement {
       <div class="upper">
         <img class="hero" src="/static/img/celebrate.png" />
         <div class="actions">
+
           <p>
             <b>Congratulations!</b> You have configured your Dogebox with a
             password, key and connection.
           </p>
+
+          <div class="pictoral-instruction">
+            <sl-icon class="usb" name="usb-drive-fill"></sl-icon>
+            <span>Please remove the startup USB</span>
+          </div>
+
           <dogebox-launcher-button></dogebox-launcher-button>
+
           <p>
             Need help? Visit
             <a href="https://setup.dogebox.net">setup.dogebox.net</a>
           </p>
+
         </div>
       </div>
 

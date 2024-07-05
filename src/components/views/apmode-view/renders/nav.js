@@ -1,4 +1,4 @@
-import { html, css, classMap } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
+import { html, css, classMap, nothing } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 
 export const navStyles = css`
   nav {
@@ -91,7 +91,7 @@ export const navStyles = css`
 export function renderNav() {
   const centerStepClasses = classMap({
     "center-steps": true,
-    hidden: !this.isLoggedIn,
+    hidden: this.activeStepNumber === 0,
   });
 
   const steps = [
@@ -111,17 +111,19 @@ export function renderNav() {
               ?data-active-step=${this.activeStepNumber === i + 1}
               ?data-completed-step=${this.activeStepNumber > i + 1}
             >
-              <sl-button size="small" circle class="${s.theme}">
+              <sl-button size="small" circle>
                 ${this.activeStepNumber > i + 1 ? "✓" : i + 1}
               </sl-button>
               <span class="step-title">${s.label}</span>
             </div>
           `,
         )}
-        <div class="step mobile-only" data-completed-step>
-          <sl-button size="small" circle>✓</sl-button>
-          <span class="step-title">Ready!</span>
-        </div>
+        ${this.activeStepNumber === 4 ? html`
+          <div class="step mobile-only" data-completed-step>
+            <sl-button size="small" circle>✓</sl-button>
+            <span class="step-title">Ready!</span>
+          </div>
+        ` : nothing }
       </div>
       <div class="dropmenu">
         <sl-dropdown distance="7">
@@ -130,9 +132,6 @@ export function renderNav() {
           </sl-button>
           <sl-menu>
             <sl-menu-item>Visit Forum</sl-menu-item>
-            <sl-menu-item @click=${this.showResetPassDialog}
-              >Reset Password</sl-menu-item
-            >
             <sl-divider></sl-divider>
             <sl-menu-item
               ?disabled=${!this.isLoggedIn}

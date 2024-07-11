@@ -15,7 +15,7 @@ class Store {
       overrideBaseUrl: false,
       useMocks: true,
       forceFailures: false,
-      forceDelayInSeconds: 3,
+      forceDelayInSeconds: 1,
       reqLogs: true,
       status: "online",
       token: false,
@@ -26,8 +26,12 @@ class Store {
       manifest: {},
     };
     this.promptContext = {
-      display: false,
-      name: null,
+      display: true,
+      name: "transaction",
+    };
+    this.setupContext = {
+      hashedPassword: null,
+      view: null,
     };
   }
 
@@ -104,6 +108,12 @@ class Store {
       this.promptContext = {
         ...this.promptContext,
         ...partialState.promptContext,
+      };
+    }
+    if (partialState.setupContext) {
+      this.setupContext = {
+        ...this.setupContext,
+        ...partialState.setupContext,
       };
     }
     // Other slices..

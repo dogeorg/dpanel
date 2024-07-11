@@ -1,8 +1,10 @@
-import { LitElement, html } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
+import { LitElement, html, classMap } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 import * as methods from "/components/common/dynamic-form/index.js";
 import { bindToClass } from "/utils/class-bind.js";
 import { styles } from "./styles.js";
+import { themes } from "./themes.js";
 import { onceThenDebounce } from "/utils/debounce.js";
+import { asyncTimeout } from "/utils/timeout.js";
 
 class DynamicForm extends LitElement {
   static get properties() {
@@ -13,14 +15,18 @@ class DynamicForm extends LitElement {
       requireCommit: { type: Boolean },
       markModifiedFields: { type: Boolean },
       allowDiscardChanges: { type: Boolean },
+      theme: { type: String },
       _activeFormId: { type: String, state: true },
       _dirty: { type: Number, state: true },
+      _initializing: { type: Boolean },
       _loading: { type: Boolean, state: true },
       _orientation: { type: String, reflect: true },
+      _rules: { type: Object, state: true },
+      _celebrate: { type: Boolean }
     };
   }
 
-  static styles = styles;
+  static styles = [styles, themes];
 
   constructor() {
     super();
@@ -32,8 +38,11 @@ class DynamicForm extends LitElement {
     this.allowDiscardChanges = false;
     this._activeFormId = null;
     this._dirty = 0;
+    this._initializing = false;
     this._loading = false;
     this._orientation = "portrait";
+    this.theme = ''
+    this._rules = [];
   }
 
   set fields(newValue) {
@@ -84,8 +93,40 @@ class DynamicForm extends LitElement {
     return this.__loading;
   }
 
+  toggleLoader() {
+    this._initializing = !this._initializing;
+  }
+
+  toggleCelebrate() {
+    // Not an async function
+    this._celebrate = true;
+    setTimeout(() => {
+      this._celebrate = false;
+    }, 1500);
+  }
+
+  toggleLabelLoader(fieldName) {
+    const { labelKey } = this.propKeys(fieldName);
+    this[labelKey] = !this[labelKey];
+    this.requestUpdate();
+  }
+
+  setValue(fieldName, newValue) {
+    const { currentKey } = this.propKeys(fieldName);
+    this[currentKey] = newValue;
+    this._checkForChanges();
+  }
+
+  firstUpdated() {
+    this._checkForChanges()
+  }
+
   render() {
-    if (!this.fields?.sections) return;
+    if (!this?.fields?.sections || this._initializing) {
+      return html`<div class="loader-overlay">
+        <sl-spinner style="font-size: 2rem; --indicator-color: #bbb;"></sl-spinner>
+      </div>`
+    };
 
     return html`
       <sl-resize-observer

@@ -14,7 +14,7 @@ export function renderBanner() {
       );
       position: relative;
       overflow: hidden;
-      margin-bottom: 1em;
+      margin-bottom: 2em;
     }
     .banner main {
       max-width: 65%;
@@ -22,6 +22,7 @@ export function renderBanner() {
     }
     .banner main p {
       font-family: unset;
+      line-height: 1.5;
     }
     .banner aside {
       position: absolute;
@@ -39,9 +40,14 @@ export function renderBanner() {
     .banner h2 {
       font-family: "Comic Neue", sans-serif;
       margin: 0px;
+      line-height: 1.1;
+      margin-bottom: 1rem;
     }
     .banner p:first-of-type {
       margin-top: 0px;
+    }
+    .banner p:last-of-type {
+      margin-bottom: 0;
     }
   `;
   return html`

@@ -1,5 +1,7 @@
 import { LitElement, html, css } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 import { postLogin } from "/api/login/login.js";
+import { hash } from "/utils/hash.js";
+import { store } from "/state/store.js";
 
 // Components
 import "/components/common/dynamic-form/dynamic-form.js";
@@ -11,18 +13,11 @@ class LoginView extends LitElement {
   static styles = css`
     :host {
       display: flex;
-      width: 100%;
-      height: 100vh;
     }
     .page {
-      max-width: 480px;
       display: flex;
       align-self: center;
       justify-content: center;
-      margin: -10vh auto 0 auto;
-    }
-    .padded {
-      padding: 20px;
     }
     h1 {
       font-family: "Comic Neue", sans-serif;
@@ -32,10 +27,9 @@ class LoginView extends LitElement {
     }
 
     .padded {
-      background: #1a191f;
-      border: 1px solid rgb(32, 31, 36);
+      // background: #1a191f;
+      // border: 1px solid rgb(32, 31, 36);
       border-radius: 16px;
-      margin: 1em;
       padding: 1em;
     }
   `;
@@ -46,6 +40,7 @@ class LoginView extends LitElement {
       _invalid_creds: { type: Boolean },
       _loginFields: { type: Object },
       _attemptLogin: { type: Object },
+      retainHash: { type: Boolean },
     };
   }
 
@@ -53,6 +48,7 @@ class LoginView extends LitElement {
     super();
     this._server_fault = false;
     this._invalid_creds = false;
+    this.retainHash = false;
   }
 
   connectedCallback() {
@@ -88,6 +84,7 @@ class LoginView extends LitElement {
 
   _attemptLogin = async (data, form, dynamicFormInstance) => {
     // Do a thing
+    data.password = await hash(data.password);
     const loginResponse = await postLogin(data).catch(this.handleFault);
 
     if (!loginResponse) {
@@ -111,6 +108,12 @@ class LoginView extends LitElement {
     // Credential success
     if (loginResponse.token) {
       dynamicFormInstance.retainChanges(); // stops spinner
+
+      if (this.retainHash) {
+        console.log('CALLED', { hashedPassword: data.password });
+        store.updateState({ setupContext: { hashedPassword: data.password }});
+      }
+
       this.handleSuccess();
       return;
     }
@@ -136,7 +139,7 @@ class LoginView extends LitElement {
   }
 
   handleSuccess() {
-    window.location = "/pups";
+    window.location = "/";
   }
 
   render() {
@@ -153,6 +156,7 @@ class LoginView extends LitElement {
             .fields=${this._loginFields}
             .onSubmit=${this._attemptLogin}
             requireCommit
+            style="--submit-btn-width: 100%; --submit-btn-anchor: center;"
           >
           </dynamic-form>
         </div>

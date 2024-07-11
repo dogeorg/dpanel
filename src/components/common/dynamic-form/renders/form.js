@@ -34,6 +34,7 @@ export function _generateOneOrManyForms(data) {
     const formControls = this._generateFormControls({
       formId: section.name,
       submitLabel: section.submitLabel || "Save",
+      submitLabelSuccess: section.submitLabelSuccess || ""
     });
     return html`
       <form
@@ -148,10 +149,13 @@ export function _generateFormControls(options = {}) {
         type="submit"
         class=${this.theme}
         ?loading=${this._loading}
-        ?disabled=${!changeCount}
+        ?disabled=${!changeCount || this._celebrate}
         form=${options.formId}
       >
-        ${options.submitLabel || "Save"}
+        ${this._celebrate ? html`
+          <sl-icon name="check-lg" slot=${options.submitLabelSuccess ? "prefix" : ""}></sl-icon>
+          ${options.submitLabelSuccess}
+          ` : (options.submitLabel || "Save")}
       </sl-button>
     </div>
   `;

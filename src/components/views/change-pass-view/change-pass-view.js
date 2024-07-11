@@ -35,6 +35,7 @@ class ChangePassView extends LitElement {
   static get properties() {
     return {
       label: { type: String },
+      buttonLabel: { type: String },
       description: { type: String },
       resetMethod: { type: String },
       fieldDefaults: { type: Object },
@@ -48,6 +49,7 @@ class ChangePassView extends LitElement {
   constructor() {
     super();
     this.label = "Reset Password";
+    this.buttonLabel = "Update Password"
     this.description = "Change your admin password using your current pass or seed phrase (12-words)";
     this.onSuccess = null;
     this.showSuccessAlert = false;
@@ -65,7 +67,7 @@ class ChangePassView extends LitElement {
       sections: [
         {
           name: "Change password",
-          submitLabel: "Update Password",
+          submitLabel: this.buttonLabel,
           fields: [
             {
               name: "new_password",

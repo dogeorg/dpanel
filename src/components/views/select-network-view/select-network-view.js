@@ -191,7 +191,8 @@ class SelectNetwork extends LitElement {
     // Handle success
     if (!response.error) {
       dynamicFormInstance.retainChanges(); // stops spinner
-      this.handleSuccess();
+      dynamicFormInstance.toggleCelebrate();
+      await this.handleSuccess();
       return;
     }
   };
@@ -213,12 +214,12 @@ class SelectNetwork extends LitElement {
     createAlert("danger", message, "emoji-frown", null, action, new Error(err));
   }
 
-  handleSuccess() {
+  async handleSuccess() {
     if (this.showSuccessAlert) {
-      createAlert("success", "Network set.", "check-square", 2000);
+      createAlert("success", "Network configuration saved.", "check-square", 4000);
     }
     if (this.onSuccess) {
-      this.onSuccess();
+      await this.onSuccess();
     }
   }
 

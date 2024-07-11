@@ -38,5 +38,17 @@ export const appModeStyles = css`
     margin-right: auto;
     max-width: 480px;
   }
+
+  div.coming-soon {
+    display: flex;
+    margin-top: 4em;
+    margin-bottom: 3em;
+    justify-content: center;
+    align-items: center;
+  }
+
+  #MgmtDialog::part(footer) {
+    border-top: 1px solid var(--sl-panel-border-color);
+  }
 `;
 

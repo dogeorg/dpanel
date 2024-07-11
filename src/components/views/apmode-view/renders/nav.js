@@ -80,6 +80,17 @@ export const navStyles = css`
     font-weight: bold;
   }
 
+  /* PARTIALLY COMPLETED STEP */
+  nav .center-steps .step[data-partial-complete-step] .step-title {
+    color: white;
+  }
+  nav .center-steps .step[data-partial-complete-step] sl-button::part(base) {
+    background: var(--sl-color-yellow-500);
+    border-color: var(--sl-color-yellow-500);
+    color: white;
+    font-weight: bold;
+  }
+
   nav .center-steps .step.mobile-only {
     display: flex;
     @media (min-width: 576px) {
@@ -109,6 +120,7 @@ export function renderNav() {
             <div
               class="step"
               ?data-active-step=${this.activeStepNumber === i + 1}
+              ?data-partial-complete-step=${checkPartialComplete(this.activeStepNumber, s, i)}
               ?data-completed-step=${this.activeStepNumber > i + 1}
             >
               <sl-button size="small" circle>
@@ -143,4 +155,10 @@ export function renderNav() {
       </div>
     </div>
   `;
+}
+
+function checkPartialComplete(active, step, stepNumber) {
+  if (step.name === "pass" && active === stepNumber + 2) {
+    return true;
+  }
 }

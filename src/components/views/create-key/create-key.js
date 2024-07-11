@@ -33,11 +33,9 @@ class CreateKey extends LitElement {
   static get properties() {
     return {
       showSuccessAlert: { type: Boolean },
+      _authenticationRequired: { type: Boolean },
       _server_fault: { type: Boolean },
       _invalid_creds: { type: Boolean },
-      _setNetworkFields: { type: Object },
-      _setNetworkValues: { type: Object },
-      _attemptSetNetwork: { type: Object },
       _keyList: { type: Object, state: true },
       _keyListLoading: { type: Boolean },
       _keyReady: { type: Boolean },
@@ -50,9 +48,9 @@ class CreateKey extends LitElement {
 
   constructor() {
     super();
+    this._authenticationRequired = false;
     this._server_fault = false;
     this._invalid_creds = false;
-    this._setNetworkFields = {};
     this._form = null;
     this._keyList = [];
     this._keyListLoading = false;
@@ -129,7 +127,7 @@ class CreateKey extends LitElement {
     // Key is encrypted with user set password
     // If user password unknown, prompt for authentication.
     if (!store.setupContext.hashedPassword) {
-      this._authenticationRequired
+      this._authenticationRequired = true;
       dialog.show();
       return;
     }
@@ -344,19 +342,25 @@ class CreateKey extends LitElement {
       </div>
 
       <sl-dialog id="KeyGenDialog" no-header>
-        <text-loader
-          loop
-          .texts=${["HOdL tight"]}
-          endText="Key Created"
-          ?loopEnd=${this._keyReady}
-        >
-        </text-loader>
+        ${!this._keyReady && this._authenticationRequired ? html `
+          <p>Something went wrong.</p>
+          <sl-button @click=${() => window.location.reload()}>Refresh</sl-button>
+          <p><small>Fault code: A01</small></p>
+        `: nothing }
 
-        ${this._keyReady ? html` ${phraseEl} ` : nothing}
-        <!--dynamic-form
-          .fields=${this.masterKeyFields}
-          .values=${this.masterKeyValues}
-        ></dynamic-form-->
+        ${!this._keyReady && !this._authenticationRequired ? html `
+          <div style="display: flex; justify-content: center;">
+            <text-loader
+              loop
+              .texts=${["HOdL tight"]}
+              endText="Key Created"
+              ?loopEnd=${this._keyReady}
+            >
+            </text-loader>
+          </div>`
+        : nothing }
+
+        ${this._keyReady && !this._authenticationRequired ? html` ${phraseEl} ` : nothing}
       </sl-dialog>
     `;
   }

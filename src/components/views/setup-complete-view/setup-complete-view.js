@@ -1,6 +1,7 @@
 import { LitElement, html, css } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 import { themes } from "/components/common/dynamic-form/themes.js";
 import "/components/views/launcher-button/index.js";
+import { store } from "/state/store.js";
 
 class SetupCompleteView extends LitElement {
   static styles = [
@@ -30,20 +31,20 @@ class SetupCompleteView extends LitElement {
       }
       .lower {
         padding: 0.2em 0;
+        margin-bottom: 2em;
       }
       .lower h2 {
         line-height: 1rem;
       }
 
       .pictoral-instruction {
-        display: none;
+        display: flex;
         flex-direction: row;
         align-items: center;
         padding: .5em;
         justify-content: center;
         border: 1px dashed var(--sl-panel-border-color);
         gap: 0.5em;
-        margin-bottom: 1.5em;
 
         & sl-icon.usb {
           font-size: 2rem;
@@ -54,21 +55,26 @@ class SetupCompleteView extends LitElement {
       }
     `,
   ];
+
+  handleMgmtOptionClick(e) {
+    store.updateState({ setupContext: { view: e.currentTarget.getAttribute('data-id') }});
+  }
+
   render() {
     return html`
       <div class="upper">
         <img class="hero" src="/static/img/celebrate.png" />
         <div class="actions">
 
+          <div class="pictoral-instruction" style="display: none;">
+            <sl-icon class="usb" name="usb-drive-fill"></sl-icon>
+            <span>Please remove the startup USB</span>
+          </div>
+
           <p>
             <b>Congratulations!</b> You have configured your Dogebox with a
             password, key and connection.
           </p>
-
-          <div class="pictoral-instruction">
-            <sl-icon class="usb" name="usb-drive-fill"></sl-icon>
-            <span>Please remove the startup USB</span>
-          </div>
 
           <dogebox-launcher-button></dogebox-launcher-button>
 
@@ -85,15 +91,31 @@ class SetupCompleteView extends LitElement {
       </div>
 
       <div class="lower">
+
         <h2>Recovery Actions</h2>
+
         <p>
           Insert your recovery USB at any time to perform the following
           administrative actions
         </p>
+
         <div class="actions gapped">
-          <sl-button variant="neutral" outline>Change Network</sl-button>
-          <sl-button variant="neutral" outline>Change Password</sl-button>
-          <sl-button variant="neutral" outline>Factory Reset</sl-button>
+          <sl-button variant="neutral" outline data-id="network"
+            @click=${this.handleMgmtOptionClick}>Change Network
+          </sl-button>
+
+          <sl-button variant="neutral" outline data-id="password"
+            @click=${this.handleMgmtOptionClick}>Change Password
+          </sl-button>
+
+          <sl-button variant="neutral" outline data-id="factory-reset"
+            @click=${this.handleMgmtOptionClick}>Factory Reset
+          </sl-button>
+        </div>
+
+        <div class="pictoral-instruction" style="display:none;">
+          <sl-icon class="usb" name="usb-drive-fill"></sl-icon>
+          <span>Insert the startup USB to perform these actions</span>
         </div>
       </div>
     `;

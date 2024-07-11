@@ -4,6 +4,7 @@ import {
   nothing,
   classMap,
   choose,
+  guard
 } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 
 // Add shoelace once. Use components anywhere.
@@ -34,6 +35,7 @@ import { StoreSubscriber } from "/state/subscribe.js";
 
 // Utils
 import { bindToClass } from "/utils/class-bind.js";
+import { asyncTimeout } from "/utils/timeout.js";
 
 // APIS
 import { getSetupBootstrap } from "/api/setup/get-bootstrap.js";
@@ -53,6 +55,7 @@ class AppModeApp extends LitElement {
   constructor() {
     super();
     this.dialog = null;
+    this.dialogMgmt = null;
     this.isLoggedIn = false;
     this.activeStepNumber = 0;
     this.setupState = null;
@@ -106,6 +109,19 @@ class AppModeApp extends LitElement {
         event.preventDefault();
       }
     });
+
+    // Prevent dialog closures on overlay click
+    this.dialogMgmt = this.shadowRoot.querySelector("#MgmtDialog");
+    this.dialogMgmt.addEventListener("sl-request-close", (event) => {
+      if (event.detail.source === "overlay") {
+        event.preventDefault();
+      }
+    });
+    this.dialogMgmt.addEventListener("sl-after-hide", (event) => {
+      if (event.originalTarget.id === "MgmtDialog") {
+        store.updateState({ setupContext: { view: null }});
+      }
+    });
   }
 
   _nextStep = () => {
@@ -128,6 +144,10 @@ class AppModeApp extends LitElement {
     this.dialog.show();
   }
 
+  _closeMgmtDialog = () => {
+    store.updateState({ setupContext: { view: null }});
+  }
+
   render() {
     const navClasses = classMap({
       solid: true,
@@ -145,7 +165,10 @@ class AppModeApp extends LitElement {
       ${this.setupState
         ? html`
             <div id="App" class="chrome">
-              <nav class="${navClasses}">${this.renderNav()}</nav>
+              <nav class="${navClasses}">
+                ${guard([this.activeStepNumber], () => this.renderNav())}
+              </nav>
+
               <main id="Main">
                 <div class="main-step-wrapper">
                   ${choose(
@@ -164,6 +187,7 @@ class AppModeApp extends LitElement {
                         () =>
                           html`<change-pass-view
                             label="Secure your Dogebox"
+                            buttonLabel="Continue"
                             description="Set your admin password.  This is also used in generating your Dogebox master key."
                             resetMethod="token"
                             retainHash
@@ -181,7 +205,7 @@ class AppModeApp extends LitElement {
                         3,
                         () =>
                           html`<select-network-view
-                            .onSuccess=${this._nextStep}
+                            .onSuccess=${async () => { await asyncTimeout(750); this._nextStep() }}
                           ></select-network-view>`,
                       ],
                       [
@@ -203,6 +227,28 @@ class AppModeApp extends LitElement {
           .fieldDefaults=${{ resetMethod: this.isLoggedIn ? 0 : 1 }}
         ></change-pass-view>
       </sl-dialog>
+
+      ${guard([this.context.store.setupContext.view], () => html`
+        <sl-dialog id="MgmtDialog" no-header ?open=${this.context.store.setupContext.view !== null }>
+          ${choose(store.setupContext.view, [
+            ['network', () => html`
+              <select-network-view
+                showSuccessAlert
+                .onClose=${() => this._closeMgmtDialog()}>
+              </select-network-view>
+            `],
+            ['password', () => html`
+              <div class="coming-soon">
+                <h3>Not yet implemented</h3>
+              </div>`],
+            ['factory-reset', () => html`
+              <div class="coming-soon">
+                <h3>Not yet implemented</h3>
+              </div>`],
+          ])}
+          <sl-button slot="footer" outline @click=${this._closeMgmtDialog}>Close</sl-button>
+        </sl-dialog>
+      `)}
     `;
   }
 }

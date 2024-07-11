@@ -31,6 +31,7 @@ class Store {
     };
     this.setupContext = {
       hashedPassword: null,
+      view: null,
     };
   }
 

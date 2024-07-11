@@ -4,6 +4,7 @@ import { bindToClass } from "/utils/class-bind.js";
 import { styles } from "./styles.js";
 import { themes } from "./themes.js";
 import { onceThenDebounce } from "/utils/debounce.js";
+import { asyncTimeout } from "/utils/timeout.js";
 
 class DynamicForm extends LitElement {
   static get properties() {
@@ -21,6 +22,7 @@ class DynamicForm extends LitElement {
       _loading: { type: Boolean, state: true },
       _orientation: { type: String, reflect: true },
       _rules: { type: Object, state: true },
+      _celebrate: { type: Boolean }
     };
   }
 
@@ -93,6 +95,14 @@ class DynamicForm extends LitElement {
 
   toggleLoader() {
     this._initializing = !this._initializing;
+  }
+
+  toggleCelebrate() {
+    // Not an async function
+    this._celebrate = true;
+    setTimeout(() => {
+      this._celebrate = false;
+    }, 1500);
   }
 
   toggleLabelLoader(fieldName) {

@@ -21,6 +21,7 @@ import { themes } from "/components/common/dynamic-form/themes.js";
 // Components
 import "/components/common/text-loader/text-loader.js";
 import "/components/common/dynamic-form/dynamic-form.js";
+import { notYet } from "/components/common/not-yet-implemented.js"
 
 // Render chunks
 import { renderBanner } from "./renders/banner.js";
@@ -72,9 +73,7 @@ class CreateKey extends LitElement {
       "sl-dialog#KeyGenDialog",
     );
     keyGenDialog.addEventListener("sl-request-close", (event) => {
-      if (event.detail.source === "overlay") {
-        event.preventDefault();
-      }
+      event.preventDefault();
     });
 
     this._fetchKeyList();
@@ -248,12 +247,11 @@ class CreateKey extends LitElement {
     `;
 
     const emptyKey = html`
-      <div class="key-wrap">
+      <div class="key-wrap empty">
         <sl-card class="card-footer">
           <div class="title-wrap">
             <span class="labels">
-              <span>Master Key</span>
-              <sl-tag pill size="small">Unset</sl-tag>
+              <span>Such Empty</span>
             </span>
             <span class="actions"></span>
           </div>
@@ -262,7 +260,7 @@ class CreateKey extends LitElement {
             disabled
             filled
           ></sl-input>
-          <div slot="footer">Created at: ...</div>
+          <div slot="footer">A master key is needed to secure and use your Dogebox</div>
         </sl-card>
       </div>
     `;
@@ -276,7 +274,7 @@ class CreateKey extends LitElement {
               <sl-tag pill size="small" variant="success">Set</sl-tag>
             </span>
             <span class="actions">
-              <sl-icon-button name="trash"></sl-icon-button>
+              <sl-icon-button name="trash" @click=${notYet}></sl-icon-button>
             </span>
           </div>
           <sl-input
@@ -318,7 +316,7 @@ class CreateKey extends LitElement {
                       ?disabled=${this._keyReady}
                       >Generate Master Key</sl-button
                     >
-                    <sl-button variant="text" ?disabled=${this._keyReady}
+                    <sl-button variant="text" @click=${notYet} ?disabled=${this._keyReady}
                       >Import key</sl-button
                     >
                   `

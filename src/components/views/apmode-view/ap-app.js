@@ -166,7 +166,7 @@ class AppModeApp extends LitElement {
         ? html`
             <div id="App" class="chrome">
               <nav class="${navClasses}">
-                ${guard([this.activeStepNumber], () => this.renderNav())}
+                ${guard([this.activeStepNumber, this.context.store.networkContext.token], () => this.renderNav())}
               </nav>
 
               <main id="Main">
@@ -188,9 +188,9 @@ class AppModeApp extends LitElement {
                           html`<change-pass-view
                             label="Secure your Dogebox"
                             buttonLabel="Continue"
-                            description="Set your admin password.  This is also used in generating your Dogebox master key."
-                            resetMethod="token"
+                            description="Devise a secure password used to encrypt your Dogebox Master Key."
                             retainHash
+                            noSubmit
                             .onSuccess=${this._nextStep}
                           ></change-pass-view>`,
                       ],
@@ -224,6 +224,8 @@ class AppModeApp extends LitElement {
       <sl-dialog id="ChangePassDialog">
         <change-pass-view
           resetMethod="credentials"
+          showSuccessAlert
+          refreshAfterChange
           .fieldDefaults=${{ resetMethod: this.isLoggedIn ? 0 : 1 }}
         ></change-pass-view>
       </sl-dialog>
@@ -238,9 +240,10 @@ class AppModeApp extends LitElement {
               </select-network-view>
             `],
             ['password', () => html`
-              <div class="coming-soon">
-                <h3>Not yet implemented</h3>
-              </div>`],
+              <change-pass-view
+                resetMethod="credentials"
+                showSuccessAlert
+              ></change-pass-view>`],
             ['factory-reset', () => html`
               <div class="coming-soon">
                 <h3>Not yet implemented</h3>

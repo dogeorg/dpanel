@@ -103,6 +103,11 @@ export const createKeyStyles = css`
   }
 
   /* Card */
+  .key-wrap.empty sl-card::part(base) {
+    border: 1px dashed var(--sl-panel-border-color);
+    background-color: var(--sl-color-neutral-0);
+  }
+
   .key-wrap.active .card-footer::part(footer) {
     color: unset;
   }

@@ -2,6 +2,7 @@ import { LitElement, html, css } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 import { themes } from "/components/common/dynamic-form/themes.js";
 import "/components/views/launcher-button/index.js";
 import { store } from "/state/store.js";
+import { notYet } from "/components/common/not-yet-implemented.js"
 
 class SetupCompleteView extends LitElement {
   static styles = [
@@ -109,7 +110,7 @@ class SetupCompleteView extends LitElement {
           </sl-button>
 
           <sl-button variant="neutral" outline data-id="factory-reset"
-            @click=${this.handleMgmtOptionClick}>Factory Reset
+            @click=${notYet}>Factory Reset
           </sl-button>
         </div>
 

@@ -21,6 +21,7 @@ export const appModeStyles = css`
     display: block;
     margin-left: auto;
     margin-right: auto;
+    padding: 0 1em;
   }
   .padded {
     padding: 20px;

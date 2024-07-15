@@ -65,7 +65,6 @@ export function _initializeFormFieldProperties(newValue) {
             value: field.revealOn[2],
           }
           this._rules.push(rule)
-          console.log(this._rules);
         } catch (ruleErr) {
           console.warn('Error with field rule', ruleErr, field.revealOn)
         }

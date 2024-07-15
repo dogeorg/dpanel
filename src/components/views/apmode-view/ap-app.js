@@ -16,7 +16,6 @@ import { appModeStyles } from "/components/views/apmode-view/styles.js";
 import { navStyles } from "./renders/nav.js";
 
 // Views
-import "/components/views/apmode-view/view-ap-login.js";
 import "/components/views/login-view/login-view.js";
 import "/components/views/change-pass-view/change-pass-view.js";
 import "/components/views/create-key/create-key.js";
@@ -54,7 +53,6 @@ class AppModeApp extends LitElement {
 
   constructor() {
     super();
-    this.dialog = null;
     this.dialogMgmt = null;
     this.isLoggedIn = false;
     this.activeStepNumber = 0;
@@ -103,14 +101,6 @@ class AppModeApp extends LitElement {
     this.fetchSetupState();
 
     // Prevent dialog closures on overlay click
-    this.dialog = this.shadowRoot.querySelector("#ChangePassDialog");
-    this.dialog.addEventListener("sl-request-close", (event) => {
-      if (event.detail.source === "overlay") {
-        event.preventDefault();
-      }
-    });
-
-    // Prevent dialog closures on overlay click
     this.dialogMgmt = this.shadowRoot.querySelector("#MgmtDialog");
     this.dialogMgmt.addEventListener("sl-request-close", (event) => {
       if (event.detail.source === "overlay") {
@@ -138,10 +128,6 @@ class AppModeApp extends LitElement {
       store.updateState({ networkContext: { token: null } });
       window.location.reload();
     }
-  }
-
-  showResetPassDialog() {
-    this.dialog.show();
   }
 
   _closeMgmtDialog = () => {
@@ -177,10 +163,7 @@ class AppModeApp extends LitElement {
                       [
                         0,
                         () =>
-                          html`<view-ap-login
-                            .onForgotPass=${() => this.showResetPassDialog()}
-                            retainHash
-                          ></view-ap-login>`,
+                          html`<login-view retainHash></login-view>`,
                       ],
                       [
                         1,
@@ -220,15 +203,6 @@ class AppModeApp extends LitElement {
             </div>
           `
         : nothing}
-
-      <sl-dialog id="ChangePassDialog">
-        <change-pass-view
-          resetMethod="credentials"
-          showSuccessAlert
-          refreshAfterChange
-          .fieldDefaults=${{ resetMethod: this.isLoggedIn ? 0 : 1 }}
-        ></change-pass-view>
-      </sl-dialog>
 
       ${guard([this.context.store.setupContext.view], () => html`
         <sl-dialog id="MgmtDialog" no-header ?open=${this.context.store.setupContext.view !== null }>

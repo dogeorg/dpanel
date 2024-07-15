@@ -7,7 +7,6 @@ export async function _onUpdate(changedProperties) {
   // Determine the appropriate form to target
   const form = this._getTargetForm(changedProperties);
   if (!form) {
-    console.log("No form found.");
     return;
   }
 

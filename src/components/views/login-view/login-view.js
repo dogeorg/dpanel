@@ -5,6 +5,7 @@ import { store } from "/state/store.js";
 
 // Components
 import "/components/common/dynamic-form/dynamic-form.js";
+import "/components/views/change-pass-view/change-pass-view.js";
 
 // Render chunks
 import { renderBanner } from "./renders/banner.js";
@@ -13,9 +14,12 @@ class LoginView extends LitElement {
   static styles = css`
     :host {
       display: flex;
+      flex-direction: column;
+      margin-top: 4em;
     }
     .page {
       display: flex;
+      flex-direction: column;
       align-self: center;
       justify-content: center;
     }
@@ -49,6 +53,7 @@ class LoginView extends LitElement {
     this._server_fault = false;
     this._invalid_creds = false;
     this.retainHash = false;
+    this.dialog = null;
   }
 
   connectedCallback() {
@@ -70,6 +75,16 @@ class LoginView extends LitElement {
         },
       ],
     };
+  }
+
+  firstUpdated() {
+    // Prevent dialog closures on overlay click
+    this.dialog = this.shadowRoot.querySelector("#ChangePassDialog");
+    this.dialog.addEventListener("sl-request-close", (event) => {
+      if (event.detail.source === "overlay") {
+        event.preventDefault();
+      }
+    });
   }
 
   disconnectedCallback() {
@@ -110,7 +125,6 @@ class LoginView extends LitElement {
       dynamicFormInstance.retainChanges(); // stops spinner
 
       if (this.retainHash) {
-        console.log('CALLED', { hashedPassword: data.password });
         store.updateState({ setupContext: { hashedPassword: data.password }});
       }
 
@@ -142,6 +156,10 @@ class LoginView extends LitElement {
     window.location = "/";
   }
 
+  handleForgotPass() {
+    this.shadowRoot.querySelector("#ChangePassDialog").show();
+  }
+
   render() {
     return html`
       <div class="page">
@@ -160,7 +178,19 @@ class LoginView extends LitElement {
           >
           </dynamic-form>
         </div>
+        <sl-button variant="text" @click="${this.handleForgotPass}">
+          I forgot my password
+        </sl-button>
       </div>
+
+      <sl-dialog id="ChangePassDialog">
+        <change-pass-view
+          resetMethod="credentials"
+          showSuccessAlert
+          refreshAfterChange
+          .fieldDefaults=${{ resetMethod: 0 }}
+        ></change-pass-view>
+      </sl-dialog>
     `;
   }
 }

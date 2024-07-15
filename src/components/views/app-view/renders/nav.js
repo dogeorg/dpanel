@@ -99,7 +99,6 @@ export function renderNav(CURPATH) {
 }
 
 export function handleExpandableMenuClick(e) {
-  console.log("yes");
   e.preventDefault();
   const sourceEl = e.currentTarget;
   const targetEl = this.shadowRoot.querySelector(

@@ -33,7 +33,6 @@ class StoreView extends LitElement {
     this.itemsPerPage = 10;
     this.pkgController = pkgController;
     this.packageList = new PaginationController(this, undefined, this.itemsPerPage,{ initialSort });
-    console.log(this.packageList.setData);
     this.inspectedPup;
     bindToClass(renderMethods, this);
   }
@@ -106,7 +105,7 @@ class StoreView extends LitElement {
       this.pkgController.setData(res);
       this.packageList.setData(this.pkgController.packages);
     } catch (err) {
-      console.log(err);
+      console.error(err);
       this.fetchError = true;
     } finally {
       // Emit a busy stop event which removes this action from the busy-queue.

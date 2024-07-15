@@ -1,8 +1,8 @@
 export const getResponse = {
   success: true,
   setup: {
-    hasPassword: false,
-    hasKey: false,
+    hasPassword: true,
+    hasKey: true,
     hasConnection: false,
   },
 };

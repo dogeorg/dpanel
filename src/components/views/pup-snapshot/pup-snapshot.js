@@ -103,9 +103,8 @@ class PupSnapshot extends LitElement {
   }
 
   async handlePupConfigSubmitResponse(res) {
-    console.log('handlePupConfigSubmitResponse CALLED', res);
     if (!res || res.error) {
-      console.log('handlePupConfigSubmitResponse massive error', { res });
+      console.error('handlePupConfigSubmitResponse massive error', { res });
       return;
     }
   }

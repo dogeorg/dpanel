@@ -108,7 +108,7 @@ class LibraryView extends LitElement {
       this.installedList.setData(this.pkgController.installed);
       // this.availableList.setData(this.pkgController.available);
     } catch (err) {
-      console.log(err);
+      console.error(err);
       this.fetchError = true;
     } finally {
       // Emit a busy stop event which removes this action from the busy-queue.

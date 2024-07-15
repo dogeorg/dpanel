@@ -53,7 +53,6 @@ class PracticeFormView extends LitElement {
   firstUpdated() {
     // Demonstration of accessing the router within other components
     const router = getRouter();
-    // console.log(router.location.pathname);
     this.forceDataSet('split')
   }
 
@@ -65,7 +64,6 @@ class PracticeFormView extends LitElement {
   onDatasetChange(event) {
     this.key = event.target.value
     this.data = dataSets[event.target.value]
-    console.log({ key: this.key, set: this.data });
   }
 
   render() {

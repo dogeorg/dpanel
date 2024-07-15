@@ -5,10 +5,7 @@ let router;
 
 export const getRouter = (targetElement) => {
   if (!router) {
-    console.log('floople', Router.go);
     router = new Router(targetElement);
-    console.log('doople', Router.go);
-    console.log('woople', router.go);
 
     // Configure routes
     router.setRoutes([

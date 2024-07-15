@@ -171,9 +171,6 @@ class SelectNetwork extends LitElement {
   }
 
   _attemptSetNetwork = async (data, form, dynamicFormInstance) => {
-    // Do a thing
-    console.log(data);
-
     const response = await postNetwork(data).catch(this.handleFault);
 
     if (!response) {

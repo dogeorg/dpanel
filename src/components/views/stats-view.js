@@ -232,7 +232,6 @@ class MyForm extends LitElement {
     // Quickly assert whether one field is dirty, if so, set dirty and return.
     if (touchedProp && newValue && this[`__${touchedProp}`] !== newValue) {
       this._dirty = true;
-      console.log('is dirty because this one field is.');
       return;
     }
 
@@ -241,7 +240,6 @@ class MyForm extends LitElement {
     Object.keys(this.fields).forEach((field) => {
       if (this[`__${field}`] !== this[field]) {
         dirty = true;
-        console.log(`${field} is dirty.`);
       }
     });
 

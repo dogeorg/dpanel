@@ -65,6 +65,9 @@ export function renderSectionInstalledBody(ready, SKELS, hasItems) {
             version=${pkg.manifest.version}
             icon="box"
             installed
+            .config=${pkg.manifest.command.config}
+            .options=${pkg.state.config}
+            status=${pkg.state.status}
             .docs=${pkg.manifest.docs}
             .gui=${pkg.manifest.gui}
             @click=${this.handlePupClick}

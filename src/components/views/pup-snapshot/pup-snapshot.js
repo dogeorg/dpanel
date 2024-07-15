@@ -56,6 +56,7 @@ class PupSnapshot extends LitElement {
     this.options = {};
     this.config = {};
     this.router = getRouter().Router;
+    this.allowInspect = true;
     // Bind all imported renderMehtods to 'this'
     bindToClass(renderMethods, this)
   }

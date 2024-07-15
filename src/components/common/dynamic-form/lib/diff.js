@@ -2,7 +2,6 @@ export function _checkForChanges() {
   if (!this.fields?.sections) return;
 
   let dirty = 0;
-  let flattenedFields = [];
 
   // Firstly, test whether any rule targeted fields have condition changes.
   this._rules.forEach((rule) => {
@@ -11,6 +10,7 @@ export function _checkForChanges() {
 
   // Secondly, check if any field differs from prior state.
   this.fields.sections.forEach((section) => {
+    let flattenedFields = [];
     let sectionChangeCount = 0;
 
     section.fields.forEach((field) => {

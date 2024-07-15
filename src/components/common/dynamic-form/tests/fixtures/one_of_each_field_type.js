@@ -39,4 +39,6 @@ export const ONE_OF_EACH_FIELD_TYPE = [
   { name: 'handicap', label: 'Handicap (0 - 100)', type: 'range' },
   // Rating
   { name: 'score', label: 'Score (out of 5)', type: 'rating' },
+  // Seedphrase
+  { name: 'twelve-words', label: 'Recovery Phrase', type: 'seedphrase' },
 ]

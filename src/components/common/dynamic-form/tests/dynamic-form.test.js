@@ -114,10 +114,10 @@ describe("DynamicForm", () => {
     // Input should have the correct type, name and label.
     expect(formInput.getAttribute('type')).to.equal('text');
     expect(formInput.getAttribute('name')).to.equal('first');
-    expect(formInput.getAttribute('label')).to.equal('First');
+    expect(formInput.textContent).to.contain('First');
   });
 
-  it('given a multiple fields (1 of each type), should render all (14) fields with the correct input control', async () => {
+  it('given a multiple fields (1 of each type), should render all (15) fields with the correct input control', async () => {
 
     const fields = {
       sections: [
@@ -142,15 +142,15 @@ describe("DynamicForm", () => {
     const form = el.shadowRoot.querySelector('form')
     const formControls = form.querySelectorAll('.form-control');
 
-    // Should be 1 form-control element
-    expect(formControls.length).to.equal(14);
+    // Should be 15 form-control element
+    expect(formControls.length).to.equal(15);
     
     // Expect correct shoelace component usage
     const tags = [...formControls].map(c => c.children[0].tagName);
     expect(tags).to.deep.equal([
       'SL-INPUT', 'SL-INPUT', 'SL-INPUT', 'SL-INPUT', 'SL-INPUT',
       'SL-CHECKBOX', 'SL-SWITCH', 'SL-SELECT', 'SL-RADIO-GROUP', 'SL-RADIO-GROUP', 
-      'SL-TEXTAREA', 'SL-COLOR-PICKER', 'SL-RANGE', 'SL-RATING']);
+      'SL-TEXTAREA', 'SL-COLOR-PICKER', 'SL-RANGE', 'SL-RATING', 'SL-TEXTAREA']);
 
     // Expect correct type attribute set for the SL-INPUT (because it can be one of many)
     const textInputs = [...formControls]

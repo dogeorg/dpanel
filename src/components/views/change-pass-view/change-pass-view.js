@@ -132,8 +132,8 @@ class ChangePassView extends LitElement {
   }
 
   _attemptChangePass = async (data, form, dynamicFormInstance) => {
-    // Do a thing
-    data.new_password = await hash(data.new_password);
+    // TODO: Hash password
+    // data.new_password = await hash(data.new_password);
 
     if (!this.noSubmit) {
       const response = await postChangePass(data).catch(this.handleFault);

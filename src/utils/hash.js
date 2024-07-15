@@ -10,5 +10,8 @@ export async function hash(password) {
   const hash = await crypto.subtle.digest('SHA-256', data);
 
   // Convert the hash to a hexadecimal string
-  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
+  return Array
+    .from(new Uint8Array(hash))
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('');
 }

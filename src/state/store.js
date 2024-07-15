@@ -26,7 +26,7 @@ class Store {
       manifest: {},
     };
     this.promptContext = {
-      display: true,
+      display: false,
       name: "transaction",
     };
     this.setupContext = {

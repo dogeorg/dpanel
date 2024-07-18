@@ -168,7 +168,7 @@ class CreateKey extends LitElement {
 
   render() {
     const dummyPhrase =
-      "hungry tavern drumkit weekend dignified turmoil cucumber pants karate yacht treacle chump";
+      "keen tavern drumkit weekend donut turmoil cucumber pants karate yacht treacle chump mega pool tiger boat wrinkle fish silly kite lizard king yeti lake";
     const emptyPhrase =
       "one two three four five six seven eight nine ten eleven twelve";
     const phrase = this._phrase || "";
@@ -188,12 +188,12 @@ class CreateKey extends LitElement {
         <div class=${phraseOverlayClasses}>
           <div class="text">
             <span
-              >Click to reveal your Master Key Recovery Phrase.<br />Record this
+              >Click to reveal your <span class="avoidwrap">Master Key Recovery Phrase</span>.<br />Record this
               phrase and store it in a safe place.</span
             >
           </div>
           <sl-button @click=${this.handlePhraseRevealClick} variant="warning"
-            >Reveal Recovery Phrase (12-words)</sl-button
+            >Reveal Recovery Phrase (24-words)</sl-button
           >
         </div>
         <div class=${phraseGridClasses}>
@@ -340,25 +340,27 @@ class CreateKey extends LitElement {
       </div>
 
       <sl-dialog id="KeyGenDialog" no-header>
-        ${!this._keyReady && this._authenticationRequired ? html `
-          <p>Something went wrong.</p>
-          <sl-button @click=${() => window.location.reload()}>Refresh</sl-button>
-          <p><small>Fault code: A01</small></p>
-        `: nothing }
+        <div class="inner">
+          ${!this._keyReady && this._authenticationRequired ? html `
+            <p>Something went wrong.</p>
+            <sl-button @click=${() => window.location.reload()}>Refresh</sl-button>
+            <p><small>Fault code: A01</small></p>
+          `: nothing }
 
-        ${!this._keyReady && !this._authenticationRequired ? html `
-          <div style="display: flex; justify-content: center;">
-            <text-loader
-              loop
-              .texts=${["HOdL tight"]}
-              endText="Key Created"
-              ?loopEnd=${this._keyReady}
-            >
-            </text-loader>
-          </div>`
-        : nothing }
+          ${!this._keyReady && !this._authenticationRequired ? html `
+            <div style="display: flex; justify-content: center;">
+              <text-loader
+                loop
+                .texts=${["HOdL tight"]}
+                endText="Key Created"
+                ?loopEnd=${this._keyReady}
+              >
+              </text-loader>
+            </div>`
+          : nothing }
 
-        ${this._keyReady && !this._authenticationRequired ? html` ${phraseEl} ` : nothing}
+          ${this._keyReady && !this._authenticationRequired ? html` ${phraseEl} ` : nothing}
+        </div>
       </sl-dialog>
     `;
   }

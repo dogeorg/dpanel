@@ -18,12 +18,16 @@ export const createKeyStyles = css`
     font-family: "Comic Neue", sans-serif;
   }
 
+  .avoidwrap {
+    display: inline-block;
+  }
+
   .phrase-wrap {
     width: 100%;
     position: relative;
     border-radius: 1em;
     border: 1px solid var(--sl-panel-border-color);
-    margin: 1em auto 0em auto;
+    margin: 0em auto 0em auto;
     box-sizing: border-box;
   }
 
@@ -156,7 +160,7 @@ export const createKeyStyles = css`
 
   #KeyGenDialog {
     --width: calc(31rem + 15%);
-    &::part(body) {
+    .inner {
       min-height: 300px;
       display: flex;
       align-items: center;

@@ -15,6 +15,7 @@ export const wrapActions =
       }
     }
     // After all actions have completed, call setMenu
+    setTitle(context, commands);
     return setMenu(context, commands);
   };
 
@@ -53,12 +54,56 @@ export async function loadPupContext(context, commands) {
   return commands.redirect('/error?type="pup-loading-error');
 }
 
+export async function loadPupManagementContext(context, commands) {
+  try {
+    const pupId = context.pathname.replace("/pups/", "");
+
+    // ensure bootstrap (temporary)
+    const res = await getBootstrap();
+    pkgController.setData(res);
+
+    const pup = pkgController.getPup(pupId);
+    const manifest = pup?.manifest;
+
+    if (!manifest) {
+      throw new Error("manifest empty");
+    }
+
+    store.updateState({
+      pupContext: { manifest },
+      appContext: {
+        pageTitle: manifest.package,
+        pageAction: "back",
+      }
+    });
+
+    return undefined;
+  } catch (error) {
+    console.error("Error fetching manifest:", error);
+  }
+
+  return commands.redirect('/error?type="pup-mgr-loading-error');
+}
+
 function setMenu(context, commands) {
   store.updateState({
     appContext: {
       pathname: context.pathname,
+      previousPathname: window.location.pathname
     },
   });
+  return undefined;
+}
+
+function setTitle(context, commands) {
+  if (context?.route?.pageTitle || !context?.route?.dynamicTitle) {
+    store.updateState({
+      appContext: {
+        pageTitle: context?.route?.pageTitle || "",
+        pageAction: context?.route?.pageAction || false
+      },
+    });
+  }
   return undefined;
 }
 

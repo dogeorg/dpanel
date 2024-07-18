@@ -46,7 +46,8 @@ class PkgController {
 
   getPup(id) {
     if (!id) return
-    return this.pupIndex[id]
+    const key = Object.keys(this.pupIndex).find(key => key.toLowerCase() === id.toLowerCase());
+    return this.pupIndex[key]
   }
 
   installPkg(pupId) {

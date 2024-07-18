@@ -10,7 +10,7 @@ class PupSnapshotSkeleton extends LitElement {
       width: 100%;
       box-sizing: border-box;
       display: block;
-      border: solid 1px var(--sl-color-neutral-200);
+      background: rgb(46, 45, 51);
       padding: 20px;
       display: flex;
       flex-direction: row;

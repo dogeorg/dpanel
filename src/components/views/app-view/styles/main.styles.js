@@ -40,7 +40,7 @@ export const mainStyles = css`
     width: 100%;
     overflow: hidden;
 
-    background: #0000008f;
+    background: #23252a;
     
     @media (min-width: 576px) {
       height: 100%;
@@ -49,12 +49,30 @@ export const mainStyles = css`
   }
 
   #Main.opaque {
-    opacity: 0.2;
+    opacity: 1;
+  }
+
+  #OutletHeader {
+    height: 80px;
+    background: #181818;
+    border-left: 1px solid #333333;
+
+    display: flex;
+    align-items: center;
+    gap: 1em;
+    flex-direction: row;
+
+    padding: 0em 1em;
+
+    h2 {
+      font-family: 'Comic Neue';
+    }
   }
 
   #Outlet {
     height: 100%;
     width: 100%;
     overflow: hidden;
+    border-left: 1px solid #333333;
   }
 `

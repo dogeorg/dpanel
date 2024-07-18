@@ -2,10 +2,12 @@ import { html, css } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
 
 export function renderSummaryTitle() {
   return html`
-    <span class="title">
-      <sl-icon name="${this.icon}"></sl-icon>
-      ${this.pupName}
-    </span>
+    <a href="/pups/${this.pupId.toLowerCase()}" @click=${this.handlePupTitleClick}>
+      <span class="title">
+        <sl-icon name="${this.icon}"></sl-icon>
+        ${(this.pupName)}
+      </span>
+    </a>
     <span class="tags" ?hidden=${!this.version}>
       <sl-tag size="small" pill>${this.version}</sl-tag>
     </span>

@@ -56,7 +56,7 @@ class PupSnapshot extends LitElement {
     this.options = {};
     this.config = {};
     this.router = getRouter().Router;
-    this.allowInspect = true;
+    this.allowInspect = false;
     // Bind all imported renderMehtods to 'this'
     bindToClass(renderMethods, this)
   }
@@ -134,6 +134,14 @@ class PupSnapshot extends LitElement {
     const failedTxnId = failedTxnPayload?.id ? `(${failedTxnPayload.id})` : '';
     createAlert('danger', ['Failed to update Pup configuration', `Refer to logs ${failedTxnId}`], 'exclamation-diamond');
     console.warn(`Doge is sad because ${failedTxnId}: `, failedTxnPayload)
+  }
+
+  handlePupTitleClick(e) {
+    e.stopPropagation();
+    e.preventDefault();
+    if (e.currentTarget.href) {
+      this.router.go(e.currentTarget.href);
+    }
   }
 
   handleTabClick(event) {

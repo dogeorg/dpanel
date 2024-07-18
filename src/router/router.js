@@ -1,5 +1,5 @@
 import { Router } from '/vendor/@vaadin/router@1.7.5/vaadin-router.min.js';
-import { wrapActions, loadPupContext, isAuthed, performLogout } from './middleware.js'
+import { wrapActions, loadPupContext, loadPupManagementContext, isAuthed, performLogout } from './middleware.js'
 
 let router;
 
@@ -16,16 +16,21 @@ export const getRouter = (targetElement) => {
       // Home
       { path: '/', action: wrapActions(isAuthed), component: 'home-view' },
 
-      // Pups
-      { path: '/pup/:path*', action: wrapActions(isAuthed, loadPupContext), component: 'iframe-view' },
-      { path: '/pups/library', action: wrapActions(isAuthed), component: 'library-view' },
-      { path: '/pups/discover', action: wrapActions(isAuthed), component: 'store-view' },
+      // Pup Iframe
+      { path: '/pup/:path*', action: wrapActions(isAuthed, loadPupContext), component: 'iframe-view', dynamicTitle: true },
+
+      // Pup Listings
+      { path: '/pups/library', action: wrapActions(isAuthed), component: 'library-view', pageTitle: "Installed Pups" },
+      { path: '/pups/discover', action: wrapActions(isAuthed), component: 'store-view', pageTitle: "Discover Pups" },
+
+      // Pup Management
+      { path: '/pups/:path*', action: wrapActions(isAuthed, loadPupManagementContext), component: 'pup-view', dynamicTitle: true  },
 
       // Settings
-      { path: '/config', action: wrapActions(isAuthed), component: 'manage-view' },
+      { path: '/config', action: wrapActions(isAuthed), component: 'manage-view', pageTitle: "Settings" },
 
       // Charts
-      { path: '/stats', action: wrapActions(isAuthed), component: 'stats-view' },
+      { path: '/stats', action: wrapActions(isAuthed), component: 'stats-view', pageTitle: "Monitor" },
     ]);
   }
   return { router, Router };

@@ -8,142 +8,34 @@ export const navStyles = css`
     overflow: hidden;
   }
 
-  #GutterNav {
+  .logo {
+    margin: 1em auto;
+    width: 120px;
     display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    width: 100%;
-    @media (min-width: 576px) {
-      flex-direction: column;
-      align-items: center;
-      width: 49px;
-    }
+    align-self: center;
   }
 
-  #GutterNav .gutter-footer {
-    display: none;
-    @media (min-width: 566px) {
-      display: flex;
-      flex-direction: column;
-      width: 100%;
-      gap: 10px;
-      align-items: center;
-      justify-content: center;
-      padding: 0.7em 0em;
-    }
-  }
-
-  #GutterNav .gutter-body {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    column-gap: 1.4em;
-    row-gap: 1.4em;
-
-    opacity: 1;
-    z-index: 2;
-
-    /*border-right: 1px solid #1c1b22;*/
-    /*background: #1c1b22;*/
-    padding: 0.75em;
-
-    height: 100%;
-    width: 100%;
-    overflow-y: auto;
-
-    @media (min-width: 576px) {
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      padding: 0.75em 0em;
-    }
-  }
-
-  #GutterNav[open] {
-    width: 100%;
-    background: #1c1b22;
-    @media (min-width: 576px) {
-      border-right: 1px solid var(--sl-panel-border-color);
-      width: 50px;
-    }
-  }
-
-  #GutterNav #logo {
-    position: relative;
-    top: 2px;
-
-    background: #f9e7b5;
-    border: 1px solid #f9e7b5;
-    border-radius: 4px;
-
-    height: 22px;
-    // transform: rotate(-3deg);
-
-    img {
-      position: absolute;
-      top: -7px;
-      left: -6px;
-
-      width: 36px;
-      // transform: rotate(0deg);
-    }
-  }
-
-  #GutterNav #logo:hover {
-    border: 1px solid rgb(255, 208, 67);
-    background: rgb(255, 208, 67);
-  }
-
-  #GutterNav #menu,
-  #GutterNav .tray-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 4px;
-    font-size: 1.1rem;
-  }
-
-  #GutterNav .tray-icon {
-    color: #595959;
-  }
-
-  #GutterNav #menu sl-icon {
-    // transform: rotate(6deg);
-  }
-
-  #GutterNav .gutter-menu-item {
-    width: 26px;
-    height: 26px;
+  .logotext {
+    font-family: 'Comic Neue';
     text-align: center;
-  }
-
-  #GutterNav .gutter-menu-item.bg {
-  }
-
-  #GutterNav .gutter-menu-item:hover {
-    cursor: pointer;
-  }
-
-  #GutterNav .gutter-menu-item:hover {
-    background: #a2a2a2;
-    border: 1px solid #a2a2a2;
+    font-size: 2rem;
+    margin-top: -1rem;
+    user-select: none;
   }
 
   #Side[open] {
     display: flex;
     position: absolute;
-    top: 50px;
 
     flex-shrink: 0;
     overflow-y: auto;
     overflow-x: hidden;
 
-    background: #1a191f;
+    background: #181818;
     box-shadow: none;
 
     @media (min-width: 576px) {
       top: 0px;
-      left: 50px;
       box-shadow: 10px 0 5px -5px rgba(0, 0, 0, 0.2);
     }
 
@@ -172,7 +64,7 @@ export const navStyles = css`
 
     @media (min-width: 576px) {
       top: 0px;
-      left: 50px;
+      /* left: 50px; */
       width: 240px;
       height: 100vh;
     }
@@ -186,6 +78,13 @@ export const navStyles = css`
     opacity: 0.1;
   }
 
+  #Side .inner {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
   #Side .menu-item {
     display: flex;
     flex-direction: row;
@@ -196,8 +95,16 @@ export const navStyles = css`
     padding: 0.5em 1em;
 
     font-family: "Comic Neue";
-    font-size: 1.1rem;
+    font-size: 1.3rem;
     font-weight: 600;
+
+    cursor: pointer;
+  }
+
+  #Side .menu-item a,
+  #Side .menu-item sl-icon {
+    text-decoration: none;
+    user-select: none;
   }
 
   #Side .menu-item:hover,
@@ -302,32 +209,20 @@ export const navStyles = css`
     background: #4360ff;
   }
 
+  .nav-footer .connection {
+    display: flex;
+    flex-direction: row;
+    padding: 0.3em 1em;
+    background: #2ede75;
+    gap: 0.5em;
+    align-items: baseline;
+    color: black;
 
-  /* Pulse / Prompt Mode */
-  #GutterNav.pulse {
-    animation-name: color;
-    animation-duration: 700ms;
-    animation-iteration-count: infinite;
-    animation-direction: alternate-reverse;
-    animation-timing-function: linear;
-
-    .gutter-footer {
-      color: white;
-    }
-
-    .gutter-footer #keys {
-      background: #fd5a5a;
-      border-color: #fd5a5a;
+    sl-icon {
+      position: relative;
+      top: 4px;
+      font-size: 1.2rem;
     }
   }
-    @keyframes color {
-      from {
-        background-color: rgb(44, 77, 255);
-      }
-      to {
-        background-color: rgb(138, 156, 255);
-      }
-    }
-
 `;
 

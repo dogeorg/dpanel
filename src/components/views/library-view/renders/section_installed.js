@@ -8,8 +8,7 @@ export function renderSectionInstalledHeader(ready) {
 
 
   return html`
-    <div class="heading-wrap">
-      <h2>Installed Pups</h2>
+    <!-- div class="heading-wrap">
       ${this.fetchLoading ? html`
         <sl-spinner></sl-spinner>
       ` : nothing }
@@ -17,9 +16,9 @@ export function renderSectionInstalledHeader(ready) {
       ${ready ? html`
         <sl-tag pill>${this.installedList.data.length}</sl-tag>
       ` : nothing }
-    </div>
+    </div -->
 
-    <div class="actions">
+    <!-- div class="actions">
       <sl-dropdown>
         <sl-button slot="trigger" ?disabled=${this.busy}><sl-icon name="three-dots-vertical"></sl-icon></sl-button>
         <sl-menu @sl-select=${this.handleActionsMenuSelect}>
@@ -35,7 +34,7 @@ export function renderSectionInstalledHeader(ready) {
           <sl-menu-item value="refresh">Refresh</sl-menu-item>
         </sl-menu>
       </sl-dropdown>
-    </div>
+    </div -->
   `
 }
 

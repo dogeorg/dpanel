@@ -8,6 +8,8 @@ class Store {
       // Define application state here
       orienation: "landscape",
       pathname: "/",
+      pageTitle: "Installed Pups",
+      pageAction: "back"
     };
     this.networkContext = this.networkContext || {
       // Define network state here
@@ -52,7 +54,6 @@ class Store {
         // Attempt to parse the saved state from localStorage
         const savedState = JSON.parse(localStorage.getItem("storeState"));
         if (savedState) {
-          this.appContext = savedState.appContext;
           this.networkContext = savedState.networkContext;
           // Load other slices as needed
         }

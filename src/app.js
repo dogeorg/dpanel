@@ -59,6 +59,7 @@ class DPanelApp extends LitElement {
     this.currentPath = "";
     this._debouncedHandleResize = debounce(this._handleResize.bind(this), 50);
     this.mainChannel = mainChannel;
+    this.router = null;
     bindToClass(renderMethods, this);
   }
 
@@ -82,7 +83,7 @@ class DPanelApp extends LitElement {
 
   firstUpdated() {
     // Initialise our router singleton and provide it a target elemenet.
-    getRouter(this.shadowRoot.querySelector("#Outlet"));
+    this.router = getRouter(this.shadowRoot.querySelector("#Outlet")).Router;
   }
 
   _handleResize() {
@@ -101,6 +102,21 @@ class DPanelApp extends LitElement {
     this.menuVisible = !this.menuVisible;
   }
 
+  handleNavClick(e) {
+    const anchor = e.currentTarget.querySelector('a');
+    if (anchor) { anchor.click(); }
+  }
+
+  handleBackClick(e) {
+    try {
+      // TODO. This needs to travel back up the route stack better.
+      this.router.go(this.context.store.appContext.previousPathname)
+    } catch (err) {
+      console.warn('Routing warning:', err)
+      history.back();
+    }
+  }
+
   enableSystemPrompt() {
     if (this.systemPromptActive) {
       this.shadowRoot.querySelector("system-prompt").close();
@@ -113,6 +129,7 @@ class DPanelApp extends LitElement {
   }
 
   render() {
+    const { pageTitle, pageAction } = this.context.store.appContext;
     const CURPATH = this.context.store.appContext.pathname || "";
     const showSystemPrompt = this.context.store.promptContext.display;
     const taskName = this.context.store.promptContext.name;
@@ -125,7 +142,20 @@ class DPanelApp extends LitElement {
       <div id="App">
         ${showChrome ? this.renderNav(CURPATH) : nothing}
         <main id="Main" class=${mainClasses}>
+
+          ${pageTitle ? html `
+            <div id="OutletHeader">
+              ${pageAction ? html`
+                <sl-button @click=${this.handleBackClick} variant="default" size="large" circle>
+                  <sl-icon name="chevron-left" label="Back"></sl-icon>
+                </sl-button>
+              `: nothing }
+              <h2>${pageTitle}</h2>
+            </div>
+          `: nothing }
+
           <div id="Outlet"></div>
+
         </main>
         ${showChrome ? this.renderFooter() : nothing}
       </div>
@@ -133,16 +163,7 @@ class DPanelApp extends LitElement {
       <aside>
         <welcome-dialog></welcome-dialog>
         <debug-panel></debug-panel>
-        <system-prompt
-          ?open=${showSystemPrompt}
-          task=${taskName}
-        ></system-prompt>
-
-        <!--button
-          @click=${this.enableSystemPrompt}
-          style="position:absolute;bottom:0px;right:0px;z-index:99999"
-          >Click
-        </button-->
+        <system-prompt ?open=${showSystemPrompt} task=${taskName}></system-prompt>
       </aside>
 
       <style>

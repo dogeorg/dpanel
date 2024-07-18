@@ -12,6 +12,11 @@ export const styles = css`
   }
   
   /* Details toggle */
+  sl-details::part(base) {
+    background: rgb(46, 45, 51);
+    box-shadow: rgba(0, 0, 0, 0.2) 4px 2px 2px;
+    border: none;
+  }
   sl-details::part(summary-icon) {
     /* Disable the expand/collapse animation */
     display: none;

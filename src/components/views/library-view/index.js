@@ -174,9 +174,7 @@ class LibraryView extends LitElement {
     }
 
     .padded {
-      background: #1a191f;
-      border: 1px solid rgb(32, 31, 36);
-      border-radius: 16px;
+      background: #23252a;
       margin: 1em;
       padding: 1em;
       @media (min-width: 1024px) {
@@ -245,12 +243,14 @@ class LibraryView extends LitElement {
       align-items: baseline;
       justify-content: space-between;
       gap: 0.8rem;
+      margin: 1em 0em;
     }
 
     header .heading-wrap {
       display: flex;
       gap: 0.8rem;
       align-items: baseline;
+      margin-bottom: 1em;
     }
 
     header .heading-wrap h2 {

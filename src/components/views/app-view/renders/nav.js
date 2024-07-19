@@ -22,14 +22,14 @@ export function renderNav(CURPATH) {
               <a href="/">Home</a>
             </div>
 
-            <div @click=${this.handleNavClick} name="pups" class="menu-item ${CURPATH.startsWith("/pups/library") ? "active" : ""}">
+            <div @click=${this.handleNavClick} name="pups" class="menu-item ${CURPATH.startsWith("/pups") ? "active" : ""}">
               <sl-icon name="box-seam"></sl-icon>
-              <a href="/pups/library">Pups</a>
+              <a href="/pups">Pups</a>
             </div>
 
-            <div @click=${this.handleNavClick} name="discover" class="menu-item ${CURPATH.startsWith("/pups/discover") ? "active" : ""}">
+            <div @click=${this.handleNavClick} name="discover" class="menu-item ${CURPATH.startsWith("/discover") ? "active" : ""}">
               <sl-icon name="search"></sl-icon>
-              <a href="/pups/discover">Discover</a>
+              <a href="/discover">Discover</a>
             </div>
 
             <div @click=${this.handleNavClick} class="menu-item ${CURPATH.startsWith("/config") ? "active" : ""}">

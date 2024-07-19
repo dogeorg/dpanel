@@ -39,7 +39,8 @@ export const navStyles = css`
       box-shadow: 10px 0 5px -5px rgba(0, 0, 0, 0.2);
     }
 
-    @media (min-width: 1024px) {
+    /*@media (min-width: 1024px) {*/
+    @media (min-width: 0px) {
       position: relative;
       top: 0px;
       left: 0px;

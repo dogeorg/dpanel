@@ -2,6 +2,7 @@
 import { store } from "/state/store.js";
 import { pkgController } from "/controllers/package/index.js";
 import { getBootstrap } from "/api/bootstrap/bootstrap.js";
+import { getRouter } from "/router/router.js";
 
 export const wrapActions =
   (...actions) =>
@@ -86,12 +87,18 @@ export async function loadPupManagementContext(context, commands) {
 }
 
 function setMenu(context, commands) {
+  const r = getRouter().router;
+
+  r.setPreviousPathname();
+
   store.updateState({
     appContext: {
       pathname: context.pathname,
-      previousPathname: window.location.pathname
+      previousPathname: r.getPreviousPathname(),
+      upwardPathname: removeLastPathSegment(context.pathname)
     },
   });
+
   return undefined;
 }
 
@@ -120,3 +127,13 @@ export function performLogout(context, commands) {
   return commands.redirect("/login");
 }
 
+function removeLastPathSegment(pathname) {
+  // Split the pathname into segments based on '/'
+  const segments = pathname.split('/').filter(Boolean); // Filter out empty segments
+
+  // Remove the last segment
+  segments.pop();
+
+  // Join the remaining segments back into a pathname
+  return '/' + segments.join('/');
+}

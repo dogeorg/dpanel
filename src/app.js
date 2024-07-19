@@ -108,12 +108,16 @@ class DPanelApp extends LitElement {
   }
 
   handleBackClick(e) {
+    // Navigate to previous path (if known)
+    // Else navigate back a segment of the href
+    // All else fails, navigate to "/".
     try {
-      // TODO. This needs to travel back up the route stack better.
-      this.router.go(this.context.store.appContext.previousPathname)
+      const { previousPathname, upwardPathname } = this.context.store.appContext
+      const destination = previousPathname || upwardPathname || "/"
+      this.router.go(destination);
     } catch (err) {
       console.warn('Routing warning:', err)
-      history.back();
+      window.location = "/";
     }
   }
 

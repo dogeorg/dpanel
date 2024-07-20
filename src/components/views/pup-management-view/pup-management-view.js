@@ -19,6 +19,7 @@ class PupManagementView extends LitElement {
     super();
     bindToClass(renderMethods, this);
     this.context = new StoreSubscriber(this, store);
+    this.router = getRouter().Router
     this.open_dialog = false;
     this.open_dialog_label = ""
   }
@@ -76,10 +77,11 @@ class PupManagementView extends LitElement {
     this.open_dialog_label = menuRowInstance.getAttribute("label")
   }
 
-  render() {
-    const pkg = this.context.store.pupContext
-    console.log(pkg);
+  navigateTo = (event, menuRowInstance) => {
+    this.router.go(`${window.location.pathname}/logs`)
+  }
 
+  render() {
     const renderHealthChecks = () => html`
       <action-row label="Blockchain Sync" prefix="arrow-repeat">
         Ea sint dolor commodo.
@@ -110,7 +112,7 @@ class PupManagementView extends LitElement {
         Ea sint dolor commodo.
       </action-row>
 
-      <action-row prefix="display" name="logs" label="Logs" .trigger=${this.handleMenuClick}>
+      <action-row prefix="display" name="logs" label="Logs" .trigger=${this.navigateTo}>
         Ea sint dolor commodo.
       </action-row>
     `;
@@ -147,13 +149,9 @@ class PupManagementView extends LitElement {
         </div>
       </section>
 
-      <sl-dialog ?open=${this.open_dialog} label=${this.open_dialog_label}>
-        ${choose(this.open_dialog, [
-          ['readme', () => html`${unsafeHTML(pkg?.manifest?.docs?.about)}`],
-          ['configure', () => html`Configurator here.`]
-        ],
-        () => html`<span>View not provided</span>`)}
-      </sl-dialog>
+      <aside>
+        ${this.renderDialog()}
+      </aside>
     `;
   }
 }

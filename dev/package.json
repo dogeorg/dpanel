@@ -6,7 +6,7 @@
   "scripts": {
     "setup": "./scripts/setup.sh",
     "check": "./scripts/check.sh",
-    "start": "./scripts/check.sh && node ./example-pups/run.js & node ./scripts/start.js",
+    "start": "./scripts/check.sh && node ./scripts/start.js",
     "test": "web-test-runner --config ./configs/web-test-runner.config.mjs",
     "test:watch": "web-test-runner --config ./configs/web-test-runner.config.mjs --watch"
   },

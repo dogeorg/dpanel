@@ -40,6 +40,8 @@ export const getRouter = (targetElement) => {
       { path: '/discover', action: wrapActions(isAuthed), component: 'store-view', pageTitle: "Discover Pups" },
 
       // Pup Management
+      { path: '/pups/:path/logs', action: wrapActions(isAuthed), pageTitle: "Logs", pageAction: "close" },
+      { path: '/pups/:path/actions', action: wrapActions(isAuthed), pageTitle: "Actions", pageAction: "close" },
       { path: '/pups/:path*', action: wrapActions(isAuthed, loadPupManagementContext), component: 'pup-management-view', dynamicTitle: true  },
 
       // Settings

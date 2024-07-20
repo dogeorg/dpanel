@@ -22,6 +22,7 @@ import { StoreSubscriber } from "/state/subscribe.js";
 
 // Views
 import "/components/views/index.js";
+import "/components/common/page-container.js";
 import "/components/views/welcome-dialog/index.js";
 import "/components/views/system-prompt/index.js";
 
@@ -132,8 +133,17 @@ class DPanelApp extends LitElement {
     }
   }
 
+  selectActionIcon(action) {
+    const actions = {
+      back: "chevron-left",
+      close: "x-lg"
+    }
+    return actions[action] || ""
+  }
+
   render() {
     const { pageTitle, pageAction } = this.context.store.appContext;
+    const { previousPathname, upwardPathname } = this.context.store.appContext
     const CURPATH = this.context.store.appContext.pathname || "";
     const showSystemPrompt = this.context.store.promptContext.display;
     const taskName = this.context.store.promptContext.name;
@@ -147,18 +157,27 @@ class DPanelApp extends LitElement {
         ${showChrome ? this.renderNav(CURPATH) : nothing}
         <main id="Main" class=${mainClasses}>
 
-          ${pageTitle ? html `
+          <page-container
+            pageTitle=${pageTitle}
+            pageAction=${pageAction}
+            previousPath=${previousPathname}
+            upwardPath=${upwardPathname}
+            .router=${this.router}>
+            <div id="Outlet"></div>
+          </page-container>
+
+          ${/*pageTitle*/ false ? html `
             <div id="OutletHeader">
               ${pageAction ? html`
                 <sl-button @click=${this.handleBackClick} variant="default" size="large" circle>
-                  <sl-icon name="chevron-left" label="Back"></sl-icon>
+                  <sl-icon name=${this.selectActionIcon(pageAction)} label="Back"></sl-icon>
                 </sl-button>
               `: nothing }
               <h2>${pageTitle}</h2>
             </div>
           `: nothing }
 
-          <div id="Outlet"></div>
+          <!-- div id="Outlet"></div -->
 
         </main>
         ${showChrome ? this.renderFooter() : nothing}

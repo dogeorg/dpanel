@@ -8,8 +8,8 @@ class Store {
       // Define application state here
       orienation: "landscape",
       pathname: "/",
-      pageTitle: "Installed Pups",
-      pageAction: "back"
+      pageTitle: "",
+      pageAction: ""
     };
     this.networkContext = this.networkContext || {
       // Define network state here

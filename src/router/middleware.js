@@ -107,7 +107,7 @@ function setTitle(context, commands) {
     store.updateState({
       appContext: {
         pageTitle: context?.route?.pageTitle || "",
-        pageAction: context?.route?.pageAction || false
+        pageAction: context?.route?.pageAction || ""
       },
     });
   }

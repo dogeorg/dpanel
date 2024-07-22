@@ -8,7 +8,7 @@ export function _render_range(field) {
     <sl-range
       name=${field.name}
       label=${ifd(field.label)}
-      .value=${this[currentKey]}
+      .value=${ifd(this[currentKey])}
       min=${ifd(field.min)}
       max=${ifd(field.max)}
       step=${ifd(field.step)}

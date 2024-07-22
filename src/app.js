@@ -166,19 +166,6 @@ class DPanelApp extends LitElement {
             <div id="Outlet"></div>
           </page-container>
 
-          ${/*pageTitle*/ false ? html `
-            <div id="OutletHeader">
-              ${pageAction ? html`
-                <sl-button @click=${this.handleBackClick} variant="default" size="large" circle>
-                  <sl-icon name=${this.selectActionIcon(pageAction)} label="Back"></sl-icon>
-                </sl-button>
-              `: nothing }
-              <h2>${pageTitle}</h2>
-            </div>
-          `: nothing }
-
-          <!-- div id="Outlet"></div -->
-
         </main>
         ${showChrome ? this.renderFooter() : nothing}
       </div>

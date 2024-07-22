@@ -33,15 +33,13 @@ export const getRouter = (targetElement) => {
       { path: '/', action: wrapActions(isAuthed), component: 'home-view' },
 
       // Pup Iframe
-      { path: '/kennel/:path*', action: wrapActions(isAuthed, loadPupContext), component: 'iframe-view', dynamicTitle: true },
+      { path: '/pup/:path*', action: wrapActions(isAuthed, loadPupContext), component: 'iframe-view', dynamicTitle: true },
 
       // Pup Listings
       { path: '/pups', action: wrapActions(isAuthed), component: 'library-view', pageTitle: "Installed Pups" },
       { path: '/discover', action: wrapActions(isAuthed), component: 'store-view', pageTitle: "Discover Pups" },
 
       // Pup Management
-      { path: '/pups/:path/logs', action: wrapActions(isAuthed), pageTitle: "Logs", pageAction: "close" },
-      { path: '/pups/:path/actions', action: wrapActions(isAuthed), pageTitle: "Actions", pageAction: "close" },
       { path: '/pups/:path*', action: wrapActions(isAuthed, loadPupManagementContext), component: 'pup-management-view', dynamicTitle: true  },
 
       // Settings

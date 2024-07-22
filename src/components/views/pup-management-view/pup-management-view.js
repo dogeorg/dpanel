@@ -1,6 +1,7 @@
 import { LitElement, html, css, nothing, choose, unsafeHTML } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
 import { getRouter } from '/router/router.js'
 import '/components/common/action-row/action-row.js';
+import '/components/common/page-container.js';
 import { bindToClass } from "/utils/class-bind.js";
 import * as renderMethods from "./renders/index.js";
 import { store } from "/state/store.js";
@@ -21,15 +22,29 @@ class PupManagementView extends LitElement {
     this.context = new StoreSubscriber(this, store);
     this.router = getRouter().Router
     this.open_dialog = false;
-    this.open_dialog_label = ""
+    this.open_dialog_label = "";
+    this.open_page = false;
+    this.open_page_label = "";
   }
 
   static styles = css`
     :host {
+      position: relative;
       display: block;
-      height: calc(100vh + -80px); /* accounts for page header*/
+      width: 100%;
+      height: 100%;
+    }
+
+    .wrapper {
+      display: block;
+      height: calc(100vh - 144px); /* accounts for page header*/
       overflow-y: auto;
       padding: 2em;
+      position: relative;
+    }
+
+    .wrapper[data-freeze] {
+      overflow: hidden;
     }
 
     h1, h2, h3 {
@@ -57,6 +72,24 @@ class PupManagementView extends LitElement {
     section div.underscored {
       border-bottom: 1px solid #333;
     }
+
+    aside.page-popver {
+      display: none;
+      position: absolute;
+      top: 0px;
+      left: 0;
+      height: calc(100vh - 80px);
+      width: 100%;
+      z-index: 99999;
+      box-sizing: border-box;
+      overflow-x: hidden;
+      overflow-y: auto;
+      background: #23252a;
+    }
+
+    aside.page-popver[data-open] {
+      display: block;
+    }
   `
 
   firstUpdated() {
@@ -82,6 +115,9 @@ class PupManagementView extends LitElement {
   }
 
   render() {
+    const path = this.context.store?.appContext?.path || [];
+    const popover_page = path[1];
+
     const renderHealthChecks = () => html`
       <action-row label="Blockchain Sync" prefix="arrow-repeat">
         Ea sint dolor commodo.
@@ -118,39 +154,44 @@ class PupManagementView extends LitElement {
     `;
 
     return html`
+      <div class="wrapper" ?data-freeze=${popover_page}>
+        <section>
+          <div class="section-title">
+            <h3>Status</h3>
+          </div>
+          <div class="underscored">
+            ${this.renderStatus()}
+          </div>
+          <div>
+            ${this.renderActions()}
+          </div>
+        </section>
+
+        <section>
+          <div class="section-title">
+            <h3>Health checks</h3>
+          </div>
+          <div class="list-wrap">
+            ${renderHealthChecks()}
+          </div>
+        </section>
+
+        <section>
+          <div class="section-title">
+            <h3>Menu</h3>
+          </div>
+          <div class="list-wrap">
+            ${renderMenu()}
+          </div>
+        </section>
+
+        <aside>
+          ${this.renderDialog()}
+        </aside>
+      </div>
       
-      <section>
-        <div class="section-title">
-          <h3>Status</h3>
-        </div>
-        <div class="underscored">
-          ${this.renderStatus()}
-        </div>
-        <div>
-          ${this.renderActions()}
-        </div>
-      </section>
-
-      <section>
-        <div class="section-title">
-          <h3>Health checks</h3>
-        </div>
-        <div class="list-wrap">
-          ${renderHealthChecks()}
-        </div>
-      </section>
-
-      <section>
-        <div class="section-title">
-          <h3>Menu</h3>
-        </div>
-        <div class="list-wrap">
-          ${renderMenu()}
-        </div>
-      </section>
-
-      <aside>
-        ${this.renderDialog()}
+      <aside class="page-popver" ?data-open=${popover_page}>
+        ${this.renderPopoverPage(popover_page)}
       </aside>
     `;
   }

@@ -18,6 +18,7 @@ class PageContainer extends LitElement {
 
     h2 {
       font-family: 'Comic Neue';
+      text-transform: capitalize;
     }
   }
 
@@ -52,12 +53,20 @@ class PageContainer extends LitElement {
     // All else fails, navigate to "/".
     try {
       console.log(this.previousPath, this.upwardPath, "/");
-      const destination = this.previousPath || this.upwardPath || "/"
+      const destination = this.upwardPath || this.previousPath || "/";
       this.router.go(destination);
     } catch (err) {
       console.warn('Routing warning:', err)
       window.location = "/";
     }
+  }
+
+  selectActionIcon(action) {
+    const actions = {
+      back: "chevron-left",
+      close: "x-lg"
+    }
+    return actions[action] || ""
   }
 
   render() {
@@ -67,7 +76,7 @@ class PageContainer extends LitElement {
         <div class="page-header">
           ${pageAction ? html`
             <sl-button @click=${handleBackClick} variant="default" size="large" circle>
-              <sl-icon name="chevron-left" label="Back"></sl-icon>
+              <sl-icon name=${this.selectActionIcon(pageAction)} label="Back"></sl-icon>
             </sl-button>
           `: nothing }
           <h2>${pageTitle}</h2>

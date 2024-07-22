@@ -57,7 +57,7 @@ export async function loadPupContext(context, commands) {
 
 export async function loadPupManagementContext(context, commands) {
   try {
-    const pupId = context.pathname.replace("/pups/", "");
+    const pupId = context.params.path[0];
 
     // ensure bootstrap (temporary)
     const res = await getBootstrap();
@@ -73,8 +73,8 @@ export async function loadPupManagementContext(context, commands) {
     store.updateState({
       pupContext: { manifest },
       appContext: {
-        pageTitle: manifest.package,
-        pageAction: "back",
+        pageTitle: context.params.path[1] || manifest.package,
+        pageAction: context.params.path[1] ? "close" : "back",
       }
     });
 
@@ -94,6 +94,7 @@ function setMenu(context, commands) {
   store.updateState({
     appContext: {
       pathname: context.pathname,
+      path: context.params.path,
       previousPathname: r.getPreviousPathname(),
       upwardPathname: removeLastPathSegment(context.pathname)
     },

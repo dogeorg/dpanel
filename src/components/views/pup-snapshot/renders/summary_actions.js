@@ -12,7 +12,7 @@ export function renderSummaryActions() {
 
     ${this.installed && !this.allowManage && this.gui ? html`
       <sl-button ?loading=${this.loading} ?disabled=${this.disabled} href="${`pup/${this.pupId}`}" @click="${(e) => this.handleLaunchAction(e)}" variant="primary" outline size="medium">
-        <sl-icon name="rocket-takeoff" label="launch"></sl-icon> <span class="btn-text">Launch</span>
+        <sl-icon name="rocket-takeoff" label="launch"></sl-icon> <span class="btn-text">Launch UI</span>
       </sl-button>
       ` : nothing
     }

@@ -6,7 +6,6 @@ export const mainStyles = css`
   }
   :host {
     display: block;
-    height: 100vh;
     overflow: hidden;
   }
   @font-face {
@@ -16,35 +15,19 @@ export const mainStyles = css`
     font-style: normal;
   }
 
-  #App {
-    display: flex;
-    flex-direction: column;
-
-    height: 100vh;
-    width: 100vw;
-    overflow: hidden;
-
-    @media (min-width: 576px) {
-      flex-direction: row;
-    }
-
-    @media (min-width: 1024px) {
-      flex-direction: row;
-    }
-  }
-
   #Main {
     flex-grow: 1;
     
     height: calc(100% - 50px);
     width: 100%;
     overflow: hidden;
+    margin-left: 240px;
 
     background: #23252a;
     
     @media (min-width: 576px) {
       height: 100%;
-      width: 100%;
+      width: calc(100% - 240px);
     }
   }
 

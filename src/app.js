@@ -153,22 +153,20 @@ class DPanelApp extends LitElement {
     });
 
     return html`
-      <div id="App">
-        ${showChrome ? this.renderNav(CURPATH) : nothing}
-        <main id="Main" class=${mainClasses}>
+      ${showChrome ? this.renderNav(CURPATH) : nothing}
+      <main id="Main" class=${mainClasses}>
 
-          <page-container
-            pageTitle=${pageTitle}
-            pageAction=${pageAction}
-            previousPath=${previousPathname}
-            upwardPath=${upwardPathname}
-            .router=${this.router}>
-            <div id="Outlet"></div>
-          </page-container>
+        <page-container
+          pageTitle=${pageTitle}
+          pageAction=${pageAction}
+          previousPath=${previousPathname}
+          upwardPath=${upwardPathname}
+          .router=${this.router}>
+          <div id="Outlet"></div>
+        </page-container>
 
-        </main>
-        ${showChrome ? this.renderFooter() : nothing}
-      </div>
+      </main>
+      ${showChrome ? this.renderFooter() : nothing}
 
       <aside>
         <welcome-dialog></welcome-dialog>

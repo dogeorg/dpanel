@@ -163,7 +163,7 @@ class LogViewer extends LitElement {
       div#LogContainer {
         background: #0b0b0b;
         padding: 0.5em;
-        height: calc(100vh - 100px);
+        height: calc(100vh - 96px);
         overflow-y: scroll;
         overflow-x: hidden;
       }

@@ -62,6 +62,35 @@ export function generateManifests(input) {
     };
   };
 
+  const generateRandomChecks = () => {
+    const checks = [
+      {
+        name: 'sync',
+        label: 'Blockchain Sync',
+        description: 'Syncing the blockchain (click for progress)',
+        type: 'script',
+        src: '/checks/sync.sh',
+        status: 'loading'
+      },
+      {
+        name: 'outbound',
+        label: 'Outbound Connectivity',
+        description: 'Tests whether your Dogebox can connect to other nodes on the network',
+        type: 'script',
+        src: '/checks/outbound.sh',
+        status: 'loading'
+      },{
+        name: 'inbound',
+        label: 'Inbound Connectivity',
+        description: 'Tests whether your Dogebox can receive incoming connections',
+        type: 'script',
+        src: '/checks/inbound.sh',
+        status: 'loading'
+      },
+    ]
+    return checks
+  }
+
   const randomSemver = () => `${Math.floor(Math.random() * 10)}.${Math.floor(Math.random() * 10)}.${Math.floor(Math.random() * 10)}`;
 
   const names = Array.isArray(input) ? input : Array.from({ length: input }, (_, index) => `Package_${index + 1}`);
@@ -72,6 +101,7 @@ export function generateManifests(input) {
     version: randomSemver(),
     hash: Math.random().toString(36).substring(2, 15),
     docs: mockDocs[name] || mockDocs.lorem,
+    gui: produceGuiSegment(name),
     command: {
       path: `/path/to/${name}`,
       args: '',
@@ -79,8 +109,8 @@ export function generateManifests(input) {
       env: null,
       config: generateRandomConfig(),
       configFiles: null,
+      checks: generateRandomChecks(),
     },
-    gui: produceGuiSegment(name)
   }));
 
   // 'Mock a hardcoded set'

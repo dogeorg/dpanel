@@ -1,11 +1,15 @@
-import { LitElement, html, css, nothing } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
+import { LitElement, html, css, nothing, classMap } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
 import { getRouter } from "/router/router.js";
 
 class PageContainer extends LitElement {
 
   static styles = css`
   .page-header {
+    position: fixed;
+    top: 0px;
+    z-index: 99;
     height: 80px;
+    width: 100%;
     background: #181818;
     border-left: 1px solid #333333;
 
@@ -27,6 +31,10 @@ class PageContainer extends LitElement {
     width: 100%;
     overflow: hidden;
     border-left: 1px solid #333333;
+  }
+
+  .pushed {
+    margin-top: 80px;
   }
 `;
 
@@ -71,6 +79,9 @@ class PageContainer extends LitElement {
 
   render() {
     const { pageTitle, pageAction, handleBackClick } = this;
+    const pageBodyClasses = classMap({
+      pushed: !!pageTitle
+    })
     return html`
       ${pageTitle ? html `
         <div class="page-header">
@@ -83,7 +94,7 @@ class PageContainer extends LitElement {
         </div>
       `: nothing }
 
-      <div class="page-body">
+      <div class="page-body" class=${pageBodyClasses}>
         <slot></slot>
       </div>
       `

@@ -5,7 +5,7 @@ export function renderDialog() {
   const readmeEl = html`${unsafeHTML(pkg?.manifest?.docs?.about)}`
   const configEl = html`
     <dynamic-form
-      .values=${{}}
+      .values=${pkg?.state?.config}
       .fields=${pkg?.manifest?.command?.config}
       requireCommit
       markModifiedFields
@@ -15,12 +15,10 @@ export function renderDialog() {
   `
 
   return html`
-    <sl-dialog ?open=${this.open_dialog} label=${this.open_dialog_label}>
-      ${choose(this.open_dialog, [
-        ['readme', () => readmeEl],
-        ['configure', () => configEl]
-      ],
-      () => html`<span>View not provided: ${this.open_dialog}</span>`)}
-    </sl-dialog>
+    ${choose(this.open_dialog, [
+      ['readme', () => readmeEl],
+      ['configure', () => configEl]
+    ],
+    () => html`<span>View not provided: ${this.open_dialog}</span>`)}
   `
 }

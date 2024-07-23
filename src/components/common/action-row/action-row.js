@@ -6,7 +6,9 @@ class ActionRow extends LitElement {
       label: { type: String },
       prefix: { type: String },
       suffix: { type: String },
-      trigger: { type: Object }
+      trigger: { type: Object },
+      variant: { type: String },
+      loading: { type: Boolean },
     };
   }
 
@@ -22,7 +24,35 @@ class ActionRow extends LitElement {
     :host {
       color: var(--sl-color-neutral-600);
     }
-    .base-wrap:hover {
+
+    /* VARIANTS */
+    :host([variant="primary"]) {
+      color: var(--sl-color-primary-600);
+    }
+    :host([variant="success"]) {
+      color: var(--sl-color-success-600);
+    }
+    :host([variant="warning"]) {
+      color: var(--sl-color-warning-600);
+    }
+    :host([variant="danger"]) {
+      color: var(--sl-color-danger-600);
+    }
+
+    /* HOVER STATES */
+    :host([variant="primary"]:hover) {
+      color: var(--sl-color-primary-800);
+    }
+    :host([variant="success"]:hover) {
+      color: var(--sl-color-success-800);
+    }
+    :host([variant="warning"]:hover) {
+      color: var(--sl-color-warning-800);
+    }
+    :host([variant="danger"]:hover) {
+      color: var(--sl-color-danger-800);
+    }
+    :host(:hover) {
       color: var(--sl-color-neutral-950);
       cursor: pointer;
     }
@@ -59,8 +89,8 @@ class ActionRow extends LitElement {
 
       .description-wrap {
         line-height: 1;
-        font-size:0.9rem;
-        font-family: 'Comic Neue';
+        font-size: 0.9rem;
+        font-family: "Comic Neue";
       }
 
       border-bottom: 1px solid #333;
@@ -83,21 +113,28 @@ class ActionRow extends LitElement {
 
   handleClick = (e) => {
     if (this.trigger) {
-      if (typeof this.trigger === 'function') {
+      if (typeof this.trigger === "function") {
         this.trigger(e, this);
       } else {
-        console.warn('Trigger provided is not a function', typeof this.trigger, this.trigger);
+        console.warn(
+          "Trigger provided is not a function",
+          typeof this.trigger,
+          this.trigger,
+        );
       }
     }
-  }
+  };
 
   render() {
     return html`
       <div class="base-wrap" part="base" @click=${this.handleClick}>
-
         <div class="prefix-wrap" part="prefix">
-          <slot name="prefix"></slot>
-          <sl-icon name="${this.prefix}"></sl-icon>
+          ${this.loading
+            ? html` <sl-spinner></sl-spinner> `
+            : html`
+                <slot name="prefix"></slot>
+                <sl-icon name="${this.prefix}"></sl-icon>
+              `}
         </div>
 
         <div class="body-wrap" part="body">
@@ -113,11 +150,9 @@ class ActionRow extends LitElement {
           <slot name="suffix"></slot>
           <sl-icon name="chevron-right"></sl-icon>
         </div>
-
       </div>
     `;
   }
 }
 
 customElements.define("action-row", ActionRow);
-

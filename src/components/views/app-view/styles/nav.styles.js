@@ -2,6 +2,9 @@ import { css } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 
 export const navStyles = css`
   #Nav {
+    position: fixed;
+    top: 0;
+    left: 0;
     display: flex;
     flex-direction: row;
     flex-shrink: 0;

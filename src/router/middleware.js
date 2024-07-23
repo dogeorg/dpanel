@@ -64,14 +64,14 @@ export async function loadPupManagementContext(context, commands) {
     pkgController.setData(res);
 
     const pup = pkgController.getPup(pupId);
-    const manifest = pup?.manifest;
+    const { manifest, state } = pup;
 
     if (!manifest) {
       throw new Error("manifest empty");
     }
 
     store.updateState({
-      pupContext: { manifest },
+      pupContext: { manifest, state },
       appContext: {
         pageTitle: context.params.path[1] || manifest.package,
         pageAction: context.params.path[1] ? "close" : "back",
@@ -113,6 +113,11 @@ function setTitle(context, commands) {
     });
   }
   return undefined;
+}
+
+export function setOverflow(context, commands) {
+  document.body.style.overflow = context.params.path[1] ? 'hidden' : 'auto';
+  return undefined
 }
 
 export function isAuthed(context, commands) {

@@ -3,7 +3,7 @@ import { css } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 export const navStyles = css`
   #Nav {
     position: fixed;
-    z-index: 99999;
+    z-index: 999999;
     top: 0;
     left: calc(0px - var(--sidebar-width));
     display: flex;

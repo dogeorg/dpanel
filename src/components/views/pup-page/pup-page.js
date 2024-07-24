@@ -49,70 +49,6 @@ class PupPage extends LitElement {
     super.disconnectedCallback();
   }
 
-  static styles = css`
-    :host {
-      position: relative;
-      display: block;
-    }
-
-    .wrapper {
-      display: block;
-      padding: 2em;
-      position: relative;
-    }
-
-    .wrapper[data-freeze] {
-      overflow: hidden;
-    }
-
-    h1,
-    h2,
-    h3 {
-      margin: 0;
-      padding: 0;
-    }
-
-    section {
-      margin-bottom: 2em;
-    }
-
-    section div {
-      margin-bottom: 1em;
-    }
-
-    section .section-title {
-      margin-bottom: 0em;
-    }
-
-    section .section-title h3 {
-      text-transform: uppercase;
-      font-family: "Comic Neue";
-    }
-
-    section div.underscored {
-      border-bottom: 1px solid #333;
-    }
-
-    aside.page-popver {
-      display: none;
-      position: fixed;
-      top: 80px;
-      left: 0;
-      height: calc(100vh - 80px);
-      width: calc(100vw - 240px);
-      margin-left: 241px;
-      z-index: 99999;
-      box-sizing: border-box;
-      overflow-x: hidden;
-      overflow-y: auto;
-      background: #23252a;
-    }
-
-    aside.page-popver[data-open] {
-      display: block;
-    }
-  `;
-
   async firstUpdated() {
     this.addEventListener("sl-hide", this.handleDialogClose);
     this.checks = this.context.store.pupContext?.manifest?.command?.checks;
@@ -236,6 +172,70 @@ class PupPage extends LitElement {
       </aside>
     `;
   }
+
+    static styles = css`
+    :host {
+      position: relative;
+      display: block;
+    }
+
+    .wrapper {
+      display: block;
+      padding: 2em;
+      position: relative;
+    }
+
+    .wrapper[data-freeze] {
+      overflow: hidden;
+    }
+
+    h1,
+    h2,
+    h3 {
+      margin: 0;
+      padding: 0;
+    }
+
+    section {
+      margin-bottom: 2em;
+    }
+
+    section div {
+      margin-bottom: 1em;
+    }
+
+    section .section-title {
+      margin-bottom: 0em;
+    }
+
+    section .section-title h3 {
+      text-transform: uppercase;
+      font-family: "Comic Neue";
+    }
+
+    section div.underscored {
+      border-bottom: 1px solid #333;
+    }
+
+    aside.page-popver {
+      display: none;
+      position: fixed;
+      top: 80px;
+      left: 0;
+      height: calc(100vh - 80px);
+      width: calc(100vw - var(--page-margin-left));
+      margin-left: var(--page-margin-left);
+      z-index: 99999;
+      box-sizing: border-box;
+      overflow-x: hidden;
+      overflow-y: auto;
+      background: #23252a;
+    }
+
+    aside.page-popver[data-open] {
+      display: block;
+    }
+  `;
 }
 
 customElements.define("pup-page", PupPage);

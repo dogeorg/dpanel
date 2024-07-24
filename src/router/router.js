@@ -37,7 +37,7 @@ export const getRouter = (targetElement) => {
       { path: "/login", action: wrapActions(), component: "login-view" },
 
       // Home
-      { path: "/", action: wrapActions(isAuthed), component: "home-view" },
+      { path: "/", action: wrapActions(isAuthed), component: "home-view", pageTitle: "Home" },
 
       // Pup Iframe
       {

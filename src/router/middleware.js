@@ -96,7 +96,8 @@ function setMenu(context, commands) {
       pathname: context.pathname,
       path: context.params.path,
       previousPathname: r.getPreviousPathname(),
-      upwardPathname: removeLastPathSegment(context.pathname)
+      upwardPathname: removeLastPathSegment(context.pathname),
+      menuVisible: false
     },
   });
 

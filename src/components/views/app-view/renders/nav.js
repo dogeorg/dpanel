@@ -8,9 +8,10 @@ export function renderNav(CURPATH) {
     inner: true,
     opaque: this.systemPromptActive,
   });
+  const menu_open = this.context.store.appContext.menuVisible;
   return html`
-    <nav id="Nav">
-      <div id="Side" ?open=${this.menuVisible}>
+    <nav id="Nav" ?open=${menu_open} ?animating=${this.menuAnimating}>
+      <div id="Side">
         <div class=${sideNavClasses}>
           <div class"nav-body">
 

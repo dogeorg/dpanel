@@ -52,7 +52,6 @@ class HomeView extends LitElement {
   render() {
     return html`
       <div class="padded" style="max-width:420px;">
-        <h1>Such Home</h1>
         <sl-details class="custom-icons" summary="Dogebox online and running.">
           <sl-icon name="plus-square" slot="expand-icon"></sl-icon>
           <sl-icon name="dash-square" slot="collapse-icon"></sl-icon>

@@ -144,15 +144,7 @@ class LibraryView extends LitElement {
     const SKELS = Array.from({ length: 1 })
 
     return html`
-
-      <div class="top">
-        ${this.renderSectionTop()}
-      </div>
-
       <div class="padded">
-        <header>
-          ${this.renderSectionInstalledHeader(ready)}
-        </header>
           ${this.renderSectionInstalledBody(ready, SKELS, hasItems)}
       </div>
 
@@ -168,19 +160,9 @@ class LibraryView extends LitElement {
       overflow-x: hidden;
     }
 
-    .top {
-      display: none;
-      margin: 1.5em 2em 2em 2em; 
-    }
-
     .padded {
       background: #23252a;
       margin: 1em;
-      padding: 1em;
-      @media (min-width: 1024px) {
-        padding: 1.4em;
-        padding-top: 0em;
-      }
     }
 
     .banner {

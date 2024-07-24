@@ -9,6 +9,14 @@ body {
   overflow-x: hidden;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
+  --sidebar-width: 77vw;
+  --page-margin-left: 0px;
+  min-width: 360px;
+
+  @media (min-width: 576px) {
+    --sidebar-width: 300px;
+    --page-margin-left: var(--sidebar-width);
+  }
 }
 
 /* Elements will sit above toasts when given this class */

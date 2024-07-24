@@ -47,7 +47,7 @@ import { mainChannel } from "/controllers/sockets/main-channel.js";
 
 class DPanelApp extends LitElement {
   static properties = {
-    menuVisible: { type: Boolean },
+    menuAnimating: { type: Boolean },
     systemPromptActive: { type: Boolean },
     currentPath: { type: String },
   };
@@ -55,7 +55,7 @@ class DPanelApp extends LitElement {
   constructor() {
     super();
     this.context = new StoreSubscriber(this, store);
-    this.menuVisible = true;
+    this.menuAnimating = false;
     this.systemPromptActive = false;
     this.currentPath = "";
     this._debouncedHandleResize = debounce(this._handleResize.bind(this), 50);
@@ -74,10 +74,14 @@ class DPanelApp extends LitElement {
 
     // Instanciate a web socket connection and add app as an observer
     this.mainChannel.addObserver(this);
+
+    // Menu animating event handler
+    this.addEventListener("menu-toggle-request", this._handleMenuToggleRequest);
   }
 
   disconnectedCallback() {
     window.removeEventListener("resize", this._debouncedHandleResize);
+    this.removeEventListener("menu-toggle-request", this._handleMenuToggleRequest);
     this.mainChannel.removeObserver(this);
     super.disconnectedCallback();
   }
@@ -94,13 +98,17 @@ class DPanelApp extends LitElement {
     store.updateState({ appContext: { orientation } });
   }
 
+  _handleMenuToggleRequest() {
+    this.menuAnimating = true;
+
+    setTimeout(() => {
+      this.menuAnimating = false;
+    }, 2000)
+  }
+
   openDrawer() {
     const drawer = this.shadowRoot.querySelector("sl-drawer");
     drawer.show();
-  }
-
-  handleMenuClick() {
-    this.menuVisible = !this.menuVisible;
   }
 
   handleNavClick(e) {

@@ -21,13 +21,13 @@ export const mainStyles = css`
     height: calc(100% - 50px);
     width: 100%;
     overflow: hidden;
-    margin-left: 240px;
+    margin-left: var(--page-margin-left);
 
     background: #23252a;
     
     @media (min-width: 576px) {
       height: 100%;
-      width: calc(100% - 240px);
+      width: calc(100% - var(--page-margin-left));
     }
   }
 
@@ -38,7 +38,7 @@ export const mainStyles = css`
   #OutletHeader {
     height: 80px;
     background: #181818;
-    border-left: 1px solid #333333;
+    // border-left: 1px solid #333333;
 
     display: flex;
     align-items: center;
@@ -56,6 +56,6 @@ export const mainStyles = css`
     height: 100%;
     width: 100%;
     overflow: hidden;
-    border-left: 1px solid #333333;
+    // border-left: 1px solid #333333;
   }
 `

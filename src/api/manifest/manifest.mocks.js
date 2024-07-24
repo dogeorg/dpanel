@@ -67,7 +67,7 @@ export function generateManifests(input) {
       {
         name: 'sync',
         label: 'Blockchain Sync',
-        description: 'Syncing the blockchain (click for progress)',
+        description: 'Syncing the blockchain',
         type: 'script',
         src: '/checks/sync.sh',
         status: 'loading'
@@ -75,14 +75,14 @@ export function generateManifests(input) {
       {
         name: 'outbound',
         label: 'Outbound Connectivity',
-        description: 'Tests whether your Dogebox can connect to other nodes on the network',
+        description: 'Can connect to other Nodes',
         type: 'script',
         src: '/checks/outbound.sh',
         status: 'loading'
       },{
         name: 'inbound',
         label: 'Inbound Connectivity',
-        description: 'Tests whether your Dogebox can receive incoming connections',
+        description: 'Can accept connections from other Nodes',
         type: 'script',
         src: '/checks/inbound.sh',
         status: 'loading'

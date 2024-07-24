@@ -11,10 +11,18 @@ export function renderActions() {
     .action-wrap {
       display: flex;
       flex-direction: row;
+      flex-wrap: wrap;
       gap: 1em;
     }
+
+    .show-only-wide {
+      display: none;
+      @media (min-width: 800px) {
+        display: inline-block;
+      }
+    }
   `
-  const status = 'NEEDS_CONFIG' || pkg.state.status;
+  const status = 'RUNNING' || pkg.state.status;
 
   return html`
     <div class="action-wrap">
@@ -22,7 +30,7 @@ export function renderActions() {
       ${status === 'RUNNING' ? html`
         <sl-button variant="danger" size="large">
           <sl-icon slot="prefix" name="stop-fill"></sl-icon>
-          Stop
+          Disable
         </sl-button>
         <sl-button variant="primary" size="large">
           <sl-icon slot="prefix" name="arrow-clockwise"></sl-icon>
@@ -45,8 +53,8 @@ export function renderActions() {
       ` : nothing }
 
       ${pkg.manifest.gui ? html`
-        <div style="display: flex; flex-direction: row; gap: 0.7em; align-items: center;">
-          <sl-divider vertical style="height: 2em;"></sl-divider>
+        <div style="display: flex; align-items: center;">
+          <sl-divider class="show-only-wide" vertical style="height: 1.5em; margin-left: 0.1em;"></sl-divider>
           <sl-button variant="primary" size="large" outline ?disabled=${status === "NEEDS_CONFIG"}>
             <sl-icon slot="prefix" name="box-arrow-up-right"></sl-icon>
             Launch UI

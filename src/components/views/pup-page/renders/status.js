@@ -21,9 +21,9 @@ export function renderStatus() {
     }
   `
 
-  const status = 'NEEDS_CONFIG' || pkg.state.status;
+  const status = 'RUNNING' || pkg.state.status;
   const statusLabel = {
-    'RUNNING': 'running',
+    'RUNNING': 'enabled',
     'NEEDS_CONFIG': 'needs config'
   }
 

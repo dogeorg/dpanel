@@ -68,7 +68,7 @@ class ActionRow extends LitElement {
     .prefix-wrap {
       width: 48px;
       max-width: 48px;
-      flex: 0 1 auto; /* Do not grow, can shrink, basis auto */
+      flex: 0 0 auto; /* Do not grow, or shrink, basis auto */
       display: flex;
       align-items: center;
       justify-content: start;
@@ -78,22 +78,35 @@ class ActionRow extends LitElement {
     .body-wrap {
       height: 62px;
       padding-bottom: 2px;
-      flex: 1 1 auto; /* Grow to fill the space, can shrink, basis auto */
+      flex: 1 0 auto; /* Grow to fill the space, no shrink, basis auto */
       display: flex;
       flex-direction: column;
       justify-content: center;
+      border-bottom: 1px solid #333;
+      max-width: calc(100% - 80px);
 
       .label-wrap {
         font-weight: bold;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
 
       .description-wrap {
         line-height: 1;
         font-size: 0.9rem;
         font-family: "Comic Neue";
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
 
-      border-bottom: 1px solid #333;
+      .label-wrap, 
+      .description-wrap {
+        flex-grow: 0;
+        flex-shrink: 1;
+        max-width: calc(100% - 10px);
+      }
     }
 
     .suffix-wrap {
@@ -103,7 +116,7 @@ class ActionRow extends LitElement {
       display: flex;
       align-items: center;
       justify-content: end;
-      padding-right: 1em;
+      padding-right: 0.2em;
       padding-left: 1em;
 
       border-bottom: 1px solid #333;

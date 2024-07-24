@@ -3,12 +3,32 @@ import { css } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 export const navStyles = css`
   #Nav {
     position: fixed;
+    z-index: 99999;
     top: 0;
-    left: 0;
+    left: calc(0px - var(--sidebar-width));
     display: flex;
     flex-direction: row;
     flex-shrink: 0;
     overflow: hidden;
+    width: var(--sidebar-width);
+    box-shadow: 10px 0 5px -5px rgba(0, 0, 0, 0.2);
+
+    @media (min-width: 576px) {
+      border-right: 1px solid #333333;
+    }
+
+    @media (min-width: 576px) {
+      left: 0;
+      box-shadow: none;
+    }
+  }
+
+  #Nav[open] {
+    transition: left 200ms ease-out;
+    left: 0px;
+  }
+  #Nav[animating] {
+    transition: left 200ms ease-out;
   }
 
   .logo {
@@ -26,55 +46,25 @@ export const navStyles = css`
     user-select: none;
   }
 
-  #Side[open] {
-    display: flex;
-    position: absolute;
-
-    flex-shrink: 0;
-    overflow-y: auto;
-    overflow-x: hidden;
-
-    background: #181818;
-    box-shadow: none;
-
-    @media (min-width: 576px) {
-      top: 0px;
-      box-shadow: 10px 0 5px -5px rgba(0, 0, 0, 0.2);
-    }
-
-    /*@media (min-width: 1024px) {*/
-    @media (min-width: 0px) {
-      position: relative;
-      top: 0px;
-      left: 0px;
-      box-shadow: none;
-    }
-  }
-
   #Side {
-    display: none;
-    left: 0px;
-    z-index: 1;
-
     flex-direction: column;
     justify-content: space-between;
     row-gap: 1em;
 
     width: 100%;
-    height: calc(100vh - 50px);
+    height: 100vh;
     overflow-y: auto;
 
-    background: #1a191f;
+    background: #181818;
+    box-shadow: 0;
 
     @media (min-width: 576px) {
-      top: 0px;
-      /* left: 50px; */
-      width: 240px;
-      height: 100vh;
+      width: var(--sidebar-width);
+      box-shadow: 10px 0 5px -5px rgba(0, 0, 0, 0.2);
     }
 
     @media (min-width: 1024px) {
-      width: 240px;
+      width: var(--sidebar-width);
     }
   }
 

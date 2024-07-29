@@ -109,6 +109,31 @@ class LogViewer extends LitElement {
     }
   }
 
+  handleDownloadClick() {
+    const contentDiv = this.shadowRoot.querySelector("#LogContainer");
+    
+    let textToDownload = '';
+
+    // Extracting text from each <li> and adding a newline after each
+    contentDiv.querySelectorAll('li').forEach(li => {
+      textToDownload += li.textContent + '\n';
+    });
+
+    // Creating a Blob for the text
+    const blob = new Blob([textToDownload], { type: 'text/plain' });
+
+    // Creating an anchor element to trigger download
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `log_${this.pupId}_${Date.now()}.txt`;
+    document.body.appendChild(a);
+    a.click();
+
+    // Cleanup the temporary element
+    document.body.removeChild(a);
+
+  }
+
   render() {
     return html`
       <div>
@@ -136,8 +161,8 @@ class LogViewer extends LitElement {
           <sl-button 
             variant="text"
             size="large"
-            href="${`${store.networkContext.apiBaseUrl}/logs/${this.pupId}/download`}"
             target="_blank"
+            @click=${this.handleDownloadClick}
             >Download
             <sl-icon name="download" slot="suffix"></sl-icon>
           </sl-button>

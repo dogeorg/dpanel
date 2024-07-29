@@ -6,7 +6,7 @@ export function mockedLogRunner(onMessageCallback) {
     const mockData = getRandomLorem();
     console.log('--mock runner executed');
     onMessageCallback({ data: mockData });
-  }, between(500, 800, 3000));
+  }, 1000);
 
   // Return a function to stop the interval
   return () => clearInterval(intervalId);
@@ -34,11 +34,3 @@ const getRandomLorem = () => {
   
   return selectedSentence.substring(start, end);
 };
-
-function between(min, normalMax, occasionalMax) {
-  const useOccasionalMax = Math.random() < 0.1; // 10% chance to use the occasional max
-  const max = useOccasionalMax ? occasionalMax : normalMax;
-
-  // Return a random number between min and the chosen max
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}

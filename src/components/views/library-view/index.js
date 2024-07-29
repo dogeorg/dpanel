@@ -1,5 +1,6 @@
 import { LitElement, html, css, nothing, repeat } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
 import '/components/views/pup-snapshot/pup-snapshot.js'
+import '/components/views/pup-card/pup-card.js'
 import '/components/views/pup-snapshot/pup-snapshot-skeleton.js'
 import { getBootstrap } from '/api/bootstrap/bootstrap.js';
 import { pkgController } from '/controllers/package/index.js'
@@ -7,6 +8,7 @@ import { PaginationController } from '/components/common/paginator/paginator-con
 import { bindToClass } from '/utils/class-bind.js'
 import * as renderMethods from './renders/index.js';
 import '/components/common/paginator/paginator-ui.js';
+import { getRouter } from "/router/router.js";
 
 const initialSort = (a, b) => {
   if (a.manifest.package < b.manifest.package) { return -1; }
@@ -33,6 +35,7 @@ class LibraryView extends LitElement {
     this.itemsPerPage = 20;
     this.pkgController = pkgController;
     this.installedList = new PaginationController(this, undefined, this.itemsPerPage, { initialSort });
+    this.router = getRouter().Router
     // this.availableList = new PaginationController(this, undefined, this.itemsPerPage);
     this.inspectedPup;
     bindToClass(renderMethods, this);
@@ -91,6 +94,10 @@ class LibraryView extends LitElement {
 
   handlePupClick(event) {
     this.inspectedPup = event.currentTarget.pupId
+  }
+
+  handlePupLinkClick(event, pupId) {
+    this.router.go(`/pups/${pupId.toLowerCase()}`);
   }
 
   handleForcedTabShow(event) {

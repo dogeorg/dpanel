@@ -3,7 +3,7 @@ import { css } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 export const navStyles = css`
   #Nav {
     position: fixed;
-    z-index: 999999;
+    z-index: 700;
     top: 0;
     left: calc(0px - var(--sidebar-width));
     display: flex;
@@ -11,7 +11,6 @@ export const navStyles = css`
     flex-shrink: 0;
     overflow: hidden;
     width: var(--sidebar-width);
-    box-shadow: 10px 0 5px -5px rgba(0, 0, 0, 0.2);
 
     @media (min-width: 576px) {
       border-right: 1px solid #333333;
@@ -25,7 +24,13 @@ export const navStyles = css`
 
   #Nav[open] {
     transition: left 200ms ease-out;
+    box-shadow: 10px 0 5px -5px rgba(0, 0, 0, 0.2);
+    z-index: 700;
     left: 0px;
+
+    @media (min-width: 576px) {
+      box-shadow: none;
+    }
   }
   #Nav[animating] {
     transition: left 200ms ease-out;
@@ -39,7 +44,7 @@ export const navStyles = css`
   }
 
   .logotext {
-    font-family: 'Comic Neue';
+    font-family: "Comic Neue";
     text-align: center;
     font-size: 2rem;
     margin-top: -1rem;
@@ -169,7 +174,9 @@ export const navStyles = css`
     padding-bottom: var(--sl-spacing-x-large);
   }
 
-  #Side .sub-menu-list.hidden { display: none; }
+  #Side .sub-menu-list.hidden {
+    display: none;
+  }
 
   #Side .menu-item-wrap.expand {
     border-right: 3px solid rgba(255, 255, 255, 0.1);
@@ -203,6 +210,13 @@ export const navStyles = css`
     background: #4360ff;
   }
 
+  .nav-footer {
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    width: var(--sidebar-width);
+  }
+
   .nav-footer .connection {
     display: flex;
     flex-direction: row;
@@ -219,4 +233,3 @@ export const navStyles = css`
     }
   }
 `;
-

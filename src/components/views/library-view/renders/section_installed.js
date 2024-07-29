@@ -4,6 +4,14 @@ var pupCardStyles = css`
   .pup-card {}
 `
 
+var pupCardGrid = css`
+  .pup-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1em;
+  }
+`
+
 export function renderSectionInstalledHeader(ready) {
 
 
@@ -56,6 +64,33 @@ export function renderSectionInstalledBody(ready, SKELS, hasItems) {
     }
 
     ${ready && hasItems('installed') ? html`
+      <div class="pup-card-grid">
+        ${repeat(this.installedList.getCurrentPageData(), (pkg) => `${pkg.manifest.id}-${pkg.manifest.version}`, (pkg) => html`
+          <pup-card
+            icon="box"
+            pupId=${pkg.manifest.id}
+            pupName=${pkg.manifest.package}
+            version=${pkg.manifest.version}
+            status=${pkg.state.status}
+            .gui=${pkg.manifest.gui}
+            @click=${(event) => this.handlePupLinkClick(event, pkg.manifest.id)}
+          ></pup-card>
+        `)}
+      </div>
+      <style>${pupCardGrid}</style>
+
+      <paginator-ui
+        ?disabled=${this.busy}
+        @go-next=${this.installedList.nextPage}
+        @go-prev=${this.installedList.previousPage}
+        currentPage=${this.installedList.currentPage}
+        totalPages=${this.installedList.getTotalPages()}
+      ></paginator-ui>
+
+      `: nothing
+    }
+
+    ${false && ready && hasItems('installed') ? html`
       <div class="details-group">
         ${repeat(this.installedList.getCurrentPageData(), (pkg) => `${pkg.manifest.id}-${pkg.manifest.version}`, (pkg) => html`
           <pup-snapshot

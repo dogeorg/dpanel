@@ -97,10 +97,10 @@ class PupPage extends LitElement {
       <action-row
         prefix="list-ul"
         name="readme"
-        label="Readme"
+        label="Read me"
         .trigger=${this.handleMenuClick}
       >
-        Ea sint dolor commodo.
+        From the author
       </action-row>
 
       <action-row
@@ -109,7 +109,7 @@ class PupPage extends LitElement {
         label="Configure"
         .trigger=${this.handleMenuClick}
       >
-        Ea sint dolor commodo.
+        Customize ${pkg.manifest.package}
       </action-row>
 
       <!--action-row prefix="archive-fill" name="properties" label="Properties" .trigger=${this
@@ -128,7 +128,7 @@ class PupPage extends LitElement {
         label="Logs"
         .trigger=${this.navigateTo}
       >
-        Ea sint dolor commodo.
+        Unfiltered logs
       </action-row>
     `;
 
@@ -163,6 +163,7 @@ class PupPage extends LitElement {
 
       <aside>
         <sl-dialog
+          class="distinct-header"
           id="PupMgmtDialog"
           ?open=${this.open_dialog}
           label=${this.open_dialog_label}
@@ -173,7 +174,7 @@ class PupPage extends LitElement {
     `;
   }
 
-    static styles = css`
+  static styles = css`
     :host {
       position: relative;
       display: block;
@@ -225,7 +226,7 @@ class PupPage extends LitElement {
       height: calc(100vh - 80px);
       width: calc(100vw - var(--page-margin-left));
       margin-left: var(--page-margin-left);
-      z-index: 99999;
+      z-index: 600;
       box-sizing: border-box;
       overflow-x: hidden;
       overflow-y: auto;
@@ -234,6 +235,11 @@ class PupPage extends LitElement {
 
     aside.page-popver[data-open] {
       display: block;
+    }
+
+    sl-dialog.distinct-header::part(header) {
+      z-index: 960;
+      background: rgb(24, 24, 24);
     }
   `;
 }

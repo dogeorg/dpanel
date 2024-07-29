@@ -9,13 +9,15 @@ class LogViewer extends LitElement {
       autostart: { type: Boolean },
       logs: { type: Array },
       isConnected: { type: Boolean },
-      follow: { type: Boolean }
+      follow: { type: Boolean },
+      pupId: { type: String },
     };
   }
 
   constructor() {
     super();
     this.logs = [];
+    this.pupId = null;
     this.isConnected = false;
     this.wsClient = null;
     this.follow = true;
@@ -117,18 +119,28 @@ class LogViewer extends LitElement {
               : html`<sl-tag size="small" pill @click=${this.handleToggleConnection} variant="neutral">Disconnected</sl-tag>`
             }
           </div>
-          <div class="options">
-            <sl-checkbox
-              size="small"
-              ?checked=${this.follow}
-              @sl-change=${this.handleFollowChange}
-            >Follow Logs</sl-checkbox>
-          </div>
         </div>
         <div id="LogContainer">
           <ul>
             ${this.logs.map(log => html`<li>${log}</li>`)}
           </ul>
+        </div>
+        <div id="LogFooter">
+          <div class="options">
+            <sl-checkbox
+              size="medium"
+              ?checked=${this.follow}
+              @sl-change=${this.handleFollowChange}
+            >Auto scroll</sl-checkbox>
+          </div>
+          <sl-button 
+            variant="text"
+            size="large"
+            href="${`${store.networkContext.apiBaseUrl}/logs/${this.pupId}/download`}"
+            target="_blank"
+            >Download
+            <sl-icon name="download" slot="suffix"></sl-icon>
+          </sl-button>
         </div>
       </div>
     `;
@@ -163,9 +175,22 @@ class LogViewer extends LitElement {
       div#LogContainer {
         background: #0b0b0b;
         padding: 0.5em;
-        height: calc(100vh - 96px);
+        height: calc(100vh - 176px);
         overflow-y: scroll;
         overflow-x: hidden;
+      }
+
+      div#LogFooter {
+        display: block;
+        height: 80px;
+        background: rgb(24, 24, 24);
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0em 1.5em;
+        box-sizing: border-box;
       }
       ul {
         list-style-type: none;

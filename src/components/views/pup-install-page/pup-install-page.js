@@ -5,9 +5,11 @@ import {
   nothing,
   choose,
   unsafeHTML,
+  classMap,
 } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 import { getRouter } from "/router/router.js";
 import "/components/common/action-row/action-row.js";
+import "/components/common/reveal-row/reveal-row.js";
 import "/components/views/health-check.js";
 import "/components/common/page-container.js";
 import { bindToClass } from "/utils/class-bind.js";
@@ -17,7 +19,7 @@ import { StoreSubscriber } from "/state/subscribe.js";
 import { pkgController } from "/controllers/package/index.js";
 import { asyncTimeout } from "/utils/timeout.js";
 
-class PupPage extends LitElement {
+class PupInstallPage extends LitElement {
   static get properties() {
     return {
       open_dialog: { type: Boolean },
@@ -36,7 +38,6 @@ class PupPage extends LitElement {
     this.open_dialog_label = "";
     this.open_page = false;
     this.open_page_label = "";
-    this.checks = [];
   }
 
   connectedCallback() {
@@ -51,15 +52,6 @@ class PupPage extends LitElement {
 
   async firstUpdated() {
     this.addEventListener("sl-hide", this.handleDialogClose);
-    this.checks = this.context.store.pupContext?.manifest?.command?.checks;
-
-    await asyncTimeout(2000);
-    this.checks[1].status = "success";
-    this.requestUpdate();
-
-    await asyncTimeout(2000);
-    this.checks[2].status = "success";
-    this.requestUpdate();
   }
 
   handleDialogClose() {
@@ -83,60 +75,28 @@ class PupPage extends LitElement {
   render() {
     const path = this.context.store?.appContext?.path || [];
     const pkg = this.context.store.pupContext;
+    const isInstalled = !!pkg.state.status;
+    const hasDependencies = (pkg?.manifest?.deps?.pups || []).length > 0
     const popover_page = path[1];
 
-    const renderHealthChecks = () => {
-      return this.checks.map(
-        (check) => html`
-          <health-check status=${check.status} .check=${check}></health-check>
-        `,
-      );
+    const wrapperClasses = classMap({
+      wrapper: true,
+      installed: isInstalled,
+    })
+
+    const renderDependancyList = () => {
+      return pkg.manifest.deps.pups.map((dep) => html`
+        <action-row prefix="box-seam" name=${dep.id} label=${dep.name} .trigger=${() => this.router.go(`/discover/${dep.id}`)}>
+          ${dep.condition}
+        </action-row>
+      `);
     };
 
-    const renderMenu = () => html`
-      <action-row
-        prefix="list-ul"
-        name="readme"
-        label="Read me"
-        .trigger=${this.handleMenuClick}
-      >
-        Many info
-      </action-row>
-
-      <action-row
-        prefix="gear"
-        name="configure"
-        label="Configure"
-        .trigger=${this.handleMenuClick}
-      >
-        Customize ${pkg.manifest.package}
-      </action-row>
-
-      <!--action-row prefix="archive-fill" name="properties" label="Properties" .trigger=${this
-        .handleMenuClick}>
-        Ea sint dolor commodo.
-      </action-row-->
-
-      <!--action-row prefix="lightning-charge" name="actions" label="Actions" .trigger=${this
-        .handleMenuClick}>
-        Ea sint dolor commodo.
-      </action-row-->
-
-      <action-row
-        prefix="display"
-        name="logs"
-        label="Logs"
-        .trigger=${this.navigateTo}
-      >
-        Unfiltered logs
-      </action-row>
-    `;
-
     return html`
-      <div id="PageWrapper" class="wrapper" ?data-freeze=${popover_page}>
-        <section>
+      <div id="PageWrapper" class="${wrapperClasses}" ?data-freeze=${popover_page}>
+        <section class="status">
           <div class="section-title">
-            <h3>Status</h3>
+            <h3>${isInstalled ? "Installed" : "Not Installed" }</h3>
           </div>
           <div class="underscored">${this.renderStatus()}</div>
           <div>${this.renderActions()}</div>
@@ -144,22 +104,37 @@ class PupPage extends LitElement {
 
         <section>
           <div class="section-title">
-            <h3>Health checks</h3>
+            <h3>Description</h3>
+            <reveal-row>
+              <p>${pkg?.manifest?.docs?.short}<br/>${pkg?.manifest?.docs?.long}</p>
+            </reveal-row>
           </div>
-          <div class="list-wrap">${renderHealthChecks()}</div>
         </section>
+
+        ${hasDependencies ? html`
+          <section>
+            <div class="section-title">
+              <h3>Dependencies</h3>
+            </div>
+            <div class="grid-list-wrap">
+              ${renderDependancyList()}
+            </div>
+          </section>`
+          : nothing
+        }
 
         <section>
           <div class="section-title">
-            <h3>Menu</h3>
+            <h3>Such Info</h3>
           </div>
-          <div class="list-wrap">${renderMenu()}</div>
+          <div class="list-wrap">
+            <action-row prefix="list-ul" name="readme" label="Read me" .trigger=${this.handleMenuClick}>
+              Many info
+            </action-row>
+          </div>
         </section>
-      </div>
 
-      <aside class="page-popver" ?data-open=${popover_page}>
-        ${this.renderPopoverPage(popover_page)}
-      </aside>
+      </div>
 
       <aside>
         <sl-dialog
@@ -214,6 +189,15 @@ class PupPage extends LitElement {
       font-family: "Comic Neue";
     }
 
+    .wrapper section.status .section-title h3 {
+      font-weight: 100;
+      color: var(--sl-color-warning-700);
+    }
+
+    .wrapper.installed section.status .section-title h3 {
+      color: #00c3ff;
+    }
+
     section div.underscored {
       border-bottom: 1px solid #333;
     }
@@ -241,7 +225,18 @@ class PupPage extends LitElement {
       z-index: 960;
       background: rgb(24, 24, 24);
     }
+
+    .grid-list-wrap {
+      display: grid;
+      row-gap: 0.5em;
+      column-gap: 2em;
+      grid-template-columns: 1fr;
+
+      @media (min-width: 576px) {
+        grid-template-columns: 1fr 1fr; /* Two columns of equal width */
+      }
+    }
   `;
 }
 
-customElements.define("pup-page", PupPage);
+customElements.define("pup-install-page", PupInstallPage);

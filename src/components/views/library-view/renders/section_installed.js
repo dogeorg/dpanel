@@ -1,9 +1,5 @@
 import { html, css, nothing, repeat } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
 
-var pupCardStyles = css`
-  .pup-card {}
-`
-
 var pupCardGrid = css`
   .pup-card-grid {
     display: grid;
@@ -89,36 +85,5 @@ export function renderSectionInstalledBody(ready, SKELS, hasItems) {
 
       `: nothing
     }
-
-    ${false && ready && hasItems('installed') ? html`
-      <div class="details-group">
-        ${repeat(this.installedList.getCurrentPageData(), (pkg) => `${pkg.manifest.id}-${pkg.manifest.version}`, (pkg) => html`
-          <pup-snapshot
-            pupId=${pkg.manifest.id}
-            pupName=${pkg.manifest.package}
-            version=${pkg.manifest.version}
-            icon="box"
-            installed
-            .config=${pkg.manifest.command.config}
-            .options=${pkg.state.config}
-            status=${pkg.state.status}
-            .docs=${pkg.manifest.docs}
-            .gui=${pkg.manifest.gui}
-            @click=${this.handlePupClick}
-            ?inspected=${this.inspectedPup === pkg.manifest.id}
-            ?disabled=${this.busy}>
-          </pup-snapshot>
-        `)}
-      </div>
-
-      <paginator-ui
-        ?disabled=${this.busy}
-        @go-next=${this.installedList.nextPage}
-        @go-prev=${this.installedList.previousPage}
-        currentPage=${this.installedList.currentPage}
-        totalPages=${this.installedList.getTotalPages()}
-      ></paginator-ui>
-    ` : nothing}
-    <style>${pupCardStyles}</style>
   `
 }

@@ -101,6 +101,7 @@ export function generateManifests(input) {
     version: randomSemver(),
     hash: Math.random().toString(36).substring(2, 15),
     docs: mockDocs[name] || mockDocs.lorem,
+    deps: produceDepSegment(name),
     gui: produceGuiSegment(name),
     command: {
       path: `/path/to/${name}`,
@@ -152,14 +153,44 @@ const produceGuiSegment = (pupName) => {
   }
 }
 
+const produceDepSegment = (pupName) => {
+  switch (pupName) {
+    case 'Core':
+      return { pups: [] }
+    case 'GigaWallet':
+      return { pups: [
+        { id: "Core", name: "Core", condition: ">=1.14.1" }
+      ] }
+    case 'ShibeShop':
+      return { pups: [
+        { id: "Core", name: "Core", condition: ">=1.14.1" },
+        { id: "GigaWallet", name: "GigaWallet", condition: ">=1.0.0" }
+      ] }
+    default: 
+      return { pups: [] }
+  }
+}
+
 const mockDocs = {
   GigaWallet: {
+    short: "The ultimate Dogecoin payment solution",
+    long: "Anim qui in sunt in ea dolore voluptate cillum excepteur consectetur pariatur tempor adipisicing cupidatat dolor ullamco ullamco quis sed ullamco amet voluptate magna labore dolor elit nisi magna est ut qui nulla ex esse duis nostrud occaecat amet ea fugiat minim sint ad in sed laborum fugiat aliqua excepteur sit eiusmod do deserunt ut nisi enim dolor esse reprehenderit consectetur mollit irure do in aliquip esse aliqua reprehenderit deserunt excepteur enim dolor exercitation qui occaecat non culpa voluptate anim cupidatat commodo amet dolor reprehenderit velit reprehenderit officia ea exercitation labore cillum mollit irure nostrud pariatur cupidatat deserunt laborum esse incididunt fugiat reprehenderit consectetur adipisicing mollit non in labore sit eiusmod pariatur elit mollit velit cupidatat eu consectetur amet eiusmod cillum occaecat consectetur culpa dolore consequat sunt voluptate cillum magna nulla labore esse ut dolor laboris enim veniam sit excepteur deserunt duis cupidatat minim culpa aliqua dolor ad velit pariatur aliquip proident eu non proident enim voluptate officia commodo occaecat sit commodo voluptate consequat magna laboris et in elit veniam consequat excepteur sit qui officia ut deserunt et cillum exercitation enim elit consectetur non anim do aliquip nostrud incididunt veniam veniam sit veniam in aliqua laboris consectetur irure in veniam occaecat est consectetur nisi non est culpa dolor aliqua velit reprehenderit mollit exercitation in magna dolor irure.",
     about: `<h1>GigaWallet</h1>
       <h2>The Ultimate Dogecoin Payment Solution</h2>
       <p>Introducing GigaWallet, a powerful backend service that enables seamless integration of Dogecoin transactions into your application. With GigaWallet, online stores, exchanges, and social media platforms can easily incorporate Dogecoin payments, providing users with a convenient and secure payment option.</p>
       `
   },
+  ShibeShop: {
+    short: "Such shop, much Doge.",
+    long: "List items for sale, manage inventory, and handle transactions seamlessly in Dogecoin.  ShibeShop is designed for individuals and small businesses to enter the digital marketplace with Dogecoin. It's user-friendly, ensuring that managing your sales, tracking inventory, and processing Dogecoin payments are straightforward and efficient. Ideal for Dogecoin enthusiasts and entrepreneurs eager to leverage cryptocurrency for e-commerce. Install ShibeShop to transform your digital sales experience.",
+    about: `<h1>Such Package</h1>
+      <h2>Much useful</h2>
+      <p>In esse do tempor commodo cupidatat ullamco deserunt deserunt dolore ullamco consectetur et esse incididunt do ad veniam fugiat non pariatur nulla cillum laborum tempor excepteur. Laquis dolore et mollit est aliqua velit dolor id magna tempor sed ex irure eu officia proident sed aliqua nisi ut dolor excepteur adipisicing reprehenderit excepteur dolor laborum proident voluptate quis.</p>
+      <p>Labore eiusmod anim do culpa non reprehenderit do sint anim proident aliqua do commodo dolore reprehenderit dolor fugiat elit irure enim mollit ut magna in tempor ex pariatur ullamco</p>`
+  },
   lorem: {
+    short: "Such package, much use.",
+    long: "Anim qui in sunt in ea dolore voluptate cillum excepteur consectetur pariatur tempor adipisicing cupidatat dolor ullamco ullamco quis sed ullamco amet voluptate magna labore dolor elit nisi magna est ut qui nulla ex esse duis nostrud occaecat amet ea fugiat minim sint ad in sed laborum fugiat aliqua excepteur sit eiusmod do deserunt ut nisi enim dolor esse reprehenderit consectetur mollit irure do in aliquip esse aliqua reprehenderit deserunt excepteur enim dolor exercitation qui occaecat non culpa voluptate anim cupidatat commodo amet dolor reprehenderit velit reprehenderit officia ea exercitation labore cillum mollit irure nostrud pariatur cupidatat deserunt laborum esse incididunt fugiat reprehenderit consectetur adipisicing mollit non in labore sit eiusmod pariatur elit mollit velit cupidatat eu consectetur amet eiusmod cillum occaecat consectetur culpa dolore consequat sunt voluptate cillum magna nulla labore esse ut dolor laboris enim veniam sit excepteur deserunt duis cupidatat minim culpa aliqua dolor ad velit pariatur aliquip proident eu non proident enim voluptate officia commodo occaecat sit commodo voluptate consequat magna laboris et in elit veniam consequat excepteur sit qui officia ut deserunt et cillum exercitation enim elit consectetur non anim do aliquip nostrud incididunt veniam veniam sit veniam in aliqua laboris consectetur irure in veniam occaecat est consectetur nisi non est culpa dolor aliqua velit reprehenderit mollit exercitation in magna dolor irure.",
     about: `<h1>Such Package</h1>
       <h2>Much useful</h2>
       <p>In esse do tempor commodo cupidatat ullamco deserunt deserunt dolore ullamco consectetur et esse incididunt do ad veniam fugiat non pariatur nulla cillum laborum tempor excepteur. Laquis dolore et mollit est aliqua velit dolor id magna tempor sed ex irure eu officia proident sed aliqua nisi ut dolor excepteur adipisicing reprehenderit excepteur dolor laborum proident voluptate quis.</p>

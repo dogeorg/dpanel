@@ -1,28 +1,19 @@
 import { html, css, nothing, repeat } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
-import debounce from "/utils/debounce.js";
+
+var pupCardGrid = css`
+  .pup-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1em;
+  }
+`
 
 export function renderSectionHeader(ready) {
+
+
   return html`
-    <div class="heading-wrap">
-      <h2>Much Pups</h2>
-      ${this.fetchLoading ? html`
-        <sl-spinner></sl-spinner>
-      ` : nothing }
 
-      ${ready ? html`
-        <sl-tag pill>${this.packageList.data.length}</sl-tag>
-      ` : nothing }
-    </div>
-
-    <div class="header-actions">
-      <sl-input
-        type="search"
-        @sl-input=${this.handleDebouncedSearchInput}
-        value=${this.searchValue}
-        clearable
-      >
-        <sl-icon name="search" slot="prefix"></sl-icon>
-      </sl-input>
+    <!-- div class="actions">
       <sl-dropdown>
         <sl-button slot="trigger" ?disabled=${this.busy}><sl-icon name="three-dots-vertical"></sl-icon></sl-button>
         <sl-menu @sl-select=${this.handleActionsMenuSelect}>
@@ -38,7 +29,7 @@ export function renderSectionHeader(ready) {
           <sl-menu-item value="refresh">Refresh</sl-menu-item>
         </sl-menu>
       </sl-dropdown>
-    </div>
+    </div -->
   `
 }
 
@@ -60,22 +51,23 @@ export function renderSectionBody(ready, SKELS, hasItems) {
     }
 
     ${ready && hasItems('packages') ? html`
-      <div class="details-group">
+      <div class="pup-card-grid">
         ${repeat(this.packageList.getCurrentPageData(), (pkg) => `${pkg.manifest.id}-${pkg.manifest.version}`, (pkg) => html`
-          <pup-snapshot
+          <pup-install-card
+            icon="box"
             pupId=${pkg.manifest.id}
             pupName=${pkg.manifest.package}
             version=${pkg.manifest.version}
-            icon="box"
+            short=${pkg.manifest.docs.short}
+            status=${pkg.state.status}
             ?installed=${pkg.state.status}
-            ?markInstalled=${pkg.state.status}
-            .docs=${pkg.manifest.docs}
-            @click=${this.handlePupClick}
-            ?inspected=${this.inspectedPup === pkg.manifest.id}
-            ?disabled=${this.busy}>
-          </pup-snapshot>
+            .gui=${pkg.manifest.gui}
+            @click=${(event) => this.handlePupLinkClick(event, pkg.manifest.id)}
+          ></pup-card>
         `)}
       </div>
+      <style>${pupCardGrid}</style>
+
       <paginator-ui
         ?disabled=${this.busy}
         @go-next=${this.packageList.nextPage}
@@ -83,11 +75,8 @@ export function renderSectionBody(ready, SKELS, hasItems) {
         currentPage=${this.packageList.currentPage}
         totalPages=${this.packageList.getTotalPages()}
       ></paginator-ui>
-    ` : nothing}
+
+      `: nothing
+    }
   `
-
-}
-
-export function handleDebouncedSearchInput(e) {
-  this.searchValue = e.target.value
 }

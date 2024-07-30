@@ -1,5 +1,5 @@
 import { LitElement, html, css, nothing, repeat } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
-import '/components/views/pup-snapshot/pup-snapshot.js'
+import '/components/views/pup-install-card/pup-install-card.js'
 import '/components/views/pup-snapshot/pup-snapshot-skeleton.js'
 import { getBootstrap } from '/api/bootstrap/bootstrap.js';
 import { pkgController } from '/controllers/package/index.js'
@@ -7,6 +7,7 @@ import { PaginationController } from '/components/common/paginator/paginator-con
 import { bindToClass } from '/utils/class-bind.js'
 import * as renderMethods from './renders/index.js';
 import '/components/common/paginator/paginator-ui.js';
+import { getRouter } from "/router/router.js";
 
 const initialSort = (a, b) => {
   if (a.manifest.package < b.manifest.package) { return -1; }
@@ -33,6 +34,7 @@ class StoreView extends LitElement {
     this.itemsPerPage = 10;
     this.pkgController = pkgController;
     this.packageList = new PaginationController(this, undefined, this.itemsPerPage,{ initialSort });
+    this.router = getRouter().Router
     this.inspectedPup;
     bindToClass(renderMethods, this);
   }
@@ -93,6 +95,10 @@ class StoreView extends LitElement {
 
   handleForcedTabShow(event) {
     this.inspectedPup = event.detail.pupId
+  }
+
+  handlePupLinkClick(event, pupId) {
+    this.router.go(`/discover/${pupId.toLowerCase()}`);
   }
 
   async fetchBootstrap() {
@@ -157,8 +163,6 @@ class StoreView extends LitElement {
 
     return html`
 
-      ${this.renderSectionTop()}
-
       <div class="padded">
         <header>
           ${this.renderSectionHeader(ready)}
@@ -179,15 +183,8 @@ class StoreView extends LitElement {
     }
 
     .padded {
-      background: #1a191f;
-      border: 1px solid rgb(32, 31, 36);
-      border-radius: 16px;
+      background: #23252a;
       margin: 1em;
-      padding: 1em;
-      @media (min-width: 1024px) {
-        padding: 1.4em;
-        padding-top: 0em;
-      }
     }
 
     h1, h2 {

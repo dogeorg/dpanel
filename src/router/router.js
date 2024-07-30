@@ -60,6 +60,13 @@ export const getRouter = (targetElement) => {
         component: "store-view",
         pageTitle: "Discover Pups",
       },
+      // Pup Listing
+      {
+        path: "/discover/:path*",
+        action: wrapActions(isAuthed, loadPupManagementContext, setOverflow),
+        component: "pup-install-page",
+        dynamicTitle: true,
+      },
 
       // Pup Management
       {

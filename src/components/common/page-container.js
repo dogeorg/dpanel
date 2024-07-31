@@ -22,8 +22,8 @@ class PageContainer extends LitElement {
         transform: translateY(0);
       }
       100% {
-        opacity: 0.3;
-        transform: translateY(15px);
+        opacity: 0.8;
+        transform: translateY(25px);
       }
     }
 
@@ -138,7 +138,7 @@ class PageContainer extends LitElement {
         pathStack.pop(); // Remove the current path
         const previousPath = pathStack[pathStack.length - 1]; // Get the new last path
 
-        await store.updateState({
+        store.updateState({
           appContext: {
             pathStack: pathStack
           }

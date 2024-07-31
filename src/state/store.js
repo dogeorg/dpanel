@@ -9,7 +9,8 @@ class Store {
       orienation: "landscape",
       pathname: "/",
       pageTitle: "",
-      pageAction: ""
+      pageAction: "",
+      pageCount: 0,
     };
     this.networkContext = this.networkContext || {
       // Define network state here

@@ -1,10 +1,12 @@
 import { Router as VaadinRouter } from "/vendor/@vaadin/router@1.7.5/vaadin-router.min.js";
 import {
-  wrapActions,
-  loadPupContext,
-  loadPupManagementContext,
+  wrapActions as middleware,
   isAuthed,
+  setTitle,
+  setTravel,
+  loadPup,
   performLogout,
+  fade,
 } from "./middleware.js";
 
 let router;
@@ -27,74 +29,83 @@ export const getRouter = (targetElement, options) => {
     // Configure routes
     router.setRoutes([
       // Auth
-      { path: "/logout", action: wrapActions(performLogout) },
-      { path: "/login", action: wrapActions(), component: "login-view" },
-
-      // Home
-      { path: "/", 
-        action: wrapActions(isAuthed), 
-        component: "home-view", 
-        pageTitle: "Home"
+      { 
+        path: "/login",
+        action: middleware(),
+        component: "login-view" 
+      },
+      {
+        path: "/logout",
+        action: middleware(performLogout)
       },
 
-      // Pup Iframe
+      // Main
       {
-        path: "/pup/:path*",
-        action: wrapActions(isAuthed, loadPupContext),
-        component: "iframe-view",
-        dynamicTitle: true,
-      },
-
-      // Pup Listings
-      {
-        path: "/pups",
-        action: wrapActions(isAuthed),
-        component: "library-view",
-        pageTitle: "Installed Pups",
-      },
-      {
-        path: "/discover",
-        action: wrapActions(isAuthed),
-        component: "store-view",
-        pageTitle: "Discover Pups",
-      },
-      // Pup Listing
-      {
-        path: "/discover/:path*",
-        action: wrapActions(isAuthed, loadPupManagementContext),
-        component: "pup-install-page",
-        dynamicTitle: true,
-      },
-      // Pup Management :: Logs
-      {
-        path: "/pups/:path*/logs",
-        action: wrapActions(isAuthed, loadPupManagementContext),
-        component: "log-viewer",
-        pageTitle: "Logs",
-        pageAction: "close",
-      },
-      // Pup Management
-      {
-        path: "/pups/:path*",
-        action: wrapActions(isAuthed, loadPupManagementContext),
-        component: "pup-page",
-        dynamicTitle: true,
-      },
-
-      // Settings
-      {
-        path: "/config",
-        action: wrapActions(isAuthed),
-        component: "manage-view",
-        pageTitle: "Settings",
-      },
-
-      // Charts
-      {
-        path: "/stats",
-        action: wrapActions(isAuthed),
-        component: "stats-view",
-        pageTitle: "Monitor",
+        path: "/",
+        action: middleware(isAuthed, setTravel),
+        children: [
+          {
+            path: "",
+            component: "home-view", 
+            pageTitle: "Home",
+            action: setTitle,
+          },
+          {
+            path: "/stats",
+            component: "stats-view",
+            pageTitle: "Monitor",
+            action: setTitle,
+          },
+          {
+            path: "/config",
+            component: "manage-view",
+            pageTitle: "Settings",
+            action: setTitle,
+          },
+          {
+            path: "/pups",
+            action: middleware(loadPup),
+            children: [
+              {
+                path: "/", // This will match "/pups/"
+                component: "library-view",
+                pageTitle: "Installed Pups",
+                action: setTitle,
+              },
+              {
+                path: "/:path", // Matches any subpath like "/pups/12345"
+                component: "pup-page",
+                dynamicTitle: true,
+                action: fade,
+              },
+              {
+                path: "/:path/logs", // Matches "/pups/12345/logs"
+                component: "log-viewer",
+                pageTitle: "Logs",
+                pageAction: "close",
+                action: fade,
+              }
+            ]
+          },
+          {
+            path: "/discover",
+            action: middleware(loadPup),
+            children: [
+              {
+                path: "",
+                component: "store-view",
+                pageTitle: "Discover Pups",
+                action: setTitle,
+              },
+              {
+                path: "/:path",
+                component: "pup-install-page",
+                dynamicTitle: true,
+                action: fade,
+              }
+            ]
+          },
+        ]
       },
     ]);
   }

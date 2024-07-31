@@ -61,6 +61,7 @@ class DPanelApp extends LitElement {
     this._debouncedHandleResize = debounce(this._handleResize.bind(this), 50);
     this.mainChannel = mainChannel;
     this.router = null;
+    this.outletWrapper = null;
     bindToClass(renderMethods, this);
   }
 
@@ -89,8 +90,8 @@ class DPanelApp extends LitElement {
   firstUpdated() {
     // Initialise our router singleton and provide it a target elemenet.
     const outlet = this.shadowRoot.querySelector("#Outlet");
-    const outletWrapper = this.shadowRoot.querySelector("#OutletWrapper")
-    this.router = getRouter(outlet, { outletWrapper }).Router;
+    this.outletWrapper = this.shadowRoot.querySelector("#OutletWrapper")
+    this.router = getRouter(outlet, { outletWrapper: this.outletWrapper }).Router;
   }
 
   _handleResize() {
@@ -151,6 +152,12 @@ class DPanelApp extends LitElement {
     return actions[action] || ""
   }
 
+  handleOutletMutation() {
+    setTimeout(() => {
+      this.outletWrapper.classList.remove("entering", "exiting");
+    }, 200);
+  }
+
   render() {
     const { pageTitle, pageAction } = this.context.store.appContext;
     const { previousPathname, upwardPathname } = this.context.store.appContext
@@ -173,7 +180,9 @@ class DPanelApp extends LitElement {
           previousPath=${previousPathname}
           upwardPath=${upwardPathname}
           .router=${this.router}>
-          <div id="Outlet"></div>
+          <sl-mutation-observer child-list @sl-mutation=${debounce(() => this.handleOutletMutation(), 0)}>
+            <div id="Outlet"></div>
+          </sl-mutation-observer>
         </page-container>
 
       </main>

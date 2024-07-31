@@ -6,8 +6,6 @@ class HomeView extends LitElement {
     :host {
       display: block;
       min-width: 980px;
-      height: 100vh;
-      overflow-y: auto;
     }
     .padded {
       padding: 20px;

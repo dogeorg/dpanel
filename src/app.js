@@ -88,7 +88,9 @@ class DPanelApp extends LitElement {
 
   firstUpdated() {
     // Initialise our router singleton and provide it a target elemenet.
-    this.router = getRouter(this.shadowRoot.querySelector("#Outlet")).Router;
+    const outlet = this.shadowRoot.querySelector("#Outlet");
+    const outletWrapper = this.shadowRoot.querySelector("#OutletWrapper")
+    this.router = getRouter(outlet, { outletWrapper }).Router;
   }
 
   _handleResize() {
@@ -163,8 +165,9 @@ class DPanelApp extends LitElement {
     return html`
       ${showChrome ? this.renderNav(CURPATH) : nothing}
       <main id="Main" class=${mainClasses}>
-
+        <div id="underlay"></div>
         <page-container
+          id="OutletWrapper"
           pageTitle=${pageTitle}
           pageAction=${pageAction}
           previousPath=${previousPathname}

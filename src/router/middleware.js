@@ -15,14 +15,41 @@ export const wrapActions =
         return result;
       }
     }
-    // After all actions have completed, call setMenu
+    // Do the following for all route changes.
     setTitle(context, commands);
-    return setMenu(context, commands);
+    setTravel(context, commands);
+    return applyTransitionEffects(context, commands)
   };
 
 // Example middleware
 export function logPathMiddleware(context, commands) {
   console.log("Navigating to path:", context.pathname);
+  return undefined; // Proceed with the navigation
+}
+
+export function applyTransitionEffects(context, commands) {
+  const r = getRouter().router;
+  const pathStack = store.appContext.pathStack || [];
+
+  // Determine if this is a backward navigation
+  const isBackward = false || pathStack.length > 1 && context.pathname === pathStack[pathStack.length - 2];
+
+  const outletWrapper = r.getOutletWrapper();
+  // Clear any existing animations
+  outletWrapper.classList.remove('entering', 'exiting');
+
+  // Apply the appropriate animation
+  if (isBackward) {
+    outletWrapper.classList.add('exiting');
+  } else {
+    outletWrapper.classList.add('entering');
+  }
+  
+  // Remove animation invoking classes after animation duration.
+  setTimeout(() => {
+    outletWrapper.classList.remove('entering', 'exiting');
+  }, 200); // Short delay before removing to ensure the transition occurs
+
   return undefined; // Proceed with the navigation
 }
 
@@ -86,17 +113,24 @@ export async function loadPupManagementContext(context, commands) {
   return commands.redirect('/error?type="pup-mgr-loading-error');
 }
 
-function setMenu(context, commands) {
+function setTravel(context, commands) {
   const r = getRouter().router;
 
-  r.setPreviousPathname();
+  // Push the new path to the pathStack
+  const pathStack = store.appContext.pathStack || [];
+  pathStack.push(context.pathname);
+
+  const dedupedStack = pathStack.filter((path, index, array) => {
+    // Check if the current path is the same as the next path
+    return index === 0 || path !== array[index - 1];
+  });
 
   store.updateState({
     appContext: {
       pathname: context.pathname,
       path: context.params.path,
-      previousPathname: r.getPreviousPathname(),
       upwardPathname: removeLastPathSegment(context.pathname),
+      pathStack: dedupedStack,
       menuVisible: false
     },
   });
@@ -114,11 +148,6 @@ function setTitle(context, commands) {
     });
   }
   return undefined;
-}
-
-export function setOverflow(context, commands) {
-  document.body.style.overflow = context.params.path[1] ? 'hidden' : 'auto';
-  return undefined
 }
 
 export function isAuthed(context, commands) {

@@ -35,6 +35,16 @@ export const mainStyles = css`
     opacity: 1;
   }
 
+  #underlay {
+    background: rgb(24, 24, 24);
+    position: absolute;
+    z-index: 0;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 200px;
+  }
+
   #OutletHeader {
     height: 80px;
     background: #181818;
@@ -56,6 +66,34 @@ export const mainStyles = css`
     height: 100%;
     width: 100%;
     overflow: hidden;
-    // border-left: 1px solid #333333;
+    background: #23252a;
+  }
+
+  #Outlet > .leaving {
+    animation: 1s fadeOut ease-in-out;
+  }
+
+  #Outlet > .entering {
+    animation: 1s fadeIn linear;
+  }
+
+  @keyframes fadeOut {
+    from {
+      opacity: 1;
+    }
+
+    to {
+      opacity: 0;
+    }
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
   }
 `

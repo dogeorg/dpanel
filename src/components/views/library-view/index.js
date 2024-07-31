@@ -161,9 +161,7 @@ class LibraryView extends LitElement {
   static styles = css`
     :host {
       display: block;
-      height: 100%;
       width: 100%;
-      overflow-y: auto;
       overflow-x: hidden;
     }
 

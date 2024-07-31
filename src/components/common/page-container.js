@@ -1,73 +1,115 @@
 import { LitElement, html, css, nothing, classMap } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
-import { getRouter } from "/router/router.js";
 import { store } from "/state/store.js";
 
 class PageContainer extends LitElement {
 
   static styles = css`
-  .page-header {
-    position: fixed;
-    top: 0px;
-    z-index: 99;
-    height: 80px;
-    width: calc(100% - var(--page-margin-left));
-    background: #181818;
-    box-sizing: border-box;
-
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.5em;
-    flex-direction: row;
-
-    padding: 0em 1em;
-
-    h2 {
-      font-family: 'Comic Neue';
-      text-transform: capitalize;
+    @keyframes slideFadeIn {
+      0% {
+        opacity: 0.5;
+        transform: translateY(15px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
-    h2.alone {
-      margin-left: 0.2em;
+    @keyframes slideFadeOut {
+      0% {
+        opacity: 0.5;
+        transform: translateY(0);
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-15px);
+      }
     }
-  }
 
-  .page-header section:first-child {
-    flex: 1; /* To take up remaining space */
-
-    display: flex;
-    align-items: center;
-    gap: 1em;
-    flex-direction: row;
-  }
-
-  .page-header section:last-child {
-    display: inline-block;
-    text-align: right;
-    width: 80px; /* Fixed width */
-
-    @media (min-width: 576px) {
-      display: none;
+    :host {
+      display: block;
+      position: relative;
     }
-  }
 
+    :host(.exiting) {
+      animation: slideFadeOut 200ms ease forwards;
+    }
 
-  .page-body {
-    height: 100%;
-    width: 100%;
-    overflow: hidden;
-  }
+    :host(.entering) {
+      animation: slideFadeIn 200ms ease forwards;
+    }
 
-  .pushed {
-    margin-top: 80px;
-  }
-`;
+    :host(.entering) .page-header,
+    :host(.exiting) .page-header {}
+
+    :host(.entering) .page-body,
+    :host(.exiting) .page-body {
+      margin-top: 0px;
+      position: relative;
+      top: 80px;
+    }
+
+    .page-header {
+      position: fixed;
+      top: 0px;
+      z-index: 99;
+      height: 80px;
+      width: calc(100% - var(--page-margin-left));
+      background: #181818;
+      box-sizing: border-box;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5em;
+      flex-direction: row;
+
+      padding: 0em 1em;
+
+      h2 {
+        font-family: 'Comic Neue';
+        text-transform: capitalize;
+      }
+
+      h2.alone {
+        margin-left: 0.2em;
+      }
+    }
+
+    .page-header section:first-child {
+      flex: 1; /* To take up remaining space */
+
+      display: flex;
+      align-items: center;
+      gap: 1em;
+      flex-direction: row;
+    }
+
+    .page-header section:last-child {
+      display: inline-block;
+      text-align: right;
+      width: 80px; /* Fixed width */
+
+      @media (min-width: 576px) {
+        display: none;
+      }
+    }
+
+    .page-body {
+      display: block;
+      width: 100%;
+      overflow: hidden;
+      position: relative;
+      margin-top: 80px;
+    }
+  `;
 
   static properties = {
     pageTitle: { type: String },
     pageAction: { type: String },
     previousPath: { type: String },
     upwardPath: { type: String },
+    transitioning: { type: Boolean },
     router: { type: Object }
   }
 
@@ -77,18 +119,32 @@ class PageContainer extends LitElement {
     this.pageAction = "";
     this.previousPath = "";
     this.upwardPath = "";
+    this.transitioning = false;
     this.router = null;
   }
 
-  handleBackClick(e) {
-    // Navigate to previous path (if known)
-    // Else navigate back a segment of the href
-    // All else fails, navigate to "/".
+  async handleBackClick(e) {
     try {
-      console.log(this.previousPath, this.upwardPath, "/");
-      const destination = this.upwardPath || this.previousPath || "/";
+      // Navigate up the page stack.
+      const pathStack = store.appContext.pathStack;
+
+      if (pathStack.length > 1) {
+        pathStack.pop(); // Remove the current path
+        const previousPath = pathStack[pathStack.length - 1]; // Get the new last path
+
+        await store.updateState({
+          appContext: {
+            pathStack: pathStack
+          }
+        });
+        return this.router.go(previousPath);
+      }
+
+      // If no page stack, navigate up the path
+      const destination = this.upwardPath || "/";
       this.router.go(destination);
     } catch (err) {
+      // All else fails, navigate to "/".
       console.warn('Routing warning:', err)
       window.location = "/";
     }
@@ -113,7 +169,7 @@ class PageContainer extends LitElement {
 
   render() {
     const { pageTitle, pageAction, handleBackClick, handleMenuClick } = this;
-    const pageBodyClasses = classMap({ pushed: !!pageTitle })
+    // const pageBodyClasses = classMap({ pushed: true })
 
     const pageActionEl = !pageAction ? nothing : html`
       <sl-button @click=${handleBackClick} variant="default" size="large" circle>
@@ -141,7 +197,7 @@ class PageContainer extends LitElement {
         </section>
       </div>
 
-      <div class="page-body" class=${pageBodyClasses}>
+      <div class="page-body">
         <slot></slot>
       </div>
       `

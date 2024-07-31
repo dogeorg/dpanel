@@ -5,7 +5,6 @@ import {
   loadPupManagementContext,
   isAuthed,
   performLogout,
-  setOverflow,
 } from "./middleware.js";
 
 let router;
@@ -13,22 +12,17 @@ let router;
 class Router extends VaadinRouter {
   constructor(outlet, options) {
     super(outlet, options);
-    this.previousPathname = null; // Initialize previous pathname storage
+    this.outletWrapper = options.outletWrapper
   }
 
-  setPreviousPathname() {
-    // Capture the previous pathname before the router updates the location
-    this.previousPathname = this.location ? this.location.pathname : null;
-  }
-
-  getPreviousPathname() {
-    return this.previousPathname;
+  getOutletWrapper() {
+    return this.outletWrapper;
   }
 }
 
-export const getRouter = (targetElement) => {
+export const getRouter = (targetElement, options) => {
   if (!router) {
-    router = new Router(targetElement);
+    router = new Router(targetElement, options);
 
     // Configure routes
     router.setRoutes([
@@ -37,7 +31,11 @@ export const getRouter = (targetElement) => {
       { path: "/login", action: wrapActions(), component: "login-view" },
 
       // Home
-      { path: "/", action: wrapActions(isAuthed), component: "home-view", pageTitle: "Home" },
+      { path: "/", 
+        action: wrapActions(isAuthed), 
+        component: "home-view", 
+        pageTitle: "Home"
+      },
 
       // Pup Iframe
       {
@@ -63,15 +61,22 @@ export const getRouter = (targetElement) => {
       // Pup Listing
       {
         path: "/discover/:path*",
-        action: wrapActions(isAuthed, loadPupManagementContext, setOverflow),
+        action: wrapActions(isAuthed, loadPupManagementContext),
         component: "pup-install-page",
         dynamicTitle: true,
       },
-
+      // Pup Management :: Logs
+      {
+        path: "/pups/:path*/logs",
+        action: wrapActions(isAuthed, loadPupManagementContext),
+        component: "log-viewer",
+        pageTitle: "Logs",
+        pageAction: "close",
+      },
       // Pup Management
       {
         path: "/pups/:path*",
-        action: wrapActions(isAuthed, loadPupManagementContext, setOverflow),
+        action: wrapActions(isAuthed, loadPupManagementContext),
         component: "pup-page",
         dynamicTitle: true,
       },

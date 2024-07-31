@@ -83,7 +83,6 @@ class PupPage extends LitElement {
   render() {
     const path = this.context.store?.appContext?.path || [];
     const pkg = this.context.store.pupContext;
-    const popover_page = path[1];
 
     const renderHealthChecks = () => {
       return this.checks.map(
@@ -133,46 +132,41 @@ class PupPage extends LitElement {
     `;
 
     return html`
-      <div id="PageWrapper" class="wrapper" ?data-freeze=${popover_page}>
-        <section>
-          <div class="section-title">
-            <h3>Status</h3>
-          </div>
-          <div class="underscored">${this.renderStatus()}</div>
-          <div>${this.renderActions()}</div>
-        </section>
+        <div id="PageWrapper" class="wrapper">
+          <section>
+            <div class="section-title">
+              <h3>Status</h3>
+            </div>
+            <div class="underscored">${this.renderStatus()}</div>
+            <div>${this.renderActions()}</div>
+          </section>
 
-        <section>
-          <div class="section-title">
-            <h3>Health checks</h3>
-          </div>
-          <div class="list-wrap">${renderHealthChecks()}</div>
-        </section>
+          <section>
+            <div class="section-title">
+              <h3>Health checks</h3>
+            </div>
+            <div class="list-wrap">${renderHealthChecks()}</div>
+          </section>
 
-        <section>
-          <div class="section-title">
-            <h3>Menu</h3>
-          </div>
-          <div class="list-wrap">${renderMenu()}</div>
-        </section>
-      </div>
+          <section>
+            <div class="section-title">
+              <h3>Menu</h3>
+            </div>
+            <div class="list-wrap">${renderMenu()}</div>
+          </section>
+        </div>
 
-      <aside class="page-popver" ?data-open=${popover_page}>
-        ${this.renderPopoverPage(popover_page)}
-      </aside>
-
-      <aside>
-        <sl-dialog
-          class="distinct-header"
-          id="PupMgmtDialog"
-          ?open=${this.open_dialog}
-          label=${this.open_dialog_label}
-        >
-          ${this.renderDialog()}
-        </sl-dialog>
-      </aside>
-    `;
-  }
+        <aside>
+          <sl-dialog
+            class="distinct-header"
+            id="PupMgmtDialog"
+            ?open=${this.open_dialog}
+            label=${this.open_dialog_label}
+          >
+            ${this.renderDialog()}
+          </sl-dialog>
+        </aside>
+  `}
 
   static styles = css`
     :host {
@@ -216,21 +210,6 @@ class PupPage extends LitElement {
 
     section div.underscored {
       border-bottom: 1px solid #333;
-    }
-
-    aside.page-popver {
-      display: none;
-      position: fixed;
-      top: 80px;
-      left: 0;
-      height: calc(100vh - 80px);
-      width: calc(100vw - var(--page-margin-left));
-      margin-left: var(--page-margin-left);
-      z-index: 600;
-      box-sizing: border-box;
-      overflow-x: hidden;
-      overflow-y: auto;
-      background: #23252a;
     }
 
     aside.page-popver[data-open] {

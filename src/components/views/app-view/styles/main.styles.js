@@ -42,7 +42,7 @@ export const mainStyles = css`
     top: 0px;
     left: 0px;
     width: 100%;
-    height: 200px;
+    height: 80px;
   }
 
   #OutletHeader {
@@ -67,33 +67,5 @@ export const mainStyles = css`
     width: 100%;
     overflow: hidden;
     background: #23252a;
-  }
-
-  #Outlet > .leaving {
-    animation: 1s fadeOut ease-in-out;
-  }
-
-  #Outlet > .entering {
-    animation: 1s fadeIn linear;
-  }
-
-  @keyframes fadeOut {
-    from {
-      opacity: 1;
-    }
-
-    to {
-      opacity: 0;
-    }
-  }
-
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-    }
-
-    to {
-      opacity: 1;
-    }
   }
 `

@@ -32,23 +32,20 @@ export function applyTransitionEffects(context, commands) {
   const pathStack = store.appContext.pathStack || [];
 
   // Determine if this is a backward navigation
-  const isBackward = false || pathStack.length > 1 && context.pathname === pathStack[pathStack.length - 2];
-
   const outletWrapper = r.getOutletWrapper();
-  // Clear any existing animations
-  outletWrapper.classList.remove('entering', 'exiting');
+  const isBackward = outletWrapper.classList.contains('exiting');
 
-  // Apply the appropriate animation
   if (isBackward) {
-    outletWrapper.classList.add('exiting');
+    // No animation, clear all.
+    outletWrapper.classList.remove('entering', 'exiting');
   } else {
     outletWrapper.classList.add('entering');
   }
-  
+
   // Remove animation invoking classes after animation duration.
   setTimeout(() => {
     outletWrapper.classList.remove('entering', 'exiting');
-  }, 200); // Short delay before removing to ensure the transition occurs
+  }, 300); // Short delay before removing to ensure the transition occurs
 
   return undefined; // Proceed with the navigation
 }

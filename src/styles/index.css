@@ -1,5 +1,5 @@
 body {
-  height: 100%;
+  background: #23252a;
   font: 16px var(--sl-font-sans);
   font-weight: var(--sl-font-weight-normal);
   line-height: var(--sl-line-height-normal);

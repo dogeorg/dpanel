@@ -1,5 +1,6 @@
 import { LitElement, html, css, nothing, classMap } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
 import { store } from "/state/store.js";
+import { asyncTimeout } from "/utils/timeout.js";
 
 class PageContainer extends LitElement {
 
@@ -17,12 +18,12 @@ class PageContainer extends LitElement {
 
     @keyframes slideFadeOut {
       0% {
-        opacity: 0.5;
+        opacity: 1;
         transform: translateY(0);
       }
       100% {
-        opacity: 0;
-        transform: translateY(-15px);
+        opacity: 0.3;
+        transform: translateY(15px);
       }
     }
 
@@ -31,16 +32,18 @@ class PageContainer extends LitElement {
       position: relative;
     }
 
-    :host(.exiting) {
-      animation: slideFadeOut 200ms ease forwards;
+    :host(.entering) {
+      animation: slideFadeIn 300ms ease forwards;
     }
 
-    :host(.entering) {
-      animation: slideFadeIn 200ms ease forwards;
+    :host(.exiting) {
+      animation: slideFadeOut 300ms ease forwards;
     }
 
     :host(.entering) .page-header,
-    :host(.exiting) .page-header {}
+    :host(.exiting) .page-header {
+      width: 100%;
+    }
 
     :host(.entering) .page-body,
     :host(.exiting) .page-body {
@@ -124,6 +127,9 @@ class PageContainer extends LitElement {
   }
 
   async handleBackClick(e) {
+    this.classList.add('exiting');
+    await asyncTimeout(200);
+
     try {
       // Navigate up the page stack.
       const pathStack = store.appContext.pathStack;

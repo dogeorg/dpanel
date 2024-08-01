@@ -15,13 +15,14 @@ export function renderNav(CURPATH) {
         <div class=${sideNavClasses}>
           <div class"nav-body">
 
-            <img class="logo" src="/static/img/dogebox-logo-small.png" />
-            <h1 class="logotext">Dogebox</h1>
-
-            <div @click=${this.handleNavClick} class="menu-item ${CURPATH === "/" ? "active" : ""}">
-              <sl-icon name="house-heart-fill"></sl-icon>
-              <a href="/">Home</a>
-            </div>
+            <a href="/" class="logo-link ${CURPATH === "/" ? "active" : ""}" @click=${this.handleNavClick}>
+              <img class="img" src="/static/img/dogebox-logo-small.png" />
+              <h1 class="sublabel">
+                Dogebox
+                <sl-icon name="heart-fill" class="icon"></sl-icon
+              </h1>
+              <h1 class="label">DOGECOIN</h1>
+            </a>
 
             <div @click=${this.handleNavClick} name="pups" class="menu-item ${CURPATH.startsWith("/pups") ? "active" : ""}">
               <sl-icon name="box-seam"></sl-icon>

@@ -7,6 +7,7 @@ class Store {
     this.appContext = this.appContext || {
       // Define application state here
       orienation: "landscape",
+      menuVisible: false,
       pathname: "/",
       pageTitle: "",
       pageAction: "",

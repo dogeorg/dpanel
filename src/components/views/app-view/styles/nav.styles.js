@@ -36,19 +36,55 @@ export const navStyles = css`
     transition: left 200ms ease-out;
   }
 
-  .logo {
-    margin: 1em auto;
-    width: 120px;
+  .logo-link {
+    margin-top: 2em;
     display: flex;
-    align-self: center;
-  }
+    flex-direction: column;
+    align-items: center;
 
-  .logotext {
-    font-family: "Comic Neue";
-    text-align: center;
-    font-size: 2rem;
-    margin-top: -1rem;
-    user-select: none;
+    color: #8c8c8c;
+    text-shadow: rgba(0,0,0,.02);
+    text-decoration: none;
+
+    transition: filter 300ms ease;
+    &:hover .img { 
+      filter: drop-shadow(0 0 1.15rem #373b75);
+    }
+    &.active .img { 
+      filter: drop-shadow(0 0 1.15rem #373b75);
+    }
+
+    .img {
+      width: 120px;
+      filter: drop-shadow(0 0 1.15rem #433);
+      margin-bottom: -7px;
+    }
+    .sublabel {
+      margin: 0;
+      font-family: "Comic Neue";
+      margin-bottom: -25px;
+      position: relative;
+      left: -7px;
+      z-index: 1;
+      color: #ffea43;
+    }
+    .label {
+      font-family: "Montserrat";
+      font-weight: 700;
+      font-size: 1.7rem;
+      margin-top: -6px;
+      user-select: none;
+      color: #222;
+    }
+
+    .icon {
+      color: #ffea43;
+      position: absolute;
+      font-size: 0.8rem;
+      top: 21px;
+      right: -15px;
+      transform: rotate(7deg);
+    }
   }
 
   #Side {
@@ -91,11 +127,11 @@ export const navStyles = css`
     column-gap: 1em;
 
     margin: 0.2em 0em 0.2em 0.5em;
-    padding: 0.5em 1em;
+    padding: 0.4em 1em;
 
     font-family: "Comic Neue";
     font-size: 1.3rem;
-    font-weight: 600;
+    font-weight: 400;
 
     cursor: pointer;
   }
@@ -165,7 +201,7 @@ export const navStyles = css`
 
   #Side .menu-item sl-icon,
   #Side .sub-menu-item sl-icon {
-    font-size: 1.3rem;
+    font-size: 1.4rem;
     color: rgba(255, 255, 255, 0.5);
   }
 

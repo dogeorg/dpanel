@@ -19,9 +19,9 @@ export function renderNav(CURPATH) {
               <img class="img" src="/static/img/dogebox-logo-small.png" />
               <h1 class="sublabel">
                 Dogebox
-                <sl-icon name="heart-fill" class="icon"></sl-icon
+                <sl-icon name="heart-fill" class="icon"></sl-icon>
               </h1>
-              <h1 class="label">DOGECOIN</h1>
+              <h1 class="label">Dogecoin</h1>
             </a>
 
             <div @click=${this.handleNavClick} name="pups" class="menu-item ${CURPATH.startsWith("/pups") ? "active" : ""}">
@@ -29,19 +29,19 @@ export function renderNav(CURPATH) {
               <a href="/pups">Pups</a>
             </div>
 
-            <div @click=${this.handleNavClick} name="discover" class="menu-item ${CURPATH.startsWith("/discover") ? "active" : ""}">
-              <sl-icon name="search"></sl-icon>
-              <a href="/discover">Discover</a>
-            </div>
-
-            <div @click=${this.handleNavClick} class="menu-item ${CURPATH.startsWith("/config") ? "active" : ""}">
-              <sl-icon name="sliders"></sl-icon>
-              <a href="/config">Settings</a>
+            <div @click=${this.handleNavClick} name="explore" class="menu-item ${CURPATH.startsWith("/explore") ? "active" : ""}">
+              <sl-icon name="search-heart"></sl-icon>
+              <a href="/explore">Explore</a>
             </div>
 
             <div @click=${this.handleNavClick} class="menu-item ${CURPATH.startsWith("/stats") ? "active" : ""}">
               <sl-icon name="heart-pulse-fill"></sl-icon>
               <a href="/stats">Monitor</a>
+            </div>
+
+            <div @click=${this.handleNavClick} class="menu-item ${CURPATH.startsWith("/config") ? "active" : ""}">
+              <sl-icon name="sliders"></sl-icon>
+              <a href="/config">Settings</a>
             </div>
           </div>
 

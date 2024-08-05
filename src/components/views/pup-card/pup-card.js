@@ -14,12 +14,15 @@
         version: { type: String },
         status: { type: String },
         running: { type: Boolean },
-        gui: { type: Object },
+        hasGui: { type: Boolean },
+        href: { type: String },
+        gref: { type: String }
       };
     }
 
     constructor() {
       super();
+      this.href = "";
     }
 
     get status() {
@@ -32,36 +35,47 @@
       this.requestUpdate();
     }
 
+    get pupId() {
+      return this._pupId;
+    }
+
+    set pupId(newPupId) {
+      this._pupId = newPupId
+      const formattedPupId = newPupId.toLowerCase();
+      this.href = `/pups/${formattedPupId}`;
+      this.gref = `/explore/${formattedPupId}/ui`;
+    }
+
     render() {
-      const { pupName, version, icon, status, gui } = this;
+      const { pupName, version, icon, status, hasGui, href, gref } = this;
       return html`
-        <div class="pup-card-wrap">
+        <a class="anchor" href=${href} target="_self">
+          <div class="pup-card-wrap">
+            <div class="icon-wrap">
+              <sl-icon name="${icon}"></sl-icon>
+            </div>
 
-          <div class="icon-wrap">
-            <sl-icon name="${icon}"></sl-icon>
-          </div>
+            <div class="details-wrap">
+              <div class="inner">
+                <span class="name">${pupName}</span>
+                <span class="version">${version}</span>
+                <span class="status">${status === "running" ? "Enabled" : status}</span>
+              </div>
+            </div>
 
-          <div class="details-wrap">
-            <div class="inner">
-              <span class="name">${pupName}</span>
-              <span class="version">${version}</span>
-              <span class="status">${status === "running" ? "Enabled" : status}</span>
+            <div class="suffix-wrap">
+              ${hasGui ? html`
+                <sl-icon-button 
+                  class="cta"
+                  variant="link"
+                  href="${gref}"
+                  target="_self"
+                  name="box-arrow-up-right">
+                </sl-icon-button>
+              ` : nothing }
             </div>
           </div>
-
-          <div class="suffix-wrap">
-            ${gui ? html`
-              <sl-icon-button 
-                class="cta"
-                variant="link"
-                href="${gui.source}" 
-                target="_self"
-                name="box-arrow-up-right">
-              </sl-icon-button>
-            ` : nothing }
-          </div>
-
-        </div>
+        </a>
       `;
     }
 
@@ -69,6 +83,11 @@
       :host {
         --icon-size: 72px;
         --row-height: 84px;
+      }
+
+      .anchor {
+        text-decoration: none;
+        color: inherit;
       }
 
       .pup-card-wrap {

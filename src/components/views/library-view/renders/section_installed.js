@@ -68,8 +68,7 @@ export function renderSectionInstalledBody(ready, SKELS, hasItems) {
             pupName=${pkg.manifest.package}
             version=${pkg.manifest.version}
             status=${pkg.state.status}
-            .gui=${pkg.manifest.gui}
-            @click=${(event) => this.handlePupLinkClick(event, pkg.manifest.id)}
+            ?hasGui=${!!pkg.manifest.gui}
           ></pup-card>
         `)}
       </div>

@@ -76,32 +76,39 @@ export const getRouter = (targetElement, options) => {
                 path: "/:path", // Matches any subpath like "/pups/12345"
                 component: "pup-page",
                 dynamicTitle: true,
-                action: fade,
+                action: middleware(fade, setTitle),
               },
               {
                 path: "/:path/logs", // Matches "/pups/12345/logs"
                 component: "log-viewer",
                 pageTitle: "Logs",
                 pageAction: "close",
-                action: fade,
+                action: middleware(fade, setTitle),
               }
             ]
           },
           {
-            path: "/discover",
+            path: "/explore",
             action: middleware(loadPup),
             children: [
               {
                 path: "",
                 component: "store-view",
-                pageTitle: "Discover Pups",
+                pageTitle: "Explore",
                 action: setTitle,
               },
               {
                 path: "/:path",
                 component: "pup-install-page",
                 dynamicTitle: true,
-                action: fade,
+                action: middleware(fade, setTitle),
+              },
+              {
+                path: "/:path/ui", // Matches "/pups/12345/ui"
+                component: "iframe-view",
+                pageTitle: "Explore > Dogecoin",
+                pageAction: "close",
+                action: middleware(fade, setTitle),
               }
             ]
           },

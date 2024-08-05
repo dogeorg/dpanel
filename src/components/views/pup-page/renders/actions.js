@@ -55,7 +55,7 @@ export function renderActions() {
       ${pkg.manifest.gui ? html`
         <div style="display: flex; align-items: center;">
           <sl-divider class="show-only-wide" vertical style="height: 1.5em; margin-left: 0.1em;"></sl-divider>
-          <sl-button variant="primary" size="large" outline ?disabled=${status === "NEEDS_CONFIG"}>
+          <sl-button variant="primary" size="large" outline href="/explore/${pkg.manifest.id.toLowerCase()}/ui" ?disabled=${status === "NEEDS_CONFIG"}>
             <sl-icon slot="prefix" name="box-arrow-up-right"></sl-icon>
             Launch UI
           </sl-button>

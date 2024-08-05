@@ -38,6 +38,7 @@ export const navStyles = css`
 
   .logo-link {
     margin-top: 2em;
+    margin-bottom: -1em;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -48,16 +49,20 @@ export const navStyles = css`
 
     transition: filter 300ms ease;
     &:hover .img { 
-      filter: drop-shadow(0 0 1.15rem #373b75);
+      filter: drop-shadow(0 0 1rem #373b75);
     }
     &.active .img { 
-      filter: drop-shadow(0 0 1.15rem #373b75);
+      filter: drop-shadow(0 0 1rem #373b75);
     }
 
     .img {
-      width: 120px;
-      filter: drop-shadow(0 0 1.15rem #433);
+      width: 180px;
+      filter: drop-shadow(0 0 1rem #433);
       margin-bottom: -7px;
+
+      @media (min-width: 576px) {
+        width: 100px;
+      }
     }
     .sublabel {
       margin: 0;
@@ -126,11 +131,15 @@ export const navStyles = css`
     align-items: center;
     column-gap: 1em;
 
-    margin: 0.2em 0em 0.2em 0.5em;
-    padding: 0.4em 1em;
+    margin: 0.2em 0em 0.2em 1em;
+    padding: 0.55em 1.4em;
+
+    @media (min-width:576px) {
+      margin-left: 0em;
+    }
 
     font-family: "Comic Neue";
-    font-size: 1.3rem;
+    font-size: 1.2rem;
     font-weight: 400;
 
     cursor: pointer;
@@ -201,7 +210,7 @@ export const navStyles = css`
 
   #Side .menu-item sl-icon,
   #Side .sub-menu-item sl-icon {
-    font-size: 1.4rem;
+    font-size: 1.2rem;
     color: rgba(255, 255, 255, 0.5);
   }
 

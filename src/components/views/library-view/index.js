@@ -96,10 +96,6 @@ class LibraryView extends LitElement {
     this.inspectedPup = event.currentTarget.pupId
   }
 
-  handlePupLinkClick(event, pupId) {
-    this.router.go(`/pups/${pupId.toLowerCase()}`);
-  }
-
   handleForcedTabShow(event) {
     this.inspectedPup = event.detail.pupId
   }

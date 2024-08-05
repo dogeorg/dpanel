@@ -1,95 +1,135 @@
 import { LitElement, html, css } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
+import "/components/common/page-banner.js";
 
 class HomeView extends LitElement {
 
   static styles = css`
     :host {
       display: block;
-      min-width: 980px;
-    }
-    .padded {
       padding: 20px;
     }
-    h1, h2, h3 {
-      font-family: 'Comic Neue', sans-serif;
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1em;
+
+      @media (min-width: 576px) {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      }
     }
-    .row {
+    
+    .card {
+      height: 270px;
+      background: #2e2e32;
+      padding: 20px;
       box-sizing: border-box;
-      display: block;
-      width: 100%;
-    }
-
-    .row.inset {
-      background: #0B0B0B;
-    }
-
-    .flex-spacebetween {
       display: flex;
+      flex-direction: column;
       justify-content: space-between;
+      align-items: center;
+      box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+      border-radius: 8px;
+      user-select: none;
     }
 
-    .flex-alignend {
-      display: flex;
-      align-items: end;
+    .card .wrap-label {
+      margin-bottom: -1em;
     }
 
-    .collapse-headings h1, h2, h3 {
-      margin-bottom: 0px;
+    .card .wrap-label .label {
+      font-size: 1.75em;
+      font-family: "Comic Neue";
+      font-weight: 700;
+      position: relative;
+      z-index: 0;
+
+      @media (min-width: 576px) {
+        font-size: 2em;
+      }
+
+      span.prefix {
+        font-size: 1.35rem;
+        font-family: "Comic Neue";
+        font-weight: 700;
+        color: yellow;
+        position: absolute;
+        transform: rotateZ(-30deg);
+        top: -10px;
+        left: -22px;
+        z-index: 1;
+      }
     }
 
-    sl-carousel {
-      --aspect-ratio: 4 / 5;
+
+
+    .card .wrap-icon {
+      &.red { color: #f93d46; }
+      &.blue { color: #0087ff; }
+      &.pink { color: deeppink; }
+      &.yellow { color: #ffc437; }
+      &.green { color: #2ede75; }
+      &.white { color: white; }
+      &.purple { color: #b469ff; }
+
+      .icon {
+        font-size: 5.5em;
+      }
     }
 
-    sl-details.custom-icons::part(summary-icon) {
-      /* Disable the expand/collapse animation */
-      rotate: none;
+    .card .wrap-desc {
+      font-size: 0.8rem;
+      text-align: center;
+      line-height: 1.2;
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .card:hover {
+      background: #3c3c40;
+      cursor: pointer;
+    }
+
+    .card:hover .wrap-icon .icon {
+      font-size: 7rem;
     }
   `
 
+  constructor() {
+    super();
+    this.options = [
+      { color: "yellow", prefix: "Such", label: "Node", icon: "cpu-fill", desc: "Node activity, stats and network contribution" },
+      { color: "blue", prefix: "Very", label: "Browse", icon: "ui-checks-grid", desc: "Install free and open source Dogecoin software" },
+      { color: "white", prefix: "Much", label: "Develop", icon: "code-slash", desc: "Write software interacting with the Dogecoin blockchain" },
+      { color: "red", prefix: "Many", label: "Monitor", icon: "heart-pulse-fill", desc: "View the vital signs of your Dogebox" },
+      { color: "green", prefix: "So", label: "Profile", icon: "person-circle", desc: "Manage your private and public identity" },
+    ]
+  }
+
   render() {
     return html`
-      <div class="padded" style="max-width:420px;">
-        <sl-details class="custom-icons" summary="Dogebox online and running.">
-          <sl-icon name="plus-square" slot="expand-icon"></sl-icon>
-          <sl-icon name="dash-square" slot="collapse-icon"></sl-icon>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna
-          aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.<br><br>
-          <a href="/stats">View Stats</a>
-        </sl-details>
-      </div>
+      <page-banner title="Dogebox" subtitle="Dogecoin">
+        <p>Easily manage your Dogecoin Node.<br/>
+        Explore the Doge Ecosystem while you're at it.</p>
+      </page-banner>
 
-      <div class="padded flex-spacebetween flex-alignend collapse-headings">
-        <h2>Your Pups</h2>
-        <a href="/pups">View All</a>
-      </div>
+      <div class="grid">
+        ${this.options.map((o) => html`
+          <div class="card">
+            <div class="wrap-label">
+              <span class="label">
+                <span class="prefix">${o.prefix}</span>
+                ${o.label}
+              </span>
+            </div>
+            <div class="wrap-icon ${o.color}">
+              <sl-icon class="icon" name="${o.icon}"></sl-icon>
+            </div>
+            <div class="wrap-desc">
+              <span class="desc">${o.desc}</span>
+            </div>
+          </div>
+        `)}
 
-      <div class="row inset padded">
-        <sl-carousel navigation mouse-dragging slides-per-page="3" slides-per-move="1">
-          <sl-carousel-item style="background: var(--sl-color-violet-200);">Slide 6</sl-carousel-item>
-          <sl-carousel-item style="background: var(--sl-color-blue-200);">Slide 5</sl-carousel-item>
-          <sl-carousel-item style="background: var(--sl-color-green-200);">Slide 4</sl-carousel-item>
-          <sl-carousel-item style="background: var(--sl-color-yellow-200);">Slide 3</sl-carousel-item>
-          <sl-carousel-item style="background: var(--sl-color-orange-200);">Slide 2</sl-carousel-item>
-          <sl-carousel-item style="background: var(--sl-color-red-200);">Slide 1</sl-carousel-item>
-        </sl-carousel>
       </div>
-
-      <div class="padded flex-spacebetween flex-alignend collapse-headings">
-        <h2>Community News</h2>
-      </div>
-
-      <div class="row inset padded">
-        <sl-carousel navigation mouse-dragging slides-per-page="3" slides-per-move="1">
-          <sl-carousel-item style="background: var(--sl-color-red-200);">Slide 1</sl-carousel-item>
-          <sl-carousel-item style="background: var(--sl-color-orange-200);">Slide 2</sl-carousel-item>
-          <sl-carousel-item style="background: var(--sl-color-yellow-200);">Slide 3</sl-carousel-item>
-          <sl-carousel-item style="background: var(--sl-color-green-200);">Slide 4</sl-carousel-item>
-          <sl-carousel-item style="background: var(--sl-color-blue-200);">Slide 5</sl-carousel-item>
-          <sl-carousel-item style="background: var(--sl-color-violet-200);">Slide 6</sl-carousel-item>
-        </sl-carousel>
-      </div>
-
     `;
   }
 }

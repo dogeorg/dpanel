@@ -2,6 +2,7 @@ import { LitElement, html, css } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
 import { StoreSubscriber } from '/state/subscribe.js';
 import { store } from '/state/store.js';
 import debounce from '/utils/debounce.js';
+import "/components/views/demo-map/demo-map.js";
 
 class IframeView extends LitElement {
   static styles = css`
@@ -16,7 +17,7 @@ class IframeView extends LitElement {
 
     #IframeContainer {
       width: 100%;
-      height: 100vh;
+      height: calc(100vh - 80px);
       box-sizing: border-box;
       position: relative;
     }
@@ -130,6 +131,7 @@ class IframeView extends LitElement {
 
         <div id="IframeContainer">
           <iframe src="${pupContext.manifest.gui.source}" frameBorder="0"></iframe>
+          <demo-map></demo-map>
         </div>
       `;
     }

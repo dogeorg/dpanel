@@ -7,6 +7,7 @@ import { PaginationController } from '/components/common/paginator/paginator-con
 import { bindToClass } from '/utils/class-bind.js'
 import * as renderMethods from './renders/index.js';
 import '/components/common/paginator/paginator-ui.js';
+import '/components/common/page-banner.js';
 import { getRouter } from "/router/router.js";
 
 const initialSort = (a, b) => {
@@ -36,6 +37,17 @@ class StoreView extends LitElement {
     this.packageList = new PaginationController(this, undefined, this.itemsPerPage,{ initialSort });
     this.router = getRouter().Router
     this.inspectedPup;
+    this.showCategories = false;
+    this.categories = [
+      { name: "all", label: "All" },
+      { name: "meme", label: "Memes" },
+      { name: "social", label: "Social" },
+      { name: "transact", label: "Transact" },
+      { name: "blockchain", label: "Blockchain" },
+      { name: "develop", label: "Develop" },
+      { name: "Write", label: "Write" },
+      { name: "host", label: "Host" },
+    ]
     bindToClass(renderMethods, this);
   }
 
@@ -98,7 +110,7 @@ class StoreView extends LitElement {
   }
 
   handlePupLinkClick(event, pupId) {
-    this.router.go(`/discover/${pupId.toLowerCase()}`);
+    this.router.go(`/explore/${pupId.toLowerCase()}`);
   }
 
   async fetchBootstrap() {
@@ -162,13 +174,31 @@ class StoreView extends LitElement {
     const SKELS = Array.from({ length: 1 })
 
     return html`
+      <page-banner title="Dogecoin" subtitle="Registry">
+        Extend your Dogebox with Pups<br/>
+        <sl-button variant="text">
+          <sl-icon name="arrow-left-right" slot="prefix"></sl-icon>
+          Change Registry
+        </sl-button>
+      </page-banner>
 
-      <div class="padded">
-        <header>
-          ${this.renderSectionHeader(ready)}
-        </header>
-          ${this.renderSectionBody(ready, SKELS, hasItems)}
+      <div class="row search-wrap">
+        <sl-input class="constrained w55" type="search" size="large" placeholder="Search">
+          <sl-icon name="search" slot="prefix"></sl-icon>
+        </sl-input>
       </div>
+
+      ${this.showCategories ? html`
+        <div class="tab-wrap constrained w80">
+          <sl-tab-group class="cat-picker">
+            ${this.categories.map((c) => html`
+              <sl-tab slot="nav" ?disabled=${c.disabled} panel="${c.name}">${c.label}</sl-tab>
+            `)}
+          </sl-tab-group>
+        </div>
+      ` : nothing }
+
+      ${this.renderSectionBody(ready, SKELS, hasItems)}
 
     `;
   }
@@ -176,72 +206,42 @@ class StoreView extends LitElement {
   static styles = css`
     :host {
       display: block;
-      height: 100%;
+      padding: 20px;
+    }
+
+    div.row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 2em;
       width: 100%;
-      overflow-y: auto;
-      overflow-x: hidden;
     }
 
-    .padded {
-      background: #23252a;
-      margin: 1em;
-    }
-
-    h1, h2 {
-      font-family: 'Comic Neue', sans-serif;
-      color: #ffd807;
-    }
-
-    header {
-      display: flex;
-      flex-direction: column;
-      gap: 1em;
-      @media (min-width: 576px) {
-        flex-direction: row;
-        align-items: baseline;
-        justify-content: space-between;
-        gap: 0.8rem;  
-      }
-    }
-
-    header .heading-wrap {
-      display: flex;
-      gap: 0.8rem;
-      align-items: baseline;
-    }
-
-    header .heading-wrap h2 {
-      margin-top: 0px;
-      @media (min-width: 1024px) {
-        margin-top: 1em;
-      }
-    }
-
-    header .header-actions {
-      display: flex;
-      flex-direction: row;
-      gap: 0.85em;
-      justify-content: space-between;
-      margin-bottom:1em;
-      @media (min-width: 576px) {
-        margin-left: auto;
-        justify-content: flex-end;
-      }
-    }
-
-    /* Details toggle */
-    .details-group pup-snapshot:not(:last-of-type),
-    .details-group pup-snapshot-skeleton:not(:last-of-type) {
-      margin-bottom: var(--sl-spacing-x-small);
-    }
-
-    .empty {
+    .constrained {
       width: 100%;
-      color: var(--sl-color-neutral-600);
-      box-sizing: border-box;
-      border: dashed 1px var(--sl-color-neutral-200);
-      border-radius: var(--sl-border-radius-medium);
-      padding: var(--sl-spacing-x-large) var(--sl-spacing-medium);
+      @media (min-width:576px) {
+        &.w55 { width: 55% }
+        &.w80 { width: 80% }
+      }
+    }
+
+    .tab-wrap {
+      margin-left: auto;
+      margin-right: auto;
+      margin-bottom: 3em
+    }
+
+    .cat-picker {
+      --indicator-color: white;
+      sl-tab::part(base) { color: grey; }
+      sl-tab[active]::part(base) { color: white; }
+      sl-tab::part(base):hover { color: white; }
+      
+      margin-left: auto;
+      margin-right: auto;
+      position: relative;
+      top: 2px;
+      
     }
   `
 }

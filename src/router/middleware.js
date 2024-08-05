@@ -53,10 +53,20 @@ export function fade(context, commands, route) {
   return undefined; // Proceed with the navigation
 }
 
-export async function loadPup(context, commands) {  
-  const pupId = context.pathname
-    .replace(`/${context.path}/`, "")
-    .replace(`/${context.path}`, "")
+export async function loadPup(context, commands) {
+
+  let pupId
+
+  if (context.pathname.includes("/ui")) {
+    // When within pup iframe
+    pupId = getSegmentBeforeTerm(context.pathname, "ui");
+    console.log(context.pathname, pupId);
+  } else {
+    // When wihtin pup management
+    pupId = context.pathname
+      .replace(`/${context.path}/`, "")
+      .replace(`/${context.path}`, "")
+  }
 
   if (!pupId) {
     return undefined;
@@ -150,4 +160,15 @@ function removeLastPathSegment(pathname) {
 
   // Join the remaining segments back into a pathname
   return '/' + segments.join('/');
+}
+
+function getSegmentBeforeTerm(path, term) {
+    const segments = path.split('/');
+    const uiIndex = segments.indexOf(term);
+
+    if (uiIndex > 0) {
+        return segments[uiIndex - 1];
+    } else {
+        return null;
+    }
 }

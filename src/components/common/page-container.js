@@ -68,6 +68,7 @@ class PageContainer extends LitElement {
       flex-direction: row;
 
       padding: 0em 1em;
+      user-select: none;
 
       h2 {
         font-family: 'Comic Neue';

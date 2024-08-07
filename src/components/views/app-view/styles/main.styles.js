@@ -35,37 +35,68 @@ export const mainStyles = css`
     opacity: 1;
   }
 
-  #underlay {
-    background: rgb(24, 24, 24);
-    position: absolute;
-    z-index: 0;
-    top: 0px;
-    left: 0px;
-    width: 100%;
-    height: 80px;
-  }
-
-  #OutletHeader {
-    height: 80px;
-    background: #181818;
-    // border-left: 1px solid #333333;
-
-    display: flex;
-    align-items: center;
-    gap: 1em;
-    flex-direction: row;
-
-    padding: 0em 1em;
-
-    h2 {
-      font-family: 'Comic Neue';
-    }
-  }
-
   #Outlet {
     height: 100%;
     width: 100%;
     overflow: hidden;
     background: #23252a;
   }
+
+  /* FORWARD NAVIGATION */
+  #Outlet > .leaving { 
+      animation: 250ms fadeOut ease-in-out; 
+  }
+  #Outlet > .entering { 
+      animation: 250ms slideFadeIn ease; 
+  }
+
+  /* BACKWARD NAVIGATION */
+  #Main.backward #Outlet > .leaving {
+    animation: none;
+  }
+  #Main.backward #Outlet > .entering { 
+    animation: none;
+  }
+
+  @keyframes slideFadeIn {
+  0% {
+    opacity: 1;
+    transform: translateY(15px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideFadeOut {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0.7;
+    transform: translateY(25px);
+  }
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes stationary {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+
 `

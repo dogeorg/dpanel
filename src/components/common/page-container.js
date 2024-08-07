@@ -5,51 +5,29 @@ import { asyncTimeout } from "/utils/timeout.js";
 class PageContainer extends LitElement {
 
   static styles = css`
-    @keyframes slideFadeIn {
-      0% {
-        opacity: 0.5;
-        transform: translateY(15px);
-      }
-      100% {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes slideFadeOut {
-      0% {
-        opacity: 1;
-        transform: translateY(0);
-      }
-      100% {
-        opacity: 0.8;
-        transform: translateY(25px);
-      }
-    }
-
     :host {
       display: block;
       position: relative;
     }
 
-    :host(.entering) {
-      animation: slideFadeIn 300ms ease forwards;
-    }
+    // :host(.entering) {
+    //   animation: slideFadeIn 300ms ease forwards;
+    // }
 
-    :host(.exiting) {
-      animation: slideFadeOut 300ms ease forwards;
-    }
+    // :host(.exiting) {
+    //   animation: slideFadeOut 300ms ease forwards;
+    // }
 
     :host(.entering) .page-header,
-    :host(.exiting) .page-header {
+    :host(.leaving) .page-header {
       width: 100%;
     }
 
     :host(.entering) .page-body,
-    :host(.exiting) .page-body {
-      margin-top: 0px;
-      position: relative;
-      top: 80px;
+    :host(.leaving) .page-body {
+      // margin-top: 0px;
+      // position: relative;
+      // top: 80px;
     }
 
     .page-header {
@@ -127,29 +105,18 @@ class PageContainer extends LitElement {
     this.router = null;
   }
 
+  firstUpdated() {
+    setTimeout(() => {
+      store.updateState({ appContext: { navigationDirection: "" }})
+    }, 50);
+  }
+
   async handleBackClick(e) {
-    this.classList.add('exiting');
-    await asyncTimeout(200);
-
+    // this.classList.add('exiting');
+    // await asyncTimeout(200);
     try {
-      // Navigate up the page stack.
-      const pathStack = store.appContext.pathStack;
-
-      if (pathStack.length > 1) {
-        pathStack.pop(); // Remove the current path
-        const previousPath = pathStack[pathStack.length - 1]; // Get the new last path
-
-        store.updateState({
-          appContext: {
-            pathStack: pathStack
-          }
-        });
-        return this.router.go(previousPath);
-      }
-
-      // If no page stack, navigate up the path
-      const destination = this.upwardPath || "/";
-      this.router.go(destination);
+      store.updateState({ appContext: { navigationDirection: "backward" }})
+      navigateBack(store, this.router);
     } catch (err) {
       // All else fails, navigate to "/".
       console.warn('Routing warning:', err)
@@ -176,7 +143,6 @@ class PageContainer extends LitElement {
 
   render() {
     const { pageTitle, pageAction, handleBackClick, handleMenuClick } = this;
-    // const pageBodyClasses = classMap({ pushed: true })
 
     const pageActionEl = !pageAction ? nothing : html`
       <sl-button @click=${handleBackClick} variant="default" size="large" circle>
@@ -209,6 +175,31 @@ class PageContainer extends LitElement {
       </div>
       `
   }
+}
+
+function navigateBack(store, router) {
+  // Retrieve path stack from the store
+  const pathStack = store.appContext.pathStack;
+  console.log({ pathStack });
+
+  // Check if there is more than one path in the stack
+  if (pathStack.length > 1) {
+    // Remove the current path and get the previous path
+    pathStack.pop();
+    const previousPath = pathStack[pathStack.length - 1];
+
+    // Update the store with the new path stack and navigate to the previous path
+    store.updateState({
+      appContext: {
+        pathStack: pathStack
+      }
+    });
+    return router.go(previousPath);
+  }
+
+  // If there is no previous path in the stack, navigate to the upwardPathname or root
+  const destination = store.appContext.upwardPathname || "/";
+  router.go(destination);
 }
 
 customElements.define('page-container', PageContainer);

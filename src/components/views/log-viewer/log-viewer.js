@@ -178,6 +178,8 @@ class LogViewer extends LitElement {
   static get styles() {
     return css`
       :host {
+        --log-footer-height: 80px;
+        --page-header-height: 80px;
         display: block;
         position: relative;
       }
@@ -204,14 +206,15 @@ class LogViewer extends LitElement {
       div#LogContainer {
         background: #0b0b0b;
         padding: 0.5em;
-        height: calc(100vh - 176px);
+        height: calc(100vh - (var(--log-footer-height) + var(--page-header-height)));
         overflow-y: scroll;
         overflow-x: hidden;
+        box-sizing: border-box;
       }
 
       div#LogFooter {
         display: block;
-        height: 80px;
+        height: var(--log-footer-height);
         background: rgb(24, 24, 24);
         width: 100%;
         display: flex;

@@ -17,39 +17,12 @@ export const wrapActions =
         return result;
       }
     }
-    // Do the following for all route changes.
-    // setTitle(context, commands);
-    // setTravel(context, commands);
-    // applyTransitionEffects(context, commands, route)
     return undefined
   };
 
 // Example middleware
 export function logPathMiddleware(context, commands) {
   console.log("Navigating to path:", context.pathname);
-  return undefined; // Proceed with the navigation
-}
-
-export function fade(context, commands, route) {
-
-  const r = getRouter().router;
-  const pathStack = store.appContext.pathStack || [];
-
-  // Determine if this is a backward navigation
-  const outletWrapper = r.getOutletWrapper();
-  const isBackward = outletWrapper.classList.contains('exiting');
-  const isLandingPage = !!(store.appContext.pageCount === 1)
-
-  // Clear animation classes on backward stack navigation
-  if (isBackward) {
-    outletWrapper.classList.remove('entering', 'exiting');
-  }
-
-  // Apply animation class on forward navigation if route declares.
-  if (!isBackward) {
-    outletWrapper.classList.add('entering');
-  }
-
   return undefined; // Proceed with the navigation
 }
 
@@ -75,11 +48,12 @@ export async function loadPup(context, commands) {
 
     store.updateState({
       pupContext: { manifest, state },
-      appContext: {
-        pageTitle: context.params.pup || manifest.package,
-        pageAction: "back",
-      }
     });
+
+    if (context.route.dynamicTitle) {
+      context.route.pageTitle = manifest.package;
+      context.route.pageAction = "back";
+    }
 
   } catch (error) {
     console.error("Error fetching manifest:", error);
@@ -115,18 +89,6 @@ export function setTravel(context, commands) {
   return undefined;
 }
 
-export function setTitle(context, commands) {
-  if (context?.route?.pageTitle || !context?.route?.dynamicTitle) {
-    store.updateState({
-      appContext: {
-        pageTitle: context?.route?.pageTitle || "",
-        pageAction: context?.route?.pageAction || ""
-      },
-    });
-  }
-  return undefined;
-}
-
 export function isAuthed(context, commands) {
   if (store.networkContext.token) {
     return undefined;
@@ -149,6 +111,23 @@ function removeLastPathSegment(pathname) {
 
   // Join the remaining segments back into a pathname
   return '/' + segments.join('/');
+}
+
+export function asPage(context, commands) {
+  const { component, pageTitle, pageAction } = context.route;
+  const pageContainer = document.createElement('page-container');
+  const r = getRouter().Router;
+  
+  // Page props
+  pageContainer.pageTitle = pageTitle;
+  pageContainer.pageAction = pageAction;
+  pageContainer.router = r;
+  
+  // Wrap route component in pageContainer
+  pageContainer.appendChild(document.createElement(component));
+
+  // Returned element is injected into #Outlet
+  return pageContainer
 }
 
 function getSegmentBeforeTerm(path, term) {

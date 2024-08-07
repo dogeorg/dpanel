@@ -2,11 +2,10 @@ import { Router as VaadinRouter } from "/vendor/@vaadin/router@1.7.5/vaadin-rout
 import {
   wrapActions as middleware,
   isAuthed,
-  setTitle,
   setTravel,
   loadPup,
   performLogout,
-  fade,
+  asPage
 } from "./middleware.js";
 
 let router;
@@ -14,11 +13,6 @@ let router;
 class Router extends VaadinRouter {
   constructor(outlet, options) {
     super(outlet, options);
-    this.outletWrapper = options.outletWrapper
-  }
-
-  getOutletWrapper() {
-    return this.outletWrapper;
   }
 }
 
@@ -46,21 +40,21 @@ export const getRouter = (targetElement, options) => {
         children: [
           {
             path: "",
-            component: "home-view", 
+            component: "home-view",
             pageTitle: "Home",
-            action: setTitle,
+            action: middleware(asPage)
           },
           {
             path: "/stats",
             component: "stats-view",
             pageTitle: "Monitor",
-            action: setTitle,
+            action: middleware(asPage)
           },
           {
             path: "/config",
             component: "manage-view",
             pageTitle: "Settings",
-            action: setTitle,
+            action: middleware(asPage)
           },
           {
             path: "/pups",
@@ -69,20 +63,22 @@ export const getRouter = (targetElement, options) => {
                 path: "/", // This will match "/pups/"
                 component: "library-view",
                 pageTitle: "Installed Pups",
-                action: setTitle,
+                action: middleware(asPage)
               },
               {
                 path: "/:pup", // Matches any subpath like "/pups/12345"
                 component: "pup-page",
                 dynamicTitle: true,
-                action: middleware(loadPup, fade, setTitle),
+                action: middleware(loadPup, asPage),
+                animate: false,
               },
               {
                 path: "/:pup/logs", // Matches "/pups/12345/logs"
                 component: "log-viewer",
                 pageTitle: "Logs",
                 pageAction: "close",
-                action: middleware(loadPup, fade, setTitle),
+                action: middleware(loadPup, asPage),
+                animate: false,
               }
             ]
           },
@@ -93,20 +89,22 @@ export const getRouter = (targetElement, options) => {
                 path: "",
                 component: "store-view",
                 pageTitle: "Explore",
-                action: setTitle,
+                action: middleware(loadPup, asPage),
               },
               {
                 path: "/:pup",
                 component: "pup-install-page",
                 dynamicTitle: true,
-                action: middleware(loadPup, fade, setTitle),
+                action: middleware(loadPup, asPage),
+                animate: false,
               },
               {
                 path: "/:pup/ui", // Matches "/pups/12345/ui"
                 component: "iframe-view",
                 pageTitle: "Explore > Dogecoin",
                 pageAction: "close",
-                action: middleware(loadPup, fade, setTitle),
+                action: middleware(loadPup, asPage),
+                animate: false,
               }
             ]
           },

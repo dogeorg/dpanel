@@ -90,8 +90,8 @@ class DPanelApp extends LitElement {
   firstUpdated() {
     // Initialise our router singleton and provide it a target elemenet.
     const outlet = this.shadowRoot.querySelector("#Outlet");
-    this.outletWrapper = this.shadowRoot.querySelector("#OutletWrapper")
-    this.router = getRouter(outlet, { outletWrapper: this.outletWrapper }).Router;
+    // this.outletWrapper = this.shadowRoot.querySelector("#OutletWrapper")
+    this.router = getRouter(outlet).Router;
   }
 
   _handleResize() {
@@ -119,20 +119,6 @@ class DPanelApp extends LitElement {
     if (anchor) { anchor.click(); }
   }
 
-  handleBackClick(e) {
-    // Navigate to previous path (if known)
-    // Else navigate back a segment of the href
-    // All else fails, navigate to "/".
-    try {
-      const { previousPathname, upwardPathname } = this.context.store.appContext
-      const destination = previousPathname || upwardPathname || "/"
-      this.router.go(destination);
-    } catch (err) {
-      console.warn('Routing warning:', err)
-      window.location = "/";
-    }
-  }
-
   enableSystemPrompt() {
     if (this.systemPromptActive) {
       this.shadowRoot.querySelector("system-prompt").close();
@@ -152,12 +138,6 @@ class DPanelApp extends LitElement {
     return actions[action] || ""
   }
 
-  handleOutletMutation() {
-    setTimeout(() => {
-      this.outletWrapper.classList.remove("entering", "exiting");
-    }, 200);
-  }
-
   render() {
     const { pageTitle, pageAction } = this.context.store.appContext;
     const { previousPathname, upwardPathname } = this.context.store.appContext
@@ -166,25 +146,14 @@ class DPanelApp extends LitElement {
     const taskName = this.context.store.promptContext.name;
     const showChrome = !CURPATH.startsWith("/login");
     const mainClasses = classMap({
+      backward: this.context.store.appContext.navigationDirection === "backward",
       opaque: showSystemPrompt,
     });
 
     return html`
       ${showChrome ? this.renderNav(CURPATH) : nothing}
       <main id="Main" class=${mainClasses}>
-        <div id="underlay"></div>
-        <page-container
-          id="OutletWrapper"
-          pageTitle=${pageTitle}
-          pageAction=${pageAction}
-          previousPath=${previousPathname}
-          upwardPath=${upwardPathname}
-          .router=${this.router}>
-          <sl-mutation-observer child-list @sl-mutation=${debounce(() => this.handleOutletMutation(), 0)}>
-            <div id="Outlet"></div>
-          </sl-mutation-observer>
-        </page-container>
-
+        <div id="Outlet"></div>
       </main>
       ${showChrome ? this.renderFooter() : nothing}
 

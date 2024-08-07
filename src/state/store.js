@@ -12,6 +12,7 @@ class Store {
       pageTitle: "",
       pageAction: "",
       pageCount: 0,
+      navigationDirection: ""
     };
     this.networkContext = this.networkContext || {
       // Define network state here

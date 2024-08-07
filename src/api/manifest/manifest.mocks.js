@@ -62,7 +62,8 @@ export function generateManifests(input) {
     };
   };
 
-  const generateRandomChecks = () => {
+  const generateRandomChecks = (pupName) => {
+    if (pupName !== 'Core') return;
     const checks = [
       {
         name: 'sync',
@@ -102,6 +103,7 @@ export function generateManifests(input) {
     hash: Math.random().toString(36).substring(2, 15),
     docs: mockDocs[name] || mockDocs.lorem,
     deps: produceDepSegment(name),
+    checks: generateRandomChecks(name),
     gui: produceGuiSegment(name),
     command: {
       path: `/path/to/${name}`,
@@ -110,7 +112,6 @@ export function generateManifests(input) {
       env: null,
       config: generateRandomConfig(),
       configFiles: null,
-      checks: generateRandomChecks(),
     },
   }));
 

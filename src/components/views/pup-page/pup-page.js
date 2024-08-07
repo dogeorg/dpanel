@@ -51,7 +51,7 @@ class PupPage extends LitElement {
 
   async firstUpdated() {
     this.addEventListener("sl-hide", this.handleDialogClose);
-    this.checks = this.context.store.pupContext?.manifest?.command?.checks;
+    this.checks = this.context.store.pupContext?.manifest?.checks;
 
     await asyncTimeout(2000);
     this.checks[1].status = "success";
@@ -83,6 +83,7 @@ class PupPage extends LitElement {
   render() {
     const path = this.context.store?.appContext?.path || [];
     const pkg = this.context.store.pupContext;
+    const hasChecks = (pkg?.manifest?.checks || []).length > 0
 
     const renderHealthChecks = () => {
       return this.checks.map(
@@ -141,12 +142,14 @@ class PupPage extends LitElement {
             <div>${this.renderActions()}</div>
           </section>
 
-          <section>
-            <div class="section-title">
-              <h3>Health checks</h3>
-            </div>
-            <div class="list-wrap">${renderHealthChecks()}</div>
-          </section>
+          ${hasChecks ? html`
+            <section>
+              <div class="section-title">
+                <h3>Health checks</h3>
+              </div>
+              <div class="list-wrap">${renderHealthChecks()}</div>
+            </section>
+          `: nothing }
 
           <section>
             <div class="section-title">

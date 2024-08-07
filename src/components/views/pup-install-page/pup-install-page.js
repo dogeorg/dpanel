@@ -10,7 +10,6 @@ import {
 import { getRouter } from "/router/router.js";
 import "/components/common/action-row/action-row.js";
 import "/components/common/reveal-row/reveal-row.js";
-import "/components/views/health-check.js";
 import "/components/common/page-container.js";
 import { bindToClass } from "/utils/class-bind.js";
 import * as renderMethods from "./renders/index.js";
@@ -24,7 +23,6 @@ class PupInstallPage extends LitElement {
     return {
       open_dialog: { type: Boolean },
       open_dialog_label: { type: String },
-      checks: { type: Object },
     };
   }
 
@@ -82,11 +80,11 @@ class PupInstallPage extends LitElement {
     const wrapperClasses = classMap({
       wrapper: true,
       installed: isInstalled,
-    })
+    });
 
     const renderDependancyList = () => {
       return pkg.manifest.deps.pups.map((dep) => html`
-        <action-row prefix="box-seam" name=${dep.id} label=${dep.name} .trigger=${() => this.router.go(`/discover/${dep.id}`)}>
+        <action-row prefix="box-seam" name=${dep.id} label=${dep.name} .trigger=${() => this.router.go(`/explore/${dep.id}`)}>
           ${dep.condition}
         </action-row>
       `);

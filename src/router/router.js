@@ -64,7 +64,6 @@ export const getRouter = (targetElement, options) => {
           },
           {
             path: "/pups",
-            action: middleware(loadPup),
             children: [
               {
                 path: "/", // This will match "/pups/"
@@ -73,23 +72,22 @@ export const getRouter = (targetElement, options) => {
                 action: setTitle,
               },
               {
-                path: "/:path", // Matches any subpath like "/pups/12345"
+                path: "/:pup", // Matches any subpath like "/pups/12345"
                 component: "pup-page",
                 dynamicTitle: true,
-                action: middleware(fade, setTitle),
+                action: middleware(loadPup, fade, setTitle),
               },
               {
-                path: "/:path/logs", // Matches "/pups/12345/logs"
+                path: "/:pup/logs", // Matches "/pups/12345/logs"
                 component: "log-viewer",
                 pageTitle: "Logs",
                 pageAction: "close",
-                action: middleware(fade, setTitle),
+                action: middleware(loadPup, fade, setTitle),
               }
             ]
           },
           {
             path: "/explore",
-            action: middleware(loadPup),
             children: [
               {
                 path: "",
@@ -98,17 +96,17 @@ export const getRouter = (targetElement, options) => {
                 action: setTitle,
               },
               {
-                path: "/:path",
+                path: "/:pup",
                 component: "pup-install-page",
                 dynamicTitle: true,
-                action: middleware(fade, setTitle),
+                action: middleware(loadPup, fade, setTitle),
               },
               {
-                path: "/:path/ui", // Matches "/pups/12345/ui"
+                path: "/:pup/ui", // Matches "/pups/12345/ui"
                 component: "iframe-view",
                 pageTitle: "Explore > Dogecoin",
                 pageAction: "close",
-                action: middleware(fade, setTitle),
+                action: middleware(loadPup, fade, setTitle),
               }
             ]
           },

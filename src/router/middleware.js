@@ -55,18 +55,7 @@ export function fade(context, commands, route) {
 
 export async function loadPup(context, commands) {
 
-  let pupId
-
-  if (context.pathname.includes("/ui")) {
-    // When within pup iframe
-    pupId = getSegmentBeforeTerm(context.pathname, "ui");
-    console.log(context.pathname, pupId);
-  } else {
-    // When wihtin pup management
-    pupId = context.pathname
-      .replace(`/${context.path}/`, "")
-      .replace(`/${context.path}`, "")
-  }
+  const pupId = context.params.pup
 
   if (!pupId) {
     return undefined;
@@ -87,7 +76,7 @@ export async function loadPup(context, commands) {
     store.updateState({
       pupContext: { manifest, state },
       appContext: {
-        pageTitle: context.params.path || manifest.package,
+        pageTitle: context.params.pup || manifest.package,
         pageAction: "back",
       }
     });

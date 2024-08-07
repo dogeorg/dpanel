@@ -53,13 +53,13 @@ class PupPage extends LitElement {
     this.addEventListener("sl-hide", this.handleDialogClose);
     this.checks = this.context.store.pupContext?.manifest?.checks;
 
-    await asyncTimeout(2000);
-    this.checks[1].status = "success";
-    this.requestUpdate();
+    // await asyncTimeout(2000);
+    // this.checks[1].status = "success";
+    // this.requestUpdate();
 
-    await asyncTimeout(2000);
-    this.checks[2].status = "success";
-    this.requestUpdate();
+    // await asyncTimeout(2000);
+    // this.checks[2].status = "success";
+    // this.requestUpdate();
   }
 
   handleDialogClose() {

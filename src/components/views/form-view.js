@@ -1,5 +1,5 @@
 import { LitElement, html, css, ifDefined } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
-import { getRouter } from '/router/router.js'
+// import { getRouter } from '/router/router.js'
 import { StoreSubscriber } from '/state/subscribe.js';
 import { store } from '/state/store.js';
 import '/components/common/render-count.js'
@@ -52,7 +52,7 @@ class PracticeFormView extends LitElement {
 
   firstUpdated() {
     // Demonstration of accessing the router within other components
-    const router = getRouter();
+    // const router = getRouter();
     this.forceDataSet('split')
   }
 

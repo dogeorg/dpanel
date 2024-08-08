@@ -2,7 +2,7 @@
 import { store } from "/state/store.js";
 import { pkgController } from "/controllers/package/index.js";
 import { getBootstrap } from "/api/bootstrap/bootstrap.js";
-import { getRouter } from "/router/router.js";
+// import { getRouter } from "/router/router.js";
 
 export const wrapActions =
   (...actions) =>
@@ -116,7 +116,7 @@ function removeLastPathSegment(pathname) {
 export function asPage(context, commands) {
   const { component, pageTitle, pageAction } = context.route;
   const pageContainer = document.createElement('page-container');
-  const r = getRouter().Router;
+  // const r = getRouter().Router;
   
   // Page props
   pageContainer.pageTitle = pageTitle;

@@ -1,116 +1,112 @@
-import { Router as VaadinRouter } from "/vendor/@vaadin/router@1.7.5/vaadin-router.min.js";
-import {
-  wrapActions as middleware,
-  isAuthed,
-  setTravel,
-  loadPup,
-  performLogout,
-  asPage
-} from "./middleware.js";
+export class Router {
+  constructor(outlet, options = {}) {
+    this.routes = [];
+    this.outlet = outlet;
+    this.transitionDuration = options.transitionDuration || 3000;
 
-let router;
+    this.setupLinkInterceptor();
 
-class Router extends VaadinRouter {
-  constructor(outlet, options) {
-    super(outlet, options);
+    window.onpopstate = function (event) {
+      this.navigate(window.location.pathname);
+    };
+
+    window.onload = () => {
+      this.navigate(window.location.pathname);
+    };
+  }
+
+  setRoutes(routes) {
+    routes.forEach((route) => {
+      this.addRoute(route.path, route.component, {
+        before: route.before,
+        middleware: route.middleware,
+        after: route.after,
+      });
+    });
+  }
+
+  addRoute(path, component, { before, middleware, after } = {}) {
+    const componentClass = customElements.get(component);
+    if (!componentClass) {
+      console.error(`Component ${component} not found.`);
+      return;
+    }
+    const routePattern = path.replace(/:[^\s/]+/g, "([^/]+)");
+    const regex = new RegExp(`^${routePattern}$`);
+    this.routes.push({
+      path,
+      regex,
+      component: componentClass,
+      before,
+      middleware,
+      after,
+    });
+  }
+
+  navigate(path) {
+    const route = this.routes.find((route) => route.regex.test(path));
+    if (!route) {
+      console.error(`No route found for path: ${path}`);
+      return;
+    }
+
+    const paramsMatch = route.regex.exec(path);
+    const params = this.extractParams(route.path, paramsMatch);
+    const context = { params };
+
+    const processRoute = async () => {
+      if (route.before)
+        await Promise.all(route.before.map((func) => func(context)));
+
+      if (route.middleware) {
+        const continueNavigation = await route.middleware(context);
+        if (!continueNavigation) {
+          console.log("Middleware blocked navigation.");
+          return;
+        }
+      }
+
+      const componentInstance = new route.component();
+      this.performTransition(componentInstance);
+
+      if (route.after)
+        await Promise.all(route.after.map((func) => func(context)));
+    };
+
+    processRoute().catch(console.error);
+  }
+
+  setupLinkInterceptor() {
+    document.addEventListener("click", (event) => {
+      const path = event.composedPath();
+      const target = path[0];
+      const anchor = target.closest("a");
+      if (anchor && anchor.href) {
+        event.preventDefault();
+        const href = anchor.getAttribute("href");
+        history.pushState({}, "", href);
+        this.navigate(href);
+      }
+    });
+  }
+
+  extractParams(routePath, paramsMatch) {
+    const paramNames = routePath.match(/:([^/]+)/g) || [];
+    const params = {};
+    paramNames.forEach((name, index) => {
+      params[name.substring(1)] = paramsMatch[index + 1];
+    });
+    return params;
+  }
+
+  performTransition(newComponent) {
+    const currentComponent = this.outlet.firstChild;
+    this.outlet.appendChild(newComponent);
+
+    if (currentComponent) {
+      setTimeout(() => {
+        this.outlet.removeChild(currentComponent);
+      }, this.transitionDuration);
+    }
   }
 }
-
-export const getRouter = (targetElement, options) => {
-  if (!router) {
-    router = new Router(targetElement, options);
-
-    // Configure routes
-    router.setRoutes([
-      // Auth
-      { 
-        path: "/login",
-        action: middleware(),
-        component: "login-view" 
-      },
-      {
-        path: "/logout",
-        action: middleware(performLogout)
-      },
-
-      // Main
-      {
-        path: "/",
-        action: middleware(isAuthed, setTravel),
-        children: [
-          {
-            path: "",
-            component: "home-view",
-            pageTitle: "Home",
-            action: middleware(asPage)
-          },
-          {
-            path: "/stats",
-            component: "stats-view",
-            pageTitle: "Monitor",
-            action: middleware(asPage)
-          },
-          {
-            path: "/config",
-            component: "manage-view",
-            pageTitle: "Settings",
-            action: middleware(asPage)
-          },
-          {
-            path: "/pups",
-            children: [
-              {
-                path: "/", // This will match "/pups/"
-                component: "library-view",
-                pageTitle: "Installed Pups",
-                action: middleware(asPage)
-              },
-              {
-                path: "/:pup", // Matches any subpath like "/pups/12345"
-                component: "pup-page",
-                dynamicTitle: true,
-                action: middleware(loadPup, asPage),
-                animate: false,
-              },
-              {
-                path: "/:pup/logs", // Matches "/pups/12345/logs"
-                component: "log-viewer",
-                pageTitle: "Logs",
-                pageAction: "close",
-                action: middleware(loadPup, asPage),
-                animate: false,
-              }
-            ]
-          },
-          {
-            path: "/explore",
-            children: [
-              {
-                path: "",
-                component: "store-view",
-                pageTitle: "Explore",
-                action: middleware(loadPup, asPage),
-              },
-              {
-                path: "/:pup",
-                component: "pup-install-page",
-                dynamicTitle: true,
-                action: middleware(loadPup, asPage),
-                animate: false,
-              },
-              {
-                path: "/:pup/ui", // Matches "/pups/12345/ui"
-                component: "iframe-view",
-                pageTitle: "Explore > Dogecoin",
-                pageAction: "close",
-                action: middleware(loadPup, asPage),
-                animate: false,
-              }
-            ]
-          },
-        ]
-      },
-    ]);
-  }
-  return { router, Router };
-};

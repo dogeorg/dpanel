@@ -33,7 +33,8 @@ import "/utils/debug-panel.js";
 import * as renderMethods from "/components/views/app-view/renders/index.js";
 
 // Router (singleton)
-import { getRouter } from "/router/router.js";
+import { Router } from "/router/router.js";
+import { routes } from "/router/routes.js";
 
 // Utils
 import debounce from "/utils/debounce.js";
@@ -91,7 +92,8 @@ class DPanelApp extends LitElement {
     // Initialise our router singleton and provide it a target elemenet.
     const outlet = this.shadowRoot.querySelector("#Outlet");
     // this.outletWrapper = this.shadowRoot.querySelector("#OutletWrapper")
-    this.router = getRouter(outlet).Router;
+    this.router = new Router(outlet);
+    this.router.setRoutes(routes)
   }
 
   _handleResize() {

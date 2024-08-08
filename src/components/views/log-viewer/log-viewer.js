@@ -21,7 +21,7 @@ class LogViewer extends LitElement {
     this.isConnected = false;
     this.wsClient = null;
     this.follow = true;
-    this.autostart = false;
+    this.autostart = true;
   }
 
   connectedCallback() {
@@ -185,15 +185,15 @@ class LogViewer extends LitElement {
       }
       div#LogHUD {
         position: absolute;
-        right: 28px;
-        top: 5px;
+        right: 16px;
+        top: 8px;
 
         display: flex;
         flex-direction: column;
         align-items: end;
       }
       div#LogHUD .status {
-        opacity: 0.7;
+        opacity: 0.3;
         cursor: pointer;
       }
       div#LogHUD div {

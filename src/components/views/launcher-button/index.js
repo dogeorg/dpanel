@@ -27,7 +27,7 @@ class DogeboxLauncherButton extends LitElement {
       } else {
         this.check();
       }
-    }, 2000);
+    }, 10000);
   }
 
   disconnectedCallback() {

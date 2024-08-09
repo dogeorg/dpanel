@@ -30,26 +30,29 @@ export const routes = [
     component: "pup-page",
     dynamicTitle: true,
     pageAction: "back",
-    before: [loadPup, asPage]
+    before: [loadPup, asPage],
+    animate: true,
   },
   {
     path: "/pups/:pup/logs",
     component: "log-viewer",
     pageTitle: "Logs",
     pageAction: "close",
-    before: [loadPup, asPage]
+    before: [loadPup, asPage],
+    animate: true,
   },
   {
     path: "/explore",
     component: "store-view",
     pageTitle: "Explore Pups",
-    before: [asPage]
+    before: [asPage],
   },
   {
     path: "/explore/:pup", // Matches any subpath like "/pups/12345"
     component: "pup-install-page",
     dynamicTitle: true,
     pageAction: "back",
-    before: [loadPup, asPage]
+    before: [loadPup, asPage],
+    animate: true,
   },
 ]

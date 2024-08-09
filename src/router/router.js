@@ -79,7 +79,7 @@ export class Router {
 
         // Check if middleware has provided a modified component instance
         const componentToRender = route.componentInstance || new route.componentClass();
-        this.performTransition(componentToRender, options);
+        this.performTransition(componentToRender, route, options);
         
         if (route.after) {
           for (const func of route.after) {
@@ -124,8 +124,13 @@ export class Router {
     return params;
   }
 
-  performTransition(incomingComponent, options) {
+  performTransition(incomingComponent, route, options) {
     const outgoingComponent = this.outlet.firstChild;
+
+    let transDuration = 1;
+    if (options.backward || route.animate) {
+      transDuration = this.transitionDuration;
+    }
 
     // Apply 'transitioning' styles to incoming/outgoing component.
     // As we are about to have both components within the one div
@@ -134,8 +139,8 @@ export class Router {
     incomingComponent.classList.add('transitioning');
 
     // Set the animation duration
-    outgoingComponent && outgoingComponent.style.setProperty('--animation-duration', `${this.transitionDuration}ms`);
-    incomingComponent.style.setProperty('--animation-duration', `${this.transitionDuration}ms`);
+    outgoingComponent && outgoingComponent.style.setProperty('--animation-duration', `${transDuration}ms`);
+    incomingComponent.style.setProperty('--animation-duration', `${transDuration}ms`);
 
     // Is this forward navigation or a backward?
     // Forward will have the incoming component on top and sliding up

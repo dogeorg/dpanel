@@ -10,7 +10,6 @@ import * as mockConfig from '/components/common/dynamic-form/mocks/index.js'
 import { pkgController } from '/controllers/package/index.js';
 import { postConfig } from '/api/config/config.js';
 import { createAlert } from '/components/common/alert.js';
-// import { getRouter } from "/router/router.js";
 
 // Import component chunks
 import * as renderMethods from './renders/index.js';
@@ -55,7 +54,6 @@ class PupSnapshot extends LitElement {
     this.pkgController = pkgController;
     this.options = {};
     this.config = {};
-    // this.router = getRouter().Router;
     this.allowInspect = false;
     // Bind all imported renderMehtods to 'this'
     bindToClass(renderMethods, this)
@@ -139,9 +137,6 @@ class PupSnapshot extends LitElement {
   handlePupTitleClick(e) {
     e.stopPropagation();
     e.preventDefault();
-    if (e.currentTarget.href) {
-      // this.router.go(e.currentTarget.href);
-    }
   }
 
   handleTabClick(event) {

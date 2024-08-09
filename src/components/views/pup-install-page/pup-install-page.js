@@ -7,7 +7,6 @@ import {
   unsafeHTML,
   classMap,
 } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
-// import { getRouter } from "/router/router.js";
 import "/components/common/action-row/action-row.js";
 import "/components/common/reveal-row/reveal-row.js";
 import "/components/common/page-container.js";
@@ -31,7 +30,6 @@ class PupInstallPage extends LitElement {
     bindToClass(renderMethods, this);
     this.pkgController = pkgController;
     this.context = new StoreSubscriber(this, store);
-    // this.router = getRouter().Router;
     this.open_dialog = false;
     this.open_dialog_label = "";
     this.open_page = false;
@@ -66,14 +64,10 @@ class PupInstallPage extends LitElement {
     this.open_dialog_label = el.getAttribute("label");
   };
 
-  navigateTo = (event, menuRowInstance) => {
-    // this.router.go(`${window.location.href}/logs`);
-  };
-
   render() {
     const path = this.context.store?.appContext?.path || [];
     const pkg = this.context.store.pupContext;
-    const isInstalled = !!pkg.state.status;
+    const isInstalled = !!pkg?.state?.status;
     const hasDependencies = (pkg?.manifest?.deps?.pups || []).length > 0
     const popover_page = path[1];
 
@@ -84,7 +78,7 @@ class PupInstallPage extends LitElement {
 
     const renderDependancyList = () => {
       return pkg.manifest.deps.pups.map((dep) => html`
-        <action-row prefix="box-seam" name=${dep.id} label=${dep.name} .trigger=${() => this.router.go(`/explore/${dep.id}`)}>
+        <action-row prefix="box-seam" name=${dep.id} label=${dep.name} href=${`/explore/${dep.id}`}>
           ${dep.condition}
         </action-row>
       `);

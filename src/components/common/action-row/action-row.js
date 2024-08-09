@@ -9,6 +9,7 @@ class ActionRow extends LitElement {
       trigger: { type: Object },
       variant: { type: String },
       loading: { type: Boolean },
+      href: { type: String },
     };
   }
 
@@ -18,11 +19,17 @@ class ActionRow extends LitElement {
     this.prefix = "columns-gap";
     this.suffix = "chevron-right";
     this.trigger = false;
+    this.href = "";
   }
 
   static styles = css`
     :host {
       color: var(--sl-color-neutral-600);
+    }
+
+    .anchor {
+      color: inherit;
+      text-decoration: inherit;
     }
 
     /* VARIANTS */
@@ -139,7 +146,8 @@ class ActionRow extends LitElement {
   };
 
   render() {
-    return html`
+
+    const el = html`
       <div class="base-wrap" part="base" @click=${this.handleClick}>
         <div class="prefix-wrap" part="prefix">
           ${this.loading
@@ -164,6 +172,11 @@ class ActionRow extends LitElement {
           <sl-icon name="chevron-right"></sl-icon>
         </div>
       </div>
+    `
+    return html`
+      ${this.href ? html`
+        <a class="anchor" href="${this.href}" target="_self">${el}</a>
+      ` : el}
     `;
   }
 }

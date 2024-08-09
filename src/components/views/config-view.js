@@ -1,5 +1,4 @@
 import { LitElement, html, css } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
-// import { getRouter } from '/router/router.js'
 import '/components/common/render-count.js'
 
 class ConfigView extends LitElement {
@@ -12,11 +11,6 @@ class ConfigView extends LitElement {
       font-family: 'Comic Neue', sans-serif;
     }
   `
-
-  firstUpdated() {
-    // Demonstration of accessing the router within other components
-    // const { router } = getRouter();
-  }
 
   render() {
     return html`

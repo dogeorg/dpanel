@@ -6,7 +6,6 @@ import {
   choose,
   unsafeHTML,
 } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
-// import { getRouter } from "/router/router.js";
 import "/components/common/action-row/action-row.js";
 import "/components/views/health-check.js";
 import "/components/common/page-container.js";
@@ -31,7 +30,6 @@ class PupPage extends LitElement {
     bindToClass(renderMethods, this);
     this.pkgController = pkgController;
     this.context = new StoreSubscriber(this, store);
-    // this.router = getRouter().Router;
     this.open_dialog = false;
     this.open_dialog_label = "";
     this.open_page = false;
@@ -77,10 +75,6 @@ class PupPage extends LitElement {
   handleMenuClick = (event, el) => {
     this.open_dialog = el.getAttribute("name");
     this.open_dialog_label = el.getAttribute("label");
-  };
-
-  navigateTo = (event, menuRowInstance) => {
-    // this.router.go(`${window.location.href}/logs`);
   };
 
   render() {
@@ -129,7 +123,7 @@ class PupPage extends LitElement {
         prefix="display"
         name="logs"
         label="Logs"
-        .trigger=${this.navigateTo}
+        href="${window.location.pathname}/logs"
       >
         Unfiltered logs
       </action-row>

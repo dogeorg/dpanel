@@ -8,7 +8,6 @@ import { PaginationController } from '/components/common/paginator/paginator-con
 import { bindToClass } from '/utils/class-bind.js'
 import * as renderMethods from './renders/index.js';
 import '/components/common/paginator/paginator-ui.js';
-// import { getRouter } from "/router/router.js";
 
 const initialSort = (a, b) => {
   if (a.manifest.package < b.manifest.package) { return -1; }
@@ -35,7 +34,6 @@ class LibraryView extends LitElement {
     this.itemsPerPage = 20;
     this.pkgController = pkgController;
     this.installedList = new PaginationController(this, undefined, this.itemsPerPage, { initialSort });
-    // this.router = getRouter().Router
     // this.availableList = new PaginationController(this, undefined, this.itemsPerPage);
     this.inspectedPup;
     bindToClass(renderMethods, this);

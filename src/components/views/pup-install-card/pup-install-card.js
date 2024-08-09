@@ -15,12 +15,15 @@
         short: { type: String },
         status: { type: String },
         running: { type: Boolean },
-        gui: { type: Object },
+        hasGui: { type: Boolean },
+        href: { type: String },
+        gref: { type: String }
       };
     }
 
     constructor() {
       super();
+      this.href = ""
     }
 
     get status() {
@@ -33,23 +36,34 @@
       this.requestUpdate();
     }
 
+    get pupId() {
+      return this._pupId;
+    }
+
+    set pupId(newPupId) {
+      this._pupId = newPupId
+      const formattedPupId = newPupId.toLowerCase();
+      this.href = `/explore/${formattedPupId}`;
+      this.gref = `/explore/${formattedPupId}/ui`;
+    }
+
     render() {
-      const { pupName, version, icon, status, gui, short } = this;
+      const { pupName, version, icon, status, gui, short, href } = this;
       return html`
-        <div class="pup-card-wrap">
-
-          <div class="icon-wrap">
-            <sl-icon name="${icon}"></sl-icon>
-          </div>
-
-          <div class="details-wrap">
-            <div class="inner">
-              <span class="name">${pupName}</span>
-              <span class="description">${short}</span>
-              <span class="status">${status === "running" ? "Installed" : status}</span>
+        <a class="anchor" href=${href} target="_self">
+          <div class="pup-card-wrap">
+            <div class="icon-wrap">
+              <sl-icon name="${icon}"></sl-icon>
+            </div>
+            <div class="details-wrap">
+              <div class="inner">
+                <span class="name">${pupName}</span>
+                <span class="description">${short}</span>
+                <span class="status">${status === "running" ? "Installed" : status}</span>
+              </div>
             </div>
           </div>
-        </div>
+        </a>
       `;
     }
 
@@ -57,6 +71,11 @@
       :host {
         --icon-size: 72px;
         --row-height: 84px;
+      }
+
+      .anchor {
+        text-decoration: none;
+        color: inherit;
       }
 
       :host([installed]) .icon-wrap {

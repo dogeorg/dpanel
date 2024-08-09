@@ -8,7 +8,6 @@ import { bindToClass } from '/utils/class-bind.js'
 import * as renderMethods from './renders/index.js';
 import '/components/common/paginator/paginator-ui.js';
 import '/components/common/page-banner.js';
-// import { getRouter } from "/router/router.js";
 
 const initialSort = (a, b) => {
   if (a.manifest.package < b.manifest.package) { return -1; }
@@ -35,7 +34,7 @@ class StoreView extends LitElement {
     this.itemsPerPage = 10;
     this.pkgController = pkgController;
     this.packageList = new PaginationController(this, undefined, this.itemsPerPage,{ initialSort });
-    // this.router = getRouter().Router
+
     this.inspectedPup;
     this.showCategories = false;
     this.categories = [
@@ -107,10 +106,6 @@ class StoreView extends LitElement {
 
   handleForcedTabShow(event) {
     this.inspectedPup = event.detail.pupId
-  }
-
-  handlePupLinkClick(event, pupId) {
-    // this.router.go(`/explore/${pupId.toLowerCase()}`);
   }
 
   async fetchBootstrap() {

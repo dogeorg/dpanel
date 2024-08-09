@@ -2,30 +2,29 @@ export class Router {
   constructor(outlet, options = {}) {
     this.routes = [];
     this.outlet = outlet;
-    this.transitionDuration = options.transitionDuration || 3000;
+    this.transitionDuration = options.transitionDuration || 300;
 
     this.setupLinkInterceptor();
 
-    window.onpopstate = function (event) {
-      this.navigate(window.location.pathname);
+    // Ensure route is processed on app start (else no component).
+    window.onload = () => {
+      this.handleNavigation(window.location.pathname);
     };
 
-    window.onload = () => {
-      this.navigate(window.location.pathname);
+    // Ensure route is processed on popstate (eg: browser back button)
+    // Else no component.
+    window.onpopstate = () => {
+      this.handleNavigation(window.location.pathname, { backward: true });
     };
   }
 
   setRoutes(routes) {
     routes.forEach((route) => {
-      this.addRoute(route.path, route.component, {
-        before: route.before,
-        middleware: route.middleware,
-        after: route.after,
-      });
+      this.addRoute(route.path, route.component, route);
     });
   }
 
-  addRoute(path, component, { before, middleware, after } = {}) {
+  addRoute(path, component, route) {
     const componentClass = customElements.get(component);
     if (!componentClass) {
       console.error(`Component ${component} not found.`);
@@ -34,16 +33,23 @@ export class Router {
     const routePattern = path.replace(/:[^\s/]+/g, "([^/]+)");
     const regex = new RegExp(`^${routePattern}$`);
     this.routes.push({
-      path,
+      ...route,
       regex,
-      component: componentClass,
-      before,
-      middleware,
-      after,
+      componentClass,
     });
   }
 
-  navigate(path) {
+  go(path, replace = false) {
+    const changeState = replace ? 'replaceState' : 'pushState';
+
+    // Update the URL without refreshing the page
+    window.history[changeState]({}, '', path);
+    
+    // With the URL updated, process the route change (middleware, component swapping)
+    this.handleNavigation(path);
+  }
+
+  handleNavigation(path, options = {}) {
     const route = this.routes.find((route) => route.regex.test(path));
     if (!route) {
       console.error(`No route found for path: ${path}`);
@@ -52,25 +58,44 @@ export class Router {
 
     const paramsMatch = route.regex.exec(path);
     const params = this.extractParams(route.path, paramsMatch);
-    const context = { params };
+    const context = { route, params };
+    const commands = {
+      stop: () => { 
+        throw new Error('Stop')
+      },
+      redirect: (destination) => { 
+        this.go(destination);
+        throw new Error('Redirection');
+      }
+    };
 
     const processRoute = async () => {
-      if (route.before)
-        await Promise.all(route.before.map((func) => func(context)));
+      try {
+        if (route.before) {
+          for (const func of route.before) {
+            const commandResult = await func(context, commands);
+          }
+        }
 
-      if (route.middleware) {
-        const continueNavigation = await route.middleware(context);
-        if (!continueNavigation) {
-          console.log("Middleware blocked navigation.");
-          return;
+        // Check if middleware has provided a modified component instance
+        const componentToRender = route.componentInstance || new route.componentClass();
+        this.performTransition(componentToRender, options);
+        
+        if (route.after) {
+          for (const func of route.after) {
+            await func(context, commands);
+          }
+        }
+      } catch (error) {
+        if (error.message === 'Redirection') {
+          console.log('Navigation process terminated due to redirection.');
+        } else if (error.message === 'Stop') {
+          console.log('Navigation process terminated due to middleware issuing stop command.');
+        } else {
+          // Re-throw unhandled cases.
+          throw error;
         }
       }
-
-      const componentInstance = new route.component();
-      this.performTransition(componentInstance);
-
-      if (route.after)
-        await Promise.all(route.after.map((func) => func(context)));
     };
 
     processRoute().catch(console.error);
@@ -85,7 +110,7 @@ export class Router {
         event.preventDefault();
         const href = anchor.getAttribute("href");
         history.pushState({}, "", href);
-        this.navigate(href);
+        this.handleNavigation(href);
       }
     });
   }
@@ -99,14 +124,40 @@ export class Router {
     return params;
   }
 
-  performTransition(newComponent) {
-    const currentComponent = this.outlet.firstChild;
-    this.outlet.appendChild(newComponent);
+  performTransition(incomingComponent, options) {
+    const outgoingComponent = this.outlet.firstChild;
 
-    if (currentComponent) {
-      setTimeout(() => {
-        this.outlet.removeChild(currentComponent);
-      }, this.transitionDuration);
-    }
+    // Apply 'transitioning' styles to incoming/outgoing component.
+    // As we are about to have both components within the one div
+    // They will require to be positioned absolutely, atop of eachother.
+    outgoingComponent && outgoingComponent.classList.add('transitioning')
+    incomingComponent.classList.add('transitioning');
+
+    // Set the animation duration
+    outgoingComponent && outgoingComponent.style.setProperty('--animation-duration', `${this.transitionDuration}ms`);
+    incomingComponent.style.setProperty('--animation-duration', `${this.transitionDuration}ms`);
+
+    // Is this forward navigation or a backward?
+    // Forward will have the incoming component on top and sliding up
+    // Backward will have the outgoing component on top and sliding down
+    const topComponent = options.backward ? outgoingComponent : incomingComponent
+    const bottomComponent = options.backward ? incomingComponent : outgoingComponent
+    topComponent.classList.add('top');
+
+    // Apply animation classes depending on naviation direction
+    topComponent.classList.add(options.backward ? 'slide-out' : 'slide-in')
+
+    // Add the incoming component to the router-outlet.
+    this.outlet.appendChild(incomingComponent);
+
+    // Remove outgoing component after transition completes.
+    // Rest styles of incoming component
+    setTimeout(() => {
+      incomingComponent.classList.remove('transitioning');
+      if (outgoingComponent) {
+        this.outlet.removeChild(outgoingComponent);
+      }
+    }, this.transitionDuration);
+
   }
 }

@@ -14,6 +14,7 @@ import {
   mainStyles,
   navStyles,
   utilStyles,
+  transitionStyles,
 } from "/components/views/app-view/styles/index.styles.js";
 
 // App state (singleton)
@@ -34,7 +35,7 @@ import * as renderMethods from "/components/views/app-view/renders/index.js";
 
 // Router (singleton)
 import { Router } from "/router/router.js";
-import { routes } from "/router/routes.js";
+import { routes } from "/router/config.js";
 
 // Utils
 import debounce from "/utils/debounce.js";
@@ -52,6 +53,13 @@ class DPanelApp extends LitElement {
     systemPromptActive: { type: Boolean },
     currentPath: { type: String },
   };
+
+  static styles = [
+    mainStyles,
+    navStyles,
+    utilStyles,
+    transitionStyles
+  ];
 
   constructor() {
     super();
@@ -117,8 +125,8 @@ class DPanelApp extends LitElement {
   }
 
   handleNavClick(e) {
-    const anchor = e.currentTarget.querySelector('a');
-    if (anchor) { anchor.click(); }
+    // const anchor = e.currentTarget.querySelector('a');
+    // if (anchor) { anchor.click(); }
   }
 
   enableSystemPrompt() {
@@ -164,12 +172,6 @@ class DPanelApp extends LitElement {
         <debug-panel></debug-panel>
         <system-prompt ?open=${showSystemPrompt} task=${taskName}></system-prompt>
       </aside>
-
-      <style>
-        ${mainStyles}
-        ${navStyles}
-        ${utilStyles}
-      </style>
     `;
   }
 }

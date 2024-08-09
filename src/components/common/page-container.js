@@ -8,26 +8,18 @@ class PageContainer extends LitElement {
     :host {
       display: block;
       position: relative;
+      background: #23252a;
+      min-height: 100vh;
     }
 
-    // :host(.entering) {
-    //   animation: slideFadeIn 300ms ease forwards;
-    // }
-
-    // :host(.exiting) {
-    //   animation: slideFadeOut 300ms ease forwards;
-    // }
-
-    :host(.entering) .page-header,
-    :host(.leaving) .page-header {
+    :host(.transitioning) .page-header {
       width: 100%;
     }
 
-    :host(.entering) .page-body,
-    :host(.leaving) .page-body {
-      // margin-top: 0px;
-      // position: relative;
-      // top: 80px;
+    :host(.transitioning) .page-body {
+      margin-top: 0px;
+      position: relative;
+      top: 80px;
     }
 
     .page-header {
@@ -112,16 +104,7 @@ class PageContainer extends LitElement {
   }
 
   async handleBackClick(e) {
-    // this.classList.add('exiting');
-    // await asyncTimeout(200);
-    try {
-      store.updateState({ appContext: { navigationDirection: "backward" }})
-      navigateBack(store, this.router);
-    } catch (err) {
-      // All else fails, navigate to "/".
-      console.warn('Routing warning:', err)
-      window.location = "/";
-    }
+    history.back();
   }
 
   handleMenuClick(e) {

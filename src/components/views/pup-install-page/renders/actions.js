@@ -19,7 +19,7 @@ export function renderActions() {
       }
     }
   `
-  const isInstalled = !!pkg.state.status;
+  const isInstalled = !!pkg?.state?.status;
 
   return html`
     <div class="action-wrap">

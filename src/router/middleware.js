@@ -2,37 +2,10 @@
 import { store } from "/state/store.js";
 import { pkgController } from "/controllers/package/index.js";
 import { getBootstrap } from "/api/bootstrap/bootstrap.js";
-// import { getRouter } from "/router/router.js";
-
-export const wrapActions =
-  (...actions) =>
-  async (context, commands) => {
-    // Execute each action in sequence
-    // const route = context.resolver?.R?.route || false
-    const route = {}
-    for (const action of actions) {
-      const result = await action(context, commands, route);
-      // If an action returns a command (like redirect), return it immediately
-      if (result) {
-        return result;
-      }
-    }
-    return undefined
-  };
-
-// Example middleware
-export function logPathMiddleware(context, commands) {
-  console.log("Navigating to path:", context.pathname);
-  return undefined; // Proceed with the navigation
-}
 
 export async function loadPup(context, commands) {
-
   const pupId = context.params.pup
-
-  if (!pupId) {
-    return undefined;
-  }
+  if (!pupId) { return undefined; }
 
   try {
     // ensure bootstrap (temporary)
@@ -62,33 +35,6 @@ export async function loadPup(context, commands) {
   return undefined
 }
 
-export function setTravel(context, commands) {
-  // const r = getRouter().router;
-
-  // Push the new path to the pathStack
-  const pathStack = store.appContext.pathStack || [];
-  pathStack.push(context.pathname);
-
-  const dedupedStack = pathStack.filter((path, index, array) => {
-    // Check if the current path is the same as the next path
-    return index === 0 || path !== array[index - 1];
-  });
-
-  const pageCount = store.appContext.pageCount + 1;
-
-  store.updateState({
-    appContext: {
-      pathname: context.pathname,
-      upwardPathname: removeLastPathSegment(context.pathname),
-      pathStack: dedupedStack,
-      menuVisible: false, // Collapses the menu for mobile on menu selection
-      pageCount
-    },
-  });
-
-  return undefined;
-}
-
 export function isAuthed(context, commands) {
   if (store.networkContext.token) {
     return undefined;
@@ -102,41 +48,21 @@ export function performLogout(context, commands) {
   return commands.redirect("/login");
 }
 
-function removeLastPathSegment(pathname) {
-  // Split the pathname into segments based on '/'
-  const segments = pathname.split('/').filter(Boolean); // Filter out empty segments
-
-  // Remove the last segment
-  segments.pop();
-
-  // Join the remaining segments back into a pathname
-  return '/' + segments.join('/');
-}
-
 export function asPage(context, commands) {
-  const { component, pageTitle, pageAction } = context.route;
-  const pageContainer = document.createElement('page-container');
-  // const r = getRouter().Router;
+  const { componentClass: ComponentClass, pageTitle, pageAction } = context.route;
+
+  // Create instance of page-container
+  const PageContainer = customElements.get('page-container');
+  const pageContainer = new PageContainer()
   
-  // Page props
+  // Set properties on the page-container per the route definition.
   pageContainer.pageTitle = pageTitle;
   pageContainer.pageAction = pageAction;
-  pageContainer.router = r;
   
-  // Wrap route component in pageContainer
-  pageContainer.appendChild(document.createElement(component));
+  // Wrap route component in page-container.
+  const childComponent = new ComponentClass();
+  pageContainer.appendChild(childComponent);
 
-  // Returned element is injected into #Outlet
-  return pageContainer
-}
-
-function getSegmentBeforeTerm(path, term) {
-    const segments = path.split('/');
-    const uiIndex = segments.indexOf(term);
-
-    if (uiIndex > 0) {
-        return segments[uiIndex - 1];
-    } else {
-        return null;
-    }
+  // Override route component withly newly wrapped component
+  context.route.componentInstance = pageContainer;
 }

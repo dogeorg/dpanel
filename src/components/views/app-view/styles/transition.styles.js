@@ -2,11 +2,14 @@ import { css } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
 
 export const transitionStyles = css`
   #Outlet > .transitioning {
-    position: absolute;
+    position: fixed;
     width: calc(100% - var(--page-margin-left));
+    overflow-y: scroll;
     top: 0px;
     right: 0px;
     z-index: 1;
+    translate3d(0, 0, 0);
+    will-change: transform, opacity;
     --animation-duration: 200ms;
   }
 

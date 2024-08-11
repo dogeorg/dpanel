@@ -27,6 +27,10 @@ class ActionRow extends LitElement {
       color: var(--sl-color-neutral-600);
     }
 
+    a, button {
+      touch-action: manipulation;
+    }
+
     .anchor {
       color: inherit;
       text-decoration: inherit;

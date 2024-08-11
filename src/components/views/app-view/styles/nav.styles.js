@@ -145,66 +145,25 @@ export const navStyles = css`
     cursor: pointer;
   }
 
-  #Side .menu-item a,
+  #Side .menu-item,
   #Side .menu-item sl-icon {
     text-decoration: none;
     user-select: none;
   }
 
-  #Side .menu-item:hover,
-  #Side .sub-menu-item:hover {
+  #Side .menu-item:hover {
     background: rgba(255, 255, 255, 0.1);
   }
 
-  #Side .sub-menu-list {
-    background: rgba(255, 255, 255, 0.02);
-    margin-top: -3px;
-    margin-left: 0.55em;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    column-gap: 1em;
-  }
-
-  #Side .sub-menu-list .sub-menu-item {
-    width: 100%;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    column-gap: 1em;
-    margin: 0.1em 0em 0em 0em;
-    padding: 0.5em 1em 0.5em 2em;
-
-    font-family: "Comic Neue";
-    font-size: 1.1rem;
-    font-weight: 600;
-  }
-
-  #Side .menu-label {
-    padding: 0.5em 1.5em;
-    font-family: "Comic Neue";
-    font-size: 0.85rem;
-    font-weight: bold;
-    text-transform: uppercase;
-    color: #5e74eb;
-  }
-
   #Side .menu-item.active,
-  #Side .sub-menu-item.active {
+  #Side .menu-item.active sl-icon {
+    text-decoration: none;
+    color: white;
     background: #4360ff;
   }
 
-  #Side .menu-item.active a,
-  #Side .menu-item.active sl-icon,
-  #Side .sub-menu-item.active a,
-  #Side .sub-menu-item.active sl-icon {
-    text-decoration: none;
-    color: white;
-  }
-
-  #Side .menu-item a,
-  #Side .sub-menu-item a {
+  #Side .menu-item,
+  #Side .sub-menu-item {
     color: rgba(255, 255, 255, 0.5);
   }
 
@@ -217,38 +176,6 @@ export const navStyles = css`
   .nav-footer-content {
     padding: 0em var(--sl-spacing-x-large);
     padding-bottom: var(--sl-spacing-x-large);
-  }
-
-  #Side .sub-menu-list.hidden {
-    display: none;
-  }
-
-  #Side .menu-item-wrap.expand {
-    border-right: 3px solid rgba(255, 255, 255, 0.1);
-  }
-  #Side .menu-item-wrap.sub-active,
-  #Side .menu-item-wrap.expand.sub-active {
-    border-right: 3px solid #4360ff;
-  }
-
-  #Side .menu-item-wrap.expand .menu-item {
-    background: rgba(255, 255, 255, 0.1);
-  }
-
-  #Side .menu-item-wrap .menu-item::after {
-    content: "▼";
-    font-size: 0.85rem;
-    color: rgba(255, 255, 255, 0.1);
-    margin-left: -5px;
-    margin-top: 2px;
-  }
-
-  #Side .menu-item-wrap.expand .menu-item::after {
-    color: rgba(255, 255, 255, 0.5);
-  }
-
-  #Side .menu-item-wrap.expand .menu-item:hover {
-    background: rgba(255, 255, 255, 0.2);
   }
 
   #Side section.section-installed .menu-item.active {

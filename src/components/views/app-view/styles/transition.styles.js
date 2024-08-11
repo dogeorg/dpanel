@@ -10,7 +10,7 @@ export const transitionStyles = css`
     z-index: 1;
     translate3d(0, 0, 0);
     will-change: transform, opacity;
-    --animation-duration: 200ms;
+    --animation-duration: 300ms;
   }
 
   #Outlet > .transitioning.top {

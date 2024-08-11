@@ -23,3 +23,7 @@ body {
 sl-dialog.above-toasts::part(base) {
   z-index: 960;
 }
+
+a, button {
+  touch-action: manipulation;
+}

@@ -151,7 +151,7 @@ class DPanelApp extends LitElement {
   render() {
     const { pageTitle, pageAction } = this.context.store.appContext;
     const { previousPathname, upwardPathname } = this.context.store.appContext
-    const CURPATH = this.context.store.appContext.pathname || "";
+    const CURPATH = window.location.pathname || "";
     const showSystemPrompt = this.context.store.promptContext.display;
     const taskName = this.context.store.promptContext.name;
     const showChrome = !CURPATH.startsWith("/login");

@@ -8,13 +8,13 @@ export const routes = [
     before: [asPage]
   },
   {
-    path: "/stats/",
+    path: "/stats",
     component: "stats-view",
     pageTitle: "Stats",
     before: [asPage]
   },
   {
-    path: "/config",
+    path: "/settings",
     component: "manage-view",
     pageTitle: "Settings",
     before: [asPage]

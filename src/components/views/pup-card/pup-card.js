@@ -85,7 +85,12 @@
         --row-height: 84px;
       }
 
+      a, button {
+        touch-action: manipulation;
+      }
+
       .anchor {
+        touch-action: manipulation;
         text-decoration: none;
         color: inherit;
       }

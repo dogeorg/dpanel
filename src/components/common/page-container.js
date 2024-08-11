@@ -12,6 +12,10 @@ class PageContainer extends LitElement {
       min-height: 100vh;
     }
 
+    a, button {
+      touch-action: manipulation;
+    }
+
     :host(.transitioning) .page-header {
       width: 100%;
     }

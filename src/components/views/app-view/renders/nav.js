@@ -39,7 +39,7 @@ export function renderNav(CURPATH) {
               Monitor
             </a>
 
-            <a href="/settings" class="menu-item ${CURPATH.startsWith("/config") ? "active" : ""}">
+            <a href="/settings" class="menu-item ${CURPATH.startsWith("/settings") ? "active" : ""}">
               <sl-icon name="sliders"></sl-icon>
               Settings
             </a>

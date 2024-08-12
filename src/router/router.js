@@ -3,6 +3,7 @@ export class Router {
     this.routes = [];
     this.outlet = outlet;
     this.transitionDuration = options.transitionDuration || 300;
+    this.currentTransition = null;
 
     this.setupLinkInterceptor();
 
@@ -125,6 +126,11 @@ export class Router {
   }
 
   performTransition(incomingComponent, route, options) {
+    if (this.currentTransition) {
+      clearTimeout(this.currentTransition);
+      this.outlet.firstChild && this.outlet.removeChild(this.outlet.firstChild);
+    }
+
     const outgoingComponent = this.outlet.firstChild;
 
     let transDuration = 1;
@@ -156,12 +162,13 @@ export class Router {
     this.outlet.appendChild(incomingComponent);
 
     // Remove outgoing component after transition completes.
-    // Rest styles of incoming component
-    setTimeout(() => {
+    // Reset styles of incoming component
+    this.currentTransition = setTimeout(() => {
       incomingComponent.classList.remove('transitioning');
       if (outgoingComponent) {
         this.outlet.removeChild(outgoingComponent);
       }
+      this.currentTransition = null; // Reset the current transition
     }, this.transitionDuration);
 
   }

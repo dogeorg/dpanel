@@ -8,6 +8,6 @@ import {
 const client = new ApiClient('http://localhost:3000', store.networkContext)
 
 export async function postNetwork(body) {
-  const res = await client.post(`/auth/network`, body, { mock: postResponse });
+  const res = await client.post(`/auth/network`, body, { mock: { res: postResponse }});
   return res
 }

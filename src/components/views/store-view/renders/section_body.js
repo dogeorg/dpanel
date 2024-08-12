@@ -61,9 +61,8 @@ export function renderSectionBody(ready, SKELS, hasItems) {
             short=${pkg.manifest.docs.short}
             status=${pkg.state.status}
             ?installed=${pkg.state.status}
-            .gui=${pkg.manifest.gui}
-            @click=${(event) => this.handlePupLinkClick(event, pkg.manifest.id)}
-          ></pup-card>
+            ?hasGui=${!!pkg.manifest.gui}
+          ></pup-install-card>
         `)}
       </div>
       <style>${pupCardGrid}</style>

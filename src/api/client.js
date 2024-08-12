@@ -1,3 +1,5 @@
+import { mocks } from "./mocks.js";
+
 export default class ApiClient {
   constructor(baseURL, networkContext = {}) {
     this.baseURL = baseURL
@@ -23,7 +25,11 @@ export default class ApiClient {
     }
 
     // If mocks enabled, avoid making legitimate request, return mocked response (success or error) instead.
-    if (this.networkContext.useMocks && config.mock) {
+    const hasMock = !!config.mock
+    const useMocks = this.networkContext.useMocks
+    const specificMockEnabled = hasMock && useMocks && isMockEnabled(config.mock.group, config.mock.name, config.mock.method, this.networkContext)
+
+    if (useMocks && hasMock && specificMockEnabled) {
       return await returnMockedResponse(path, config, this.networkContext)
     }
 
@@ -69,9 +75,9 @@ async function returnMockedResponse(path, config, networkContext) {
   reqLogs && console.group('Mock Request', path)
   reqLogs && console.log(`Req (${config.method}):`, config.body || '--no-body');
 
-  const response = (typeof config.mock === 'function')
-    ? config.mock(path, { forceFailures })
-    : getMockedSuccessOrError(path, config.mock, forceFailures);
+  const response = (typeof config.mock.res === 'function')
+    ? config.mock.res(path, { forceFailures })
+    : getMockedSuccessOrError(path, config.mock.res, forceFailures);
     reqLogs && console.log('Res:', response);
     reqLogs && console.groupEnd();
 
@@ -84,4 +90,13 @@ function getMockedSuccessOrError(path, mock, forceFailures) {
     throw new Error(`Simulated error returned from ${path}`)
   }
   return mock;
+}
+
+function isMockEnabled(group, name, method, networkContext) {
+  if (!group || !name || !method) {
+    console.warn('Mock check was provided invalid group, name or method', arguments)
+    return false;
+  }
+
+  return networkContext[`mock::${group}::${name}::${method}`]
 }

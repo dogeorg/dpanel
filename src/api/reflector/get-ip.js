@@ -8,6 +8,6 @@ import {
 const client = new ApiClient('http://localhost:3000', store.networkContext)
 
 export async function getIP() {
-  const res = await client.get(`/reflector/ip`, { mock: getResponse });
+  const res = await client.get(`/reflector/ip`, { mock: { res: getResponse }});
   return res
 }

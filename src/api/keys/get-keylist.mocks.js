@@ -1,6 +1,11 @@
 export const getResponse = {
-  success: true,
-  list: [],
+  name: "/dkm/list",
+  group: "DKM",
+  method: "get",
+  res: {
+    success: true,
+    list: [],
+  }
 };
 
 export const getMockList = {

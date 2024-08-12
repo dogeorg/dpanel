@@ -1,5 +1,10 @@
 export const postResponse = {
-  success: true,
-  message: "Logged in!",
-  token: 'ABC123',
+  name: "/login",
+  group: "auth",
+  method: "post",
+  res: {
+    success: true,
+    message: "Logged in!",
+    token: 'ABC123',
+  }
 }

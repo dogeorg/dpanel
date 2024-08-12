@@ -24,6 +24,7 @@ import "/components/views/setup-complete-view/setup-complete-view.js";
 
 // Components
 import "/components/common/dynamic-form/dynamic-form.js";
+import "/utils/debug-panel.js";
 
 // Render chunks
 import * as renderChunks from "./renders/index.js";
@@ -226,6 +227,7 @@ class AppModeApp extends LitElement {
           <sl-button slot="footer" outline @click=${this._closeMgmtDialog}>Close</sl-button>
         </sl-dialog>
       `)}
+      <debug-panel></debug-panel>
     `;
   }
 }

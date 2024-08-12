@@ -1,5 +1,10 @@
 export const postResponse = {
-  success: true,
-  message: "Password successfully changed",
-  token: "flibble-wibble-from-change-pass",
+  name: "/change-pass",
+  group: "auth",
+  method: "post",
+  res: {
+    success: true,
+    message: "Password successfully changed",
+    token: "flibble-wibble-from-change-pass",
+  }
 }

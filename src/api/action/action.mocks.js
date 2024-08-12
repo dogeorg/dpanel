@@ -1,4 +1,4 @@
-export const postResponse = [
+const postResponse = [
   // When successful
   {
     success: true,
@@ -9,4 +9,11 @@ export const postResponse = [
     message: "Loser loser, tofu bruiser",
     errors: [1,2,3]
   }
-]
+];
+
+export const mock = {
+  name: '/action/:pup/start',
+  method: 'get',
+  group: 'pup actions',
+  res: postResponse
+}

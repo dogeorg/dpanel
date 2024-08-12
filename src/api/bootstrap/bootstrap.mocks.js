@@ -91,3 +91,10 @@ function generateRandomStats() {
     MEM_PERCENT_30: Array.from({ length: 6 }, () => Math.random()),
   };
 };
+
+export const mock = {
+  name: '/bootstrap',
+  method: 'get',
+  group: 'system',
+  res: generateBootstrap
+}

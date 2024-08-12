@@ -34,7 +34,7 @@ class PaginatorUI extends LitElement {
       }
 
       .page-counter[disabled] {
-        opacity: 0.2;
+        opacity: 1;
       }
     `;
   }

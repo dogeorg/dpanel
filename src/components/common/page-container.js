@@ -9,7 +9,8 @@ class PageContainer extends LitElement {
       display: block;
       position: relative;
       background: #23252a;
-      min-height: 100vh;
+      min-height: calc(100vh - 80px);
+      box-sizing: border-box;
     }
 
     a, button {

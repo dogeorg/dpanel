@@ -15,7 +15,7 @@ class DebugSettingsDialog extends LitElement {
 
     // Subscribe to store
     this.context = new StoreSubscriber(this, store);
-    this.isOpen = true;
+    this.isOpen = false;
     // this.mockOptions = [
     //   { enabled: true, group: 'networks', name: '/networks', method: 'GET' },
     //   { enabled: true, group: 'networks', name: '/networks/save', method: 'POST' },

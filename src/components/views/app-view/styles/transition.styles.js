@@ -4,7 +4,7 @@ export const transitionStyles = css`
   #Outlet > .transitioning {
     position: fixed;
     width: calc(100% - var(--page-margin-left));
-    overflow-y: scroll;
+    overflow-y: hidden;
     top: 0px;
     right: 0px;
     z-index: 1;

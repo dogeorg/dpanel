@@ -6,6 +6,6 @@ import { getResponse } from "./get-keylist.mocks.js";
 const client = new ApiClient("http://localhost:3000", store.networkContext);
 
 export async function getKeylist() {
-  const res = await client.get(`/keyring/list`, { mock: { res: getResponse }});
+  const res = await client.get(`/keyring/list`, { mock: getResponse });
   return res;
 }

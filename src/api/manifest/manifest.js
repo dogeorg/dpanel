@@ -8,5 +8,5 @@ import {
 const client = new ApiClient('http://localhost:3000', store.networkContext)
 
 export async function getManifest() {
-  return client.get('/manifest/', { mock: { res: generateManifests }});
+  return client.get('/manifest/', { mock: generateManifests });
 }

@@ -63,7 +63,7 @@ class DebugPanel extends LitElement {
 
   constructor() {
     super();
-    this.isVisible = true;
+    this.isVisible = false;
     this.logMessages = [];
     // this.originalConsoleLog = console.log;
     // this.originalConsoleInfo = console.info;

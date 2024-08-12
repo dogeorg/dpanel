@@ -1,20 +1,35 @@
 export const postResponse = {
-  success: true,
-  message: "Winner winner, chicken dinner",
+  name: '/config/:pup',
+  method: 'post',
+  group: 'pup config',
+  res: {
+    success: true,
+    message: "Winner winner, chicken dinner",
+  }
 }
 
 export const getResponse = {
-  key: 'value',
+  name: '/config/pup',
+  method: 'get',
+  group: 'pup config',
+  res: {
+    key: 'value',
+  }
 }
 
 export const getAllResponse = {
-  'Core': {
-    key: 'value',
-  },
-  'Identity': {
-    key: 'value',
-  },
-  'GigaWallet': {
-    key: 'value',
-  },
+  name: '/config',
+  method: 'get',
+  group: 'pup config',
+  res: {
+    'Core': {
+      key: 'value',
+    },
+    'Identity': {
+      key: 'value',
+    },
+    'GigaWallet': {
+      key: 'value',
+    }
+  }
 }

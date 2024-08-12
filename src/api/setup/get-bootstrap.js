@@ -8,6 +8,6 @@ import {
 const client = new ApiClient('http://localhost:3000', store.networkContext)
 
 export async function getSetupBootstrap(body) {
-  const res = await client.get(`/setup/bootstrap`, { mock: { res: getResponse }});
+  const res = await client.get(`/setup/bootstrap`, { mock: getResponse });
   return res
 }

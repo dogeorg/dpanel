@@ -94,7 +94,7 @@ function generateRandomStats() {
 
 export const mock = {
   name: '/bootstrap',
-  method: 'post',
+  method: 'get',
   group: 'system',
   res: generateBootstrap
 }

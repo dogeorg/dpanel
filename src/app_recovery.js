@@ -20,7 +20,7 @@ import "/components/views/action-login/index.js";
 import "/components/views/action-change-pass/index.js";
 import "/components/views/action-create-key/index.js";
 import "/components/views/action-select-network/index.js";
-import "/components/pages/page-recovery/index.js";
+import "/pages/page-recovery/index.js";
 
 // Components
 import "/components/common/dynamic-form/dynamic-form.js";
@@ -109,7 +109,7 @@ class AppModeApp extends LitElement {
       }
     });
     this.dialogMgmt.addEventListener("sl-after-hide", (event) => {
-      if (event.originalTarget.id === "MgmtDialog") {
+      if (event.target.id === "MgmtDialog") {
         store.updateState({ setupContext: { view: null }});
       }
     });

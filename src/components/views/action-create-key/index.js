@@ -232,7 +232,7 @@ class CreateKey extends LitElement {
         <sl-divider></sl-divider>
         <div class="phraseProceedActions">
           <sl-checkbox
-            @sl-change=${(e) => (this._termsChecked = e.originalTarget.checked)}
+            @sl-change=${(e) => (this._termsChecked = e.target.checked)}
             >I understand this prhase is the only way to recover my
             Dogebox</sl-checkbox
           >

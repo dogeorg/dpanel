@@ -82,7 +82,6 @@ class ActionRow extends LitElement {
       flex: 0 0 auto; /* Do not grow, or shrink, basis auto */
       display: flex;
       align-items: center;
-      justify-content: start;
       font-size: 1.5rem;
     }
 

@@ -3,7 +3,7 @@ import { loadPup, asPage } from "./middleware.js"
 export const routes = [
   {
     path: "/",
-    component: "home-view",
+    component: "x-page-home",
     pageTitle: "Home",
     before: [asPage]
   },
@@ -21,13 +21,13 @@ export const routes = [
   },
   {
     path: "/pups",
-    component: "library-view",
+    component: "x-page-pup-library",
     pageTitle: "Installed Pups",
     before: [asPage]
   },
   {
     path: "/pups/:pup",
-    component: "pup-page",
+    component: "x-page-pup-library-listing",
     dynamicTitle: true,
     pageAction: "back",
     before: [loadPup, asPage],
@@ -35,7 +35,7 @@ export const routes = [
   },
   {
     path: "/pups/:pup/logs",
-    component: "log-viewer",
+    component: "x-log-viewer",
     pageTitle: "Logs",
     pageAction: "close",
     before: [loadPup, asPage],
@@ -43,16 +43,24 @@ export const routes = [
   },
   {
     path: "/explore",
-    component: "store-view",
+    component: "x-page-pup-store",
     pageTitle: "Explore Pups",
     before: [asPage],
   },
   {
-    path: "/explore/:pup", // Matches any subpath like "/pups/12345"
-    component: "pup-install-page",
+    path: "/explore/:pup",
+    component: "x-page-pup-store-listing",
     dynamicTitle: true,
     pageAction: "back",
     before: [loadPup, asPage],
     animate: true,
   },
+  {
+    path: "/explore/:pup/ui",
+    component: "x-page-pup-iframe",
+    dynamicTitle: true,
+    pageAction: "close",
+    before: [loadPup, asPage],
+    animate: true
+  }
 ]

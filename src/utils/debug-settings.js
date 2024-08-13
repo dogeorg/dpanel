@@ -134,14 +134,14 @@ class DebugSettingsDialog extends LitElement {
                   <div class="mock-group-wrap">
                     <h4>${group}</h4>
                     ${this.groupedOptions[group].map(option => html`
-                      <mock-option
+                      <x-mock-option
                         name=${option.name}
                         method=${option.method}
                         group=${option.group}
                         ?disabled=${!networkContext.useMocks}
                         ?checked=${networkContext[`mock::${option.group}::${option.name}::${option.method}`]}
                         .onChange=${this.handleMockToggle}
-                      ></mock-option>
+                      ></x-mock-option>
                     `)}
                   </div>
                 `)}
@@ -314,4 +314,4 @@ class MockOption extends LitElement {
     `
   }
 }
-customElements.define("mock-option", MockOption);
+customElements.define("x-mock-option", MockOption);

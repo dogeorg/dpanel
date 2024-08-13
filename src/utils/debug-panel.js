@@ -174,4 +174,4 @@ class DebugPanel extends LitElement {
   }
 }
 
-customElements.define("debug-panel", DebugPanel);
+customElements.define("x-debug-panel", DebugPanel);

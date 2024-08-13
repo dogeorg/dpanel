@@ -15,23 +15,24 @@ import {
   navStyles,
   utilStyles,
   transitionStyles,
-} from "/components/views/app-view/styles/index.styles.js";
+} from "/components/layouts/standard-mode/styles/index.styles.js";
 
 // App state (singleton)
 import { store } from "/state/store.js";
 import { StoreSubscriber } from "/state/subscribe.js";
 
 // Views
+import "/components/pages/index.js";
 import "/components/views/index.js";
 import "/components/common/page-container.js";
-import "/components/views/welcome-dialog/index.js";
-import "/components/views/system-prompt/index.js";
+import "/components/views/prompt-welcome/index.js";
+import "/components/views/prompt-system/index.js";
 
 // Components
 import "/utils/debug-panel.js";
 
 // Render chunks
-import * as renderMethods from "/components/views/app-view/renders/index.js";
+import * as renderMethods from "/components/layouts/standard/renders/index.js";
 
 // Router (singleton)
 import { Router } from "/router/router.js";
@@ -51,7 +52,6 @@ class DPanelApp extends LitElement {
   static properties = {
     menuAnimating: { type: Boolean },
     systemPromptActive: { type: Boolean },
-    currentPath: { type: String },
   };
 
   static styles = [
@@ -66,7 +66,6 @@ class DPanelApp extends LitElement {
     this.context = new StoreSubscriber(this, store);
     this.menuAnimating = false;
     this.systemPromptActive = false;
-    this.currentPath = "";
     this._debouncedHandleResize = debounce(this._handleResize.bind(this), 50);
     this.mainChannel = mainChannel;
     this.router = null;
@@ -122,11 +121,6 @@ class DPanelApp extends LitElement {
   openDrawer() {
     const drawer = this.shadowRoot.querySelector("sl-drawer");
     drawer.show();
-  }
-
-  handleNavClick(e) {
-    // const anchor = e.currentTarget.querySelector('a');
-    // if (anchor) { anchor.click(); }
   }
 
   enableSystemPrompt() {

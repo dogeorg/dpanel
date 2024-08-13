@@ -1,7 +1,7 @@
 import { LitElement, html, css } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
 import '/components/common/render-count.js'
 
-class ConfigView extends LitElement {
+class SettingsPage extends LitElement {
 
   static styles = css`
     .padded {
@@ -15,7 +15,7 @@ class ConfigView extends LitElement {
   render() {
     return html`
       <div class="padded">
-        <h1>So Config</h1>
+        <h1>So Settings</h1>
 
         Rendered: <render-count></render-count>
       </div>
@@ -23,4 +23,4 @@ class ConfigView extends LitElement {
   }
 }
 
-customElements.define('config-view', ConfigView);
+customElements.define('x-page-settings', SettingsPage);

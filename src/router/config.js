@@ -9,13 +9,13 @@ export const routes = [
   },
   {
     path: "/stats",
-    component: "stats-view",
+    component: "x-page-stats",
     pageTitle: "Stats",
     before: [asPage]
   },
   {
     path: "/settings",
-    component: "manage-view",
+    component: "x-page-settings",
     pageTitle: "Settings",
     before: [asPage]
   },

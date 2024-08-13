@@ -162,7 +162,7 @@ class DPanelApp extends LitElement {
 
       <aside>
         <welcome-dialog></welcome-dialog>
-        <debug-panel></debug-panel>
+        <x-debug-panel></x-debug-panel>
         <system-prompt ?open=${showSystemPrompt} task=${taskName}></system-prompt>
       </aside>
     `;

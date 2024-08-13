@@ -9,12 +9,12 @@ import { sendKeys } from "../../../../dev/node_modules/@web/test-runner-commands
 import { spy } from "../../../../dev/node_modules/sinon";
 
 // Component being tested.
-import "./login-view.js";
+import "./index.js";
 
 describe("LoginView", () => {
   it("presents a login field and button", async () => {
     // Initialise the component
-    const el = await fixture(html`<login-view></login-view>`);
+    const el = await fixture(html`<x-action-login></x-action-login>`);
 
     // Heading
     const heading = el.shadowRoot.querySelector("h1");
@@ -34,7 +34,7 @@ describe("LoginView", () => {
 
   it("_attemtpLogin is called on form submit with typed password as first arg", async () => {
     // Initialise the component
-    const el = await fixture(html`<login-view></login-view>`);
+    const el = await fixture(html`<x-action-login></x-action-login>`);
 
     // Override components _attemptLogin function
     const _attemptLoginSpy = spy(el, "_attemptLogin");

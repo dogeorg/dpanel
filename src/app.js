@@ -15,7 +15,7 @@ import {
   navStyles,
   utilStyles,
   transitionStyles,
-} from "/components/layouts/standard-mode/styles/index.styles.js";
+} from "/components/layouts/standard/styles/index.styles.js";
 
 // App state (singleton)
 import { store } from "/state/store.js";

@@ -209,16 +209,16 @@ class AppModeApp extends LitElement {
         <sl-dialog id="MgmtDialog" no-header ?open=${this.context.store.setupContext.view !== null }>
           ${choose(store.setupContext.view, [
             ['network', () => html`
-              <select-network-view
+              <x-action-select-network
                 showSuccessAlert
                 .onClose=${() => this._closeMgmtDialog()}>
-              </select-network-view>
+              </x-action-select-network>
             `],
             ['password', () => html`
-              <change-pass-view
+              <x-action-change-pass
                 resetMethod="credentials"
                 showSuccessAlert
-              ></change-pass-view>`],
+              ></x-action-change-pass>`],
             ['factory-reset', () => html`
               <div class="coming-soon">
                 <h3>Not yet implemented</h3>

@@ -23,7 +23,6 @@ import { StoreSubscriber } from "/state/subscribe.js";
 
 // Views
 import "/components/pages/index.js";
-import "/components/views/index.js";
 import "/components/common/page-container.js";
 import "/components/views/prompt-welcome/index.js";
 import "/components/views/prompt-system/index.js";

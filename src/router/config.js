@@ -35,7 +35,7 @@ export const routes = [
   },
   {
     path: "/pups/:pup/logs",
-    component: "x-log-viewer",
+    component: "x-page-pup-logs",
     pageTitle: "Logs",
     pageAction: "close",
     before: [loadPup, asPage],

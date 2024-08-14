@@ -1,14 +1,8 @@
 export function _checkForChanges() {
   if (!this.fields?.sections) return;
-
   let dirty = 0;
 
-  // Firstly, test whether any rule targeted fields have condition changes.
-  this._rules.forEach((rule) => {
-    this._checkAndSetConditionMetFlags(rule);
-  });
-
-  // Secondly, check if any field differs from prior state.
+  // Firstly, check if any field differs from prior state.
   this.fields.sections.forEach((section) => {
     let flattenedFields = [];
     let sectionChangeCount = 0;
@@ -33,27 +27,45 @@ export function _checkForChanges() {
   });
 
   this._dirty = dirty;
+
+  // [HACK] Process rules on next tick
+  // Secondly, test whether any rule targeted fields have condition changes.
+  setTimeout(() => {
+    const currentState = this.getState();
+    const currentValues = this.getFormValues();
+    this._rules.forEach((rule) => {
+      this._checkAndSetConditionMetFlags(rule, currentState, currentValues);
+    });
+  }, 1);
 }
 
-export function _checkAndSetConditionMetFlags(rule) {
-  // Obtain targets current value
-  const targetValue = this[this.propKeys(rule.target).currentKey]
-  const desiredValue = rule.value;
-  const revealKey = this.propKeys(rule.self).revealKey
+export function _checkAndSetConditionMetFlags(rule, currentState, currentValues) {
+  const revealKey = this.propKeys(rule.self).revealKey;
 
-  // Test the rule
-  let newState;
-  switch (rule.operator) {
-    case "=":
-      newState = targetValue == desiredValue
-      break;
-    case "!=":
-      newState = targetValue && targetValue != desiredValue
-      break
+  if (!rule.fn) {
+    // Obtain targets current value
+    const targetValue = this[this.propKeys(rule.target).currentKey]
+    const desiredValue = rule.value;
+
+    // Test the rule
+    let newState;
+    switch (rule.operator) {
+      case "=":
+        newState = targetValue == desiredValue
+        break;
+      case "!=":
+        newState = targetValue && targetValue != desiredValue
+        break
+    }
+
+    // Toggle field flag (and being a reactive property, the UI will update);
+    this[revealKey] = newState;
   }
 
-  // Toggle field flag (and being a reactive property, the UI will update);
-  this[revealKey] = newState;
+  if (rule.fn) {
+    const shouldReveal = !!rule.fn(currentState, currentValues);
+    this[revealKey] = shouldReveal
+  }
 }
 
 export function _checkAndSetFieldDirtyStatus(fieldName) {

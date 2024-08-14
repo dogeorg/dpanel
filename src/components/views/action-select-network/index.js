@@ -50,7 +50,8 @@ class SelectNetwork extends LitElement {
     this._invalid_creds = false;
     this._setNetworkFields = {};
     // this._setNetworkValues = { 'device-name': 'potato', network: 'hidden', 'network-ssid': 'BarryWifi', 'network-pass': 'Peanut' };
-    this._setNetworkValues = { network: "ethernet" };
+    // this._setNetworkValues = { network: "ethernet" };
+    this._setNetworkFields = {}
     this._form = null;
   }
 
@@ -66,7 +67,7 @@ class SelectNetwork extends LitElement {
     this._setNetworkFields = {
       sections: [
         {
-          name: "Select Network",
+          name: "select-network",
           submitLabel: "Much Connect",
           fields: [
             {
@@ -102,7 +103,11 @@ class SelectNetwork extends LitElement {
               type: "password",
               required: true,
               passwordToggle: true,
-              revealOn: ["network", "!=", "ethernet"],
+              // revealOn: ["network", "!=", "ethernet"],
+              revealOn: (state, values) => {
+                console.log(state.network);
+                return !!(state.network && state.network.type !== "ethernet")
+              }
             },
           ],
         },

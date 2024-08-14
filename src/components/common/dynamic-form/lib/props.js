@@ -58,12 +58,22 @@ export function _initializeFormFieldProperties(newValue) {
         this.constructor.createProperty(labelKey, { type: Boolean });
 
         try {
-          const rule = {
-            self: field.name,
-            target: field.revealOn[0],
-            operator: field.revealOn[1],
-            value: field.revealOn[2],
+          let rule = {}
+
+          if (typeof field.revealOn === 'function') {
+            rule = {
+               self: field.name,
+               fn: field.revealOn
+            }
+          } else {
+            rule = {
+              self: field.name,
+              target: field.revealOn[0],
+              operator: field.revealOn[1],
+              value: field.revealOn[2],
+            }
           }
+
           this._rules.push(rule)
         } catch (ruleErr) {
           console.warn('Error with field rule', ruleErr, field.revealOn)

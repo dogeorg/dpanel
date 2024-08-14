@@ -6,20 +6,20 @@ export function _initializeFormFieldProperties(newValue) {
     });
     this[`_form_${section.name}_count`] = 0;
 
-    let flattenedFields = [];
+    this._flattenedFields = [];
     section.fields.forEach((field) => {
       // Push all field types.
-      flattenedFields.push(field);
+      this._flattenedFields.push(field);
 
       // Additionally, for toggleFields push nested fields.
       if (field.type === "toggleField") {
         field.fields.forEach((f) => {
-          flattenedFields.push(f);
+          this._flattenedFields.push(f);
         });
       }
     });
 
-    flattenedFields.forEach((field) => {
+    this._flattenedFields.forEach((field) => {
       const {
         currentKey,
         originalKey,

@@ -43,6 +43,7 @@ export function _checkAndSetConditionMetFlags(rule, currentState, currentValues)
   const revealKey = this.propKeys(rule.self).revealKey;
 
   if (!rule.fn) {
+
     // Obtain targets current value
     const targetValue = this[this.propKeys(rule.target).currentKey]
     const desiredValue = rule.value;

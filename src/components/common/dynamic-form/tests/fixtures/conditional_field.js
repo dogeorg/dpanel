@@ -1,7 +1,7 @@
 export const CONDITIONAL_FIELD = {
   sections: [
     {
-      name: "Select Network",
+      name: "select-network",
       submitLabel: "Much Connect",
       fields: [
         {

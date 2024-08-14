@@ -6,17 +6,6 @@ import { repeatKeys } from '../../../../../dev/utils/keyboard.js';
 // Component being tested.
 import "../dynamic-form.js";
 
-const selectWithStandardOptions = { 
-  name: 'colour',
-  label: 'Favourite Colour',
-  type: 'select',
-  options: [
-    { name: '#FF0000', label: 'Red' },
-    { name: '#0000FF', label: 'Blue' },
-    { name: '#00FF00', label: 'Green' },
-  ]
-}
-
 describe("A select field, with options", async () => {
 
   const fields = {
@@ -59,7 +48,7 @@ describe("A select field, with options", async () => {
   
   });
 
-  it("on submit, the selected option's value is accurate", async () => {
+  it("on change, the selected option's value is accurate", async () => {
 
     const values = {
       colour: '#FF0000'

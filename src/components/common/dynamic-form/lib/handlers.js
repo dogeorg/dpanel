@@ -36,7 +36,7 @@ export function _handleDiscardChanges(event) {
     .map((node) => node.name)
     .forEach((fieldName) => {
       const { currentKey, originalKey } = this.propKeys(fieldName);
-      this[currentKey] = this[originalKey] || "";
+      this[currentKey] = this[originalKey];
     });
 
   this._checkForChanges();

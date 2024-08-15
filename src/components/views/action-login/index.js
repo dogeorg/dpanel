@@ -184,12 +184,12 @@ class LoginView extends LitElement {
       </div>
 
       <sl-dialog id="ChangePassDialog">
-        <change-pass-view
+        <x-action-change-pass
           resetMethod="credentials"
           showSuccessAlert
           refreshAfterChange
           .fieldDefaults=${{ resetMethod: 0 }}
-        ></change-pass-view>
+        ></x-action-change-pass>
       </sl-dialog>
     `;
   }

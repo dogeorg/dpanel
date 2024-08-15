@@ -164,7 +164,7 @@ class AppModeApp extends LitElement {
                       [
                         0,
                         () =>
-                          html`<login-view retainHash></login-view>`,
+                          html`<x-action-login retainHash></x-action-login>`,
                       ],
                       [
                         1,

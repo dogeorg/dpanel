@@ -15,7 +15,7 @@ export function _render_number(field) {
       max=${ifd(field.max)}
       step=${ifd(field.step)}
       size=${ifd(field.size)}
-      .value=${this[currentKey]}
+      .value=${ifd(this[currentKey] || "")}
       ?clearable=${field.clearable}
       ?noSpinButtons=${field.noSpinButtons}
       ?autofocus=${field.autofocus}

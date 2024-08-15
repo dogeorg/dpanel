@@ -17,7 +17,9 @@ export function _render_select(field, options) {
       ?clearable=${field.clearable}
       ?disabled=${field.disabled}
       ?data-dirty-field=${this[isDirtyKey]}
-      @sl-change=${this._handleChoice}>
+      @sl-change=${this._handleChoice}
+      @sl-hide=${(e) => e.stopPropagation()}
+      >
       ${options.labelEl}
       ${field.options.map(option => html`
         <sl-option value=${option.value}>${option.label}</sl-option>

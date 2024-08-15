@@ -128,6 +128,7 @@ class LogViewer extends LitElement {
 
     // Creating an anchor element to trigger download
     const a = document.createElement('a');
+    a.setAttribute('no-intercept', true)
     a.href = URL.createObjectURL(blob);
     a.download = `log_${this.pupId}_${Date.now()}.txt`;
     document.body.appendChild(a);

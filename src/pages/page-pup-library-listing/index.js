@@ -64,7 +64,7 @@ class PupPage extends LitElement {
     }
   }
 
-  handleDialogClose() {
+  handleDialogClose(event) {
     this.clearDialog();
   }
 

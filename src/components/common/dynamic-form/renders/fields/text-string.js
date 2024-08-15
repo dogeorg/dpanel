@@ -15,7 +15,7 @@ export function _render_text(field, options) {
       maxlength=${ifd(field.maxlength)}
       pattern=${ifd(field.pattern)}
       size=${ifd(field.size)}
-      .value=${ifd(this[currentKey])}
+      .value=${ifd(this[currentKey] || "")}
       ?clearable=${field.clearable}
       ?required=${field.required}
       ?data-dirty-field=${this[isDirtyKey]}

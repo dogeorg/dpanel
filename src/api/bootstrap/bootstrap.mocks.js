@@ -46,6 +46,7 @@ function generateValue(fieldName) {
 
   if (fieldName.includes('number_')) {
     return Math.round(69 * Math.random()).toString();
+    return;
   }
 
   if (fieldName.includes('checkbox_')) {

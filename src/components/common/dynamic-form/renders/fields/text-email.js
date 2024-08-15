@@ -15,7 +15,7 @@ export function _render_email(field) {
       maxlength=${ifd(field.maxLength)}
       pattern=${ifd(field.pattern)}
       size=${ifd(field.size)}
-      .value=${this[currentKey]}
+      .value=${ifd(this[currentKey] || "")}
       ?clearable=${field.clearable}
       ?required=${field.required}
       ?disabled=${field.disabled}

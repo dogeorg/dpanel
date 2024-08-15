@@ -24,7 +24,7 @@ export function _render_password(field) {
       maxlength=${ifd(field.maxLength)}
       pattern=${ifd(field.pattern)}
       size=${ifd(field.size)}
-      .value=${ifd(this[currentKey])}
+      .value=${ifd(this[currentKey] || "")}
       ?clearable=${field.clearable}
       ?required=${field.required}
       ?disabled=${field.disabled}

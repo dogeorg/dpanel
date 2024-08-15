@@ -78,6 +78,28 @@ class PupPage extends LitElement {
     this.open_dialog_label = el.getAttribute("label");
   };
 
+  submitConfig = async (stagedChanges, formNode, dynamicForm) => {
+    // Define callbacks
+    const callbacks = {
+      onSuccess: () => dynamicForm.commitChanges(formNode),
+      onError: (errorPayload) => {
+        dynamicForm.retainChanges(); // To cease the form from spinning
+        this.displayConfigUpdateErr(errorPayload); // Display a failure banner
+      }
+    }
+
+    // Invoke pkgContrller model update, supplying data and callbacks
+    const pkgId = this.context.store.pupContext.manifest.package
+    const res = await pkgController.requestPupChanges(pkgId, stagedChanges, callbacks);
+    if (res && !res.error) return true;
+  }
+
+  displayConfigUpdateErr(failedTxnPayload) {
+    const failedTxnId = failedTxnPayload?.id ? `(${failedTxnPayload.id})` : '';
+    createAlert('danger', ['Failed to update Pup configuration', `Refer to logs ${failedTxnId}`], 'exclamation-diamond');
+    console.warn(`Doge is sad because ${failedTxnId}: `, failedTxnPayload)
+  }
+
   render() {
     const path = this.context.store?.appContext?.path || [];
     const pkg = this.context.store.pupContext;

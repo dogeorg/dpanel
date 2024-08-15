@@ -96,7 +96,7 @@ class PkgController {
       callbacks,
       actionType,
       pupId
-    })
+    });
   }
 
   resolveAction(txn, payload) {
@@ -165,11 +165,16 @@ class PkgController {
     const actionType = 'UPDATE-PUP';
 
     // Make a network call
+    console.log('HERE');
     const res = await postConfig(pupId, newData).catch((err) => {
+      console.log('ERR');
       console.error(err);
     });
 
+    console.log('HERE2');
+
     if (!res || res.error) {
+      console.log('THERE');
       callbacks.onError({ error: true, message: 'failure occured when calling postConfig' });
       return false;
     }
@@ -178,6 +183,7 @@ class PkgController {
     const txn = res.id
     if (txn && callbacks) {
       // Register transaction in actions register.
+      console.log('TXN', txn);
       this.registerAction(txn, callbacks, actionType, pupId)
     }
 

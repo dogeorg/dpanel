@@ -7,6 +7,7 @@ export function renderDialog() {
     <dynamic-form
       .values=${pkg?.state?.config}
       .fields=${pkg?.manifest?.command?.config}
+      .onSubmit=${this.submitConfig}
       requireCommit
       markModifiedFields
       allowDiscardChanges

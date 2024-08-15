@@ -107,7 +107,14 @@ export class Router {
       const path = event.composedPath();
       const target = path[0];
       const anchor = target.closest("a");
-      if (anchor && anchor.href) {
+
+      // Do not intercept for these cases.
+      if (!anchor) return
+      if (anchor._target === "_blank") return
+      if (anchor.hasAttribute("no-intercept")) return
+
+      // Intercept
+      if (anchor.href) {
         event.preventDefault();
         const href = anchor.getAttribute("href");
         history.pushState({}, "", href);

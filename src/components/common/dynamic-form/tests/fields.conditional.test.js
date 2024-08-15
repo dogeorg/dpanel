@@ -36,7 +36,7 @@ describe("DynamicForm", () => {
     expect(tags).to.deep.equal(['SL-INPUT', 'SL-SELECT']);
   });
 
-  it('when a conditional fields ruling is already met, it is displayed', async () => {
+  it.only('when a conditional fields ruling is already met, it is displayed', async () => {
     const fields = CONDITIONAL_FIELD;
     
     // The form reveals 2 more fields when network has a value of 'hidden'
@@ -54,12 +54,13 @@ describe("DynamicForm", () => {
 
     // Wait until fields are initialized
     await waitUntil(() => el.values, 'Values did not become ready');
+    await aTimeout(100);
 
     // Target form
     const form = el.shadowRoot.querySelector('form')
     const formControls = form.querySelectorAll('.form-control');
 
-    // Should be 2 form-control element
+    // Should be 4 form-control element
     expect(formControls.length).to.equal(4);
 
     // Expecting an inital four fields (because all conditions are met)

@@ -1,10 +1,17 @@
 import { customElementsReady } from '/utils/custom-elements-ready.js';
 
 export async function _onUpdate(changedProperties) {
+  if (changedProperties.has("fields") || changedProperties.has("values")) {
+    // Run rules.
+    this._checkForChanges();
+  }
+
   if (!this._shouldUpdateForm(changedProperties)) {
     return;
   }
   // Determine the appropriate form to target
+
+
   const form = this._getTargetForm(changedProperties);
   if (!form) {
     return;

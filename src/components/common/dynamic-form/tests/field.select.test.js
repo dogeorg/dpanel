@@ -108,7 +108,7 @@ describe("Methods: getState, getFormValues", async () => {
     ]
   }
 
-    it('getFormValues returns siple key/val pairs', async () => {
+    it('getFormValues returns simple key/val pairs', async () => {
   
     // Initialise the component
     const el = await fixture(html`
@@ -133,13 +133,13 @@ describe("Methods: getState, getFormValues", async () => {
     await waitUntil(() => el._colour, 'color did not update');
 
     el.focus('flavour');
-    await sendKeys({ type: 'chocolate' });
+    await sendKeys({ type: 'A' });
 
-    await waitUntil(() => el._flavour, 'flavour did not update');
+    await waitUntil(() => el._flavour === "A", 'flavour did not update');
 
     const expectedValues = { 
       "colour": "#0000FF",
-      "flavour": "chocolate",
+      "flavour": "A",
     }
 
     expect(el.getFormValues()).to.deep.equal(expectedValues);
@@ -171,9 +171,9 @@ describe("Methods: getState, getFormValues", async () => {
     await waitUntil(() => el._colour, 'color did not update');
 
     el.focus('flavour');
-    await sendKeys({ type: 'chocolate' });
+    await sendKeys({ type: 'A' });
 
-    await waitUntil(() => el._flavour, 'flavour did not update');
+    await waitUntil(() => el._flavour === "A", 'flavour did not update');
 
     const expectedState = { 
       "colour": {
@@ -181,7 +181,7 @@ describe("Methods: getState, getFormValues", async () => {
         "primary": true,
         "value": "#0000FF",
       },
-      "flavour" : "chocolate",
+      "flavour" : "A",
     }
 
     expect(el.getState()).to.deep.equal(expectedState);

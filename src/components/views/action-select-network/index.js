@@ -49,8 +49,7 @@ class SelectNetwork extends LitElement {
     this._server_fault = false;
     this._invalid_creds = false;
     this._setNetworkFields = {};
-    // this._setNetworkValues = { 'device-name': 'potato', network: 'hidden', 'network-ssid': 'BarryWifi', 'network-pass': 'Peanut' };
-    this._setNetworkValues = { network: "ethernet" };
+    this._setNetworkValues = {};
     this._form = null;
   }
 
@@ -66,7 +65,7 @@ class SelectNetwork extends LitElement {
     this._setNetworkFields = {
       sections: [
         {
-          name: "Select Network",
+          name: "select-network",
           submitLabel: "Much Connect",
           fields: [
             {
@@ -94,7 +93,8 @@ class SelectNetwork extends LitElement {
               label: "Network SSID",
               type: "text",
               required: true,
-              revealOn: ["network", "=", "hidden"],
+              // revealOn: ["network", "=", "hidden"],
+              revealOn: (state, values) => state.network && state.network.value == "hidden"
             },
             {
               name: "network-pass",
@@ -102,7 +102,11 @@ class SelectNetwork extends LitElement {
               type: "password",
               required: true,
               passwordToggle: true,
-              revealOn: ["network", "!=", "ethernet"],
+              // revealOn: ["network", "!=", "ethernet"],
+              revealOn: (state, values) => Boolean(
+                (state.network && state.network.encryption === "PSK") ||
+                (state.network && state.network.type !== "ethernet")
+              )
             },
           ],
         },
@@ -126,10 +130,23 @@ class SelectNetwork extends LitElement {
 
     const { networks } = response;
 
+    // Set the retreived networks as the network field's dropdown options
+    // Set a hardcoded option of "Hidden"
     this._setNetworkFields.sections[0].fields[1].options = [
       ...networks,
       { type: "wifi", value: "hidden", label: "Hidden Network" },
     ];
+
+    // If the retrieved networks has an identifed selected network,
+    // Set it as the chosen option.
+    const selectedNetwork = networks.find((net) => net.selected);
+    if (selectedNetwork) {
+      this._setNetworkValues = {
+        ...this._setNetworkValues,
+        network: selectedNetwork.value
+      }
+    }
+
     // Stop label spinner
     this._form.toggleLabelLoader("network");
   }
@@ -166,11 +183,18 @@ class SelectNetwork extends LitElement {
   }
 
   _generateName() {
-    const rando = Math.round(Math.random() * 100);
-    this._form.setValue("device-name", `Potato_${rando}`);
+    const rando = Math.round(Math.random() * 1000);
+    this._form.setValue("device-name", `my_dogebox_${rando}`);
   }
 
   _attemptSetNetwork = async (data, form, dynamicFormInstance) => {
+
+    console.log({
+      changesOnly: data,
+      currentState: dynamicFormInstance.getState(),
+      currentValues: dynamicFormInstance.getFormValues()
+    });
+
     const response = await postNetwork(data).catch(this.handleFault);
 
     if (!response) {

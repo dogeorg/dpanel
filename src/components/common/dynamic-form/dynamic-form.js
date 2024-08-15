@@ -112,27 +112,26 @@ class DynamicForm extends LitElement {
     this.requestUpdate();
   }
 
-  getFormValues() {
+  getFormValues = () => {
     // Purpose of this method is to return the values of the form
     // In a key/val structure, where key is the field name, val is the field value.
     // eg. { colour: '#0000FF' }
-    const form = this.shadowRoot.querySelector(`#${this._activeFormId}`);
-    return this.getChanges(form);
+    let out = {}
+    this._flattenedFields.forEach(field => {
+      out[field.name] = this[`_${field.name}`]
+    });
+    return out;
   }
 
-  getState() {
+  getState = () => {
     // Extending getFormValues, this does the same except for any field that has
     // an options property, it will supply the selected option object as the value.
     // eg. { colour: { value: '#0000FF', label: 'Blue', primary: true } }
-    const form = this.shadowRoot.querySelector(`#${this._activeFormId}`);
-    let state = this.getChanges(form);
-    let out = {}
-
-    Object.keys(state).forEach(key => {
-      const field = this._flattenedFields.find(field => field.name === key);
-      out[key] = field.options
-        ? field.options.find(option => option.value === state[key])
-        : state[key];
+    let out = {};
+    this._flattenedFields.forEach(field => {
+      out[field.name] = field.options
+        ? field.options.find(option => option.value === this[`_${field.name}`])
+        : this[`_${field.name}`]
     });
 
     return out;
@@ -145,7 +144,8 @@ class DynamicForm extends LitElement {
   }
 
   firstUpdated() {
-    this._checkForChanges()
+    this._activeFormId = this.shadowRoot.querySelector('form').id;
+    this._checkForChanges();
   }
 
   render() {

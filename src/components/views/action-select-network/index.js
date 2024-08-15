@@ -49,7 +49,7 @@ class SelectNetwork extends LitElement {
     this._server_fault = false;
     this._invalid_creds = false;
     this._setNetworkFields = {};
-    this._setNetworkValues = { 'device-name': 'potato' };
+    this._setNetworkValues = {};
     this._form = null;
   }
 
@@ -188,6 +188,13 @@ class SelectNetwork extends LitElement {
   }
 
   _attemptSetNetwork = async (data, form, dynamicFormInstance) => {
+
+    console.log({
+      changesOnly: data,
+      currentState: dynamicFormInstance.getState(),
+      currentValues: dynamicFormInstance.getFormValues()
+    });
+
     const response = await postNetwork(data).catch(this.handleFault);
 
     if (!response) {

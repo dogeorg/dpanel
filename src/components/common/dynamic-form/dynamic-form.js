@@ -120,6 +120,7 @@ class DynamicForm extends LitElement {
     this._flattenedFields.forEach(field => {
       out[field.name] = this[`_${field.name}`]
     });
+    return out;
   }
 
   getState = () => {

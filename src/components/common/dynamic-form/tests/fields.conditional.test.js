@@ -54,6 +54,7 @@ describe("DynamicForm", () => {
 
     // Wait until fields are initialized
     await waitUntil(() => el.values, 'Values did not become ready');
+    await aTimeout(100);
 
     // Target form
     const form = el.shadowRoot.querySelector('form')

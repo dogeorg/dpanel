@@ -46,11 +46,15 @@ class SelectNetwork extends LitElement {
 
   constructor() {
     super();
+    this._form = null;
     this._server_fault = false;
     this._invalid_creds = false;
     this._setNetworkFields = {};
     this._setNetworkValues = {};
-    this._form = null;
+    this._networks = [];
+
+    // Set initial fields
+    this.updateSetNetworkFields();
   }
 
   async connectedCallback() {
@@ -59,9 +63,15 @@ class SelectNetwork extends LitElement {
       "action-label-triggered",
       this.handleLabelActionClick,
     );
+    this.addEventListener("sl-hide", this.dismissErrors);
+  }
 
-    const networks = [];
+  firstUpdated() {
+    this._form = this.shadowRoot.querySelector("dynamic-form");
+    this._fetchAvailableNetworks();
+  }
 
+  updateSetNetworkFields() {
     this._setNetworkFields = {
       sections: [
         {
@@ -83,8 +93,7 @@ class SelectNetwork extends LitElement {
               type: "select",
               required: true,
               options: [
-                ...networks,
-                { type: "ethernet", value: "ethernet", label: "Ethernet" },
+                ...this._networks,
                 { type: "wifi", value: "hidden", label: "Hidden Network" },
               ],
             },
@@ -112,13 +121,6 @@ class SelectNetwork extends LitElement {
         },
       ],
     };
-
-    this.addEventListener("sl-hide", this.dismissErrors);
-  }
-
-  firstUpdated() {
-    this._form = this.shadowRoot.querySelector("dynamic-form");
-    this._fetchAvailableNetworks();
   }
 
   async _fetchAvailableNetworks() {
@@ -129,16 +131,14 @@ class SelectNetwork extends LitElement {
     if (!response.networks) return [];
 
     const { networks } = response;
+    this._networks = networks;
 
-    // Set the retreived networks as the network field's dropdown options
-    // Set a hardcoded option of "Hidden"
-    this._setNetworkFields.sections[0].fields[1].options = [
-      ...networks,
-      { type: "wifi", value: "hidden", label: "Hidden Network" },
-    ];
+    // Networks have been retrieved, ensure they are supplied
+    // as the network picker's options.
+    this.updateSetNetworkFields();
 
-    // If the retrieved networks has an identifed selected network,
-    // Set it as the chosen option.
+    // If the retrieved networks has an identifed SELECTED network,
+    // set it as the chosen option.
     const selectedNetwork = networks.find((net) => net.selected);
     if (selectedNetwork) {
       this._setNetworkValues = {
@@ -249,15 +249,17 @@ class SelectNetwork extends LitElement {
       <div class="page">
         <div class="padded">
           ${renderBanner()}
-          <dynamic-form
-            .fields=${this._setNetworkFields}
-            .values=${this._setNetworkValues}
-            .onSubmit=${this._attemptSetNetwork}
-            requireCommit
-            theme="yellow"
-            style="--submit-btn-width: 100%; --submit-btn-anchor: center;"
-          >
-          </dynamic-form>
+          ${this._setNetworkFields ? html`
+            <dynamic-form
+              .fields=${this._setNetworkFields}
+              .values=${this._setNetworkValues}
+              .onSubmit=${this._attemptSetNetwork}
+              requireCommit
+              theme="yellow"
+              style="--submit-btn-width: 100%; --submit-btn-anchor: center;"
+            >
+            </dynamic-form>
+            `: nothing }
         </div>
       </div>
     `;

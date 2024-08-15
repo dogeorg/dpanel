@@ -183,8 +183,8 @@ class SelectNetwork extends LitElement {
   }
 
   _generateName() {
-    const rando = Math.round(Math.random() * 100);
-    this._form.setValue("device-name", `Potato_${rando}`);
+    const rando = Math.round(Math.random() * 1000);
+    this._form.setValue("device-name", `my_dogebox_${rando}`);
   }
 
   _attemptSetNetwork = async (data, form, dynamicFormInstance) => {

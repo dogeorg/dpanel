@@ -68,6 +68,8 @@ export function renderSectionInstalledBody(ready, SKELS, hasItems) {
             pupName=${pkg.manifest.package}
             version=${pkg.manifest.version}
             status=${pkg.state.status}
+            href=${pkg.computed.url.library}
+            gref=${pkg.computed.url.ui}
             ?hasGui=${!!pkg.manifest.gui}
           ></pup-card>
         `)}

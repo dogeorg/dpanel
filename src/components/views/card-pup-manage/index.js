@@ -22,7 +22,6 @@
 
     constructor() {
       super();
-      this.href = "";
     }
 
     get status() {
@@ -33,17 +32,6 @@
       this._status = newStatus;
       this.running = newStatus === 'running';
       this.requestUpdate();
-    }
-
-    get pupId() {
-      return this._pupId;
-    }
-
-    set pupId(newPupId) {
-      this._pupId = newPupId
-      const formattedPupId = newPupId.toLowerCase();
-      this.href = `/pups/${formattedPupId}`;
-      this.gref = `/explore/${formattedPupId}/ui`;
     }
 
     render() {

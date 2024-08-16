@@ -62,6 +62,7 @@ export function renderSectionBody(ready, SKELS, hasItems) {
             status=${pkg.state.status}
             ?installed=${pkg.state.status}
             ?hasGui=${!!pkg.manifest.gui}
+            href="${pkg.computed.url.store}"
           ></pup-install-card>
         `)}
       </div>

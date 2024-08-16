@@ -13,14 +13,14 @@ export async function loadPup(context, commands) {
     pkgController.setData(res);
 
     const pup = pkgController.getPup(pupId);
-    const { manifest, state } = pup;
+    const { manifest, state, computed } = pup;
 
     if (!manifest) {
       throw new Error("manifest empty");
     }
 
     store.updateState({
-      pupContext: { manifest, state },
+      pupContext: { manifest, state, computed },
     });
 
     if (context.route.dynamicTitle) {

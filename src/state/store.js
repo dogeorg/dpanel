@@ -29,6 +29,8 @@ class Store {
     this.pupContext = {
       // Define pup state here
       manifest: {},
+      state: {},
+      computed: {},
     };
     this.promptContext = {
       display: false,

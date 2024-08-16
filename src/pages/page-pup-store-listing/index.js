@@ -78,7 +78,7 @@ class PupInstallPage extends LitElement {
 
     const renderDependancyList = () => {
       return pkg.manifest.deps.pups.map((dep) => html`
-        <action-row prefix="box-seam" name=${dep.id} label=${dep.name} href=${`/explore/${dep.id}`}>
+        <action-row prefix="box-seam" name=${dep.id} label=${dep.name} href=${`/explore/${dep.id}/${dep.name}`}>
           ${dep.condition}
         </action-row>
       `);

@@ -7,6 +7,7 @@ export function openConfig() {
 
 export function renderActions() {
   const pkg = this.context.store.pupContext;
+  console.log(pkg);
   const styles = css`
     .action-wrap {
       display: flex;
@@ -25,7 +26,7 @@ export function renderActions() {
     <div class="action-wrap">
 
       ${isInstalled ? html`
-        <sl-button variant="primary" size="large" href="/pups/${pkg.manifest.id.toLowerCase()}">
+        <sl-button variant="primary" size="large" href="${pkg.computed.url.library}">
           Manage
         </sl-button>
       ` : nothing }

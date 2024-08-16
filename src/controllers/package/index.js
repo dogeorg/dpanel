@@ -213,6 +213,7 @@ function toAssembledPup(bootstrapResponse) {
     // sources such as "local", "remote" etc..
     bootstrapResponse.manifests[source].available.forEach((m) => {
       out.available[m.id] = {
+        computed: generateComputedVals(m),
         manifest: m,
         state: {
           id: m.id,
@@ -226,6 +227,7 @@ function toAssembledPup(bootstrapResponse) {
   // Popupate installed index.
   Object.values(states).forEach((s) => {
     out.installed[s.id] = {
+      computed: generateComputedVals(out.available[s.id].manifest),
       manifest: out.available[s.id].manifest,
       state: s
     }
@@ -247,5 +249,18 @@ function defaultPupState() {
     status: undefined,
     stats: undefined,
     config: {}
+  }
+}
+
+function generateComputedVals(m) {
+  const id = encodeURIComponent(m.id.toLowerCase());
+  const name = encodeURIComponent(m.package.toLowerCase());
+  return {
+    id: m.id,
+    url: {
+      gui: `/explore/${id}/${name}/ui`,
+      library: `/pups/${id}/${name}`,
+      store: `/explore/${id}/${name}`,
+    },
   }
 }

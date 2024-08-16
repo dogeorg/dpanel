@@ -36,17 +36,6 @@
       this.requestUpdate();
     }
 
-    get pupId() {
-      return this._pupId;
-    }
-
-    set pupId(newPupId) {
-      this._pupId = newPupId
-      const formattedPupId = newPupId.toLowerCase();
-      this.href = `/explore/${formattedPupId}`;
-      this.gref = `/explore/${formattedPupId}/ui`;
-    }
-
     render() {
       const { pupName, version, icon, status, gui, short, href } = this;
       return html`

@@ -16,6 +16,7 @@ import { store } from "/state/store.js";
 import { StoreSubscriber } from "/state/subscribe.js";
 import { pkgController } from "/controllers/package/index.js";
 import { asyncTimeout } from "/utils/timeout.js";
+import { createAlert } from "/components/common/alert.js";
 
 class PupPage extends LitElement {
   static get properties() {
@@ -40,6 +41,9 @@ class PupPage extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
+    // Observers with a pupId will be requested to
+    // update when state for that pup changes
+    this.pupId = this.context.store.pupContext.manifest.id;
     this.pkgController.addObserver(this);
   }
 
@@ -52,8 +56,8 @@ class PupPage extends LitElement {
     this.addEventListener("sl-hide", this.handleDialogClose);
     this.checks = this.context.store.pupContext?.manifest?.checks;
 
-    const pkgId = this.context.store.pupContext.manifest.package
-    if (pkgId === 'Core') {
+    const pkgId = this.context.store.pupContext.manifest.package;
+    if (pkgId === "Core") {
       await asyncTimeout(1200);
       this.checks[1].status = "success";
       this.requestUpdate();
@@ -85,25 +89,45 @@ class PupPage extends LitElement {
       onError: (errorPayload) => {
         dynamicForm.retainChanges(); // To cease the form from spinning
         this.displayConfigUpdateErr(errorPayload); // Display a failure banner
-      }
-    }
+      },
+    };
 
     // Invoke pkgContrller model update, supplying data and callbacks
-    const pkgId = this.context.store.pupContext.manifest.package
-    const res = await pkgController.requestPupChanges(pkgId, stagedChanges, callbacks);
-    if (res && !res.error) return true;
-  }
+    const pkgId = this.context.store.pupContext.manifest.id;
+    const res = await pkgController.requestPupChanges(
+      pkgId,
+      stagedChanges,
+      callbacks,
+    );
+    if (res && !res.error) {
+      return true;
+    }
+  };
 
   displayConfigUpdateErr(failedTxnPayload) {
-    const failedTxnId = failedTxnPayload?.id ? `(${failedTxnPayload.id})` : '';
-    createAlert('danger', ['Failed to update Pup configuration', `Refer to logs ${failedTxnId}`], 'exclamation-diamond');
-    console.warn(`Doge is sad because ${failedTxnId}: `, failedTxnPayload)
+    const failedTxnId = failedTxnPayload?.id ? `(${failedTxnPayload.id})` : "";
+    const message = [
+      "Failed to update configuration",
+      `Refer to logs ${failedTxnId}`,
+    ];
+    const action = { text: "View details" };
+    const err = new Error(failedTxnPayload.error);
+    const hideAfter = 0;
+
+    createAlert(
+      "danger",
+      message,
+      "exclamation-diamond",
+      hideAfter,
+      action,
+      err,
+    );
   }
 
   render() {
     const path = this.context.store?.appContext?.path || [];
     const pkg = this.context.store.pupContext;
-    const hasChecks = (pkg?.manifest?.checks || []).length > 0
+    const hasChecks = (pkg?.manifest?.checks || []).length > 0;
 
     const renderHealthChecks = () => {
       return this.checks.map(
@@ -153,43 +177,46 @@ class PupPage extends LitElement {
     `;
 
     return html`
-        <div id="PageWrapper" class="wrapper">
-          <section>
-            <div class="section-title">
-              <h3>Status</h3>
-            </div>
-            <div class="underscored">${this.renderStatus()}</div>
-            <div>${this.renderActions()}</div>
-          </section>
+      <div id="PageWrapper" class="wrapper">
+        <section>
+          <div class="section-title">
+            <h3>Status</h3>
+          </div>
+          <div class="underscored">${this.renderStatus()}</div>
+          <div>${this.renderActions()}</div>
+        </section>
 
-          ${hasChecks ? html`
-            <section>
-              <div class="section-title">
-                <h3>Health checks</h3>
-              </div>
-              <div class="list-wrap">${renderHealthChecks()}</div>
-            </section>
-          `: nothing }
+        ${hasChecks
+          ? html`
+              <section>
+                <div class="section-title">
+                  <h3>Health checks</h3>
+                </div>
+                <div class="list-wrap">${renderHealthChecks()}</div>
+              </section>
+            `
+          : nothing}
 
-          <section>
-            <div class="section-title">
-              <h3>Menu</h3>
-            </div>
-            <div class="list-wrap">${renderMenu()}</div>
-          </section>
-        </div>
+        <section>
+          <div class="section-title">
+            <h3>Menu</h3>
+          </div>
+          <div class="list-wrap">${renderMenu()}</div>
+        </section>
+      </div>
 
-        <aside>
-          <sl-dialog
-            class="distinct-header"
-            id="PupMgmtDialog"
-            ?open=${this.open_dialog}
-            label=${this.open_dialog_label}
-          >
-            ${this.renderDialog()}
-          </sl-dialog>
-        </aside>
-  `}
+      <aside>
+        <sl-dialog
+          class="distinct-header"
+          id="PupMgmtDialog"
+          ?open=${this.open_dialog}
+          label=${this.open_dialog_label}
+        >
+          ${this.renderDialog()}
+        </sl-dialog>
+      </aside>
+    `;
+  }
 
   static styles = css`
     :host {

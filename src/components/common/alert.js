@@ -21,19 +21,24 @@ export function createAlert(variant, message, icon = 'info-circle', duration = 0
     : escapeHtml(message)
 
   const actionEl = action ? `
-    <a class="more" href="#error-details">${action.text}</sl-button>
+    <a class="more" no-intercept href="${`${window.location.href}?error=true`}">${action.text}</sl-button>
     ` : nothing
 
   alert.innerHTML = `
     ${iconEl}
     ${messageEl}
+    ${actionEl}
   `
 
   document.body.append(alert);
 
   if (action) {
-    const anchor = alert.querySelector("a.more")
-    anchor.addEventListener("click", () => createMoreDetailDialog(messageEl, errorDetail))
+    try {
+      const anchor = alert.querySelector("a.more")
+      anchor.addEventListener("click", (e) => { e.preventDefault(); createMoreDetailDialog(messageEl, errorDetail) })
+    } catch (err) {
+      console.error(err);
+    }
   }
   alert.toast();
 }
@@ -45,12 +50,22 @@ function escapeHtml(html) {
   return div.innerHTML;
 }
 
-function createMoreDetailDialog(messageEl, error) {
+function createMoreDetailDialog(messageEl, providedError) {
   // Dialog element
   const dialog = document.createElement('sl-dialog');
   dialog.label = 'Error details'
   dialog.classList.add("error-dialog");
   dialog.classList.add('above-toasts') // Dialogs usually sit below toasts in terms of z-index. This class styles them to sit above.
+
+  let error = new Error(providedError);
+
+  if (providedError instanceof Error) {
+    error = providedError
+  }
+
+  if (providedError.error) {
+    error = new Error(providedError.error);
+  }
 
   // Limit stack trace
   const maxLines = 4;

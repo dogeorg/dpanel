@@ -5,6 +5,7 @@ export const postResponse = {
   res: {
     success: true,
     message: "Winner winner, chicken dinner",
+    id: 123
   }
 }
 

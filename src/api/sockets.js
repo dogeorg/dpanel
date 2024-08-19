@@ -1,7 +1,7 @@
 export default class WebSocketClient {
-  constructor(url, useMocks, mockEventGenerator) {
+  constructor(url, networkContext, mockEventGenerator) {
     this.url = url;
-    this.useMocks = useMocks;
+    this.useMocks = networkContext?.useMocks;
     this.mockEventGenerator = mockEventGenerator;
     this.stopMocking = () => console.log('Stop function not provided.');
     this.socket = null;

@@ -1,4 +1,4 @@
-import { postConfig } from '/api/config/config.js';
+import { postConfig } from "/api/config/config.js";
 
 class PkgController {
   observers = [];
@@ -36,23 +36,25 @@ class PkgController {
   }
 
   setData(bootstrapResponse) {
-    const { installed, available } = toAssembledPup(bootstrapResponse)
-    this.installed = toArray(installed)
+    const { installed, available } = toAssembledPup(bootstrapResponse);
+    this.installed = toArray(installed);
     this.available = toArray(available);
     this.packages = [...toArray(available), ...toArray(installed)];
-    this.pupIndex = { ...available, ...installed }
+    this.pupIndex = { ...available, ...installed };
     this.notify();
   }
 
   getPup(id) {
-    if (!id) return
-    const key = Object.keys(this.pupIndex).find(key => key.toLowerCase() === id.toLowerCase());
-    return this.pupIndex[key]
+    if (!id) return;
+    const key = Object.keys(this.pupIndex).find(
+      (key) => key.toLowerCase() === id.toLowerCase(),
+    );
+    return this.pupIndex[key];
   }
 
   installPkg(pupId) {
     // Find the pup in the available list
-    const index = this.available.findIndex(pup => pup.manifest.id === pupId);
+    const index = this.available.findIndex((pup) => pup.manifest.id === pupId);
     if (index !== -1) {
       // Move the pup from the available list to the installed list
       const [pup] = this.available.splice(index, 1);
@@ -63,7 +65,7 @@ class PkgController {
 
   removePkg(pupId) {
     // Find the pup in the installed list
-    const index = this.installed.findIndex(pup => pup.id === pupId);
+    const index = this.installed.findIndex((pup) => pup.id === pupId);
     if (index !== -1) {
       // Remove the pup from the installed list
       this.installed.splice(index, 1);
@@ -73,21 +75,28 @@ class PkgController {
 
   registerAction(txn, callbacks, actionType, pupId) {
     if (!txn || !callbacks || !actionType || !pupId) {
-      console.warn(`
+      console.warn(
+        `
         pkgController: MALFORMED REGISTER ACTION REQUEST.
         Expecting: txn, callbacks, actionType & pupId`,
-        { txn, callbacks, actionType, pupId }
-      )
+        { txn, callbacks, actionType, pupId },
+      );
       return;
     }
 
-    if (typeof callbacks.onSuccess !== 'function') {
-      console.warn('pkgController: ACTION SUCCESS CALLBACK NOT A FUNCTION.', { txn, callbacks })
+    if (typeof callbacks.onSuccess !== "function") {
+      console.warn("pkgController: ACTION SUCCESS CALLBACK NOT A FUNCTION.", {
+        txn,
+        callbacks,
+      });
       return;
     }
 
-    if (typeof callbacks.onError !== 'function') {
-      console.warn('pkgController: ACTION ERROR CALLBACK NOT A FUNCTION.', { txn, callbacks })
+    if (typeof callbacks.onError !== "function") {
+      console.warn("pkgController: ACTION ERROR CALLBACK NOT A FUNCTION.", {
+        txn,
+        callbacks,
+      });
       return;
     }
 
@@ -95,14 +104,14 @@ class PkgController {
       txn,
       callbacks,
       actionType,
-      pupId
-    })
+      pupId,
+    });
   }
 
   resolveAction(txn, payload) {
-    const foundAction = this.actions.find(action => action.txn === txn);
+    const foundAction = this.actions.find((action) => action.txn === txn);
     if (!foundAction) {
-      console.warn('pkgController: ACTION NOT FOUND.', { txn })
+      console.warn("pkgController: ACTION NOT FOUND.", { txn });
       return;
     }
 
@@ -111,7 +120,7 @@ class PkgController {
       try {
         foundAction.callbacks.onError(payload);
       } catch (err) {
-        console.warn('the provided onError callback function threw an error');
+        console.warn("the provided onError callback function threw an error");
       }
       return;
     }
@@ -120,11 +129,11 @@ class PkgController {
     try {
       foundAction.callbacks.onSuccess(payload);
     } catch (err) {
-      console.warn('the provided onSuccess callback function threw an error');
+      console.warn("the provided onSuccess callback function threw an error");
     }
 
     switch (foundAction.actionType) {
-      case 'UPDATE-PUP':
+      case "UPDATE-PUP":
         this.updatePupModel(foundAction.pupId, payload.update);
         break;
     }
@@ -147,8 +156,8 @@ class PkgController {
         ...indexedPup,
         state: {
           ...indexedPup.state,
-          ...newPupStateData
-        }
+          ...newPupStateData,
+        },
       };
     }
 
@@ -157,12 +166,14 @@ class PkgController {
   }
 
   async requestPupChanges(pupId, newData, callbacks) {
-
     if (!pupId || !newData || !callbacks) {
-      console.warn('Error. requestPupChanges expected pupId, newData, callbacks', { pupId, newData, callbacks});
+      console.warn(
+        "Error. requestPupChanges expected pupId, newData, callbacks",
+        { pupId, newData, callbacks },
+      );
     }
 
-    const actionType = 'UPDATE-PUP';
+    const actionType = "UPDATE-PUP";
 
     // Make a network call
     const res = await postConfig(pupId, newData).catch((err) => {
@@ -170,15 +181,18 @@ class PkgController {
     });
 
     if (!res || res.error) {
-      callbacks.onError({ error: true, message: 'failure occured when calling postConfig' });
+      callbacks.onError({
+        error: true,
+        message: "failure occured when calling postConfig",
+      });
       return false;
     }
 
     // Submitting changes succeeded, carry on.
-    const txn = res.id
+    const txn = res.id;
     if (txn && callbacks) {
       // Register transaction in actions register.
-      this.registerAction(txn, callbacks, actionType, pupId)
+      this.registerAction(txn, callbacks, actionType, pupId);
     }
 
     // Return truthy to caller
@@ -199,14 +213,14 @@ function getInstance() {
 export const pkgController = getInstance();
 
 function toAssembledPup(bootstrapResponse) {
-  const sources = Object.keys(bootstrapResponse.manifests)
-  const states = bootstrapResponse.states
+  const sources = Object.keys(bootstrapResponse.manifests);
+  const states = bootstrapResponse.states;
   const stateKeys = Object.keys(states);
   const out = {
     internal: {},
     installed: {},
     available: {},
-  }
+  };
 
   // Populate available index.
   sources.forEach((source) => {
@@ -218,25 +232,25 @@ function toAssembledPup(bootstrapResponse) {
         state: {
           id: m.id,
           package: m.package,
-          ...defaultPupState()
+          ...defaultPupState(),
         },
-      }
-    })
-  })
+      };
+    });
+  });
 
   // Popupate installed index.
   Object.values(states).forEach((s) => {
     out.installed[s.id] = {
       computed: generateComputedVals(out.available[s.id].manifest),
       manifest: out.available[s.id].manifest,
-      state: s
-    }
-  })
+      state: s,
+    };
+  });
 
   // Remove installed pups from available index.
-  stateKeys.forEach(k => {
+  stateKeys.forEach((k) => {
     delete out.available[k];
-  })
+  });
   return out;
 }
 
@@ -248,8 +262,8 @@ function defaultPupState() {
   return {
     status: undefined,
     stats: undefined,
-    config: {}
-  }
+    config: {},
+  };
 }
 
 function generateComputedVals(m) {
@@ -262,5 +276,5 @@ function generateComputedVals(m) {
       library: `/pups/${id}/${name}`,
       store: `/explore/${id}/${name}`,
     },
-  }
+  };
 }

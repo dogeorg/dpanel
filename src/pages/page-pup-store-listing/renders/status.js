@@ -1,7 +1,9 @@
-import { html, css, classMap } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
+import { html, css, classMap, nothing } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 
 export function renderStatus() {
-  const pkg = this.context.store.pupContext
+  const pkg = this.pkgController.getPup(this.context.store.pupContext.manifest.id);
+  const { statusId, statusLabel } = pkg.computed
+  const isLoadingStatus = ["installing"].includes(statusId);
   const styles = css`
     .status-label {
       font-size: 2em;

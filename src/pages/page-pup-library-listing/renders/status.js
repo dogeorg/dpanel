@@ -1,7 +1,9 @@
-import { html, css, classMap } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
+import { html, css, classMap, nothing } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 
 export function renderStatus() {
-  const pkg = this.context.store.pupContext
+  const pkg = this.pkgController.getPup(this.context.store.pupContext.manifest.id);
+  const { statusId, statusLabel } = pkg.computed;
+  const isLoadingStatus = ["starting", "stopping", "crashing"].includes(statusId);
   const styles = css`
     .status-label {
       font-size: 2em;
@@ -11,29 +13,35 @@ export function renderStatus() {
       font-family: 'Comic Neue';
       text-transform: capitalize;
 
-      &.running {
+      &.enabled {
         color: #2ede75;
       }
 
       &.needs_config {
         color: var(--sl-color-amber-600);
       }
+
+      &.installing,
+      &.starting {
+        color: rgb(0, 195, 255);
+      }
+
+      &.stopping,
+      &.broken {
+        color: #fe5c5c;
+      }
+
+      &.disabled,
+      &.not_installed {
+        color: #8e8e9a;
+      }
     }
   `
 
-  const status = 'RUNNING' || pkg.state.status;
-  const statusLabel = {
-    'RUNNING': 'enabled',
-    'NEEDS_CONFIG': 'needs config'
-  }
-
-  const statusClasses = classMap({
-    'running': status === 'RUNNING',
-    'needs_config': status === 'NEEDS_CONFIG',
-  });
-
   return html`
-    <span class="status-label ${statusClasses}">${statusLabel[status]}</span>
+    <span class="status-label ${statusId}">
+      ${statusLabel}
+    </span>
     <style>${styles}</style>
   `
 };

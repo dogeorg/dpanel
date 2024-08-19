@@ -126,8 +126,10 @@ class PupPage extends LitElement {
 
   render() {
     const path = this.context.store?.appContext?.path || [];
-    const pkg = this.context.store.pupContext;
+    const pkg = this.pkgController.getPup(this.context.store.pupContext.manifest.id);
+    const { statusId, statusLabel } = pkg.computed
     const hasChecks = (pkg?.manifest?.checks || []).length > 0;
+    const isLoadingStatus =  ["starting", "stopping", "crashing"].includes(statusId);
 
     const renderHealthChecks = () => {
       return this.checks.map(
@@ -136,6 +138,14 @@ class PupPage extends LitElement {
         `,
       );
     };
+
+    const renderStatusAndActions = () => {
+      return html`
+        ${this.renderStatus()}
+        <sl-progress-bar value="0" ?indeterminate=${isLoadingStatus} class="loading-bar"></sl-progress-bar>
+        ${this.renderActions()}
+      `
+    }
 
     const renderMenu = () => html`
       <action-row
@@ -182,8 +192,7 @@ class PupPage extends LitElement {
           <div class="section-title">
             <h3>Status</h3>
           </div>
-          <div class="underscored">${this.renderStatus()}</div>
-          <div>${this.renderActions()}</div>
+          ${renderStatusAndActions()}
         </section>
 
         ${hasChecks
@@ -222,6 +231,7 @@ class PupPage extends LitElement {
     :host {
       position: relative;
       display: block;
+      --indi: #777;
     }
 
     .wrapper {
@@ -269,6 +279,11 @@ class PupPage extends LitElement {
     sl-dialog.distinct-header::part(header) {
       z-index: 960;
       background: rgb(24, 24, 24);
+    }
+
+    .loading-bar {
+      --height: 1px;
+      --track-color: #444;
     }
   `;
 }

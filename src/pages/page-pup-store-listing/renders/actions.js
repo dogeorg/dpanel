@@ -6,14 +6,15 @@ export function openConfig() {
 }
 
 export function renderActions() {
-  const pkg = this.context.store.pupContext;
-  console.log(pkg);
+  const pkg = this.pkgController.getPup(this.context.store.pupContext.manifest.id);
+  const { statusId, statusLabel, installationId, installationLabel } = pkg.computed
   const styles = css`
     .action-wrap {
       display: flex;
       flex-direction: row;
       flex-wrap: wrap;
       gap: 1em;
+      margin-top: 1.2em;
 
       sl-button {
         min-width: 180px;
@@ -25,15 +26,21 @@ export function renderActions() {
   return html`
     <div class="action-wrap">
 
-      ${isInstalled ? html`
-        <sl-button variant="primary" size="large" href="${pkg.computed.url.library}">
-          Manage
+      ${installationId === "not_installed" ? html`
+        <sl-button variant="warning" size="large">
+          Such Install
         </sl-button>
       ` : nothing }
 
-      ${!isInstalled ? html`
-        <sl-button variant="warning" size="large">
-          Such Install
+      ${installationId === "installing" ? html`
+        <sl-button variant="warning" size="large" disabled>
+          Installing <sl-spinner slot="suffix" style="--indicator-color:#222"></sl-spinner>
+        </sl-button>
+      ` : nothing }
+
+      ${installationId === "installed" ? html`
+        <sl-button variant="primary" size="large" href="${pkg.computed.url.library}">
+          Manage
         </sl-button>
       ` : nothing }
 

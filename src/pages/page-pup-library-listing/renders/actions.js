@@ -6,13 +6,15 @@ export function openConfig() {
 }
 
 export function renderActions() {
-  const pkg = this.context.store.pupContext;
+  const pkg = this.pkgController.getPup(this.context.store.pupContext.manifest.id);
+  const { statusId, statusLabel } = pkg.computed
   const styles = css`
     .action-wrap {
       display: flex;
       flex-direction: row;
       flex-wrap: wrap;
       gap: 1em;
+      margin-top: 1.2em;
     }
 
     .show-only-wide {
@@ -22,12 +24,19 @@ export function renderActions() {
       }
     }
   `
-  const status = 'RUNNING' || pkg.state.status;
+  const status = statusId;
 
   return html`
     <div class="action-wrap">
 
-      ${status === 'RUNNING' ? html`
+      ${statusId === 'needs_config' ? html`
+        <sl-button variant="warning" size="large" @click=${this.openConfig}>
+          <sl-icon slot="prefix" name="gear"></sl-icon>
+          Configure
+        </sl-button>
+      ` : nothing }
+
+      ${status === 'enabled' ? html`
         <sl-button variant="danger" size="large">
           <sl-icon slot="prefix" name="stop-fill"></sl-icon>
           Disable
@@ -38,17 +47,25 @@ export function renderActions() {
         </sl-button>
       ` : nothing }
 
-      ${status === 'NEEDS_CONFIG' ? html`
-        <sl-button variant="warning" size="large" @click=${this.openConfig}>
-          <sl-icon slot="prefix" name="gear"></sl-icon>
-          Configure
+      ${status === 'starting' || status === 'stopping' ? html`
+        <sl-button variant="danger" size="large" disabled>
+          <sl-icon slot="prefix" name="stop-fill"></sl-icon>
+          Disable
+        </sl-button>
+        <sl-button variant="primary" size="large" disabled>
+          <sl-icon slot="prefix" name="arrow-clockwise"></sl-icon>
+          Restart
         </sl-button>
       ` : nothing }
 
-      ${status === 'UNMET_DEP' ? html`
-        <sl-button variant="warning" size="large">
-          <sl-icon slot="prefix" name="stop-fill"></sl-icon>
-          Configure
+      ${status === 'disabled' ? html`
+        <sl-button variant="primary" size="large">
+          <sl-icon slot="prefix" name="play-fill"></sl-icon>
+          Enable
+        </sl-button>
+        <sl-button variant="primary" size="large" disable>
+          <sl-icon slot="prefix" name="arrow-clockwise"></sl-icon>
+          Restart
         </sl-button>
       ` : nothing }
 

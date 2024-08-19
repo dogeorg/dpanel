@@ -158,11 +158,12 @@ class PkgController {
           ...indexedPup.state,
           ...newPupStateData,
         },
+        computed: generateComputedVals(this.pupIndex[pupId].manifest, { ...indexedPup.state, ...newPupStateData })
       };
-    }
 
-    // Request an update to re-render the host with new data
-    this.notify(pupId);
+      // Request an update to re-render the host with new data
+      this.notify(pupId);
+    }
   }
 
   async requestPupChanges(pupId, newData, callbacks) {
@@ -241,7 +242,7 @@ function toAssembledPup(bootstrapResponse) {
   // Popupate installed index.
   Object.values(states).forEach((s) => {
     out.installed[s.id] = {
-      computed: generateComputedVals(out.available[s.id].manifest),
+      computed: generateComputedVals(out.available[s.id].manifest, s),
       manifest: out.available[s.id].manifest,
       state: s,
     };
@@ -266,9 +267,11 @@ function defaultPupState() {
   };
 }
 
-function generateComputedVals(m) {
+function generateComputedVals(m, s) {
   const id = encodeURIComponent(m.id.toLowerCase());
   const name = encodeURIComponent(m.package.toLowerCase());
+  const status = determineStatusId(s?.installation, s?.status);
+  const installation = determineInstallationId(s?.installation);
   return {
     id: m.id,
     url: {
@@ -276,5 +279,65 @@ function generateComputedVals(m) {
       library: `/pups/${id}/${name}`,
       store: `/explore/${id}/${name}`,
     },
+    statusId: status.id,
+    statusLabel: status.label,
+    installationId: installation.id,
+    installationLabel: installation.label
   };
+}
+
+function determineInstallationId(installation) {
+  if (!installation) {
+    return { id: "not_installed", label: "not installed" };
+  }
+
+  if (installation === "installing") {
+    return { id: "installing", label: "installing" };
+  }
+
+  if (installation === "installed") {
+    return { id: "installed", label: "installed" };
+  }
+
+  if (installation === "broken") {
+    return { id: "broken", label: "broken" };
+  }
+
+  return { id: "unknown", label: "unknown" };
+}
+
+function determineStatusId(installation, status) {
+  if (!installation) {
+    return { id: "not_installed", label: "not installed" };
+  }
+
+  if (installation === "installing") {
+    return { id: "installing", label: "installing" };
+  }
+
+  if (installation === "broken") {
+    return { id: "broken", label: "broken" };
+  }
+
+  if (status === "needs_config") {
+    return { id: "needs_config", label: "needs config" };
+  }
+
+  if (status === "starting") {
+    return { id: "starting", label: "starting" };
+  }
+
+  if (status === "enabled") {
+    return { id: "enabled", label: "enabled" };
+  }
+
+  if (status === "stopping") {
+    return { id: "stopping", label: "stopping" };
+  }
+
+  if (status === "disabled") {
+    return { id: "disabled", label: "disabled" };
+  }
+
+  return { id: "unknown", label: "unknown" };
 }

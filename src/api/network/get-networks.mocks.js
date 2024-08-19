@@ -5,8 +5,23 @@ export const getResponse = {
   res: {
     success: true,
     networks: [
-      { type: "ethernet", value: "ethernet", label: "Ethernet" },
-      { type: "wifi", value: "home-wifi", label: "Home Wifi", encryption: "PSK", selected: true },
+      { type: "ethernet", interface: "eth0" },
+      { type: "ethernet", interface: "eth1" },
+      {
+        type: "wifi",
+        interface: "wlan0",
+        ssids: [
+          {
+            ssid: "DogeBox",
+            bssid: "AA:AA:AA:AA:AA:AA:AA:AA",
+            encryption: "WPA2"
+          },
+          {
+            ssid: "Open Network",
+            bssid: "BB:BB:BB:BB:BB:BB:BB:BB",
+          }
+        ]
+      }
     ],
   }
 }

@@ -92,10 +92,7 @@ class SelectNetwork extends LitElement {
               labelAction: { name: "refresh", label: "Refresh" },
               type: "select",
               required: true,
-              options: [
-                ...this._networks,
-                { type: "wifi", value: "hidden", label: "Hidden Wi-Fi Network" },
-              ],
+              options: this._networks
             },
             {
               name: "network-ssid",
@@ -164,6 +161,12 @@ class SelectNetwork extends LitElement {
       }
 
       if (network.type === 'wifi') {
+        this._networks.push({
+          interface: network.interface,
+          label: `🛜 Hidden Wi-Fi Network (${network.interface})`,
+          value: 'hidden'
+        })
+
         return network.ssids.map((s) => {
           return this._networks.push({
             interface: network.interface,
@@ -231,19 +234,15 @@ class SelectNetwork extends LitElement {
   }
 
   _attemptSetNetwork = async (data, form, dynamicFormInstance) => {
-    console.log({
-      changesOnly: data,
-      currentState: dynamicFormInstance.getState(),
-      currentValues: dynamicFormInstance.getFormValues()
-    });
-
     const state = dynamicFormInstance.getState()
+
+    const isHiddenNetwork = state.network.value === 'hidden'
 
     const apiData = {
       interface: state.network.interface,
-      ssid: state.network.ssid,
+      ssid: isHiddenNetwork ? state['network-ssid'] : state.network.ssid,
       password: state['network-pass'],
-      encryption: state['network-encryption'].value
+      encryption: isHiddenNetwork ? state['network-encryption'].value : state.network.encryption
     }
 
     const response = await postNetwork(apiData).catch(this.handleFault);

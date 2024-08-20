@@ -16,7 +16,7 @@ async function mockedMainChannelRunner(onMessageCallback) {
   }
 
   if (true) {
-    await performMockCycle(c1, (statusUpdate) => onMessageCallback({ data: JSON.stringify(statusUpdate) }))
+    await performMockCycle(c5, (statusUpdate) => onMessageCallback({ data: JSON.stringify(statusUpdate) }))
   }
 }
 

@@ -5,6 +5,10 @@ export function renderStatus() {
   const { statusId, statusLabel } = pkg.computed;
   const isLoadingStatus = ["starting", "stopping", "crashing"].includes(statusId);
   const styles = css`
+    :host {
+      --color-neutral: #8e8e9a;
+    }
+
     .status-label {
       font-size: 2em;
       line-height: 1.5;
@@ -12,29 +16,26 @@ export function renderStatus() {
       padding-bottom: 0.5rem;
       font-family: 'Comic Neue';
       text-transform: capitalize;
+      color: var(--color-neutral);
 
-      &.enabled {
-        color: #2ede75;
+      &.running {
+        color: var(--sl-color-success-500);
       }
 
       &.needs_config {
         color: var(--sl-color-amber-600);
       }
 
-      &.installing,
-      &.starting {
-        color: rgb(0, 195, 255);
+      &.starting,
+      &.stopping
+      &.stopped {
+        color: var(--color-neutral);
       }
 
-      &.stopping,
       &.broken {
-        color: #fe5c5c;
+        color: var(--sl-color-danger-500);
       }
 
-      &.disabled,
-      &.not_installed {
-        color: #8e8e9a;
-      }
     }
   `
 

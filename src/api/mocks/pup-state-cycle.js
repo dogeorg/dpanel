@@ -13,49 +13,49 @@ function asStatusUpdate(pupId, newState) {
     installation: newState[0],
     status: newState[1]
   }
-  console.log('OUT!', out);
   return out;
 }
 
 export async function performMockCycle(cycle, fn) {
   for (let i = 0; i < cycle.length; i++) {
-    await asyncTimeout(3000);
+    await asyncTimeout(8000);
     await fn(asStatusUpdate("ShibeShop", cycle[i]));
   }
 }
 
 export const c1 = [
+  ["", ""],
   ["installing", ""],
-  ["installing", ""],
-  ["installed", "starting"],
-  ["installed", "enabled"],
+  ["unready", ""],
+  ["ready", ""]
 ];
 
 export const c2 = [
   ["", ""],
   ["installing", ""],
-  ["installed", "configure"],
+  ["ready", "configure"],
 ];
 
 export const c3 = [
   ["", ""],
   ["installing", ""],
-  ["installed", "configure"],
+  ["ready", "configure"],
 ];
 
 export const c4 = [
   ["", ""],
   ["installing", ""],
   ["broken", ""],
-  ["installed", "needs_config"],
-  ["installed", "starting"],
-  ["installed", "enabled"],
-  ["installed", "stopping"],
-  ["installed", "disabled"],
+  ["ready", "needs_config"],
+  ["ready", "starting"],
+  ["ready", "enabled"],
+  ["ready", "stopping"],
+  ["ready", "disabled"],
 ];
 
 export const c5 = [
-  ["installed", "starting"],
-  ["installed", "starting"],
-  ["installed", "enabled"],
+  ["ready", "starting"],
+  ["ready", "running"],
+  ["ready", "stopping"],
+  ["ready", "stopped"]
 ]

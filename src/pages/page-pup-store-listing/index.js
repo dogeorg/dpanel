@@ -22,6 +22,8 @@ class PupInstallPage extends LitElement {
     return {
       open_dialog: { type: Boolean },
       open_dialog_label: { type: String },
+      busy: { type: Boolean },
+      inflight: { type: Boolean },
     };
   }
 
@@ -34,6 +36,8 @@ class PupInstallPage extends LitElement {
     this.open_dialog_label = "";
     this.open_page = false;
     this.open_page_label = "";
+    this.busy = false;
+    this.inflight = false;
   }
 
   connectedCallback() {
@@ -76,7 +80,7 @@ class PupInstallPage extends LitElement {
 
     const wrapperClasses = classMap({
       wrapper: true,
-      installed: statusId === 'installed',
+      installed: ["ready", "unready"].includes(installationId),
     });
 
     const renderStatusAndActions = () => {

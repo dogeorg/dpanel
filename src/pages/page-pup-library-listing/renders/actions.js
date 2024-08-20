@@ -36,36 +36,31 @@ export function renderActions() {
         </sl-button>
       ` : nothing }
 
-      ${status === 'enabled' ? html`
+      ${status === 'running' ? html`
         <sl-button variant="danger" size="large">
           <sl-icon slot="prefix" name="stop-fill"></sl-icon>
           Disable
         </sl-button>
-        <sl-button variant="primary" size="large">
-          <sl-icon slot="prefix" name="arrow-clockwise"></sl-icon>
-          Restart
+      ` : nothing }
+
+      ${status === 'starting' ? html`
+        <sl-button variant="success" size="large" disabled>
+          <sl-icon slot="prefix" name="play-fill"></sl-icon>
+          Enable
         </sl-button>
       ` : nothing }
 
-      ${status === 'starting' || status === 'stopping' ? html`
+      ${status === 'stopping' ? html`
         <sl-button variant="danger" size="large" disabled>
           <sl-icon slot="prefix" name="stop-fill"></sl-icon>
           Disable
         </sl-button>
-        <sl-button variant="primary" size="large" disabled>
-          <sl-icon slot="prefix" name="arrow-clockwise"></sl-icon>
-          Restart
-        </sl-button>
       ` : nothing }
 
-      ${status === 'disabled' ? html`
-        <sl-button variant="primary" size="large">
+      ${status === 'stopped' ? html`
+        <sl-button variant="success" size="large">
           <sl-icon slot="prefix" name="play-fill"></sl-icon>
           Enable
-        </sl-button>
-        <sl-button variant="primary" size="large" disable>
-          <sl-icon slot="prefix" name="arrow-clockwise"></sl-icon>
-          Restart
         </sl-button>
       ` : nothing }
 

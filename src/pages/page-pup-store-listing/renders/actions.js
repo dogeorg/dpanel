@@ -1,4 +1,5 @@
 import { html, css, nothing } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
+import { installPup } from "/api/action/action.js";
 
 export function openConfig() {
   this.open_dialog = "configure";
@@ -27,7 +28,10 @@ export function renderActions() {
     <div class="action-wrap">
 
       ${installationId === "not_installed" ? html`
-        <sl-button variant="warning" size="large">
+        <sl-button variant="warning" size="large"
+          @click=${this.handleInstall}
+          ?disabled=${this.inflight}
+          ?loading=${this.inflight}>
           Such Install
         </sl-button>
       ` : nothing }
@@ -38,7 +42,7 @@ export function renderActions() {
         </sl-button>
       ` : nothing }
 
-      ${installationId === "installed" ? html`
+      ${["ready", "unready"].includes(installationId) ? html`
         <sl-button variant="primary" size="large" href="${pkg.computed.url.library}">
           Manage
         </sl-button>
@@ -48,3 +52,14 @@ export function renderActions() {
     <style>${styles}</style>
   `
 };
+
+export async function handleInstall() {
+  this.inflight = true;
+  const callbacks = {
+    onSuccess: () => console.log('WOW'),
+    onError: () => console.log('NOO..'),
+    onTimeout: () => { console.log('TOO SLOW..'); this.inflight = false; }
+  }
+  await this.pkgController.requestPupAction(this.pupId, 'install', callbacks);
+}
+

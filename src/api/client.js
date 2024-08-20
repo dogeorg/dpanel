@@ -28,7 +28,6 @@ export default class ApiClient {
     const hasMock = !!config.mock
     const useMocks = this.networkContext.useMocks
     const specificMockEnabled = hasMock && useMocks && isMockEnabled(config.mock.group, config.mock.name, config.mock.method, this.networkContext)
-
     if (useMocks && hasMock && specificMockEnabled) {
       return await returnMockedResponse(path, config, this.networkContext)
     }

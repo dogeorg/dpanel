@@ -1,4 +1,4 @@
-import { mock as actionMocks } from "./action/action.mocks.js"
+import { startMock, installMock } from "./action/action.mocks.js"
 import { mock as bootstrapMocks } from "./bootstrap/bootstrap.mocks.js"
 import { postResponse as pupConfigPost, getResponse as pupConfigGetById, getAllResponse as pupConfigGetAll } from "./config/config.mocks.js";
 import { getResponse as dkmGet } from "./keys/get-keylist.mocks.js";
@@ -12,7 +12,8 @@ import { getResponse as apModeFacts } from "./setup/get-bootstrap.mocks.js";
 
 export const mocks = [
   bootstrapMocks,
-  actionMocks,
+  startMock,
+  installMock,
   pupConfigGetAll,
   pupConfigGetById,
   pupConfigPost,

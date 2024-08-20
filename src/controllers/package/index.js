@@ -1,4 +1,5 @@
 import { postConfig } from "/api/config/config.js";
+import { pickAndPerformPupAction } from "/api/action/action.js";
 
 class PkgController {
   observers = [];
@@ -7,6 +8,10 @@ class PkgController {
   installed = [];
   available = [];
   packages = [];
+
+  constructor() {
+    this.transactionTimeoutChecker();
+  }
 
   // Register an observer
   addObserver(observer) {
@@ -73,7 +78,7 @@ class PkgController {
     }
   }
 
-  registerAction(txn, callbacks, actionType, pupId) {
+  registerAction(txn, callbacks, actionType, pupId, timeout) {
     if (!txn || !callbacks || !actionType || !pupId) {
       console.warn(
         `
@@ -100,11 +105,16 @@ class PkgController {
       return;
     }
 
+    const issuedAt = Date.now();
+    const expireAt = timeout ? issuedAt + timeout : false;
+
     this.actions.push({
       txn,
       callbacks,
       actionType,
       pupId,
+      issuedAt,
+      expireAt
     });
   }
 
@@ -134,6 +144,9 @@ class PkgController {
 
     switch (foundAction.actionType) {
       case "UPDATE-PUP":
+        this.updatePupModel(foundAction.pupId, payload.update);
+        break;
+      case "PUP-ACTION":
         this.updatePupModel(foundAction.pupId, payload.update);
         break;
     }
@@ -199,6 +212,63 @@ class PkgController {
     // Return truthy to caller
     return true;
   }
+
+  async requestPupAction(pupId, action, callbacks) {
+    if (!pupId || !action || !callbacks) {
+      console.warn(
+        "Error. requestPupAction expected pupId, action, callbacks",
+        { pupId, action, callbacks },
+      );
+    }
+
+    const actionType = "PUP-ACTION";
+    const timeoutMs = 10000; // 10 seconds
+
+    // Make a network call
+    const res = await pickAndPerformPupAction(pupId, action).catch((err) => {
+      console.error(err);
+    });
+
+    if (!res || res.error) {
+      callbacks.onError({
+        error: true,
+        message: "failure occured when calling postConfig",
+      });
+      return false;
+    }
+
+    // Submitting changes succeeded, carry on.
+    const txn = res.id;
+    if (txn && callbacks) {
+      // Register transaction in actions register.
+      this.registerAction(txn, callbacks, actionType, pupId, timeoutMs);
+    }
+
+    // Return truthy to caller
+    return true;
+  }
+
+  transactionTimeoutChecker() {
+    setInterval(() => {
+      console.log(this.actions.length);
+      if (this.actions.length === 0) return;
+      this.actions.forEach((a) => {
+        if (!a.expireAt) return;
+
+        if (Date.now() > a.expireAt && typeof a.callbacks.onTimeout === "function") {
+          try {
+            const registeredActionIndex = this.actions.findIndex((b) => b.id === a.id);
+            this.actions.splice(registeredActionIndex, 1);
+            a.callbacks.onTimeout();
+          } catch(err) {
+            console.warn('registered onTimeout fn for txn threw an error when called');
+          }
+        }
+
+      })
+    }, 1000);
+  }
+
 }
 
 // Instance holder
@@ -295,12 +365,20 @@ function determineInstallationId(installation) {
     return { id: "installing", label: "installing" };
   }
 
-  if (installation === "installed") {
-    return { id: "installed", label: "installed" };
+  if (installation === "ready" || installation === "unready") {
+    return { id: installation, label: "installed" };
   }
 
   if (installation === "broken") {
     return { id: "broken", label: "broken" };
+  }
+
+  if (installation === "uninstalling") {
+    return { id: "uninstalling", label: "uninstalling" };
+  }
+
+  if (installation === "uninstalled") {
+    return { id: "uninstalled", label: "uninstalled" };
   }
 
   return { id: "unknown", label: "unknown" };
@@ -319,25 +397,22 @@ function determineStatusId(installation, status) {
     return { id: "broken", label: "broken" };
   }
 
-  if (status === "needs_config") {
-    return { id: "needs_config", label: "needs config" };
-  }
-
   if (status === "starting") {
     return { id: "starting", label: "starting" };
   }
 
-  if (status === "enabled") {
-    return { id: "enabled", label: "enabled" };
+  if (status === "running") {
+    return { id: "running", label: "running" };
   }
 
   if (status === "stopping") {
     return { id: "stopping", label: "stopping" };
   }
 
-  if (status === "disabled") {
-    return { id: "disabled", label: "disabled" };
+  if (status === "stopped") {
+    return { id: "stopped", label: "stopped" };
   }
 
   return { id: "unknown", label: "unknown" };
 }
+

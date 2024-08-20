@@ -284,6 +284,7 @@ class PupPage extends LitElement {
     .loading-bar {
       --height: 1px;
       --track-color: #444;
+      --indicator-color: #999;
     }
   `;
 }

@@ -13,7 +13,12 @@ export function openDeps() {
 export function renderActions() {
   const pkg = this.pkgController.getPup(this.context.store.pupContext.manifest.id);
   const { installationId, statusId, statusLabel } = pkg.computed
-  const hasButtons =  ["needs_deps", "needs_config"].includes(statusId) || pkg.manifest.gui;
+
+  const hasButtons =
+    ["needs_deps", "needs_config"].includes(statusId)
+    || ["uninstalled"].includes(installationId)
+    || pkg.manifest.gui;
+
   const styles = css`
     .action-wrap {
       display: flex;
@@ -47,6 +52,12 @@ export function renderActions() {
       ${statusId === 'needs_deps' ? html`
         <sl-button variant="warning" size="large" name="deps" label="dependencies" @click=${this.openDeps}>
           View List
+        </sl-button>
+      ` : nothing }
+
+      ${installationId === 'uninstalled' ? html`
+        <sl-button variant="warning" size="large" href="${pkg.computed.url.store}">
+          Such Install
         </sl-button>
       ` : nothing }
 

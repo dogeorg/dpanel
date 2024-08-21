@@ -5,6 +5,7 @@ import {
   nothing,
   choose,
   unsafeHTML,
+  classMap,
 } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 import "/components/common/action-row/action-row.js";
 import "/components/common/dynamic-form/dynamic-form.js";
@@ -164,11 +165,12 @@ class PupPage extends LitElement {
     const { installationId, statusId, statusLabel } = pkg.computed
     const hasChecks = (pkg?.manifest?.checks || []).length > 0;
     const isLoadingStatus =  ["starting", "stopping", "uninstalling"].includes(statusId);
+    const disableActions = installationId === "uninstalled"
 
     const renderHealthChecks = () => {
       return this.checks.map(
         (check) => html`
-          <health-check status=${check.status} .check=${check} ?disabled=${!this.pupEnabled}></health-check>
+          <health-check status=${check.status} .check=${check} ?disabled=${!this.pupEnabled || disableActions}></health-check>
         `,
       );
     };
@@ -182,24 +184,24 @@ class PupPage extends LitElement {
     }
 
     const renderMenu = () => html`
-      <action-row prefix="power" name="state" label="Enabled">
+      <action-row prefix="power" name="state" label="Enabled" ?disabled=${disableActions}>
         Enable or disable this Pup
-        <sl-switch slot="suffix" ?checked=${pkg.state.enabled} @sl-input=${this.handleStartStop} ?disabled=${this.inflight || installationId === "unready"}></sl-switch>
+        <sl-switch slot="suffix" ?checked=${!disableActions && pkg.state.enabled} @sl-input=${this.handleStartStop} ?disabled=${this.inflight || installationId !== "ready"}></sl-switch>
       </action-row>
 
-      <action-row prefix="gear" name="configure" label="Configure" .trigger=${this.handleMenuClick}>
+      <action-row prefix="gear" name="configure" label="Configure" .trigger=${this.handleMenuClick} ?disabled=${disableActions}>
         Customize ${pkg.manifest.package}
       </action-row>
 
-      <!--action-row prefix="archive-fill" name="properties" label="Properties" .trigger=${this.handleMenuClick}>
+      <!--action-row prefix="archive-fill" name="properties" label="Properties" .trigger=${this.handleMenuClick} ?disabled=${disableActions}>
         Ea sint dolor commodo.
       </action-row-->
 
-      <!--action-row prefix="lightning-charge" name="actions" label="Actions" .trigger=${this.handleMenuClick}>
+      <!--action-row prefix="lightning-charge" name="actions" label="Actions" .trigger=${this.handleMenuClick} ?disabled=${disableActions}>
         Ea sint dolor commodo.
       </action-row-->
 
-      <action-row prefix="display" name="logs" label="Logs" href="${window.location.pathname}/logs">
+      <action-row prefix="display" name="logs" label="Logs" href="${window.location.pathname}/logs" ?disabled=${disableActions}>
         Unfiltered logs
       </action-row>
     `;
@@ -215,10 +217,15 @@ class PupPage extends LitElement {
     `
 
     const renderCareful = () => html`
-      <action-row prefix="trash3-fill" name="uninstall" label="Uninstall" .trigger=${this.handleMenuClick}>
+      <action-row prefix="trash3-fill" name="uninstall" label="Uninstall" .trigger=${this.handleMenuClick} ?disabled=${disableActions}>
         Remove this pup from your system
       </action-row>
     `
+
+    const sectionTitleClasses = classMap({
+      "section-title": true,
+      "disabled": disableActions
+    })
 
     return html`
       <div id="PageWrapper" class="wrapper">
@@ -230,7 +237,7 @@ class PupPage extends LitElement {
         </section>
 
         <section>
-          <div class="section-title">
+          <div class=${sectionTitleClasses}>
             <h3>Menu</h3>
           </div>
           <div class="list-wrap">${renderMenu()}</div>
@@ -238,7 +245,7 @@ class PupPage extends LitElement {
 
         ${hasChecks ? html`
         <section>
-          <div class="section-title">
+          <div class=${sectionTitleClasses}>
             <h3>Health checks</h3>
           </div>
           <div class="list-wrap">${renderHealthChecks()}</div>
@@ -307,6 +314,10 @@ class PupPage extends LitElement {
 
     section .section-title {
       margin-bottom: 0em;
+    }
+
+    section .section-title.disabled {
+      color: var(--sl-color-neutral-400);
     }
 
     section .section-title h3 {

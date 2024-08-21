@@ -20,7 +20,7 @@ function generateStates(manifests) {
         status: ['Core', 'Dogeboxd', 'Map', 'Identity', 'Tipjar', 'ShibeShop'].includes(p.package) ? 'running' : 'stopped',
         stats: generateRandomStats(),
         config: generateConfigOptions(p.command.config),
-        installation: "unready",
+        installation: "ready",
         enabled: !!['Core', 'Dogeboxd', 'Map', 'Identity', 'Tipjar'].includes(p.package),
         needs_deps: false,
         needs_config: false,

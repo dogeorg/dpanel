@@ -55,7 +55,7 @@ export function renderActions() {
           ${statusId === 'needs_config' || statusId === 'needs_deps' ? html`
           <sl-divider class="show-only-wide" vertical style="height: 1.5em; margin-left: 0.1em;"></sl-divider>
           `: nothing}
-          <sl-button size="large" variant="warning" href="${pkg.computed.url.gui}"} ?disabled="${installationId !== "unready" }">
+          <sl-button size="large" variant="warning" href="${pkg.computed.url.gui}"} ?disabled="${installationId !== "ready" }">
             <sl-icon slot="prefix" name="stars"></sl-icon>
             Launch UI
           </sl-button>

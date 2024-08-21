@@ -92,18 +92,27 @@ class SelectNetwork extends LitElement {
               labelAction: { name: "refresh", label: "Refresh" },
               type: "select",
               required: true,
-              options: [
-                ...this._networks,
-                { type: "wifi", value: "hidden", label: "Hidden Network" },
-              ],
+              options: this._networks
             },
             {
               name: "network-ssid",
               label: "Network SSID",
               type: "text",
               required: true,
-              // revealOn: ["network", "=", "hidden"],
-              revealOn: (state, values) => state.network && state.network.value == "hidden"
+              revealOn: (state) => state.network?.value == "hidden"
+            },
+            {
+              name: "network-encryption",
+              label: "Network Encryption",
+              type: "select",
+              required: true,
+              revealOn: (state) => state.network?.value === 'hidden',
+              options: [
+                { value: 'wep', label: 'WEP' },
+                { value: 'wpa', label: 'WPA' },
+                { value: 'wpa2-psk', label: 'WPA2 Personal' },
+                { value: 'none', label: 'None' },
+              ]
             },
             {
               name: "network-pass",
@@ -111,11 +120,19 @@ class SelectNetwork extends LitElement {
               type: "password",
               required: true,
               passwordToggle: true,
-              // revealOn: ["network", "!=", "ethernet"],
-              revealOn: (state, values) => Boolean(
-                (state.network && state.network.encryption === "PSK") ||
-                (state.network && state.network.type !== "ethernet")
-              )
+              revealOn: (state) => {
+                // If the selected network is a broadcast wifi network with encryption, show.
+                if (state.network?.encryption) return true
+
+                // If we've selected a hidden wifi network, _and_ configured the encryption to be NOT none, show.
+                if (state.network?.value === 'hidden') {
+                  if (state['network-encryption'] && state['network-encryption'].value !== 'none') {
+                    return true
+                  }
+                }
+
+                return false
+              }
             },
           ],
         },
@@ -131,7 +148,36 @@ class SelectNetwork extends LitElement {
     if (!response.networks) return [];
 
     const { networks } = response;
-    this._networks = networks;
+
+    this._networks = []
+
+    networks.forEach((network) => {
+      if (network.type === 'ethernet') {
+        return this._networks.push({
+          ...network,
+          label: `Ethernet - ${network.interface}`,
+          value: network.interface
+        })
+      }
+
+      if (network.type === 'wifi') {
+        this._networks.push({
+          interface: network.interface,
+          label: `🛜 Hidden Wi-Fi Network (${network.interface})`,
+          value: 'hidden'
+        })
+
+        return network.ssids.map((s) => {
+          return this._networks.push({
+            interface: network.interface,
+            ssid: s.ssid,
+            encryption: s.encryption,
+            label: `🛜 ${s.ssid} (${network.interface}, ${s.encryption ?? 'Open'})`,
+            value: `${network.interface}-${s.bssid}`
+          })
+        })
+      }
+    })
 
     // Networks have been retrieved, ensure they are supplied
     // as the network picker's options.
@@ -188,14 +234,18 @@ class SelectNetwork extends LitElement {
   }
 
   _attemptSetNetwork = async (data, form, dynamicFormInstance) => {
+    const state = dynamicFormInstance.getState()
 
-    console.log({
-      changesOnly: data,
-      currentState: dynamicFormInstance.getState(),
-      currentValues: dynamicFormInstance.getFormValues()
-    });
+    const isHiddenNetwork = state.network.value === 'hidden'
 
-    const response = await postNetwork(data).catch(this.handleFault);
+    const apiData = {
+      interface: state.network.interface,
+      ssid: isHiddenNetwork ? state['network-ssid'] : state.network.ssid,
+      password: state['network-pass'],
+      encryption: isHiddenNetwork ? state['network-encryption'].value : state.network.encryption
+    }
+
+    const response = await postNetwork(apiData).catch(this.handleFault);
 
     if (!response) {
       dynamicFormInstance.retainChanges(); // stops spinner

@@ -393,6 +393,14 @@ function determineStatusId(state) {
     needs_config: state?.needs_config
   }
 
+  if (installation === "uninstalling") {
+    return { id: "uninstalling", label: "Uninstalling" }
+  }
+
+  if (installation === "uninstalled") {
+    return { id: "uninstalled", label: "Uninstalled" }
+  }
+
   if (flags.needs_deps) {
     return { id: "needs_deps", label: "Missing Dependencies" };
   }

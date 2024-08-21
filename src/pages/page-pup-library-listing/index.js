@@ -163,7 +163,7 @@ class PupPage extends LitElement {
     const pkg = this.pkgController.getPup(this.context.store.pupContext.manifest.id);
     const { installationId, statusId, statusLabel } = pkg.computed
     const hasChecks = (pkg?.manifest?.checks || []).length > 0;
-    const isLoadingStatus =  ["starting", "stopping", "crashing"].includes(statusId);
+    const isLoadingStatus =  ["starting", "stopping", "uninstalling"].includes(statusId);
 
     const renderHealthChecks = () => {
       return this.checks.map(
@@ -333,6 +333,7 @@ class PupPage extends LitElement {
       --indicator-color: #999;
       &.starting { --indicator-color: var(--sl-color-primary-600); }
       &.stopping { --indicator-color: var(--sl-color-danger-600); }
+      &.uninstalling { --indicator-color: var(--sl-color-danger-600); }
     }
   `;
 }

@@ -21,7 +21,7 @@ function generateStates(manifests) {
         stats: generateRandomStats(),
         config: generateConfigOptions(p.command.config),
         installation: "ready",
-        enabled: !!['Core', 'Dogeboxd', 'Map', 'Identity', 'Tipjar'].includes(p.package),
+        enabled: !!['Core', 'Dogeboxd', 'Map', 'Identity', 'Tipjar', 'ShibeShop'].includes(p.package),
         needs_deps: false,
         needs_config: false,
       };

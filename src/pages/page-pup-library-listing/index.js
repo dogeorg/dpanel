@@ -24,6 +24,8 @@ class PupPage extends LitElement {
       open_dialog: { type: Boolean },
       open_dialog_label: { type: String },
       checks: { type: Object },
+      pupEnabled: { type: Boolean },
+      _confirmedName: { type: String },
     };
   }
 
@@ -38,6 +40,7 @@ class PupPage extends LitElement {
     this.open_page_label = "";
     this.checks = [];
     this.pupEnabled = false;
+    this._confirmedName = "";
   }
 
   connectedCallback() {
@@ -138,10 +141,27 @@ class PupPage extends LitElement {
     await this.pkgController.requestPupAction(this.pupId, actionName, callbacks);
   }
 
+  async handleUninstall(e) {
+    this.pupEnabled = false;
+    this.inflight = true;
+    this.requestUpdate();
+
+    const actionName = 'uninstall'
+    const callbacks = {
+      onSuccess: () => console.log('WOW'),
+      onError: () => console.log('NOO..'),
+      onTimeout: () => { console.log('TOO SLOW..'); this.inflight = false; }
+    }
+    await this.pkgController.requestPupAction(this.pupId, actionName, callbacks);
+    await asyncTimeout(1500);
+    this._confirmedName = "";
+    this.clearDialog();
+  }
+
   render() {
     const path = this.context.store?.appContext?.path || [];
     const pkg = this.pkgController.getPup(this.context.store.pupContext.manifest.id);
-    const { statusId, statusLabel } = pkg.computed
+    const { installationId, statusId, statusLabel } = pkg.computed
     const hasChecks = (pkg?.manifest?.checks || []).length > 0;
     const isLoadingStatus =  ["starting", "stopping", "crashing"].includes(statusId);
 
@@ -164,7 +184,7 @@ class PupPage extends LitElement {
     const renderMenu = () => html`
       <action-row prefix="power" name="state" label="Enabled">
         Enable or disable this Pup
-        <sl-switch slot="suffix" ?checked=${pkg.state.enabled} @sl-input=${this.handleStartStop}></sl-switch>
+        <sl-switch slot="suffix" ?checked=${pkg.state.enabled} @sl-input=${this.handleStartStop} ?disabled=${this.inflight || installationId === "unready"}></sl-switch>
       </action-row>
 
       <action-row prefix="gear" name="configure" label="Configure" .trigger=${this.handleMenuClick}>
@@ -191,6 +211,12 @@ class PupPage extends LitElement {
 
       <action-row prefix="box-seam" name="deps" label="Dependencies" .trigger=${this.handleMenuClick}>
         View software this Pup depends on
+      </action-row>
+    `
+
+    const renderCareful = () => html`
+      <action-row prefix="trash3-fill" name="uninstall" label="Uninstall" .trigger=${this.handleMenuClick}>
+        Remove this pup from your system
       </action-row>
     `
 
@@ -224,6 +250,13 @@ class PupPage extends LitElement {
             <h3>Such More</h3>
           </div>
           <div class="list-wrap">${renderMore()}</div>
+        </section>
+
+        <section>
+          <div class="section-title">
+            <h3>Much Care</h3>
+          </div>
+          <div class="list-wrap">${renderCareful()}</div>
         </section>
       </div>
 

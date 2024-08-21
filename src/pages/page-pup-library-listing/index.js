@@ -37,6 +37,7 @@ class PupPage extends LitElement {
     this.open_page = false;
     this.open_page_label = "";
     this.checks = [];
+    this.pupEnabled = false;
   }
 
   connectedCallback() {
@@ -44,6 +45,7 @@ class PupPage extends LitElement {
     // Observers with a pupId will be requested to
     // update when state for that pup changes
     this.pupId = this.context.store.pupContext.manifest.id;
+    this.pupEnabled = this.pkgController.getPup(this.pupId)?.state?.enabled
     this.pkgController.addObserver(this);
   }
 
@@ -56,8 +58,7 @@ class PupPage extends LitElement {
     this.addEventListener("sl-hide", this.handleDialogClose);
     this.checks = this.context.store.pupContext?.manifest?.checks;
 
-    const pkgId = this.context.store.pupContext.manifest.package;
-    if (pkgId === "Core") {
+    if (this.pupId === "Core") {
       await asyncTimeout(1200);
       this.checks[1].status = "success";
       this.requestUpdate();
@@ -93,9 +94,8 @@ class PupPage extends LitElement {
     };
 
     // Invoke pkgContrller model update, supplying data and callbacks
-    const pkgId = this.context.store.pupContext.manifest.id;
     const res = await pkgController.requestPupChanges(
-      pkgId,
+      this.pupId,
       stagedChanges,
       callbacks,
     );
@@ -124,6 +124,20 @@ class PupPage extends LitElement {
     );
   }
 
+  async handleStartStop(e) {
+    this.inflight = true;
+    this.pupEnabled = e.target.checked;
+    this.requestUpdate();
+
+    const actionName = e.target.checked ? 'start' : 'stop' ;
+    const callbacks = {
+      onSuccess: () => console.log('WOW'),
+      onError: () => console.log('NOO..'),
+      onTimeout: () => { console.log('TOO SLOW..'); this.inflight = false; }
+    }
+    await this.pkgController.requestPupAction(this.pupId, actionName, callbacks);
+  }
+
   render() {
     const path = this.context.store?.appContext?.path || [];
     const pkg = this.pkgController.getPup(this.context.store.pupContext.manifest.id);
@@ -134,7 +148,7 @@ class PupPage extends LitElement {
     const renderHealthChecks = () => {
       return this.checks.map(
         (check) => html`
-          <health-check status=${check.status} .check=${check}></health-check>
+          <health-check status=${check.status} .check=${check} ?disabled=${!this.pupEnabled}></health-check>
         `,
       );
     };
@@ -142,49 +156,43 @@ class PupPage extends LitElement {
     const renderStatusAndActions = () => {
       return html`
         ${this.renderStatus()}
-        <sl-progress-bar value="0" ?indeterminate=${isLoadingStatus} class="loading-bar"></sl-progress-bar>
+        <sl-progress-bar value="0" ?indeterminate=${isLoadingStatus} class="loading-bar ${statusId}"></sl-progress-bar>
         ${this.renderActions()}
       `
     }
 
     const renderMenu = () => html`
-      <action-row
-        prefix="list-ul"
-        name="readme"
-        label="Read me"
-        .trigger=${this.handleMenuClick}
-      >
-        Many info
+      <action-row prefix="power" name="state" label="Enabled">
+        Enable or disable this Pup
+        <sl-switch slot="suffix" ?checked=${pkg.state.enabled} @sl-input=${this.handleStartStop}></sl-switch>
       </action-row>
 
-      <action-row
-        prefix="gear"
-        name="configure"
-        label="Configure"
-        .trigger=${this.handleMenuClick}
-      >
+      <action-row prefix="gear" name="configure" label="Configure" .trigger=${this.handleMenuClick}>
         Customize ${pkg.manifest.package}
       </action-row>
 
-      <!--action-row prefix="archive-fill" name="properties" label="Properties" .trigger=${this
-        .handleMenuClick}>
+      <!--action-row prefix="archive-fill" name="properties" label="Properties" .trigger=${this.handleMenuClick}>
         Ea sint dolor commodo.
       </action-row-->
 
-      <!--action-row prefix="lightning-charge" name="actions" label="Actions" .trigger=${this
-        .handleMenuClick}>
+      <!--action-row prefix="lightning-charge" name="actions" label="Actions" .trigger=${this.handleMenuClick}>
         Ea sint dolor commodo.
       </action-row-->
 
-      <action-row
-        prefix="display"
-        name="logs"
-        label="Logs"
-        href="${window.location.pathname}/logs"
-      >
+      <action-row prefix="display" name="logs" label="Logs" href="${window.location.pathname}/logs">
         Unfiltered logs
       </action-row>
     `;
+
+    const renderMore = () => html`
+      <action-row prefix="list-ul" name="readme" label="Read me" .trigger=${this.handleMenuClick}>
+        Many info
+      </action-row>
+
+      <action-row prefix="box-seam" name="deps" label="Dependencies" .trigger=${this.handleMenuClick}>
+        View software this Pup depends on
+      </action-row>
+    `
 
     return html`
       <div id="PageWrapper" class="wrapper">
@@ -195,22 +203,27 @@ class PupPage extends LitElement {
           ${renderStatusAndActions()}
         </section>
 
-        ${hasChecks
-          ? html`
-              <section>
-                <div class="section-title">
-                  <h3>Health checks</h3>
-                </div>
-                <div class="list-wrap">${renderHealthChecks()}</div>
-              </section>
-            `
-          : nothing}
-
         <section>
           <div class="section-title">
             <h3>Menu</h3>
           </div>
           <div class="list-wrap">${renderMenu()}</div>
+        </section>
+
+        ${hasChecks ? html`
+        <section>
+          <div class="section-title">
+            <h3>Health checks</h3>
+          </div>
+          <div class="list-wrap">${renderHealthChecks()}</div>
+        </section>`
+        : nothing }
+
+        <section>
+          <div class="section-title">
+            <h3>Such More</h3>
+          </div>
+          <div class="list-wrap">${renderMore()}</div>
         </section>
       </div>
 
@@ -285,6 +298,8 @@ class PupPage extends LitElement {
       --height: 1px;
       --track-color: #444;
       --indicator-color: #999;
+      &.starting { --indicator-color: var(--sl-color-primary-600); }
+      &.stopping { --indicator-color: var(--sl-color-danger-600); }
     }
   `;
 }

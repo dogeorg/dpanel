@@ -250,7 +250,6 @@ class PkgController {
 
   transactionTimeoutChecker() {
     setInterval(() => {
-      console.log(this.actions.length);
       if (this.actions.length === 0) return;
       this.actions.forEach((a) => {
         if (!a.expireAt) return;
@@ -340,8 +339,8 @@ function defaultPupState() {
 function generateComputedVals(m, s) {
   const id = encodeURIComponent(m.id.toLowerCase());
   const name = encodeURIComponent(m.package.toLowerCase());
-  const status = determineStatusId(s?.installation, s?.status);
-  const installation = determineInstallationId(s?.installation);
+  const status = determineStatusId(s);
+  const installation = determineInstallationId(s);
   return {
     id: m.id,
     url: {
@@ -356,7 +355,9 @@ function generateComputedVals(m, s) {
   };
 }
 
-function determineInstallationId(installation) {
+function determineInstallationId(state) {
+  const installation = state?.installation;
+
   if (!installation) {
     return { id: "not_installed", label: "not installed" };
   }
@@ -384,17 +385,20 @@ function determineInstallationId(installation) {
   return { id: "unknown", label: "unknown" };
 }
 
-function determineStatusId(installation, status) {
-  if (!installation) {
-    return { id: "not_installed", label: "not installed" };
+function determineStatusId(state) {
+  const installation = state?.installation;
+  const status = state?.status;
+  const flags = {
+    needs_deps: state?.needs_deps,
+    needs_config: state?.needs_config
   }
 
-  if (installation === "installing") {
-    return { id: "installing", label: "installing" };
+  if (flags.needs_deps) {
+    return { id: "needs_deps", label: "Missing Dependencies" };
   }
 
-  if (installation === "broken") {
-    return { id: "broken", label: "broken" };
+  if (flags.needs_config) {
+    return { id: "needs_config", label: "Needs Config" };
   }
 
   if (status === "starting") {

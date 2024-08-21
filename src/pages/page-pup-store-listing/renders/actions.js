@@ -1,5 +1,4 @@
 import { html, css, nothing } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
-import { installPup } from "/api/action/action.js";
 
 export function openConfig() {
   this.open_dialog = "configure";

@@ -28,6 +28,9 @@ export function pickAndPerformPupAction(pupId, action) {
     case 'start':
       return startPup(pupId);
       break;
+    case 'stop':
+      return stopPup(pupId);
+      break;
     default:
       console.warn('unsupported pup action requested', action);
   }

@@ -73,7 +73,6 @@ class PupInstallPage extends LitElement {
     const path = this.context.store?.appContext?.path || [];
     const pkg = this.pkgController.getPup(this.context.store.pupContext.manifest.id);
     const { statusId, statusLabel, installationId, installationLabel } = pkg.computed
-    const isInstalled = installationId === "installed";
     const isLoadingStatus = ["installing"].includes(statusId);
     const hasDependencies = (pkg?.manifest?.deps?.pups || []).length > 0
     const popover_page = path[1];
@@ -82,14 +81,6 @@ class PupInstallPage extends LitElement {
       wrapper: true,
       installed: ["ready", "unready"].includes(installationId),
     });
-
-    const renderStatusAndActions = () => {
-      return html`
-        ${this.renderStatus()}
-        <sl-progress-bar class="loading-bar" value="0" ?indeterminate=${isLoadingStatus}></sl-progress-bar>
-        ${this.renderActions()}
-      `
-    }
 
     const renderDependancyList = () => {
       return pkg.manifest.deps.pups.map((dep) => html`
@@ -102,10 +93,8 @@ class PupInstallPage extends LitElement {
     return html`
       <div id="PageWrapper" class="${wrapperClasses}" ?data-freeze=${popover_page}>
         <section class="status">
-          <div class="section-title">
-            <h3 class="installation-label ${installationId}">${installationLabel}</h3>
-          </div>
-          ${renderStatusAndActions()}
+          ${this.renderStatus()}
+          ${this.renderActions()}
         </section>
 
         <section>
@@ -195,31 +184,6 @@ class PupInstallPage extends LitElement {
       font-family: "Comic Neue";
     }
 
-    .wrapper section.status .section-title h3 {
-      font-weight: 100;
-      color: var(--sl-color-warning-700);
-
-      &.installing {
-        color: var(--sl-color-warning-700);
-      }
-
-      &.installed {
-        color: rgb(0, 195, 255);
-      }
-
-      &.broken {
-        color: #fe5c5c;
-      }
-    }
-
-    .wrapper.installed section.status .section-title h3 {
-      color: #00c3ff;
-    }
-
-    section div.underscored {
-      border-bottom: 1px solid #333;
-    }
-
     aside.page-popver {
       display: none;
       position: fixed;
@@ -253,11 +217,6 @@ class PupInstallPage extends LitElement {
       @media (min-width: 576px) {
         grid-template-columns: 1fr 1fr; /* Two columns of equal width */
       }
-    }
-
-    .loading-bar {
-      --indicator-color:var(--sl-color-amber-700);
-      --height: 1px;
     }
   `;
 }

@@ -15,7 +15,7 @@ async function mockedMainChannelRunner(onMessageCallback) {
     }, 2000);
   }
 
-  if (true) {
+  if (store.networkContext.demoPupLifecycle) {
     await performMockCycle(c5, (statusUpdate) => onMessageCallback({ data: JSON.stringify(statusUpdate) }))
   }
 }

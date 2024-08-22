@@ -1,6 +1,7 @@
 export class Router {
   constructor(outlet, options = {}) {
     this.routes = [];
+    this.hooks = [];
     this.outlet = outlet;
     this.transitionDuration = options.transitionDuration || 300;
     this.currentTransition = null;
@@ -27,7 +28,7 @@ export class Router {
 
   addRoute(path, component, route) {
     const componentClass = customElements.get(component);
-    if (!componentClass) {
+    if (component && !componentClass) {
       console.error(`Component ${component} not found.`);
       return;
     }
@@ -38,6 +39,10 @@ export class Router {
       regex,
       componentClass,
     });
+  }
+
+  addHook(fn) {
+    this.hooks.push(fn);
   }
 
   go(path, replace = false) {
@@ -86,6 +91,10 @@ export class Router {
           for (const func of route.after) {
             await func(context, commands);
           }
+        }
+
+        for (const func of this.hooks) {
+          const commandResult = await func(context, commands);
         }
       } catch (error) {
         if (error.message === 'Redirection') {

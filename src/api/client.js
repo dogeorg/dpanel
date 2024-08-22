@@ -37,7 +37,7 @@ export default class ApiClient {
     const headers = { 'Content-Type': 'application/json', ...config.headers };
 
     if (this.networkContext.token) {
-      headers.Authorization = this.networkContext.token
+      headers.Authorization = `Bearer ${this.networkContext.token}`
     }
 
     let response, data
@@ -52,8 +52,17 @@ export default class ApiClient {
       throw new Error(`Resource not found: ${url}`);
     }
 
+    if (response.status === 403) {
+      return { success: false, error: true, status: 403 }
+    }
+
+    if (response.status === 401) {
+      return window.location.href = window.location.origin + "/logout"
+    }
+
     if (!response.ok) {
-      throw new Error('Fetching returned an unsuccessful response', { ok, status: repsonse.status });
+      console.warn('Unsuccessful respose', { status: response.status })
+      throw new Error('Fetching returned an unsuccessful response');
     }
 
     try {

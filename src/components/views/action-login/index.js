@@ -101,7 +101,6 @@ class LoginView extends LitElement {
     // TODO
     // data.password = await hash(data.password);
     const loginResponse = await postLogin(data).catch(this.handleFault);
-
     if (!loginResponse) {
       dynamicFormInstance.retainChanges(); // stops spinner
       return;
@@ -136,7 +135,6 @@ class LoginView extends LitElement {
   handleFault = (loginFault) => {
     this._server_fault = true;
     console.warn(loginFault);
-    window.alert("boo. something went wrong");
   };
 
   handleError(loginResponseError) {

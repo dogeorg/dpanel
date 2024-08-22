@@ -1,3 +1,4 @@
+import "./page-login/index.js";
 import "./page-home/index.js";
 import "./page-iframe/index.js";
 import "./page-pup-library/index.js";

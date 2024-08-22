@@ -8,9 +8,12 @@ import {
 const client = new ApiClient('http://localhost:3000', store.networkContext)
 
 export async function postLogin(body) {
-  const res = await client.post(`/auth/login`, body, { mock: postResponse });
+  const res = await client.post(`/authenticate`, body, { mock: postResponse });
   if (res && res.token) {
     store.updateState({ networkContext: { token: res.token }})
+  }
+  if (res.error & res.status === 403) {
+    return { error: "CHECK-CREDS" }
   }
   return res
 }

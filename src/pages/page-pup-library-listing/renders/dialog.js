@@ -8,7 +8,7 @@ export function renderDialog() {
   const pkg = this.pkgController.getPup(this.pupId);
   const { statusId } = pkg.computed
   const readmeEl = html`${unsafeHTML(pkg?.manifest?.docs?.about)}`;
-  const depsEl = pkg.manifest.deps.pups.length > 0 
+  const depsEl = pkg.manifest?.deps?.pups?.length > 0 
     ? pkg.manifest.deps.pups.map((dep) => html`
       <action-row prefix="box-seam" name=${dep.id} label=${dep.name} href=${`/explore/${dep.id}/${dep.name}`}>
         ${dep.condition}

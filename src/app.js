@@ -100,6 +100,9 @@ class DPanelApp extends LitElement {
     // this.outletWrapper = this.shadowRoot.querySelector("#OutletWrapper")
     this.router = new Router(outlet);
     this.router.setRoutes(routes)
+    this.router.addHook(
+      () => store.updateState({ appContext: { menuVisible: false }})
+    )
   }
 
   _handleResize() {
@@ -149,6 +152,7 @@ class DPanelApp extends LitElement {
     const taskName = this.context.store.promptContext.name;
     const showChrome = !CURPATH.startsWith("/login");
     const mainClasses = classMap({
+      fullscreen: !showChrome,
       backward: this.context.store.appContext.navigationDirection === "backward",
       opaque: showSystemPrompt,
     });

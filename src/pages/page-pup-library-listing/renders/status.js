@@ -20,11 +20,15 @@ export function renderStatus() {
 
       &.needs_deps { color: var(--sl-color-amber-600); }
       &.needs_config { color: var(--sl-color-amber-600); }
+
       &.starting { color: var(--sl-color-primary-600); }
       &.stopping { color: var(--sl-color-danger-600); }
-      &.stopped { color: var(--color-neutral); }
       &.running { color: var(--sl-color-success-600); }
+      &.stopped { color: var(--color-neutral); }
+
       &.broken { color: var(--sl-color-danger-600);}
+      &.uninstalling { color: var(--sl-color-danger-600); }
+      &.uninstalled { color: var(--color-neutral); }
     }
   `
 

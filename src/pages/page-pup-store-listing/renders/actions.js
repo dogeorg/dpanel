@@ -26,7 +26,7 @@ export function renderActions() {
   return html`
     <div class="action-wrap">
 
-      ${installationId === "not_installed" ? html`
+      ${["not_installed", "uninstalled"].includes(installationId) ? html`
         <sl-button variant="warning" size="large"
           @click=${this.handleInstall}
           ?disabled=${this.inflight}

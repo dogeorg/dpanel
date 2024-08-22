@@ -4,10 +4,17 @@ export function renderStatus() {
   const pkg = this.pkgController.getPup(this.context.store.pupContext.manifest.id);
   const { installationId, installationLabel } = pkg.computed
   const isLoadingStatus = ["installing"].includes(installationId);
+  const normalisedLabel = () => {
+    if (["not_installed", "uninstalled"].includes(installationId)) {
+      return "Not installed"
+    } else {
+      return installationLabel
+    }
+  }
 
   return html`
     <div class="section-title">
-      <h3 class="installation-label ${installationId}">${installationLabel}</h3>
+      <h3 class="installation-label ${installationId}">${normalisedLabel()}</h3>
     </div>
     <div>
       <span class="status-label">${pkg.manifest.package}</span>

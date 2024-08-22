@@ -10,6 +10,7 @@ class ActionRow extends LitElement {
       variant: { type: String },
       loading: { type: Boolean },
       href: { type: String },
+      disabled: { type: Boolean },
     };
   }
 
@@ -20,6 +21,7 @@ class ActionRow extends LitElement {
     this.suffix = "chevron-right";
     this.trigger = false;
     this.href = "";
+    this.disabled = false;
   }
 
   static styles = css`
@@ -64,9 +66,20 @@ class ActionRow extends LitElement {
       color: var(--sl-color-danger-800);
     }
     :host(:hover) {
-      color: var(--sl-color-neutral-950);
+      color: var(--sl-color-neutral-800);
       cursor: pointer;
     }
+
+    /* DISABLED STATE */
+    :host([disabled]) {
+      pointer-events: none;
+      color: var(--sl-color-neutral-400);
+    }
+
+    :host([disabled]:hover) {
+      color: var(--sl-color-neutral-400);
+    }
+
 
     .base-wrap {
       display: flex;
@@ -171,8 +184,9 @@ class ActionRow extends LitElement {
         </div>
 
         <div class="suffix-wrap" part="suffix">
-          <slot name="suffix"></slot>
-          <sl-icon name="chevron-right"></sl-icon>
+          <slot name="suffix">
+            <sl-icon name="chevron-right"></sl-icon>
+          </slot>
         </div>
       </div>
     `

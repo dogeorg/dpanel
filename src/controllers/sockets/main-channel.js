@@ -2,8 +2,9 @@ import WebSocketClient from "/api/sockets.js";
 import { store } from "/state/store.js";
 import { pkgController } from "/controllers/package/index.js";
 import { asyncTimeout } from "/utils/timeout.js";
+import { performMockCycle, c1, c4, c5 } from "/api/mocks/pup-state-cycle.js";
 
-function mockedMainChannelRunner(onMessageCallback) {
+async function mockedMainChannelRunner(onMessageCallback) {
   if (store.networkContext.demoSystemPrompt) {
     setTimeout(() => {
       const mockData = {
@@ -12,6 +13,10 @@ function mockedMainChannelRunner(onMessageCallback) {
       };
       onMessageCallback({ data: JSON.stringify(mockData) });
     }, 2000);
+  }
+
+  if (store.networkContext.demoPupLifecycle) {
+    await performMockCycle(c5, (statusUpdate) => onMessageCallback({ data: JSON.stringify(statusUpdate) }))
   }
 }
 
@@ -50,7 +55,7 @@ class SocketChannel {
     };
 
     this.wsClient.onMessage = async (event) => {
-      console.log("MSSSGSG!~", event, event.data);
+      // console.log("MSSSGSG!~", event, event.data);
 
       let err, data;
       try {
@@ -70,11 +75,20 @@ class SocketChannel {
 
       switch (data.type) {
         case "PupStatus":
+          // A message of type PupStatus is received in response to a requested action resolving.
+
           // TODO: determine why.
           // Receiving completed txns before the txn has been registered in the client.
           await asyncTimeout(500);
 
           pkgController.resolveAction(data.id, data);
+          break;
+        case "status":
+          // A message of type "status" is received when dogeboxd broadcasts status changes
+          // Changes include cpu, mem, running states etc..
+          Object.keys(data.update).forEach((pupId) => {
+            pkgController.updatePupModel(pupId, data.update[pupId])
+          });
           break;
         case "ShowPrompt":
           store.updateState({

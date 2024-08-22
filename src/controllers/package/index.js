@@ -1,4 +1,5 @@
 import { postConfig } from "/api/config/config.js";
+import { pickAndPerformPupAction } from "/api/action/action.js";
 
 class PkgController {
   observers = [];
@@ -7,6 +8,10 @@ class PkgController {
   installed = [];
   available = [];
   packages = [];
+
+  constructor() {
+    this.transactionTimeoutChecker();
+  }
 
   // Register an observer
   addObserver(observer) {
@@ -73,7 +78,7 @@ class PkgController {
     }
   }
 
-  registerAction(txn, callbacks, actionType, pupId) {
+  registerAction(txn, callbacks, actionType, pupId, timeout) {
     if (!txn || !callbacks || !actionType || !pupId) {
       console.warn(
         `
@@ -100,11 +105,16 @@ class PkgController {
       return;
     }
 
+    const issuedAt = Date.now();
+    const expireAt = timeout ? issuedAt + timeout : false;
+
     this.actions.push({
       txn,
       callbacks,
       actionType,
       pupId,
+      issuedAt,
+      expireAt
     });
   }
 
@@ -136,6 +146,9 @@ class PkgController {
       case "UPDATE-PUP":
         this.updatePupModel(foundAction.pupId, payload.update);
         break;
+      case "PUP-ACTION":
+        this.updatePupModel(foundAction.pupId, payload.update);
+        break;
     }
   }
 
@@ -158,11 +171,12 @@ class PkgController {
           ...indexedPup.state,
           ...newPupStateData,
         },
+        computed: generateComputedVals(this.pupIndex[pupId].manifest, { ...indexedPup.state, ...newPupStateData })
       };
-    }
 
-    // Request an update to re-render the host with new data
-    this.notify(pupId);
+      // Request an update to re-render the host with new data
+      this.notify(pupId);
+    }
   }
 
   async requestPupChanges(pupId, newData, callbacks) {
@@ -198,6 +212,62 @@ class PkgController {
     // Return truthy to caller
     return true;
   }
+
+  async requestPupAction(pupId, action, callbacks) {
+    if (!pupId || !action || !callbacks) {
+      console.warn(
+        "Error. requestPupAction expected pupId, action, callbacks",
+        { pupId, action, callbacks },
+      );
+    }
+
+    const actionType = "PUP-ACTION";
+    const timeoutMs = 10000; // 10 seconds
+
+    // Make a network call
+    const res = await pickAndPerformPupAction(pupId, action).catch((err) => {
+      console.error(err);
+    });
+
+    if (!res || res.error) {
+      callbacks.onError({
+        error: true,
+        message: "failure occured when calling postConfig",
+      });
+      return false;
+    }
+
+    // Submitting changes succeeded, carry on.
+    const txn = res.id;
+    if (txn && callbacks) {
+      // Register transaction in actions register.
+      this.registerAction(txn, callbacks, actionType, pupId, timeoutMs);
+    }
+
+    // Return truthy to caller
+    return true;
+  }
+
+  transactionTimeoutChecker() {
+    setInterval(() => {
+      if (this.actions.length === 0) return;
+      this.actions.forEach((a) => {
+        if (!a.expireAt) return;
+
+        if (Date.now() > a.expireAt && typeof a.callbacks.onTimeout === "function") {
+          try {
+            const registeredActionIndex = this.actions.findIndex((b) => b.id === a.id);
+            this.actions.splice(registeredActionIndex, 1);
+            a.callbacks.onTimeout();
+          } catch(err) {
+            console.warn('registered onTimeout fn for txn threw an error when called');
+          }
+        }
+
+      })
+    }, 1000);
+  }
+
 }
 
 // Instance holder
@@ -241,7 +311,7 @@ function toAssembledPup(bootstrapResponse) {
   // Popupate installed index.
   Object.values(states).forEach((s) => {
     out.installed[s.id] = {
-      computed: generateComputedVals(out.available[s.id].manifest),
+      computed: generateComputedVals(out.available[s.id].manifest, s),
       manifest: out.available[s.id].manifest,
       state: s,
     };
@@ -266,9 +336,11 @@ function defaultPupState() {
   };
 }
 
-function generateComputedVals(m) {
+function generateComputedVals(m, s) {
   const id = encodeURIComponent(m.id.toLowerCase());
   const name = encodeURIComponent(m.package.toLowerCase());
+  const status = determineStatusId(s);
+  const installation = determineInstallationId(s);
   return {
     id: m.id,
     url: {
@@ -276,5 +348,75 @@ function generateComputedVals(m) {
       library: `/pups/${id}/${name}`,
       store: `/explore/${id}/${name}`,
     },
+    statusId: status.id,
+    statusLabel: status.label,
+    installationId: installation.id,
+    installationLabel: installation.label
   };
 }
+
+function determineInstallationId(state) {
+  const installation = state?.installation;
+
+  if (!installation) {
+    return { id: "not_installed", label: "not installed" };
+  }
+
+  if (installation === "installing") {
+    return { id: "installing", label: "installing" };
+  }
+
+  if (installation === "ready" || installation === "unready") {
+    return { id: installation, label: "installed" };
+  }
+
+  if (installation === "broken") {
+    return { id: "broken", label: "broken" };
+  }
+
+  if (installation === "uninstalling") {
+    return { id: "uninstalling", label: "uninstalling" };
+  }
+
+  if (installation === "uninstalled") {
+    return { id: "uninstalled", label: "uninstalled" };
+  }
+
+  return { id: "unknown", label: "unknown" };
+}
+
+function determineStatusId(state) {
+  const installation = state?.installation;
+  const status = state?.status;
+  const flags = {
+    needs_deps: state?.needs_deps,
+    needs_config: state?.needs_config
+  }
+
+  if (flags.needs_deps) {
+    return { id: "needs_deps", label: "Missing Dependencies" };
+  }
+
+  if (flags.needs_config) {
+    return { id: "needs_config", label: "Needs Config" };
+  }
+
+  if (status === "starting") {
+    return { id: "starting", label: "starting" };
+  }
+
+  if (status === "running") {
+    return { id: "running", label: "running" };
+  }
+
+  if (status === "stopping") {
+    return { id: "stopping", label: "stopping" };
+  }
+
+  if (status === "stopped") {
+    return { id: "stopped", label: "stopped" };
+  }
+
+  return { id: "unknown", label: "unknown" };
+}
+

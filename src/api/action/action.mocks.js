@@ -1,19 +1,19 @@
-const postResponse = [
-  // When successful
-  {
-    success: true,
-    message: "Winner winner, chicken dinner",
-  },
-  // When fail
-  {
-    message: "Loser loser, tofu bruiser",
-    errors: [1,2,3]
-  }
-];
+const postResponse = {
+  success: true,
+  message: "Winner winner, chicken dinner",
+  id: 123,
+}
 
-export const mock = {
+export const startMock = {
   name: '/action/:pup/start',
-  method: 'get',
+  method: 'post',
+  group: 'pup actions',
+  res: postResponse
+}
+
+export const installMock = {
+  name: '/action/:pup/install',
+  method: 'post',
   group: 'pup actions',
   res: postResponse
 }

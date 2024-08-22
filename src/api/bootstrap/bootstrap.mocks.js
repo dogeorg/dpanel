@@ -12,14 +12,18 @@ export function generateBootstrap(input) {
 function generateStates(manifests) {
   const sources = [...manifests.local.available, ...manifests.internal.available]
   return sources.reduce((out, p) => {
-    if (['Core', 'Dogeboxd', 'Map', 'Identity', 'Tipjar'].includes(p.package)) {
+    if (['Core', 'Dogeboxd', 'Map', 'Identity', 'Tipjar', 'ShibeShop'].includes(p.package)) {
       out[p.package] = {
         id: p.id,
         package: p.package,
         source: 'local',
-        status: ['Core', 'Dogeboxd', 'Map', 'Identity', 'Tipjar'].includes(p.package) ? 'running' : 'stopped',
+        status: ['Core', 'Dogeboxd', 'Map', 'Identity', 'Tipjar', 'ShibeShop'].includes(p.package) ? 'running' : 'stopped',
         stats: generateRandomStats(),
-        config: generateConfigOptions(p.command.config)
+        config: generateConfigOptions(p.command.config),
+        installation: "ready",
+        enabled: !!['Core', 'Dogeboxd', 'Map', 'Identity', 'Tipjar'].includes(p.package),
+        needs_deps: false,
+        needs_config: false,
       };
     }
     return out;

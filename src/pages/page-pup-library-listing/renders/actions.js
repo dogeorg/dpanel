@@ -5,14 +5,25 @@ export function openConfig() {
   this.open_dialog_label = "Configure";
 }
 
+export function openDeps() {
+  this.open_dialog = "deps";
+  this.open_dialog_label = "Dependencies";
+}
+
 export function renderActions() {
-  const pkg = this.context.store.pupContext;
+  const pkg = this.pkgController.getPup(this.context.store.pupContext.manifest.id);
+  const { installationId, statusId, statusLabel } = pkg.computed
+  const hasButtons =  ["needs_deps", "needs_config"].includes(statusId) || pkg.manifest.gui;
   const styles = css`
     .action-wrap {
       display: flex;
       flex-direction: row;
       flex-wrap: wrap;
       gap: 1em;
+
+      &.margin {
+        margin-top: 1.2em;
+      }
     }
 
     .show-only-wide {
@@ -22,41 +33,30 @@ export function renderActions() {
       }
     }
   `
-  const status = 'RUNNING' || pkg.state.status;
 
   return html`
-    <div class="action-wrap">
+    <div class="action-wrap ${hasButtons ? "margin" : ""}">
 
-      ${status === 'RUNNING' ? html`
-        <sl-button variant="danger" size="large">
-          <sl-icon slot="prefix" name="stop-fill"></sl-icon>
-          Disable
-        </sl-button>
-        <sl-button variant="primary" size="large">
-          <sl-icon slot="prefix" name="arrow-clockwise"></sl-icon>
-          Restart
-        </sl-button>
-      ` : nothing }
-
-      ${status === 'NEEDS_CONFIG' ? html`
+      ${statusId === 'needs_config' ? html`
         <sl-button variant="warning" size="large" @click=${this.openConfig}>
           <sl-icon slot="prefix" name="gear"></sl-icon>
           Configure
         </sl-button>
       ` : nothing }
 
-      ${status === 'UNMET_DEP' ? html`
-        <sl-button variant="warning" size="large">
-          <sl-icon slot="prefix" name="stop-fill"></sl-icon>
-          Configure
+      ${statusId === 'needs_deps' ? html`
+        <sl-button variant="warning" size="large" name="deps" label="dependencies" @click=${this.openDeps}>
+          View List
         </sl-button>
       ` : nothing }
 
       ${pkg.manifest.gui ? html`
         <div style="display: flex; align-items: center;">
+          ${statusId === 'needs_config' || statusId === 'needs_deps' ? html`
           <sl-divider class="show-only-wide" vertical style="height: 1.5em; margin-left: 0.1em;"></sl-divider>
-          <sl-button variant="primary" size="large" outline href="/explore/${pkg.manifest.id.toLowerCase()}/ui" ?disabled=${status === "NEEDS_CONFIG"}>
-            <sl-icon slot="prefix" name="box-arrow-up-right"></sl-icon>
+          `: nothing}
+          <sl-button size="large" variant="warning" href="${pkg.computed.url.gui}"} ?disabled="${installationId !== "ready" }">
+            <sl-icon slot="prefix" name="stars"></sl-icon>
             Launch UI
           </sl-button>
         </div>

@@ -6,6 +6,7 @@ class HealthCheck extends LitElement {
     return {
       status: { type: String },
       check: { type: Object },
+      disabled: { type: Boolean }
     };
   }
 
@@ -13,13 +14,23 @@ class HealthCheck extends LitElement {
     super();
     this.check = {};
     this.status = "loading";
+    this.disabled = false;
   }
 
   determine(status) {
     let prefix = "";
     let variant = "";
 
+    if (this.disabled) {
+      status = "disabled"
+    }
+
     switch (status) {
+      case "disabled":
+        return {
+          prefix: "pause-circle",
+          variant: "neutral",
+        };
       case "success":
         return {
           prefix: "check2",
@@ -62,7 +73,8 @@ class HealthCheck extends LitElement {
         label="${check.label}"
         prefix=${this.determine(this.status).prefix}
         variant=${this.determine(this.status).variant}
-        ?loading=${this.status === "loading"}
+        ?loading=${!this.disabled && this.status === "loading"}
+        ?disabled=${this.disabled}
       >
         ${check.description}
       </action-row>

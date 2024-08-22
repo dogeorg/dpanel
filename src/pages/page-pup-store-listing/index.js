@@ -22,6 +22,8 @@ class PupInstallPage extends LitElement {
     return {
       open_dialog: { type: Boolean },
       open_dialog_label: { type: String },
+      busy: { type: Boolean },
+      inflight: { type: Boolean },
     };
   }
 
@@ -34,10 +36,13 @@ class PupInstallPage extends LitElement {
     this.open_dialog_label = "";
     this.open_page = false;
     this.open_page_label = "";
+    this.busy = false;
+    this.inflight = false;
   }
 
   connectedCallback() {
     super.connectedCallback();
+    this.pupId = this.context.store.pupContext.manifest.id;
     this.pkgController.addObserver(this);
   }
 
@@ -66,14 +71,15 @@ class PupInstallPage extends LitElement {
 
   render() {
     const path = this.context.store?.appContext?.path || [];
-    const pkg = this.context.store.pupContext;
-    const isInstalled = !!pkg?.state?.status;
+    const pkg = this.pkgController.getPup(this.context.store.pupContext.manifest.id);
+    const { statusId, statusLabel, installationId, installationLabel } = pkg.computed
+    const isLoadingStatus = ["installing"].includes(statusId);
     const hasDependencies = (pkg?.manifest?.deps?.pups || []).length > 0
     const popover_page = path[1];
 
     const wrapperClasses = classMap({
       wrapper: true,
-      installed: isInstalled,
+      installed: ["ready", "unready"].includes(installationId),
     });
 
     const renderDependancyList = () => {
@@ -87,11 +93,8 @@ class PupInstallPage extends LitElement {
     return html`
       <div id="PageWrapper" class="${wrapperClasses}" ?data-freeze=${popover_page}>
         <section class="status">
-          <div class="section-title">
-            <h3>${isInstalled ? "Installed" : "Not Installed" }</h3>
-          </div>
-          <div class="underscored">${this.renderStatus()}</div>
-          <div>${this.renderActions()}</div>
+          ${this.renderStatus()}
+          ${this.renderActions()}
         </section>
 
         <section>
@@ -179,19 +182,6 @@ class PupInstallPage extends LitElement {
     section .section-title h3 {
       text-transform: uppercase;
       font-family: "Comic Neue";
-    }
-
-    .wrapper section.status .section-title h3 {
-      font-weight: 100;
-      color: var(--sl-color-warning-700);
-    }
-
-    .wrapper.installed section.status .section-title h3 {
-      color: #00c3ff;
-    }
-
-    section div.underscored {
-      border-bottom: 1px solid #333;
     }
 
     aside.page-popver {

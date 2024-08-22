@@ -1,8 +1,14 @@
-import { html, css, classMap } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
+import { html, css, classMap, nothing } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 
 export function renderStatus() {
-  const pkg = this.context.store.pupContext
+  const pkg = this.pkgController.getPup(this.context.store.pupContext.manifest.id);
+  const { statusId, statusLabel } = pkg.computed;
+  const isLoadingStatus = ["starting", "stopping", "crashing"].includes(statusId);
   const styles = css`
+    :host {
+      --color-neutral: #8e8e9a;
+    }
+
     .status-label {
       font-size: 2em;
       line-height: 1.5;
@@ -10,30 +16,22 @@ export function renderStatus() {
       padding-bottom: 0.5rem;
       font-family: 'Comic Neue';
       text-transform: capitalize;
+      color: var(--color-neutral);
 
-      &.running {
-        color: #2ede75;
-      }
-
-      &.needs_config {
-        color: var(--sl-color-amber-600);
-      }
+      &.needs_deps { color: var(--sl-color-amber-600); }
+      &.needs_config { color: var(--sl-color-amber-600); }
+      &.starting { color: var(--sl-color-primary-600); }
+      &.stopping { color: var(--sl-color-danger-600); }
+      &.stopped { color: var(--color-neutral); }
+      &.running { color: var(--sl-color-success-600); }
+      &.broken { color: var(--sl-color-danger-600);}
     }
   `
 
-  const status = 'RUNNING' || pkg.state.status;
-  const statusLabel = {
-    'RUNNING': 'enabled',
-    'NEEDS_CONFIG': 'needs config'
-  }
-
-  const statusClasses = classMap({
-    'running': status === 'RUNNING',
-    'needs_config': status === 'NEEDS_CONFIG',
-  });
-
   return html`
-    <span class="status-label ${statusClasses}">${statusLabel[status]}</span>
+    <span class="status-label ${statusId}">
+      ${statusLabel}
+    </span>
     <style>${styles}</style>
   `
 };

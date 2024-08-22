@@ -1,4 +1,4 @@
-import { loadPup, asPage } from "./middleware.js"
+import { loadPup, asPage, performLogout } from "./middleware.js"
 
 export const routes = [
   {
@@ -6,6 +6,14 @@ export const routes = [
     component: "x-page-home",
     pageTitle: "Home",
     before: [asPage]
+  },
+  {
+    path: "/logout",
+    before: [performLogout]
+  },
+  {
+    path: "/login",
+    component: "x-action-login",
   },
   {
     path: "/stats",

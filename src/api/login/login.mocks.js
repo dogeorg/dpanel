@@ -1,5 +1,5 @@
 export const postResponse = {
-  name: "/login",
+  name: "/authenticate",
   group: "auth",
   method: "post",
   res: {

@@ -29,6 +29,11 @@ export const mainStyles = css`
       height: 100%;
       width: calc(100% - var(--page-margin-left));
     }
+
+    &.fullscreen {
+      margin-left: 0;
+      width: 100%;
+    }
   }
 
   #Main.opaque {

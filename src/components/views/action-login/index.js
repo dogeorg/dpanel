@@ -135,7 +135,6 @@ class LoginView extends LitElement {
   handleFault = (loginFault) => {
     this._server_fault = true;
     console.warn(loginFault);
-    // window.alert("boo. something went wrong");
   };
 
   handleError(loginResponseError) {

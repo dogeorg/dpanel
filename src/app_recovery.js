@@ -90,11 +90,21 @@ class AppModeApp extends LitElement {
   }
 
   _determineStartingStep(setupState) {
-    const { hasPassword, hasKey, hasConnection } = setupState;
-    if (hasPassword && !this.isLoggedIn) return 0;
-    if (!hasPassword) return 1;
-    if (hasPassword && this.isLoggedIn && !hasKey) return 2;
-    if (hasPassword && this.isLoggedIn && hasKey && !hasConnection) return 3;
+    const { hasCompletedInitialConfiguration, hasGeneratedKey, hasConfiguredNetwork } = setupState;
+
+    // If we're already fully set up, or if we've generated a key, show our login step.
+    if (hasCompletedInitialConfiguration || hasGeneratedKey) {
+      return 0;
+    }
+
+    if (!hasGeneratedKey) {
+      return 1;
+    }
+
+    if (hasGeneratedKey && !hasConfiguredNetwork) {
+      return 2;
+    }
+
     return 4;
   }
 

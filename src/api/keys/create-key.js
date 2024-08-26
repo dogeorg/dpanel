@@ -8,7 +8,7 @@ import {
 const client = new ApiClient('http://localhost:3000', store.networkContext)
 
 export async function createKey(password) {
-  const res = await client.post(`/keyring/create`, { password }, { mock: postResponse });
+  const res = await client.post(`/keys/create-master`, { password }, { mock: postResponse });
   if (res && res.token) {
     store.updateState({ networkContext: { token: res.token }})
   }

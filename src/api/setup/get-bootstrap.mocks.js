@@ -5,9 +5,9 @@ export const getResponse = {
   res: {
     success: true,
     setup: {
-      hasPassword: true,
-      hasKey: true,
-      hasConnection: false,
+      hasGeneratedKey: false,
+      hasConfiguredNetwork: false,
+      hasCompletedInitialConfiguration: false
     },
   }
 };

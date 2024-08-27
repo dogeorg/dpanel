@@ -82,10 +82,14 @@ class AppModeApp extends LitElement {
   async fetchSetupState() {
     this.loading = true;
     const response = await getSetupBootstrap();
-    if (response.setup) {
-      this.setupState = response.setup;
+
+    if (!response.setupFacts) {
+      // TODO (error handling)
+      alert('Failed to fetch bootstrap.');
+      return;
     }
-    // TODO (error handling)
+
+    this.setupState = response.setupFacts;
     this.loading = false;
   }
 

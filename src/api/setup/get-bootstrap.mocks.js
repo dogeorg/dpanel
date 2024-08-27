@@ -1,10 +1,10 @@
 export const getResponse = {
-  name: "/setup/facts",
+  name: "/system/bootstrap",
   method: "get",
   group: "setup",
   res: {
     success: true,
-    setup: {
+    setupFacts: {
       hasGeneratedKey: false,
       hasConfiguredNetwork: false,
       hasCompletedInitialConfiguration: false

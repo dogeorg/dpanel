@@ -8,6 +8,6 @@ import {
 const client = new ApiClient('http://localhost:3000', store.networkContext)
 
 export async function getNetworks(body) {
-  const res = await client.get(`/auth/networks`, { mock: getResponse });
+  const res = await client.get(`/system/network/list`, { mock: getResponse });
   return res
 }

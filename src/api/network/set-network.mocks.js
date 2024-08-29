@@ -1,5 +1,5 @@
 export const postResponse = {
-  name: "/network/set",
+  name: "/system/network/set-pending",
   method: "post",
   group: "networks",
   res: {

@@ -83,10 +83,10 @@ class CreateKey extends LitElement {
     this._keyListLoading = true;
     const response = await getKeylist();
     this._keyListLoading = false;
-    if (!response.list) return [];
+    if (!response.keys) return [];
 
-    const { list } = response;
-    this._keyList = mockData || list;
+    const { keys } = response;
+    this._keyList = mockData || keys;
   }
 
   disconnectedCallback() {
@@ -135,15 +135,15 @@ class CreateKey extends LitElement {
     dialog.show();
 
     const res = await createKey(store.setupContext.hashedPassword)
-    if (!res || !res.success || res.error || !res.phrase) {
+    if (!res || !res.success || res.error || !res.seedPhrase) {
       this.handleError();
     }
-    
+
     // Remove hashedPassword from application state
     store.updateState({ setupContext: { hashedPassword: null }});
 
     // Key is ready, recovery phrase available.
-    this._phrase = res.phrase;
+    this._phrase = res.seedPhrase;
     this._keyReady = true;
   }
 
@@ -159,7 +159,7 @@ class CreateKey extends LitElement {
     const dialog = this.shadowRoot.querySelector("#KeyGenDialog");
     this._revealPhrase = false;
     dialog.hide();
-    this._fetchKeyList(getMockList.list);
+    this._fetchKeyList(getMockList.keys);
   }
 
   _handleContinueClick() {
@@ -167,11 +167,9 @@ class CreateKey extends LitElement {
   }
 
   render() {
-    const dummyPhrase =
-      "keen tavern drumkit weekend donut turmoil cucumber pants karate yacht treacle chump mega pool tiger boat wrinkle fish silly kite lizard king yeti lake";
     const emptyPhrase =
-      "one two three four five six seven eight nine ten eleven twelve";
-    const phrase = this._phrase || "";
+      "one two three four five six seven eight nine ten eleven twelve".split(" ");
+    const phrase = this._phrase || [];
 
     const phraseGridClasses = classMap({
       "phrase-grid": true,
@@ -198,7 +196,6 @@ class CreateKey extends LitElement {
         </div>
         <div class=${phraseGridClasses}>
           ${(this._keyReady ? phrase : emptyPhrase)
-            .split(" ")
             .map(
               (w, i) => html`
                 <sl-tag size="large"

@@ -82,19 +82,33 @@ class AppModeApp extends LitElement {
   async fetchSetupState() {
     this.loading = true;
     const response = await getSetupBootstrap();
-    if (response.setup) {
-      this.setupState = response.setup;
+
+    if (!response.setupFacts) {
+      // TODO (error handling)
+      alert('Failed to fetch bootstrap.');
+      return;
     }
-    // TODO (error handling)
+
+    this.setupState = response.setupFacts;
     this.loading = false;
   }
 
   _determineStartingStep(setupState) {
-    const { hasPassword, hasKey, hasConnection } = setupState;
-    if (hasPassword && !this.isLoggedIn) return 0;
-    if (!hasPassword) return 1;
-    if (hasPassword && this.isLoggedIn && !hasKey) return 2;
-    if (hasPassword && this.isLoggedIn && hasKey && !hasConnection) return 3;
+    const { hasCompletedInitialConfiguration, hasGeneratedKey, hasConfiguredNetwork } = setupState;
+
+    // If we're already fully set up, or if we've generated a key, show our login step.
+    if (hasCompletedInitialConfiguration || hasGeneratedKey) {
+      return 0;
+    }
+
+    if (!hasGeneratedKey) {
+      return 1;
+    }
+
+    if (hasGeneratedKey && !hasConfiguredNetwork) {
+      return 2;
+    }
+
     return 4;
   }
 

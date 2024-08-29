@@ -18,6 +18,10 @@ export default class ApiClient {
     return this.request(path, { ...config, method: 'POST', body: JSON.stringify(body) });
   }
 
+  async put(path, body, config = {}) {
+    return this.request(path, { ...config, method: 'PUT', body: JSON.stringify(body) });
+  }
+
   async request(path, config) {
     // Debug, if the dev has forceDelay, wait the delay time in seconds before making request
     if (this.networkContext.forceDelayInSeconds) {

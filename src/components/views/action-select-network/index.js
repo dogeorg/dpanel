@@ -1,6 +1,6 @@
 import { LitElement, html, css } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 import { getNetworks } from "/api/network/get-networks.js";
-import { postNetwork } from "/api/network/set-network.js";
+import { putNetwork } from "/api/network/set-network.js";
 import { asyncTimeout } from "/utils/timeout.js";
 import { createAlert } from "/components/common/alert.js";
 
@@ -245,7 +245,7 @@ class SelectNetwork extends LitElement {
       encryption: isHiddenNetwork ? state['network-encryption'].value : state.network.encryption
     }
 
-    const response = await postNetwork(apiData).catch(this.handleFault);
+    const response = await putNetwork(apiData).catch(this.handleFault);
 
     if (!response) {
       dynamicFormInstance.retainChanges(); // stops spinner

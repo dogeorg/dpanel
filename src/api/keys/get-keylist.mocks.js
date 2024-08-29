@@ -1,14 +1,14 @@
 export const getResponse = {
-  name: "/dkm/list",
-  group: "DKM",
+  name: "/keys",
+  group: "Keys",
   method: "get",
   res: {
     success: true,
-    list: [],
+    keys: [],
   }
 };
 
 export const getMockList = {
   success: true,
-  list: [{ type: "master", created: Date.now() }],
+  keys: [{ type: "master", created: Date.now() }],
 };

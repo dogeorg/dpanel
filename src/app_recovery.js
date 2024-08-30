@@ -97,7 +97,7 @@ class AppModeApp extends LitElement {
     const { hasCompletedInitialConfiguration, hasGeneratedKey, hasConfiguredNetwork } = setupState;
 
     // If we're already fully set up, or if we've generated a key, show our login step.
-    if (hasCompletedInitialConfiguration || hasGeneratedKey) {
+    if ((hasCompletedInitialConfiguration || hasGeneratedKey) && !this.isLoggedIn) {
       return 0;
     }
 

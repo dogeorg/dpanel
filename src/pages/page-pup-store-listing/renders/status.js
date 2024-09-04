@@ -1,7 +1,7 @@
 import { html, css, classMap, nothing } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 
 export function renderStatus() {
-  const pkg = this.pkgController.getPup(this.context.store.pupContext.manifest.id);
+  const pkg = this.pkg
   const { installationId, installationLabel } = pkg.computed
   const isLoadingStatus = ["installing"].includes(installationId);
   const normalisedLabel = () => {
@@ -17,7 +17,7 @@ export function renderStatus() {
       <h3 class="installation-label ${installationId}">${normalisedLabel()}</h3>
     </div>
     <div>
-      <span class="status-label">${pkg.manifest.package}</span>
+      <span class="status-label">${pkg.versionLatest.meta.name}</span>
       <sl-progress-bar class="loading-bar" value="0" ?indeterminate=${isLoadingStatus}></sl-progress-bar>
     </div>
     <style>${styles}</style>

@@ -1,4 +1,4 @@
-import { loadPup, asPage, performLogout } from "./middleware.js"
+import { loadPup, loadPupDefinition, asPage, performLogout } from "./middleware.js"
 
 export const routes = [
   {
@@ -42,7 +42,7 @@ export const routes = [
     animate: true,
   },
   {
-    path: "/pups/:pup/:name/logs",
+    path: "/pups/:s/:name/logs",
     component: "x-page-pup-logs",
     pageTitle: "Logs",
     pageAction: "close",
@@ -56,11 +56,11 @@ export const routes = [
     before: [asPage],
   },
   {
-    path: "/explore/:pup/:name",
+    path: "/explore/:source/:pup",
     component: "x-page-pup-store-listing",
     dynamicTitle: true,
     pageAction: "back",
-    before: [loadPup, asPage],
+    before: [loadPupDefinition, asPage],
     animate: true,
   },
   {

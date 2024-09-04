@@ -1,7 +1,7 @@
 import { html, css, classMap, nothing } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 
 export function renderStatus() {
-  const pkg = this.pkgController.getPup(this.context.store.pupContext.manifest.id);
+  const pkg = this.pkgController.getPup(this.pupId);
   const { statusId, statusLabel } = pkg.computed;
   const isLoadingStatus = ["starting", "stopping", "crashing"].includes(statusId);
   const styles = css`

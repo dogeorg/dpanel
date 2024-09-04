@@ -52,17 +52,15 @@ export function renderSectionBody(ready, SKELS, hasItems) {
 
     ${ready && hasItems('packages') ? html`
       <div class="pup-card-grid">
-        ${repeat(this.packageList.getCurrentPageData(), (pkg) => `${pkg.manifest.id}-${pkg.manifest.version}`, (pkg) => html`
+        ${repeat(this.packageList.getCurrentPageData(), (pkg) => `${pkg.source.id}-${pkg.id}`, (pkg) => html`
           <pup-install-card
             icon="box"
-            pupId=${pkg.manifest.id}
-            pupName=${pkg.manifest.package}
-            version=${pkg.manifest.version}
-            short=${pkg.manifest.docs.short}
-            status=${pkg.state.status}
-            ?installed=${pkg.state.status}
-            ?hasGui=${!!pkg.manifest.gui}
-            href="${pkg.computed.url.store}"
+            pupId="${pkg.source.id}-${pkg.id}"
+            pupName=${pkg.versionLatest.meta.name}
+            version=${pkg.versionLatest.version}
+            short=${pkg.versionLatest.meta.descShort}
+            ?installed=${pkg.isInstalled}
+            href=${pkg.computed.url.store}
           ></pup-install-card>
         `)}
       </div>

@@ -1,7 +1,7 @@
 import { LitElement, html, css, nothing, repeat } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
 import '/components/views/card-pup-manage/index.js'
 import '/components/common/paginator/paginator-ui.js';
-import { getBootstrap } from '/api/bootstrap/bootstrap.js';
+import { getBootstrapV2 } from '/api/bootstrap/bootstrap.js';
 import { pkgController } from '/controllers/package/index.js'
 import { PaginationController } from '/components/common/paginator/paginator-controller.js';
 import { bindToClass } from '/utils/class-bind.js'
@@ -102,10 +102,9 @@ class LibraryView extends LitElement {
     this.dispatchEvent(new CustomEvent('busy-start', {}));
 
     try {
-      const res = await getBootstrap()
-      this.pkgController.setData(res);
-      this.installedList.setData(this.pkgController.installed);
-      // this.availableList.setData(this.pkgController.available);
+      const res = await getBootstrapV2()
+      this.pkgController.setDataV2(res);
+      this.installedList.setData(this.pkgController.installedV2);
     } catch (err) {
       console.error(err);
       this.fetchError = true;

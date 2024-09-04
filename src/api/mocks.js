@@ -1,5 +1,7 @@
 import { startMock, stopMock, installMock, uninstallMock } from "./action/action.mocks.js"
 import { mock as bootstrapMocks } from "./bootstrap/bootstrap.mocks.js"
+import { storeListingMock } from "./sources/sources.mocks.js"
+import { mockV2 as bootstrapV2Mocks } from "./bootstrap/bootstrap.mocks.v2.js"
 import { postResponse as pupConfigPost, getResponse as pupConfigGetById, getAllResponse as pupConfigGetAll } from "./config/config.mocks.js";
 import { getResponse as dkmGet } from "./keys/get-keylist.mocks.js";
 import { postResponse as dkmCreate } from "./keys/create-key.mocks.js";
@@ -11,6 +13,8 @@ import { getResponse as checkReflector } from "./reflector/get-ip.mocks.js";
 import { getResponse as apModeFacts } from "./setup/get-bootstrap.mocks.js";
 
 export const mocks = [
+  storeListingMock,
+  bootstrapV2Mocks,
   bootstrapMocks,
   installMock,
   uninstallMock,

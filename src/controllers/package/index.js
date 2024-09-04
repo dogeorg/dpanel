@@ -4,10 +4,17 @@ import { pickAndPerformPupAction } from "/api/action/action.js";
 class PkgController {
   observers = [];
   actions = [];
+
   pupIndex = {};
   installed = [];
   available = [];
   packages = [];
+
+  pupIndexV2 = {};
+  installedV2 = [];
+
+  packageIndexBySource = {};
+  availablePackagesAll = [];
 
   constructor() {
     this.transactionTimeoutChecker();
@@ -40,6 +47,44 @@ class PkgController {
     }
   }
 
+  ingestInstalledPupStates(states) {
+    // Convert to array, enrich each state object.
+    this.installedV2 = toArray(states)
+      .map(s => toEnrichedPupState(s));
+
+    // Index by id.
+    this.pupIndexV2 = this.installedV2
+      .toObject({ key: 'id' });
+  }
+
+  ingestAvailablePupDefs(storeListingRes) {
+    this.packageIndexBySource = storeListingRes;
+    this.availablePackagesAll = toFlattenedAvailablePupsArray(storeListingRes);
+    this.notify();
+  }
+
+  getPupDefinition(sourceId, pupId) {
+    const pup = this.availablePackagesAll.find(
+      p => p.source.id === sourceId && p.id === pupId
+    );
+    return pup;
+  }
+
+  getInstalledVersion(sourceId, pupId) {
+    const pup = this.availablePackagesAll.find(
+      p => p.source.id === sourceId && p.id === pupId
+    );
+    const installedVersion = pup.versions.find(
+      v => v.version === pup.installedVersion
+    )
+    return installedVersion;
+  }
+
+  setDataV2(bootstrapResponseV2) {
+    this.ingestInstalledPupStates(bootstrapResponseV2.states);
+    this.notify();
+  }
+
   setData(bootstrapResponse) {
     const { installed, available } = toAssembledPup(bootstrapResponse);
     this.installed = toArray(installed);
@@ -51,10 +96,10 @@ class PkgController {
 
   getPup(id) {
     if (!id) return;
-    const key = Object.keys(this.pupIndex).find(
+    const key = Object.keys(this.pupIndexV2).find(
       (key) => key.toLowerCase() === id.toLowerCase(),
     );
-    return this.pupIndex[key];
+    return this.pupIndexV2[key];
   }
 
   installPkg(pupId) {
@@ -328,6 +373,13 @@ function toArray(object) {
   return Object.values(object);
 }
 
+function toObject(array) {
+  return array.reduce((obj, value, index) => {
+    obj[index] = value;
+    return obj;
+  }, {});
+}
+
 function defaultPupState() {
   return {
     status: undefined,
@@ -428,3 +480,84 @@ function determineStatusId(state) {
   return { id: "unknown", label: "unknown" };
 }
 
+// Extend Array prototype (for toObject convenience method)
+Array.prototype.toObject = function(options = {}) {
+  const key = options.key || 'id';
+  return this.reduce((obj, item) => {
+    if (item && typeof item === 'object' && key in item) {
+      obj[item[key]] = item;
+    }
+    return obj;
+  }, {});
+};
+
+function toEnrichedPupState(pupState) {
+  const id = pupState.id;
+  const name = pupState.manifest.meta.name.toLowerCase();
+  const status = determineStatusId(pupState);
+  const installation = determineInstallationId(pupState);
+
+  return {
+    ...pupState,
+    computed: {
+      id: pupState.id,
+      url: {
+        gui: `/explore/${id}/${name}/ui`,
+        library: `/pups/${id}/${name}`,
+        store: `/explore/${id}/${name}`,
+      },
+      statusId: status.id,
+      statusLabel: status.label,
+      installationId: installation.id,
+      installationLabel: installation.label
+    }
+  }
+}
+
+function toFlattenedAvailablePupsArray(sources) {
+  const pupsArray = [];
+
+  for (const [sourceName, sourceData] of Object.entries(sources)) {
+    for (const [pupId, pupData] of Object.entries(sourceData.pups)) {
+
+      const versions = Object.entries(pupData.versions).map(([version, versionData]) => ({
+        version,
+        ...versionData
+      }));
+
+      const installedVersionNumber = pupData.installedVersion;
+      delete pupData.installedVersion;
+
+      const versionLatest = versions[versions.length - 1];
+      const versionInstalled = pupData.isInstalled && versions.find(v => v.version === installedVersionNumber) || null
+      const versionOutdated = pupData.isInstalled && pupData.versionInstalled.version !== versionLatest.version;
+
+      // COMPUTED
+      const status = determineStatusId({});
+      const installation = determineInstallationId(pupData);
+
+      const pup = {
+        id: pupId,
+        source: { id: sourceName, lastUpdated: sourceData.lastUpdated },
+        ...pupData,
+        versionOutdated,
+        versionInstalled,
+        versionLatest,
+        versions,
+        computed: {
+          url: {
+            store: `/explore/${sourceName}/${pupId}`,
+            library: `/todo`,
+          },
+          statusId: status.id,
+          statusLabel: status.label,
+          installationId: installation.id,
+          installationLabel: installation.label
+        }
+      };
+      pupsArray.push(pup);
+    }
+  }
+
+  return pupsArray;
+}

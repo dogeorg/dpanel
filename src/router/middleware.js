@@ -1,7 +1,8 @@
 // import { getManifest } from "/api/manifest/index.js";
 import { store } from "/state/store.js";
 import { pkgController } from "/controllers/package/index.js";
-import { getBootstrap } from "/api/bootstrap/bootstrap.js";
+import { getBootstrapV2 } from "/api/bootstrap/bootstrap.js";
+import { getStoreListing } from "/api/sources/sources.js";
 
 export async function loadPup(context, commands) {
   const pupId = context.params.pup
@@ -9,22 +10,53 @@ export async function loadPup(context, commands) {
 
   try {
     // ensure bootstrap (temporary)
-    const res = await getBootstrap();
-    pkgController.setData(res);
+    const res = await getBootstrapV2();
+    pkgController.setDataV2(res);
 
     const pup = pkgController.getPup(pupId);
-    const { manifest, state, computed } = pup;
 
-    if (!manifest) {
+    if (!pup || !pup.manifest) {
       throw new Error("manifest empty");
     }
 
     store.updateState({
-      pupContext: { manifest, state, computed },
+      pupContext: pup,
     });
 
     if (context.route.dynamicTitle) {
-      context.route.pageTitle = manifest.package;
+      context.route.pageTitle = pup?.manifest?.meta?.name;
+      context.route.pageAction = "back";
+    }
+
+  } catch (error) {
+    console.error("Error fetching manifest:", error);
+  }
+
+  return undefined
+}
+
+export async function loadPupDefinition(context, commands) {
+  const sourceId = context.params.source
+  const pupId = context.params.pup
+  if (!sourceId || !pupId) { return undefined; }
+
+  try {
+    // ensure bootstrap (temporary)
+    const res = await getStoreListing();
+    pkgController.ingestAvailablePupDefs(res);
+
+    const pup = pkgController.getPupDefinition(sourceId, pupId);
+
+    if (!pup) {
+      throw new Error("missing pup definition");
+    }
+
+    store.updateState({
+      pupDefinitionContext: pup,
+    });
+
+    if (context.route.dynamicTitle) {
+      context.route.pageTitle = pup?.latestVersion?.meta?.name;
       context.route.pageAction = "back";
     }
 

@@ -2,6 +2,7 @@ export default class WebSocketClient {
   constructor(url, networkContext, mockEventGenerator) {
     this.url = url;
     this.useMocks = networkContext?.useMocks;
+    this.token = networkContext.token
     this.mockEventGenerator = mockEventGenerator;
     this.stopMocking = () => console.log('Stop function not provided.');
     this.socket = null;
@@ -21,7 +22,8 @@ export default class WebSocketClient {
   }
 
   startWebSocketConnection() {
-    this.socket = new WebSocket(this.url);
+    const urlWithAuth = this.url + `?token=${this.token}`
+    this.socket = new WebSocket(urlWithAuth);
     this.socket.onopen = () => {
       this._isConnected = true;
       this.onOpen();

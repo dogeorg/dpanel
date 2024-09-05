@@ -55,11 +55,15 @@ class SocketChannel {
     };
 
     this.wsClient.onMessage = async (event) => {
-      // console.log("MSSSGSG!~", event, event.data);
+      
 
       let err, data;
       try {
         data = JSON.parse(event.data);
+        console.log(JSON.stringify(data, null, 2));
+        if (data?.update[0]?.status) {
+          console.log("REPORTED STATUS:", data.update[0].status, data);
+        }
       } catch (err) {
         console.warn("failed to JSON.parse incoming event", event, err);
         err = true;
@@ -74,23 +78,31 @@ class SocketChannel {
       }
 
       switch (data.type) {
-        case "PupStatus":
-          // A message of type PupStatus is received in response to a requested action resolving.
+        case "pup":
+          // emitted on state change
+          break;
 
-          // TODO: determine why.
-          // Receiving completed txns before the txn has been registered in the client.
-          await asyncTimeout(500);
+        case "stats":
+          // emitted on an interval (contains current status and vitals)
+          if (data && data.update && typeof data.update === Array) {
+            data.update.forEach((pupId) => {
+              pkgController.updatePupStatsModel(pupId.id, pupId)
+            });
+          }
+          break;
 
+        case "status-change"
+          // emitted on stats.status change
+          // limited payload to status.
+          break;
+
+        case "action":
+          // emitted in response to an action
+          await asyncTimeout(500); // Why?
           pkgController.resolveAction(data.id, data);
           break;
-        case "status":
-          // A message of type "status" is received when dogeboxd broadcasts status changes
-          // Changes include cpu, mem, running states etc..
-          Object.keys(data.update).forEach((pupId) => {
-            pkgController.updatePupModel(pupId, data.update[pupId])
-          });
-          break;
-        case "ShowPrompt":
+
+        case "prompt": // synthetic (client side only)
           store.updateState({
             promptContext: {
               display: true,

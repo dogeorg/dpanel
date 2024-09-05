@@ -53,12 +53,18 @@ export function renderActions() {
 };
 
 export async function handleInstall() {
+  const pkg = this.pkg
   this.inflight = true;
   const callbacks = {
     onSuccess: () => console.log('WOW'),
     onError: () => console.log('NOO..'),
     onTimeout: () => { console.log('TOO SLOW..'); this.inflight = false; }
   }
-  await this.pkgController.requestPupAction(this.pupId, 'install', callbacks);
+  const body = {
+    sourceName: pkg.source.id,
+    pupName: pkg.versionLatest.meta.name,
+    pupVersion: pkg.versionLatest.meta.version
+  }
+  await this.pkgController.requestPupAction(this.pupId, 'install', callbacks, body);
 }
 

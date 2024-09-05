@@ -17,15 +17,15 @@ export function renderDialog() {
   `;
 
   const preventUninstallEl = html`
-    <p>Cannot uninstall a running Pup.<br/>Please disable ${pkg.manifest.package } and try again.</p>
+    <p>Cannot uninstall a running Pup.<br/>Please disable ${pkg.manifest.meta.name } and try again.</p>
     <sl-button slot="footer" variant="primary" @click=${this.clearDialog}>Dismiss</sl-button>
     <style>p:first-of-type { margin-top: 0px; }</style>
   `
 
   const uninstallEl = html`
-    <p>Are you sure you want to uninstall ${pkg.manifest.package  }?</p>
-    <sl-input placeholder="Type '${pkg.manifest.package}' to confirm" @sl-input=${(e) => this._confirmedName = e.target.value }></sl-input>
-    <sl-button slot="footer" variant="danger" @click=${this.handleUninstall} ?loading=${this.inflight} ?disabled=${this.inflight || this._confirmedName !== pkg.manifest.package}>Uninstall</sl-button>
+    <p>Are you sure you want to uninstall ${pkg.manifest.meta.name}?</p>
+    <sl-input placeholder="Type '${pkg.manifest.meta.name}' to confirm" @sl-input=${(e) => this._confirmedName = e.target.value }></sl-input>
+    <sl-button slot="footer" variant="danger" @click=${this.handleUninstall} ?loading=${this.inflight} ?disabled=${this.inflight || this._confirmedName !== pkg.manifest.meta.name}>Uninstall</sl-button>
     <style>p:first-of-type { margin-top: 0px; }</style>
   `;
 

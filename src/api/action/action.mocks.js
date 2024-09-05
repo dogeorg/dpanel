@@ -5,28 +5,35 @@ const postResponse = {
 }
 
 export const startMock = {
-  name: '/action/:pup/enable',
+  name: '/pup/:pup/enable',
   method: 'post',
   group: 'pup actions',
   res: postResponse
 }
 
 export const stopMock = {
-  name: '/action/:pup/disable',
+  name: '/pup/:pup/disable',
   method: 'post',
   group: 'pup actions',
   res: postResponse
 }
 
 export const installMock = {
-  name: '/action/:pup/install',
+  name: '/todo/:pup/install',
   method: 'post',
   group: 'pup actions',
   res: postResponse
 }
 
 export const uninstallMock = {
-  name: '/action/:pup/uninstall',
+  name: '/pup/:pup/uninstall',
+  method: 'post',
+  group: 'pup actions',
+  res: postResponse
+}
+
+export const purgeMock = {
+  name: '/pup/:pup/purge',
   method: 'post',
   group: 'pup actions',
   res: postResponse

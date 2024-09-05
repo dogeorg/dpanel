@@ -10,6 +10,18 @@ export function openDeps() {
   this.open_dialog_label = "Dependencies";
 }
 
+export async function handlePurgeFunction() {
+  this.inflight = true;
+  this.requestUpdate();
+
+  const callbacks = {
+    onSuccess: () => { console.log('WOW'); this.inflight = false; },
+    onError: () => { console.log('NOO..'); this.inflight = false; },
+    onTimeout: () => { console.log('TOO SLOW..'); this.inflight = false; }
+  }
+  await this.pkgController.requestPupAction(this.pupId, 'purge', callbacks);
+}
+
 export function renderActions() {
   const pkg = this.pkgController.getPup(this.pupId);;
   const { installationId, statusId, statusLabel } = pkg.computed
@@ -56,8 +68,8 @@ export function renderActions() {
       ` : nothing }
 
       ${installationId === 'uninstalled' ? html`
-        <sl-button variant="warning" size="large" href="${pkg.computed.url.store}">
-          Such Install
+        <sl-button variant="danger" size="large" ?loading=${this.inflight} @click=${this.handlePurgeFunction}>
+          Purge Data & Settings
         </sl-button>
       ` : nothing }
 

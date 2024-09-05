@@ -27,6 +27,7 @@ class PupPage extends LitElement {
       checks: { type: Object },
       pupEnabled: { type: Boolean },
       _confirmedName: { type: String },
+      inflight: { type: Boolean },
     };
   }
 
@@ -135,8 +136,8 @@ class PupPage extends LitElement {
 
     const actionName = e.target.checked ? 'start' : 'stop' ;
     const callbacks = {
-      onSuccess: () => console.log('WOW'),
-      onError: () => console.log('NOO..'),
+      onSuccess: () => { console.log('WOW'); this.inflight = false; },
+      onError: () => { console.log('NOO..'); this.inflight = false; },
       onTimeout: () => { console.log('TOO SLOW..'); this.inflight = false; }
     }
     await this.pkgController.requestPupAction(this.pupId, actionName, callbacks);

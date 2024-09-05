@@ -198,6 +198,18 @@ class PkgController {
     }
   }
 
+  updatePupStatsModel(pupId, newPupStatsData) {
+    // Update the pup in the pupIndex
+    if (this.pupIndexV2[pupId]) {
+      console.log('THIS IS THE CASE', this.pupIndexV2[pupId]);
+      this.pupIndexV2[pupId] = toEnrichedInstalledPup(this.pupIndexV2[pupId], newPupStatsData);
+      console.log('ENRICHED!', this.pupIndexV2[pupId]);
+      this.notify(pupId);
+    } else {
+      console.log('Nope.', pupId);
+    }
+  }
+
   updatePupModel(pupId, newPupStateData) {
     // Update the pup in the installed list
     // const installedIndex = this.installed.findIndex(pup => pup.manifest.id === pupId);
@@ -259,7 +271,7 @@ class PkgController {
     return true;
   }
 
-  async requestPupAction(pupId, action, callbacks) {
+  async requestPupAction(pupId, action, callbacks, body) {
     if (!pupId || !action || !callbacks) {
       console.warn(
         "Error. requestPupAction expected pupId, action, callbacks",
@@ -268,10 +280,10 @@ class PkgController {
     }
 
     const actionType = "PUP-ACTION";
-    const timeoutMs = 10000; // 10 seconds
+    const timeoutMs = 3000; // 3 seconds
 
     // Make a network call
-    const res = await pickAndPerformPupAction(pupId, action).catch((err) => {
+    const res = await pickAndPerformPupAction(pupId, action, body).catch((err) => {
       console.error(err);
     });
 

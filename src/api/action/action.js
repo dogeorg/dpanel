@@ -6,33 +6,41 @@ import {
   stopMock,
   installMock,
   uninstallMock,
+  purgeMock
 } from './action.mocks.js'
 
 const client = new ApiClient('http://localhost:3000', store.networkContext)
 
 export async function installPup(pupId, body) {
-  return client.post(`/action/${pupId}/install`, body, { mock: installMock });
+  return client.put(`/pup`, body, { mock: installMock });
 }
 
 export async function uninstallPup(pupId, body) {
-  return client.post(`/action/${pupId}/uninstall`, body, { mock: uninstallMock });
+  return client.post(`/pup/${pupId}/uninstall`, body, { mock: uninstallMock });
+}
+
+export async function purgePup(pupId, body) {
+  return client.post(`/pup/${pupId}/purge`, body, { mock: purgeMock });
 }
 
 export async function startPup(pupId, body) {
-  return client.post(`/action/${pupId}/enable`, body, { mock: startMock });
+  return client.post(`/pup/${pupId}/enable`, body, { mock: startMock });
 }
 
 export async function stopPup(pupId, body) {
-  return client.post(`/action/${pupId}/disable`, body, { mock: stopMock });
+  return client.post(`/pup/${pupId}/disable`, body, { mock: stopMock });
 }
 
-export function pickAndPerformPupAction(pupId, action) {
+export function pickAndPerformPupAction(pupId, action, body) {
   switch(action) {
     case 'install':
-      return installPup(pupId);
+      return installPup(pupId, body);
       break;
     case 'uninstall':
       return uninstallPup(pupId);
+      break;
+    case 'purge':
+      return purgePup(pupId);
       break;
     case 'start':
       return startPup(pupId);

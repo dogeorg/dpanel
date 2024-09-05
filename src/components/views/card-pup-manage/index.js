@@ -3,6 +3,7 @@
     html,
     css,
     nothing,
+    classMap
   } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 
   class PupCard extends LitElement {
@@ -36,6 +37,10 @@
 
     render() {
       const { pupName, version, icon, status, hasGui, href, gref } = this;
+      const statusClassMap = classMap({
+        status: true,
+        running: status === "running"
+      });
       return html`
         <a class="anchor" href=${href} target="_self">
           <div class="pup-card-wrap">
@@ -47,7 +52,7 @@
               <div class="inner">
                 <span class="name">${pupName}</span>
                 <span class="version">${version}</span>
-                <span class="status">${status === "running" ? "Enabled" : status}</span>
+                <span class=${statusClassMap}>${status === "running" ? "Enabled" : status}</span>
               </div>
             </div>
 
@@ -157,8 +162,12 @@
       span.status {
         line-height: 1.5;
         text-transform: capitalize;
-        color: #2ede75;
         font-size: 0.9rem;
+        color: grey;
+      }
+
+      span.status.running {
+        color: #2ede75;
       }
     `;
   }

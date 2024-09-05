@@ -47,10 +47,10 @@ class PkgController {
     }
   }
 
-  ingestInstalledPupStates(states) {
+  ingestInstalledPup(states, stats) {
     // Convert to array, enrich each state object.
     this.installedV2 = toArray(states)
-      .map(s => toEnrichedPupState(s));
+      .map(s => toEnrichedInstalledPup(s, stats[s.id]));
 
     // Index by id.
     this.pupIndexV2 = this.installedV2
@@ -81,7 +81,8 @@ class PkgController {
   }
 
   setDataV2(bootstrapResponseV2) {
-    this.ingestInstalledPupStates(bootstrapResponseV2.states);
+    const { states, stats } = bootstrapResponseV2;
+    this.ingestInstalledPup(states, stats);
     this.notify();
   }
 
@@ -437,9 +438,9 @@ function determineInstallationId(state) {
   return { id: "unknown", label: "unknown" };
 }
 
-function determineStatusId(state) {
+function determineStatusId(state, stats) {
   const installation = state?.installation;
-  const status = state?.status;
+  const status = stats?.status;
   const flags = {
     needs_deps: state?.needs_deps,
     needs_config: state?.needs_config
@@ -491,20 +492,23 @@ Array.prototype.toObject = function(options = {}) {
   }, {});
 };
 
-function toEnrichedPupState(pupState) {
+function toEnrichedInstalledPup(pupState, pupStats) {
   const id = pupState.id;
-  const name = pupState.manifest.meta.name.toLowerCase();
-  const status = determineStatusId(pupState);
+  const urlEncodedPupame = encodeURIComponent(pupState.manifest.meta.name.replaceAll(' ', '-')).toLowerCase();
+  const urlEncodedSourceName = encodeURIComponent(pupState.source.name.replaceAll(' ', '-')).toLowerCase();
+  const stats = pupStats
+  const status = determineStatusId(pupState, pupStats);
   const installation = determineInstallationId(pupState);
 
   return {
     ...pupState,
+    stats,
     computed: {
       id: pupState.id,
       url: {
-        gui: `/explore/${id}/${name}/ui`,
-        library: `/pups/${id}/${name}`,
-        store: `/explore/${id}/${name}`,
+        gui: `/explore/${id}/${urlEncodedPupame}/ui`,
+        library: `/pups/${id}/${urlEncodedPupame}`,
+        store: `/explore/${urlEncodedSourceName}/${urlEncodedPupame}`,
       },
       statusId: status.id,
       statusLabel: status.label,
@@ -518,26 +522,28 @@ function toFlattenedAvailablePupsArray(sources) {
   const pupsArray = [];
 
   for (const [sourceName, sourceData] of Object.entries(sources)) {
-    for (const [pupId, pupData] of Object.entries(sourceData.pups)) {
+    for (const [pupName, pupData] of Object.entries(sourceData.pups)) {
 
       const versions = Object.entries(pupData.versions).map(([version, versionData]) => ({
         version,
         ...versionData
       }));
 
-      const installedVersionNumber = pupData.installedVersion;
-      delete pupData.installedVersion;
 
-      const versionLatest = versions[versions.length - 1];
-      const versionInstalled = pupData.isInstalled && versions.find(v => v.version === installedVersionNumber) || null
-      const versionOutdated = pupData.isInstalled && pupData.versionInstalled.version !== versionLatest.version;
+      const installedVersionNumber = pupData.installedVersion;
+      const versionLatest = pupData.latestVersion && versions.find(v => v.version === pupData.latestVersion) || {}
+      const versionInstalled = pupData.isInstalled && versions.find(v => v.version === installedVersionNumber) || {}
+      const versionOutdated = pupData.isInstalled && pupData.latestVersion !== pupData.installedVersion;
 
       // COMPUTED
       const status = determineStatusId({});
       const installation = determineInstallationId(pupData);
+      const urlEncodedSourceName = encodeURIComponent(sourceName.replaceAll(' ', '-')).toLowerCase();
+      const urlEncodedPupName = encodeURIComponent(pupName.replaceAll(' ', '-')).toLowerCase();
+      const installedId = pupData.installedId
 
       const pup = {
-        id: pupId,
+        id: urlEncodedPupName,
         source: { id: sourceName, lastUpdated: sourceData.lastUpdated },
         ...pupData,
         versionOutdated,
@@ -546,8 +552,8 @@ function toFlattenedAvailablePupsArray(sources) {
         versions,
         computed: {
           url: {
-            store: `/explore/${sourceName}/${pupId}`,
-            library: `/todo`,
+            store: `/explore/${urlEncodedSourceName}/${urlEncodedPupName}`,
+            library: `/pups/${installedId}/${urlEncodedPupName}`,
           },
           statusId: status.id,
           statusLabel: status.label,

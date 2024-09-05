@@ -56,7 +56,7 @@ export async function loadPupDefinition(context, commands) {
     });
 
     if (context.route.dynamicTitle) {
-      context.route.pageTitle = pup?.latestVersion?.meta?.name;
+      context.route.pageTitle = pup?.versionLatest?.meta?.name;
       context.route.pageAction = "back";
     }
 

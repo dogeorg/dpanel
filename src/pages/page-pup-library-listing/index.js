@@ -48,8 +48,8 @@ class PupPage extends LitElement {
     super.connectedCallback();
     // Observers with a pupId will be requested to
     // update when state for that pup changes
-    this.pupId = this.context.store.pupContext.manifest.id;
-    this.pupEnabled = this.pkgController.getPup(this.pupId)?.state?.enabled
+    this.pupId = this.context.store.pupContext.id;
+    this.pupEnabled = this.pkgController.getPup(this.pupId)?.enabled
     this.pkgController.addObserver(this);
   }
 
@@ -161,7 +161,7 @@ class PupPage extends LitElement {
 
   render() {
     const path = this.context.store?.appContext?.path || [];
-    const pkg = this.pkgController.getPup(this.context.store.pupContext.manifest.id);
+    const pkg = this.pkgController.getPup(this.context.store.pupContext.id);
     const { installationId, statusId, statusLabel } = pkg.computed
     const hasChecks = (pkg?.manifest?.checks || []).length > 0;
     const isLoadingStatus =  ["starting", "stopping", "uninstalling"].includes(statusId);
@@ -186,7 +186,7 @@ class PupPage extends LitElement {
     const renderMenu = () => html`
       <action-row prefix="power" name="state" label="Enabled" ?disabled=${disableActions}>
         Enable or disable this Pup
-        <sl-switch slot="suffix" ?checked=${!disableActions && pkg.state.enabled} @sl-input=${this.handleStartStop} ?disabled=${this.inflight || installationId !== "ready"}></sl-switch>
+        <sl-switch slot="suffix" ?checked=${!disableActions && pkg.enabled} @sl-input=${this.handleStartStop} ?disabled=${this.inflight || installationId !== "ready"}></sl-switch>
       </action-row>
 
       <action-row prefix="gear" name="configure" label="Configure" .trigger=${this.handleMenuClick} ?disabled=${disableActions}>

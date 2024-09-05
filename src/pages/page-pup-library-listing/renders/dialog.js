@@ -31,8 +31,8 @@ export function renderDialog() {
 
   const configEl = html`
     <dynamic-form
-      .values=${pkg?.state?.config}
-      .fields=${pkg?.manifest?.command?.config}
+      .values=${pkg?.config}
+      .fields=${pkg?.manifest?.config}
       .onSubmit=${this.submitConfig}
       requireCommit
       markModifiedFields

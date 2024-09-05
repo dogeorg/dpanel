@@ -42,8 +42,12 @@ class PupInstallPage extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
-    this.pupId = this.context.store.pupContext.manifest.id;
+    this.pupId = this.context.store.pupDefinitionContext.id;
     this.pkgController.addObserver(this);
+    this.pkg = this.pkgController.getPupDefinition(
+      this.context.store.pupDefinitionContext.source.id,
+      this.context.store.pupDefinitionContext.id
+    );
   }
 
   disconnectedCallback() {
@@ -71,7 +75,7 @@ class PupInstallPage extends LitElement {
 
   render() {
     const path = this.context.store?.appContext?.path || [];
-    const pkg = this.pkgController.getPup(this.context.store.pupContext.manifest.id);
+    const pkg = this.pkg
     const { statusId, statusLabel, installationId, installationLabel } = pkg.computed
     const isLoadingStatus = ["installing"].includes(statusId);
     const hasDependencies = (pkg?.manifest?.deps?.pups || []).length > 0
@@ -101,7 +105,7 @@ class PupInstallPage extends LitElement {
           <div class="section-title">
             <h3>Description</h3>
             <reveal-row>
-              <p>${pkg?.manifest?.docs?.short}<br/>${pkg?.manifest?.docs?.long}</p>
+              <p>${pkg?.versionLatest?.meta?.descShort}<br/>${pkg?.versionLatest?.meta?.descLong}</p>
             </reveal-row>
           </div>
         </section>

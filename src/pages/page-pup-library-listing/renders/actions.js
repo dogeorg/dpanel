@@ -11,7 +11,7 @@ export function openDeps() {
 }
 
 export function renderActions() {
-  const pkg = this.pkgController.getPup(this.context.store.pupContext.manifest.id);
+  const pkg = this.pkgController.getPup(this.pupId);;
   const { installationId, statusId, statusLabel } = pkg.computed
 
   const hasButtons =

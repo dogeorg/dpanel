@@ -6,7 +6,7 @@ export function openConfig() {
 }
 
 export function renderActions() {
-  const pkg = this.pkgController.getPup(this.context.store.pupContext.manifest.id);
+  const pkg = this.pkg
   const { statusId, statusLabel, installationId, installationLabel } = pkg.computed
   const styles = css`
     .action-wrap {
@@ -21,12 +21,12 @@ export function renderActions() {
       }
     }
   `
-  const isInstalled = !!pkg?.state?.status;
+  const isInstalled = pkg.isInstalled
 
   return html`
     <div class="action-wrap">
 
-      ${["not_installed", "uninstalled"].includes(installationId) ? html`
+      ${!isInstalled ? html`
         <sl-button variant="warning" size="large"
           @click=${this.handleInstall}
           ?disabled=${this.inflight}
@@ -35,13 +35,13 @@ export function renderActions() {
         </sl-button>
       ` : nothing }
 
-      ${installationId === "installing" ? html`
+      ${!isInstalled && installationId === "installing" ? html`
         <sl-button variant="warning" size="large" disabled>
           Installing <sl-spinner slot="suffix" style="--indicator-color:#222"></sl-spinner>
         </sl-button>
       ` : nothing }
 
-      ${["ready", "unready"].includes(installationId) ? html`
+      ${isInstalled ? html`
         <sl-button variant="primary" size="large" href="${pkg.computed.url.library}">
           Manage
         </sl-button>

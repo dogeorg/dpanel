@@ -97,7 +97,7 @@ function generateRandomStats() {
 };
 
 export const mock = {
-  name: '/system/bootstrap',
+  name: '/system/bootstrap (deprecating)',
   method: 'get',
   group: 'system',
   res: generateBootstrap

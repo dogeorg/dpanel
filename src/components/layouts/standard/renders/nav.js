@@ -45,12 +45,12 @@ export function renderNav(CURPATH) {
             </a>
           </div>
 
-          <div class="nav-footer">
+          <!-- <div class="nav-footer">
             <div class="connection online">
               <sl-icon name="cloud-check-fill"></sl-icon>
               Connected
             </div>
-          </div>
+          </div> -->
         </div>
       </div>
     </nav>

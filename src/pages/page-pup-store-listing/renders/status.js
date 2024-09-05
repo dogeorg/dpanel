@@ -1,23 +1,25 @@
 import { html, css, classMap, nothing } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 
 export function renderStatus() {
-  const pkg = this.pkgController.getPup(this.context.store.pupContext.manifest.id);
+  const pkg = this.pkg
   const { installationId, installationLabel } = pkg.computed
+  const isInstalled = pkg.isInstalled
   const isLoadingStatus = ["installing"].includes(installationId);
+
   const normalisedLabel = () => {
-    if (["not_installed", "uninstalled"].includes(installationId)) {
+    if (!isInstalled) {
       return "Not installed"
     } else {
-      return installationLabel
+      return "Installed"
     }
   }
 
   return html`
     <div class="section-title">
-      <h3 class="installation-label ${installationId}">${normalisedLabel()}</h3>
+      <h3 class="installation-label ${isInstalled ? "installed" : "not_installed"}">${normalisedLabel()}</h3>
     </div>
     <div>
-      <span class="status-label">${pkg.manifest.package}</span>
+      <span class="status-label">${pkg.versionLatest.meta.name}</span>
       <sl-progress-bar class="loading-bar" value="0" ?indeterminate=${isLoadingStatus}></sl-progress-bar>
     </div>
     <style>${styles}</style>

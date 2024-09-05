@@ -1,5 +1,5 @@
 import { LitElement, html, css, nothing, repeat } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
-import { getBootstrap } from '/api/bootstrap/bootstrap.js';
+import { getStoreListing } from '/api/sources/sources.js';
 import { pkgController } from '/controllers/package/index.js'
 import { PaginationController } from '/components/common/paginator/paginator-controller.js';
 import { bindToClass } from '/utils/class-bind.js'
@@ -9,8 +9,8 @@ import '/components/common/paginator/paginator-ui.js';
 import '/components/common/page-banner.js';
 
 const initialSort = (a, b) => {
-  if (a.manifest.package < b.manifest.package) { return -1; }
-  if (a.manifest.package > b.manifest.package) { return 1; }
+  if (a.versionLatest.meta.name < b.versionLatest.meta.name) { return -1; }
+  if (a.versionLatest.meta.name > b.versionLatest.meta.name) { return 1; }
   return 0;
 }
 
@@ -113,9 +113,9 @@ class StoreView extends LitElement {
     this.dispatchEvent(new CustomEvent('busy-start', {}));
 
     try {
-      const res = await getBootstrap()
-      this.pkgController.setData(res);
-      this.packageList.setData(this.pkgController.packages);
+      const res = await getStoreListing()
+      this.pkgController.ingestAvailablePupDefs(res);
+      this.packageList.setData(this.pkgController.availablePackagesAll);
     } catch (err) {
       console.error(err);
       this.fetchError = true;
@@ -170,10 +170,12 @@ class StoreView extends LitElement {
     return html`
       <page-banner title="Dogecoin" subtitle="Registry">
         Extend your Dogebox with Pups<br/>
+        <!--
         <sl-button variant="text">
           <sl-icon name="arrow-left-right" slot="prefix"></sl-icon>
           Change Registry
         </sl-button>
+        -->
       </page-banner>
 
       <div class="row search-wrap">

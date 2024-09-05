@@ -32,6 +32,9 @@ class Store {
       state: {},
       computed: {},
     };
+    this.pupDefinitionContext = {
+      computed: {},
+    };
     this.promptContext = {
       display: false,
       name: "transaction",
@@ -109,6 +112,9 @@ class Store {
     }
     if (partialState.pupContext) {
       this.pupContext = { ...this.pupContext, ...partialState.pupContext };
+    }
+    if (partialState.pupDefinitionContext) {
+      this.pupDefinitionContext = { ...this.pupDefinitionContext, ...partialState.pupDefinitionContext };
     }
     if (partialState.promptContext) {
       this.promptContext = {

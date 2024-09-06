@@ -265,18 +265,18 @@ class SelectNetwork extends LitElement {
     // TODO: move this into post-network flow.
     const finalSystemBootstrap = await postSetupBootstrap({
       reflectorToken: null
-    }).catch(this.handleFault);
+    }).catch(() => { console.log('bootstrap called but no response returned')});
 
-    if (!finalSystemBootstrap) {
-      dynamicFormInstance.retainChanges(); // stops spinner
-      return;
-    }
+    // if (!finalSystemBootstrap) {
+    //   dynamicFormInstance.retainChanges(); // stops spinner
+    //   return;
+    // }
 
-    if (finalSystemBootstrap.error) {
-      dynamicFormInstance.retainChanges(); // stops spinner
-      this.handleError(finalSystemBootstrap.error);
-      return;
-    }
+    // if (finalSystemBootstrap.error) {
+    //   dynamicFormInstance.retainChanges(); // stops spinner
+    //   this.handleError(finalSystemBootstrap.error);
+    //   return;
+    // }
 
     // Handle success
     dynamicFormInstance.retainChanges(); // stops spinner

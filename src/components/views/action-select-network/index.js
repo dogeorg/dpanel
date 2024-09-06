@@ -1,6 +1,8 @@
 import { LitElement, html, css } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 import { getNetworks } from "/api/network/get-networks.js";
 import { putNetwork } from "/api/network/set-network.js";
+import { postSetupBootstrap } from "/api/system/post-bootstrap.js";
+
 import { asyncTimeout } from "/utils/timeout.js";
 import { createAlert } from "/components/common/alert.js";
 
@@ -259,13 +261,27 @@ class SelectNetwork extends LitElement {
       return;
     }
 
+    // temp: also call our final initialisation API here.
+    // TODO: move this into post-network flow.
+    const finalSystemBootstrap = await postSetupBootstrap({
+      reflectorToken: null
+    }).catch(() => { console.log('bootstrap called but no response returned')});
+
+    // if (!finalSystemBootstrap) {
+    //   dynamicFormInstance.retainChanges(); // stops spinner
+    //   return;
+    // }
+
+    // if (finalSystemBootstrap.error) {
+    //   dynamicFormInstance.retainChanges(); // stops spinner
+    //   this.handleError(finalSystemBootstrap.error);
+    //   return;
+    // }
+
     // Handle success
-    if (!response.error) {
-      dynamicFormInstance.retainChanges(); // stops spinner
-      dynamicFormInstance.toggleCelebrate();
-      await this.handleSuccess();
-      return;
-    }
+    dynamicFormInstance.retainChanges(); // stops spinner
+    dynamicFormInstance.toggleCelebrate();
+    await this.handleSuccess();
   };
 
   handleFault = (fault) => {

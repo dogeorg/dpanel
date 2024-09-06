@@ -38,7 +38,7 @@ import { bindToClass } from "/utils/class-bind.js";
 import { asyncTimeout } from "/utils/timeout.js";
 
 // APIS
-import { getSetupBootstrap } from "/api/setup/get-bootstrap.js";
+import { getSetupBootstrap } from "/api/system/get-bootstrap.js";
 
 // Do this once to set the location of shoelace assets (icons etc..)
 setBasePath("/vendor/@shoelace/cdn@2.14.0/");

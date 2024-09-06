@@ -5,9 +5,10 @@ import {
 } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 
 export function renderDialog() {
-  const pkg = this.pkgController.getPup(this.pupId);
+  const pupContext = this.context.store?.pupContext
+  const pkg = this.pkgController.getPup(pupContext.id);
   const { statusId } = pkg.computed
-  const readmeEl = html`${unsafeHTML(pkg?.manifest?.docs?.about)}`;
+  const readmeEl = html`<div style="padding: 1em; text-align: center;"> Such empty. This pup does not provide a README.</div>`;
   const depsEl = pkg.manifest?.deps?.pups?.length > 0 
     ? pkg.manifest.deps.pups.map((dep) => html`
       <action-row prefix="box-seam" name=${dep.id} label=${dep.name} href=${`/explore/${dep.id}/${dep.name}`}>
@@ -17,15 +18,15 @@ export function renderDialog() {
   `;
 
   const preventUninstallEl = html`
-    <p>Cannot uninstall a running Pup.<br/>Please disable ${pkg.manifest.package } and try again.</p>
+    <p>Cannot uninstall a running Pup.<br/>Please disable ${pkg.manifest.meta.name } and try again.</p>
     <sl-button slot="footer" variant="primary" @click=${this.clearDialog}>Dismiss</sl-button>
     <style>p:first-of-type { margin-top: 0px; }</style>
   `
 
   const uninstallEl = html`
-    <p>Are you sure you want to uninstall ${pkg.manifest.package  }?</p>
-    <sl-input placeholder="Type '${pkg.manifest.package}' to confirm" @sl-input=${(e) => this._confirmedName = e.target.value }></sl-input>
-    <sl-button slot="footer" variant="danger" @click=${this.handleUninstall} ?loading=${this.inflight} ?disabled=${this.inflight || this._confirmedName !== pkg.manifest.package}>Uninstall</sl-button>
+    <p>Are you sure you want to uninstall ${pkg.manifest.meta.name}?</p>
+    <sl-input placeholder="Type '${pkg.manifest.meta.name}' to confirm" @sl-input=${(e) => this._confirmedName = e.target.value }></sl-input>
+    <sl-button slot="footer" variant="danger" @click=${this.handleUninstall} ?loading=${this.inflight} ?disabled=${this.inflight || this._confirmedName !== pkg.manifest.meta.name}>Uninstall</sl-button>
     <style>p:first-of-type { margin-top: 0px; }</style>
   `;
 

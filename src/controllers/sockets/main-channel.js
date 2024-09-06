@@ -55,11 +55,13 @@ class SocketChannel {
     };
 
     this.wsClient.onMessage = async (event) => {
-      // console.log("MSSSGSG!~", event, event.data);
-
+      
       let err, data;
       try {
         data = JSON.parse(event.data);
+        if (data?.update && data.update[0] && data.update[0]?.status) {
+          // console.log("REPORTED STATUS:", data.update[0].status, data);
+        }
       } catch (err) {
         console.warn("failed to JSON.parse incoming event", event, err);
         err = true;
@@ -74,23 +76,29 @@ class SocketChannel {
       }
 
       switch (data.type) {
-        case "PupStatus":
-          // A message of type PupStatus is received in response to a requested action resolving.
+        case "pup":
+          // emitted on state change (eg: installing, ready)
+          console.log("PUP EVENT RECEIVED:", data.update.id, data.update.installation, data.update)
+          pkgController.updatePupModel(data.update.id, data.update)
+          break;
 
-          // TODO: determine why.
-          // Receiving completed txns before the txn has been registered in the client.
-          await asyncTimeout(500);
+        case "stats":
+          // emitted on an interval (contains current status and vitals)
+          if (data && data.update && Array.isArray(data.update)) {
+            data.update.forEach((statsUpdatePayload) => {
+              console.log('stats', statsUpdatePayload.status, statsUpdatePayload.id);
+              pkgController.updatePupStatsModel(statsUpdatePayload.id, statsUpdatePayload)
+            });
+          }
+          break;
 
+        case "action":
+          // emitted in response to an action
+          await asyncTimeout(500); // Why?
           pkgController.resolveAction(data.id, data);
           break;
-        case "status":
-          // A message of type "status" is received when dogeboxd broadcasts status changes
-          // Changes include cpu, mem, running states etc..
-          Object.keys(data.update).forEach((pupId) => {
-            pkgController.updatePupModel(pupId, data.update[pupId])
-          });
-          break;
-        case "ShowPrompt":
+
+        case "prompt": // synthetic (client side only)
           store.updateState({
             promptContext: {
               display: true,

@@ -38,7 +38,8 @@ export const routes = [
     component: "x-page-pup-library-listing",
     dynamicTitle: true,
     pageAction: "back",
-    before: [loadPup, asPage],
+    before: [asPage],
+    after: [loadPup],
     animate: true,
   },
   {
@@ -46,7 +47,8 @@ export const routes = [
     component: "x-page-pup-logs",
     pageTitle: "Logs",
     pageAction: "close",
-    before: [loadPup, asPage],
+    before: [asPage],
+    after: [loadPup],
     animate: true,
   },
   {
@@ -56,11 +58,12 @@ export const routes = [
     before: [asPage],
   },
   {
-    path: "/explore/:source/:pup",
+    path: "/explore/:source/:name",
     component: "x-page-pup-store-listing",
     dynamicTitle: true,
     pageAction: "back",
-    before: [loadPupDefinition, asPage],
+    before: [asPage],
+    after: [loadPupDefinition],
     animate: true,
   },
   {

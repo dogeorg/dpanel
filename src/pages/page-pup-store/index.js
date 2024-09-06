@@ -115,7 +115,7 @@ class StoreView extends LitElement {
     try {
       const res = await getStoreListing()
       this.pkgController.ingestAvailablePupDefs(res);
-      this.packageList.setData(this.pkgController.availablePackagesAll);
+      this.packageList.setData(this.pkgController.packageDefinitions);
     } catch (err) {
       console.error(err);
       this.fetchError = true;
@@ -194,7 +194,10 @@ class StoreView extends LitElement {
         </div>
       ` : nothing }
 
-      ${this.renderSectionBody(ready, SKELS, hasItems)}
+      ${this.fetchLoading
+        ? html`<sl-spinner style="--indicator-color:#777;"></sl-spinner>`
+        : this.renderSectionBody(ready, SKELS, hasItems)
+      }
 
     `;
   }

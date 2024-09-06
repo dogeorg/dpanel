@@ -22,11 +22,14 @@ import { createAlert } from "/components/common/alert.js";
 class PupPage extends LitElement {
   static get properties() {
     return {
+      ready: { type: Boolean }, // Page is loading or not.
+      result: { type: String }, // 200, 404, 500.
       open_dialog: { type: Boolean },
       open_dialog_label: { type: String },
       checks: { type: Object },
       pupEnabled: { type: Boolean },
       _confirmedName: { type: String },
+      inflight: { type: Boolean },
     };
   }
 
@@ -48,8 +51,8 @@ class PupPage extends LitElement {
     super.connectedCallback();
     // Observers with a pupId will be requested to
     // update when state for that pup changes
-    this.pupId = this.context.store.pupContext.id;
-    this.pupEnabled = this.pkgController.getPup(this.pupId)?.enabled
+    // this.pupId = this.context.store.pupContext.id;
+    // this.pupEnabled = this.pkgController.getPup(this.pupId)?.enabled
     this.pkgController.addObserver(this);
   }
 
@@ -60,17 +63,17 @@ class PupPage extends LitElement {
 
   async firstUpdated() {
     this.addEventListener("sl-hide", this.handleDialogClose);
-    this.checks = this.context.store.pupContext?.manifest?.checks;
+    // this.checks = this.context.store.pupContext?.manifest?.checks;
 
-    if (this.pupId === "Core") {
-      await asyncTimeout(1200);
-      this.checks[1].status = "success";
-      this.requestUpdate();
+    // if (this.pupId === "Core") {
+    //   await asyncTimeout(1200);
+    //   this.checks[1].status = "success";
+    //   this.requestUpdate();
 
-      await asyncTimeout(800);
-      this.checks[2].status = "success";
-      this.requestUpdate();
-    }
+    //   await asyncTimeout(800);
+    //   this.checks[2].status = "success";
+    //   this.requestUpdate();
+    // }
   }
 
   handleDialogClose() {
@@ -89,6 +92,7 @@ class PupPage extends LitElement {
 
   submitConfig = async (stagedChanges, formNode, dynamicForm) => {
     // Define callbacks
+    const pupId = this.context.store.pupContext.id
     const callbacks = {
       onSuccess: () => dynamicForm.commitChanges(formNode),
       onError: (errorPayload) => {
@@ -99,7 +103,7 @@ class PupPage extends LitElement {
 
     // Invoke pkgContrller model update, supplying data and callbacks
     const res = await pkgController.requestPupChanges(
-      this.pupId,
+      pupId,
       stagedChanges,
       callbacks,
     );
@@ -129,20 +133,22 @@ class PupPage extends LitElement {
   }
 
   async handleStartStop(e) {
+    const pupId = this.context.store.pupContext.id
     this.inflight = true;
     this.pupEnabled = e.target.checked;
     this.requestUpdate();
 
     const actionName = e.target.checked ? 'start' : 'stop' ;
     const callbacks = {
-      onSuccess: () => console.log('WOW'),
-      onError: () => console.log('NOO..'),
+      onSuccess: () => { console.log('WOW'); this.inflight = false; },
+      onError: () => { console.log('NOO..'); this.inflight = false; },
       onTimeout: () => { console.log('TOO SLOW..'); this.inflight = false; }
     }
-    await this.pkgController.requestPupAction(this.pupId, actionName, callbacks);
+    await this.pkgController.requestPupAction(pupId, actionName, callbacks);
   }
 
   async handleUninstall(e) {
+    const pupId = this.context.store.pupContext.id
     this.pupEnabled = false;
     this.inflight = true;
     this.requestUpdate();
@@ -153,15 +159,42 @@ class PupPage extends LitElement {
       onError: () => console.log('NOO..'),
       onTimeout: () => { console.log('TOO SLOW..'); this.inflight = false; }
     }
-    await this.pkgController.requestPupAction(this.pupId, actionName, callbacks);
+    await this.pkgController.requestPupAction(pupId, actionName, callbacks);
     await asyncTimeout(1500);
     this._confirmedName = "";
     this.clearDialog();
   }
 
   render() {
+    const pupContext = this.context.store?.pupContext
+
+    if (!pupContext.ready) {
+      return html`
+      <div id="PageWrapper" class="wrapper">
+        <section>
+          <div class="section-title">
+            <h3>Status &nbsp;<sl-spinner style="position: relative; top: 3px;"></sl-spinner></h3>
+          </div>
+          <!-- TODO More Skeleton -->
+        </section>
+      </div>`
+    }
+
+    if (pupContext.result !== 200) {
+      return html`
+      <div id="PageWrapper" class="wrapper">
+        <section>
+          <div class="section-title">
+            <h3>Such Empty</h3>
+            <p>Nothing to see here</p>
+            <!-- TODO Specific error handling -->
+          </div>
+        </section>
+      </div>`
+    }
+
     const path = this.context.store?.appContext?.path || [];
-    const pkg = this.pkgController.getPup(this.context.store.pupContext.id);
+    const pkg = this.pkgController.getPup(pupContext.id);
     const { installationId, statusId, statusLabel } = pkg.computed
     const hasChecks = (pkg?.manifest?.checks || []).length > 0;
     const isLoadingStatus =  ["starting", "stopping", "uninstalling"].includes(statusId);

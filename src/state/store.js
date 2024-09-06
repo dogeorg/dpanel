@@ -99,6 +99,21 @@ class Store {
     }
   }
 
+  clearContext(contexts) {
+    if (!contexts) {
+      return;
+    }
+
+    contexts.forEach((context) => {
+      if (this[context]) {
+        this[context] = {};
+      }
+    });
+
+    this.persist();
+    this.notifySubscribers();
+  }
+
   updateState(partialState) {
     // Update the state properties with the partial state provided
     if (partialState.appContext) {

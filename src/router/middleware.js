@@ -7,11 +7,10 @@ import { getStoreListing } from "/api/sources/sources.js";
 export async function loadPup(context, commands) {
   const pupId = context.params.pup
   if (!pupId) { return undefined; }
-
   try {
     // ensure bootstrap (temporary)
     const res = await getBootstrapV2();
-    pkgController.setDataV2(res);
+    pkgController.setData(res);
 
     const pup = pkgController.getPup(pupId);
 
@@ -20,13 +19,8 @@ export async function loadPup(context, commands) {
     }
 
     store.updateState({
-      pupContext: pup,
+      pupContext: { ...pup, ready: true, result: 200 },
     });
-
-    if (context.route.dynamicTitle) {
-      context.route.pageTitle = pup?.manifest?.meta?.name;
-      context.route.pageAction = "back";
-    }
 
   } catch (error) {
     console.error("Error fetching manifest:", error);
@@ -36,29 +30,23 @@ export async function loadPup(context, commands) {
 }
 
 export async function loadPupDefinition(context, commands) {
-  const sourceId = context.params.source
-  const pupId = context.params.pup
-  if (!sourceId || !pupId) { return undefined; }
+  const sourceId = decodeURIComponent(context.params.source);
+  const pupName = decodeURIComponent(context.params.name);
+  if (!sourceId || !pupName) { return undefined; }
 
   try {
     // ensure bootstrap (temporary)
     const res = await getStoreListing();
     pkgController.ingestAvailablePupDefs(res);
-
-    const pup = pkgController.getPupDefinition(sourceId, pupId);
+    const pup = pkgController.getPupDefinition(sourceId, pupName);
 
     if (!pup) {
       throw new Error("missing pup definition");
     }
 
     store.updateState({
-      pupDefinitionContext: pup,
+      pupDefinitionContext: { ...pup, ready: true, result: 200 }
     });
-
-    if (context.route.dynamicTitle) {
-      context.route.pageTitle = pup?.versionLatest?.meta?.name;
-      context.route.pageAction = "back";
-    }
 
   } catch (error) {
     console.error("Error fetching manifest:", error);
@@ -81,6 +69,11 @@ export function performLogout(context, commands) {
 }
 
 export function asPage(context, commands) {
+  if (context.route.dynamicTitle) {
+    context.route.pageTitle = decodeURIComponent(context.params.name);
+    context.route.pageAction = "back";
+  }
+
   const { componentClass: ComponentClass, pageTitle, pageAction } = context.route;
 
   // Create instance of page-container

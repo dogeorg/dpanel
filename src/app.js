@@ -41,11 +41,17 @@ import { routes } from "/router/config.js";
 import debounce from "/utils/debounce.js";
 import { bindToClass } from "/utils/class-bind.js";
 
+// Apis
+import { getBootstrapV2 } from "/api/bootstrap/bootstrap.js";
+
 // Do this once to set the location of shoelace assets (icons etc..)
 setBasePath("/vendor/@shoelace/cdn@2.14.0/");
 
 // Main web socket channel (singleton)
 import { mainChannel } from "/controllers/sockets/main-channel.js";
+
+// Pkg controller
+import { pkgController } from "/controllers/package/index.js"
 
 class DPanelApp extends LitElement {
   static properties = {
@@ -66,6 +72,7 @@ class DPanelApp extends LitElement {
     this.menuAnimating = false;
     this.systemPromptActive = false;
     this._debouncedHandleResize = debounce(this._handleResize.bind(this), 50);
+    this.pkgController = pkgController;
     this.mainChannel = mainChannel;
     this.router = null;
     this.outletWrapper = null;
@@ -94,15 +101,34 @@ class DPanelApp extends LitElement {
     super.disconnectedCallback();
   }
 
-  firstUpdated() {
+  async firstUpdated() {
+    // Fetch bootstrap first (TODO - improve condition).
+    if (!window.location.href.includes('/log')) {
+      this.fetchBootstrap();
+    }
+
     // Initialise our router singleton and provide it a target elemenet.
     const outlet = this.shadowRoot.querySelector("#Outlet");
     // this.outletWrapper = this.shadowRoot.querySelector("#OutletWrapper")
     this.router = new Router(outlet);
     this.router.setRoutes(routes)
-    this.router.addHook(
-      () => store.updateState({ appContext: { menuVisible: false }})
-    )
+
+    // Hide menu on page change
+    this.router.addHook(() => store.updateState({ appContext: { menuVisible: false }}))
+
+    // Clear some contexts on route change
+    this.router.addHook(() => store.clearContext(['pupContext', 'pupDefinitionContext']));
+  }
+
+  async fetchBootstrap() {
+    try {
+      const res = await getBootstrapV2()
+      this.pkgController.setData(res);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      // this.fetchLoading = false
+    }
   }
 
   _handleResize() {

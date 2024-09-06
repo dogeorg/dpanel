@@ -103,8 +103,8 @@ class LibraryView extends LitElement {
 
     try {
       const res = await getBootstrapV2()
-      this.pkgController.setDataV2(res);
-      this.installedList.setData(this.pkgController.installedV2);
+      this.pkgController.setData(res);
+      this.installedList.setData(this.pkgController.installedPackages);
     } catch (err) {
       console.error(err);
       this.fetchError = true;
@@ -143,7 +143,9 @@ class LibraryView extends LitElement {
 
     return html`
       <div class="padded">
-          ${this.renderSectionInstalledBody(ready, SKELS, hasItems)}
+        ${this.fetchLoading 
+          ? html`<sl-spinner style="--indicator-color:#777;"></sl-spinner>
+        ` : this.renderSectionInstalledBody(ready, SKELS, hasItems) }
       </div>
 
     `;

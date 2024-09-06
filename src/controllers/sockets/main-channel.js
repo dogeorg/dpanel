@@ -56,13 +56,11 @@ class SocketChannel {
 
     this.wsClient.onMessage = async (event) => {
       
-
       let err, data;
       try {
         data = JSON.parse(event.data);
-        console.log(JSON.stringify(data, null, 2));
-        if (data?.update[0]?.status) {
-          console.log("REPORTED STATUS:", data.update[0].status, data);
+        if (data?.update && data.update[0] && data.update[0]?.status) {
+          // console.log("REPORTED STATUS:", data.update[0].status, data);
         }
       } catch (err) {
         console.warn("failed to JSON.parse incoming event", event, err);
@@ -79,14 +77,17 @@ class SocketChannel {
 
       switch (data.type) {
         case "pup":
-          // emitted on state change
+          // emitted on state change (eg: installing, ready)
+          console.log("PUP EVENT RECEIVED:", data.update.id, data.update.installation, data.update)
+          pkgController.updatePupModel(data.update.id, data.update)
           break;
 
         case "stats":
           // emitted on an interval (contains current status and vitals)
-          if (data && data.update && typeof data.update === Array) {
-            data.update.forEach((pupId) => {
-              pkgController.updatePupStatsModel(pupId.id, pupId)
+          if (data && data.update && Array.isArray(data.update)) {
+            data.update.forEach((statsUpdatePayload) => {
+              console.log('stats', statsUpdatePayload.status, statsUpdatePayload.id);
+              pkgController.updatePupStatsModel(statsUpdatePayload.id, statsUpdatePayload)
             });
           }
           break;

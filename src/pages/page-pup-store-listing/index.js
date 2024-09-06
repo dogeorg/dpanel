@@ -104,9 +104,7 @@ class PupInstallPage extends LitElement {
     const path = this.context.store?.appContext?.path || [];
     const pkg = this.pkgController.getPupDefinition(pupDefinitionContext.source.id, pupDefinitionContext.id);
 
-    console.log({pkg, pupDefinitionContext});
     const { statusId, statusLabel, installationId, installationLabel } = pkg.computed
-    const isLoadingStatus = ["installing"].includes(statusId);
     const hasDependencies = (pkg?.manifest?.deps?.pups || []).length > 0
     const popover_page = path[1];
 
@@ -134,7 +132,7 @@ class PupInstallPage extends LitElement {
           <div class="section-title">
             <h3>Description</h3>
             <reveal-row>
-              <p>${pkg?.versionLatest?.meta?.descShort}<br/>${pkg?.versionLatest?.meta?.descLong}</p>
+              <p>${pkg?.versionLatest?.meta?.shortDescription}<br/>${pkg?.versionLatest?.meta?.longDescription}</p>
             </reveal-row>
           </div>
         </section>

@@ -6,10 +6,26 @@ export function openConfig() {
 }
 
 export function renderActions() {
-  const pupDefinitionContext = this.context.store?.pupDefinitionContext
-  const pkg = this.pkgController.getPupDefinition(pupDefinitionContext.source.id, pupDefinitionContext.id);
+  // const pupDefinitionContext = this.context.store?.pupDefinitionContext
 
-  const { statusId, statusLabel, installationId, installationLabel } = pkg.computed
+  // const def = this.pkgController.getPupDefinition(pupDefinitionContext.source.id, pupDefinitionContext.id);
+  // const pkg = this.pkgController.getPup(def.installedId)
+
+  // const installationId = pkg?.computed?.installationId;
+  // const installationLabel = pkg?.computed?.installationLabel;
+  // const statusId = pkg?.computed?.statusId;
+  // const statusLabel = pkg?.computed?.statusLabel;
+
+  const pupDefinitionContext = this.context.store?.pupDefinitionContext
+  const def = this.pkgController.getPupDefinition(pupDefinitionContext.source.id, pupDefinitionContext.id);
+  const pkg = this.pkgController.getPupByDefinitionData(pupDefinitionContext?.source?.id, pupDefinitionContext?.id)
+
+  const installationId = pkg?.computed?.installationId;
+  const installationLabel = pkg?.computed?.installationLabel;
+
+  const isInstalled = def.isInstalled || installationId === "ready"
+  const isLoadingStatus = ["installing"].includes(installationId);
+
   const styles = css`
     .action-wrap {
       display: flex;
@@ -23,12 +39,11 @@ export function renderActions() {
       }
     }
   `
-  const isInstalled = pkg.isInstalled
 
   return html`
     <div class="action-wrap">
 
-      ${!isInstalled ? html`
+      ${!isInstalled && installationId !== "installing" ? html`
         <sl-button variant="warning" size="large"
           @click=${this.handleInstall}
           ?disabled=${this.inflight}
@@ -55,18 +70,19 @@ export function renderActions() {
 };
 
 export async function handleInstall() {
-  const pkg = this.pkg
+  const pupDefinitionContext = this.context.store?.pupDefinitionContext
+  const def = this.pkgController.getPupDefinition(pupDefinitionContext.source.id, pupDefinitionContext.id);
   this.inflight = true;
   const callbacks = {
-    onSuccess: () => console.log('WOW'),
-    onError: () => console.log('NOO..'),
+    onSuccess: () => { console.log('WOW'); this.inflight = false; },
+    onError: () => { console.log('NOO..'); this.inflight = false; },
     onTimeout: () => { console.log('TOO SLOW..'); this.inflight = false; }
   }
   const body = {
-    sourceName: pkg.source.id,
-    pupName: pkg.versionLatest.meta.name,
-    pupVersion: pkg.versionLatest.meta.version
+    sourceName: def.source.id,
+    pupName: def.versionLatest.meta.name,
+    pupVersion: def.versionLatest.meta.version
   }
-  await this.pkgController.requestPupAction(this.pupId, 'install', callbacks, body);
+  await this.pkgController.requestPupAction('--', 'install', callbacks, body);
 }
 

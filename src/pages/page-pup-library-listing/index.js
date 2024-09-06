@@ -92,6 +92,7 @@ class PupPage extends LitElement {
 
   submitConfig = async (stagedChanges, formNode, dynamicForm) => {
     // Define callbacks
+    const pupId = this.context.store.pupContext.id
     const callbacks = {
       onSuccess: () => dynamicForm.commitChanges(formNode),
       onError: (errorPayload) => {
@@ -102,7 +103,7 @@ class PupPage extends LitElement {
 
     // Invoke pkgContrller model update, supplying data and callbacks
     const res = await pkgController.requestPupChanges(
-      this.pupId,
+      pupId,
       stagedChanges,
       callbacks,
     );
@@ -132,6 +133,7 @@ class PupPage extends LitElement {
   }
 
   async handleStartStop(e) {
+    const pupId = this.context.store.pupContext.id
     this.inflight = true;
     this.pupEnabled = e.target.checked;
     this.requestUpdate();
@@ -142,10 +144,11 @@ class PupPage extends LitElement {
       onError: () => { console.log('NOO..'); this.inflight = false; },
       onTimeout: () => { console.log('TOO SLOW..'); this.inflight = false; }
     }
-    await this.pkgController.requestPupAction(this.pupId, actionName, callbacks);
+    await this.pkgController.requestPupAction(pupId, actionName, callbacks);
   }
 
   async handleUninstall(e) {
+    const pupId = this.context.store.pupContext.id
     this.pupEnabled = false;
     this.inflight = true;
     this.requestUpdate();
@@ -156,7 +159,7 @@ class PupPage extends LitElement {
       onError: () => console.log('NOO..'),
       onTimeout: () => { console.log('TOO SLOW..'); this.inflight = false; }
     }
-    await this.pkgController.requestPupAction(this.pupId, actionName, callbacks);
+    await this.pkgController.requestPupAction(pupId, actionName, callbacks);
     await asyncTimeout(1500);
     this._confirmedName = "";
     this.clearDialog();

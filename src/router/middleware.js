@@ -30,15 +30,14 @@ export async function loadPup(context, commands) {
 }
 
 export async function loadPupDefinition(context, commands) {
-  const sourceId = context.params.source
-  const pupName = context.params.name
+  const sourceId = decodeURIComponent(context.params.source);
+  const pupName = decodeURIComponent(context.params.name);
   if (!sourceId || !pupName) { return undefined; }
 
   try {
     // ensure bootstrap (temporary)
     const res = await getStoreListing();
     pkgController.ingestAvailablePupDefs(res);
-
     const pup = pkgController.getPupDefinition(sourceId, pupName);
 
     if (!pup) {
@@ -71,7 +70,7 @@ export function performLogout(context, commands) {
 
 export function asPage(context, commands) {
   if (context.route.dynamicTitle) {
-    context.route.pageTitle = context.params.name;
+    context.route.pageTitle = decodeURIComponent(context.params.name);
     context.route.pageAction = "back";
   }
 

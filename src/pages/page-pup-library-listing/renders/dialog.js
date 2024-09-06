@@ -8,7 +8,7 @@ export function renderDialog() {
   const pupContext = this.context.store?.pupContext
   const pkg = this.pkgController.getPup(pupContext.id);
   const { statusId } = pkg.computed
-  const readmeEl = html`${unsafeHTML(pkg?.manifest?.docs?.about)}`;
+  const readmeEl = html`<div style="padding: 1em; text-align: center;"> Such empty. This pup does not provide a README.</div>`;
   const depsEl = pkg.manifest?.deps?.pups?.length > 0 
     ? pkg.manifest.deps.pups.map((dep) => html`
       <action-row prefix="box-seam" name=${dep.id} label=${dep.name} href=${`/explore/${dep.id}/${dep.name}`}>

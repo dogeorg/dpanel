@@ -12,6 +12,7 @@ export function openDeps() {
 
 export async function handlePurgeFunction() {
   this.inflight = true;
+  const pupId = this.context.store?.pupContext.id
   this.requestUpdate();
 
   const callbacks = {
@@ -19,7 +20,7 @@ export async function handlePurgeFunction() {
     onError: () => { console.log('NOO..'); this.inflight = false; },
     onTimeout: () => { console.log('TOO SLOW..'); this.inflight = false; }
   }
-  await this.pkgController.requestPupAction(this.pupId, 'purge', callbacks);
+  await this.pkgController.requestPupAction(pupId, 'purge', callbacks);
 }
 
 export function renderActions() {

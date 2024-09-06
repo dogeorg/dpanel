@@ -47,11 +47,13 @@ class PkgController {
   ingestInstalledPup(states, stats) {
     // Convert to array, enrich each state object.
     this.installedPackages = toArray(states)
-      .map(s => toEnrichedInstalledPup(s, stats[s.id]));
+      .map(s => toEnrichedInstalledPup(s.id, s, stats[s.id]));
 
     // Index by id.
     this.installedPackageIndex = this.installedPackages
       .toObject({ key: 'id' });
+
+    console.log(this.installedPackages);
   }
 
   ingestAvailablePupDefs(storeListingRes) {
@@ -89,6 +91,13 @@ class PkgController {
       (key) => key.toLowerCase() === id.toLowerCase(),
     );
     return this.installedPackageIndex[key];
+  }
+
+  getPupByDefinitionData(source, pupName) {
+    const pup = this.installedPackages.find(
+      p => p.source.name === source && p.manifest.meta.name === pupName
+    );
+    return pup;
   }
 
   registerAction(txn, callbacks, actionType, pupId, timeout) {
@@ -132,7 +141,8 @@ class PkgController {
   }
 
   resolveAction(txn, payload) {
-    const foundAction = this.actions.find((action) => action.txn === txn);
+    const foundActionIndex = this.actions.findIndex((action) => action.txn === txn);
+    const foundAction = foundActionIndex !== -1 ? this.actions[foundActionIndex] : null;
     if (!foundAction) {
       console.warn("pkgController: ACTION NOT FOUND.", { txn });
       return;
@@ -141,6 +151,9 @@ class PkgController {
     // Txn failed, invoke error callback.
     if (!payload || payload.error) {
       try {
+        // Remove action from actions list.
+        this.actions.splice(foundActionIndex, 1);
+        // Invoke error callback
         foundAction.callbacks.onError(payload);
       } catch (err) {
         console.warn("the provided onError callback function threw an error");
@@ -148,60 +161,56 @@ class PkgController {
       return;
     }
 
-    // Txn succeeded, invoke success callback.
-    try {
-      foundAction.callbacks.onSuccess(payload);
-    } catch (err) {
-      console.warn("the provided onSuccess callback function threw an error");
-    }
-
     switch (foundAction.actionType) {
       case "UPDATE-PUP":
         this.updatePupModel(foundAction.pupId, payload.update);
         break;
       case "PUP-ACTION":
+        // TODO.
+        if (foundAction.pupId === '--') {
+          console.log('Odd pupId for action', foundAction.pupId);
+          return;
+        }
         this.updatePupModel(foundAction.pupId, payload.update);
         break;
+    }
+
+    // Txn succeeded, invoke success callback.
+    try {
+      // Remove action from actions list.
+      this.actions.splice(foundActionIndex, 1);
+      // Invoke success callback
+      foundAction.callbacks.onSuccess(payload);
+    } catch (err) {
+      console.warn("the provided onSuccess callback function threw an error");
     }
   }
 
   updatePupStatsModel(pupId, newPupStatsData) {
-    // Update the pup in the pupIndex
-    if (this.pupIndexV2[pupId]) {
-      console.log('THIS IS THE CASE', this.pupIndexV2[pupId]);
-      this.pupIndexV2[pupId] = toEnrichedInstalledPup(this.pupIndexV2[pupId], newPupStatsData);
-      console.log('ENRICHED!', this.pupIndexV2[pupId]);
-      this.notify(pupId);
-    } else {
-      console.log('Nope.', pupId);
+    console.log('updatePupStatsModel', pupId);
+    if (this.installedPackageIndex[pupId]) {      
+      this.installedPackageIndex[pupId].stats = newPupStatsData;
+      this.installedPackageIndex[pupId].computed = computeVals(pupId, this.installedPackageIndex[pupId], newPupStatsData);
+      this.notify();
     }
   }
 
   updatePupModel(pupId, newPupStateData) {
-    // Update the pup in the installed list
-    // const installedIndex = this.installed.findIndex(pup => pup.manifest.id === pupId);
-    // if (installedIndex !== -1) {
-    //   const installedPup = this.installed[installedIndex];
-    //   // Update the installed pup with new data
-    //   this.installed[installedIndex] = { ...installedPup, ...newData };
-    // }
-
-    // Update the pup in the pupIndex
-    if (this.pupIndex[pupId]) {
-      const indexedPup = this.pupIndex[pupId];
-      // Update the indexed pup with new data
-      this.pupIndex[pupId] = {
-        ...indexedPup,
-        state: {
-          ...indexedPup.state,
-          ...newPupStateData,
-        },
-        computed: generateComputedVals(this.pupIndex[pupId].manifest, { ...indexedPup.state, ...newPupStateData })
-      };
-
-      // Request an update to re-render the host with new data
-      this.notify(pupId);
+    const existingStats = this.installedPackageIndex[pupId]?.stats || {};
+    this.installedPackageIndex[pupId] = toEnrichedInstalledPup(pupId, newPupStateData, existingStats);
+    
+    const foundPkgIndex = this.installedPackages.findIndex(installedPkg => installedPkg.id === newPupStateData.id)
+    console.log('found pkg index:', foundPkgIndex);
+    if (foundPkgIndex !== -1) {
+      this.installedPackages[foundPkgIndex] = this.installedPackageIndex[pupId];
+    } else {
+      // Pup not yet present on available array. Push it to array
+      console.log('here. pushing to array');
+      this.installedPackages.push(this.installedPackageIndex[pupId]);
     }
+
+    console.log('GOT TO NOTIFY');
+    this.notify();
   }
 
   async requestPupChanges(pupId, newData, callbacks) {
@@ -247,7 +256,7 @@ class PkgController {
     }
 
     const actionType = "PUP-ACTION";
-    const timeoutMs = 3000; // 3 seconds
+    const timeoutMs = 15000; // 3 seconds
 
     // Make a network call
     const res = await pickAndPerformPupAction(pupId, action, body).catch((err) => {
@@ -307,48 +316,6 @@ function getInstance() {
 
 export const pkgController = getInstance();
 
-function toAssembledPup(bootstrapResponse) {
-  const sources = Object.keys(bootstrapResponse.manifests);
-  const states = bootstrapResponse.states;
-  const stateKeys = Object.keys(states);
-  const out = {
-    internal: {},
-    installed: {},
-    available: {},
-  };
-
-  // Populate available index.
-  sources.forEach((source) => {
-    // sources such as "local", "remote" etc..
-    bootstrapResponse.manifests[source].available.forEach((m) => {
-      out.available[m.id] = {
-        computed: generateComputedVals(m),
-        manifest: m,
-        state: {
-          id: m.id,
-          package: m.package,
-          ...defaultPupState(),
-        },
-      };
-    });
-  });
-
-  // Popupate installed index.
-  Object.values(states).forEach((s) => {
-    out.installed[s.id] = {
-      computed: generateComputedVals(out.available[s.id].manifest, s),
-      manifest: out.available[s.id].manifest,
-      state: s,
-    };
-  });
-
-  // Remove installed pups from available index.
-  stateKeys.forEach((k) => {
-    delete out.available[k];
-  });
-  return out;
-}
-
 function toArray(object) {
   return Object.values(object);
 }
@@ -358,33 +325,6 @@ function toObject(array) {
     obj[index] = value;
     return obj;
   }, {});
-}
-
-function defaultPupState() {
-  return {
-    status: undefined,
-    stats: undefined,
-    config: {},
-  };
-}
-
-function generateComputedVals(m, s) {
-  const id = encodeURIComponent(m.id.toLowerCase());
-  const name = encodeURIComponent(m.package.toLowerCase());
-  const status = determineStatusId(s);
-  const installation = determineInstallationId(s);
-  return {
-    id: m.id,
-    url: {
-      gui: `/explore/${id}/${name}/ui`,
-      library: `/pups/${id}/${name}`,
-      store: `/explore/${id}/${name}`,
-    },
-    statusId: status.id,
-    statusLabel: status.label,
-    installationId: installation.id,
-    installationLabel: installation.label
-  };
 }
 
 function determineInstallationId(state) {
@@ -471,29 +411,34 @@ Array.prototype.toObject = function(options = {}) {
   }, {});
 };
 
-function toEnrichedInstalledPup(pupState, pupStats) {
-  const id = pupState.id;
-  const urlEncodedPupame = encodeURIComponent(pupState.manifest.meta.name.replaceAll(' ', '-')).toLowerCase();
-  const urlEncodedSourceName = encodeURIComponent(pupState.source.name.replaceAll(' ', '-')).toLowerCase();
-  const stats = pupStats
+function computeVals(pupId, pupState, pupStats) {
+  const urlEncodedPupName = pupState.manifest.meta.name;
+  const urlEncodedSourceName = pupState.source.name;
+
+  // const urlEncodedPupame = encodeURIComponent(pupState.manifest.meta.name.replaceAll(' ', '-')).toLowerCase();
+  // const urlEncodedSourceName = encodeURIComponent(pupState.source.name.replaceAll(' ', '-')).toLowerCase();
   const status = determineStatusId(pupState, pupStats);
   const installation = determineInstallationId(pupState);
 
   return {
+    url: {
+      gui: `/explore/${pupId}/${urlEncodedPupName}/ui`,
+      library: `/pups/${pupId}/${urlEncodedPupName}`,
+      store: `/explore/${urlEncodedSourceName}/${urlEncodedPupName}`,
+    },
+    statusId: status.id,
+    statusLabel: status.label,
+    installationId: installation.id,
+    installationLabel: installation.label
+  }
+}
+
+function toEnrichedInstalledPup(pupId, pupState, pupStats) {
+  console.log("toEnrichedInstalledPup", {pupId, pupState, pupStats});
+  return {
     ...pupState,
-    stats,
-    computed: {
-      id: pupState.id,
-      url: {
-        gui: `/explore/${id}/${urlEncodedPupame}/ui`,
-        library: `/pups/${id}/${urlEncodedPupame}`,
-        store: `/explore/${urlEncodedSourceName}/${urlEncodedPupame}`,
-      },
-      statusId: status.id,
-      statusLabel: status.label,
-      installationId: installation.id,
-      installationLabel: installation.label
-    }
+    stats: pupStats,
+    computed: computeVals(pupId, pupState, pupStats)
   }
 }
 
@@ -517,12 +462,16 @@ function toFlattenedAvailablePupsArray(sources) {
       // COMPUTED
       const status = determineStatusId({});
       const installation = determineInstallationId(pupData);
-      const urlEncodedSourceName = encodeURIComponent(sourceName.replaceAll(' ', '-')).toLowerCase();
-      const urlEncodedPupName = encodeURIComponent(pupName.replaceAll(' ', '-')).toLowerCase();
-      const installedId = pupData.installedId
+      // const urlEncodedSourceName = encodeURIComponent(sourceName.replaceAll(' ', '-')).toLowerCase();
+      // const urlEncodedPupName = encodeURIComponent(pupName.replaceAll(' ', '-')).toLowerCase();
+      const urlEncodedSourceName = sourceName;
+      const urlEncodedPupName = pupName;
+
+      const installedId = pupData.installedId;
 
       const pup = {
-        id: urlEncodedPupName,
+        id: pupName,
+        urlId: urlEncodedPupName,
         source: { id: sourceName, lastUpdated: sourceData.lastUpdated },
         ...pupData,
         versionOutdated,

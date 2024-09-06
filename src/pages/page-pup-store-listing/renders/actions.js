@@ -6,7 +6,9 @@ export function openConfig() {
 }
 
 export function renderActions() {
-  const pkg = this.pkg
+  const pupDefinitionContext = this.context.store?.pupDefinitionContext
+  const pkg = this.pkgController.getPupDefinition(pupDefinitionContext.source.id, pupDefinitionContext.id);
+
   const { statusId, statusLabel, installationId, installationLabel } = pkg.computed
   const styles = css`
     .action-wrap {

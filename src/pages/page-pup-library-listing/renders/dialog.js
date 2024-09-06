@@ -5,7 +5,8 @@ import {
 } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 
 export function renderDialog() {
-  const pkg = this.pkgController.getPup(this.pupId);
+  const pupContext = this.context.store?.pupContext
+  const pkg = this.pkgController.getPup(pupContext.id);
   const { statusId } = pkg.computed
   const readmeEl = html`${unsafeHTML(pkg?.manifest?.docs?.about)}`;
   const depsEl = pkg.manifest?.deps?.pups?.length > 0 

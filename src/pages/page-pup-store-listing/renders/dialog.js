@@ -1,7 +1,8 @@
 import { html, choose, unsafeHTML } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 
 export function renderDialog() {
-  const pkg = this.context.store.pupContext
+  const pupDefinitionContext = this.context.store?.pupDefinitionContext
+  const pkg = this.pkgController.getPupDefinition(pupDefinitionContext.source.id, pupDefinitionContext.id);
   const readmeEl = html`${unsafeHTML(pkg?.manifest?.docs?.about)}`
 
   return html`

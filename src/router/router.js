@@ -89,7 +89,7 @@ export class Router {
         
         if (route.after) {
           for (const func of route.after) {
-            await func(context, commands);
+            func(context, commands);
           }
         }
 

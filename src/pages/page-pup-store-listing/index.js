@@ -42,12 +42,12 @@ class PupInstallPage extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
-    this.pupId = this.context.store.pupDefinitionContext.id;
+    // this.pupId = this.context.store.pupDefinitionContext.id;
+    // this.pkg = this.pkgController.getPupDefinition(
+    //   this.context.store.pupDefinitionContext.source.id,
+    //   this.context.store.pupDefinitionContext.id
+    // );
     this.pkgController.addObserver(this);
-    this.pkg = this.pkgController.getPupDefinition(
-      this.context.store.pupDefinitionContext.source.id,
-      this.context.store.pupDefinitionContext.id
-    );
   }
 
   disconnectedCallback() {
@@ -74,8 +74,37 @@ class PupInstallPage extends LitElement {
   };
 
   render() {
+    const pupDefinitionContext = this.context.store?.pupDefinitionContext
+
+    if (!pupDefinitionContext.ready) {
+      return html`
+      <div id="PageWrapper" class="wrapper">
+        <section>
+          <div class="section-title">
+            <h3 style="color:#777">HoDl tight &nbsp;<sl-spinner style="--indicator-color:#777; position: relative; top: 3px;"></sl-spinner></h3>
+          </div>
+          <!-- TODO More Skeleton -->
+        </section>
+      </div>`
+    }
+
+    if (pupDefinitionContext.result !== 200) {
+      return html`
+      <div id="PageWrapper" class="wrapper">
+        <section>
+          <div class="section-title">
+            <h3>Such Empty</h3>
+            <p>Nothing to see here</p>
+            <!-- TODO Specific error handling -->
+          </div>
+        </section>
+      </div>`
+    }
+
     const path = this.context.store?.appContext?.path || [];
-    const pkg = this.pkg
+    const pkg = this.pkgController.getPupDefinition(pupDefinitionContext.source.id, pupDefinitionContext.id);
+
+    console.log({pkg, pupDefinitionContext});
     const { statusId, statusLabel, installationId, installationLabel } = pkg.computed
     const isLoadingStatus = ["installing"].includes(statusId);
     const hasDependencies = (pkg?.manifest?.deps?.pups || []).length > 0

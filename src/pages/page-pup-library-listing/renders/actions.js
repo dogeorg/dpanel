@@ -23,7 +23,8 @@ export async function handlePurgeFunction() {
 }
 
 export function renderActions() {
-  const pkg = this.pkgController.getPup(this.pupId);;
+  const pupContext = this.context.store?.pupContext
+  const pkg = this.pkgController.getPup(pupContext.id);
   const { installationId, statusId, statusLabel } = pkg.computed
 
   const hasButtons =

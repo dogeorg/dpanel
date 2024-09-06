@@ -1,7 +1,8 @@
 import { html, css, classMap, nothing } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 
 export function renderStatus() {
-  const pkg = this.pkg
+  const pupDefinitionContext = this.context.store?.pupDefinitionContext
+  const pkg = this.pkgController.getPupDefinition(pupDefinitionContext.source.id, pupDefinitionContext.id);
   const { installationId, installationLabel } = pkg.computed
   const isInstalled = pkg.isInstalled
   const isLoadingStatus = ["installing"].includes(installationId);

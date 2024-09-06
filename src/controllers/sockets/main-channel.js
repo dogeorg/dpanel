@@ -91,11 +91,6 @@ class SocketChannel {
           }
           break;
 
-        case "status-change"
-          // emitted on stats.status change
-          // limited payload to status.
-          break;
-
         case "action":
           // emitted in response to an action
           await asyncTimeout(500); // Why?

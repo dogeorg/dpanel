@@ -100,9 +100,12 @@ class DPanelApp extends LitElement {
     // this.outletWrapper = this.shadowRoot.querySelector("#OutletWrapper")
     this.router = new Router(outlet);
     this.router.setRoutes(routes)
-    this.router.addHook(
-      () => store.updateState({ appContext: { menuVisible: false }})
-    )
+
+    // Hide menu on page change
+    this.router.addHook(() => store.updateState({ appContext: { menuVisible: false }}))
+
+    // Clear some contexts on route change
+    this.router.addHook(() => store.clearContext(['pupContext', 'pupDefinitionContext']));
   }
 
   _handleResize() {

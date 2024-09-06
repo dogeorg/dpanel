@@ -5,16 +5,13 @@ class PkgController {
   observers = [];
   actions = [];
 
-  pupIndex = {};
-  installed = [];
-  available = [];
-  packages = [];
+  // Installed packages on system
+  installedPackageIndex = {};
+  installedPackages = [];
 
-  pupIndexV2 = {};
-  installedV2 = [];
-
-  packageIndexBySource = {};
-  availablePackagesAll = [];
+  // Available packges to install.
+  packageDefinitionIndex = {};
+  pacakgeDefinitions = [];
 
   constructor() {
     this.transactionTimeoutChecker();
@@ -49,29 +46,29 @@ class PkgController {
 
   ingestInstalledPup(states, stats) {
     // Convert to array, enrich each state object.
-    this.installedV2 = toArray(states)
+    this.installedPackages = toArray(states)
       .map(s => toEnrichedInstalledPup(s, stats[s.id]));
 
     // Index by id.
-    this.pupIndexV2 = this.installedV2
+    this.installedPackageIndex = this.installedPackages
       .toObject({ key: 'id' });
   }
 
   ingestAvailablePupDefs(storeListingRes) {
-    this.packageIndexBySource = storeListingRes;
-    this.availablePackagesAll = toFlattenedAvailablePupsArray(storeListingRes);
+    this.packageDefinitionIndex = storeListingRes;
+    this.packageDefinitions = toFlattenedAvailablePupsArray(storeListingRes);
     this.notify();
   }
 
   getPupDefinition(sourceId, pupId) {
-    const pup = this.availablePackagesAll.find(
+    const pup = this.packageDefinitions.find(
       p => p.source.id === sourceId && p.id === pupId
     );
     return pup;
   }
 
   getInstalledVersion(sourceId, pupId) {
-    const pup = this.availablePackagesAll.find(
+    const pup = this.packageDefinitions.find(
       p => p.source.id === sourceId && p.id === pupId
     );
     const installedVersion = pup.versions.find(
@@ -80,48 +77,18 @@ class PkgController {
     return installedVersion;
   }
 
-  setDataV2(bootstrapResponseV2) {
+  setData(bootstrapResponseV2) {
     const { states, stats } = bootstrapResponseV2;
     this.ingestInstalledPup(states, stats);
     this.notify();
   }
 
-  setData(bootstrapResponse) {
-    const { installed, available } = toAssembledPup(bootstrapResponse);
-    this.installed = toArray(installed);
-    this.available = toArray(available);
-    this.packages = [...toArray(available), ...toArray(installed)];
-    this.pupIndex = { ...available, ...installed };
-    this.notify();
-  }
-
   getPup(id) {
     if (!id) return;
-    const key = Object.keys(this.pupIndexV2).find(
+    const key = Object.keys(this.installedPackageIndex).find(
       (key) => key.toLowerCase() === id.toLowerCase(),
     );
-    return this.pupIndexV2[key];
-  }
-
-  installPkg(pupId) {
-    // Find the pup in the available list
-    const index = this.available.findIndex((pup) => pup.manifest.id === pupId);
-    if (index !== -1) {
-      // Move the pup from the available list to the installed list
-      const [pup] = this.available.splice(index, 1);
-      this.installed.push(pup);
-      this.notify();
-    }
-  }
-
-  removePkg(pupId) {
-    // Find the pup in the installed list
-    const index = this.installed.findIndex((pup) => pup.id === pupId);
-    if (index !== -1) {
-      // Remove the pup from the installed list
-      this.installed.splice(index, 1);
-      this.notify();
-    }
+    return this.installedPackageIndex[key];
   }
 
   registerAction(txn, callbacks, actionType, pupId, timeout) {

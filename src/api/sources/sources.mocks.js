@@ -18,7 +18,7 @@ function _generateStoreListingResponse(sources) {
     };
 
     pups.forEach((pupName, i) => {
-      response[sourceName].pups[pupName.toLowerCase()] = {
+      response[sourceName].pups[pupName] = {
         installedVersion: "1.0.0",
         installedId: `mock-pup-id-${i}`, // TODO
         latestVersion: "1.0.3",

@@ -2,7 +2,7 @@ import WebSocketClient from "/api/sockets.js";
 import { store } from "/state/store.js";
 import { pkgController } from "/controllers/package/index.js";
 import { asyncTimeout } from "/utils/timeout.js";
-import { performMockCycle, c1, c4, c5 } from "/api/mocks/pup-state-cycle.js";
+import { performMockCycle } from "/api/mocks/pup-state-cycle.js";
 
 async function mockedMainChannelRunner(onMessageCallback) {
   if (store.networkContext.demoSystemPrompt) {
@@ -15,8 +15,8 @@ async function mockedMainChannelRunner(onMessageCallback) {
     }, 2000);
   }
 
-  if (store.networkContext.demoPupLifecycle) {
-    await performMockCycle(c5, (statusUpdate) => onMessageCallback({ data: JSON.stringify(statusUpdate) }))
+  if (true || store.networkContext.demoPupLifecycle) {
+    await performMockCycle((statusUpdate) => onMessageCallback({ data: JSON.stringify(statusUpdate) }))
   }
 }
 
@@ -55,7 +55,7 @@ class SocketChannel {
     };
 
     this.wsClient.onMessage = async (event) => {
-      
+      console.log('MSG!');
       let err, data;
       try {
         data = JSON.parse(event.data);

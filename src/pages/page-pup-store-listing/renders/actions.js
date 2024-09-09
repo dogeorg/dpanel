@@ -18,6 +18,9 @@ export function renderActions() {
 
   const pupDefinitionContext = this.context.store?.pupDefinitionContext
   const def = this.pkgController.getPupDefinition(pupDefinitionContext.source.id, pupDefinitionContext.id);
+
+  console.log({ def }, pupDefinitionContext?.source?.id, pupDefinitionContext?.id, this.pkgController.installedPackages);
+
   const pkg = this.pkgController.getPupByDefinitionData(pupDefinitionContext?.source?.id, pupDefinitionContext?.id)
 
   const installationId = pkg?.computed?.installationId;

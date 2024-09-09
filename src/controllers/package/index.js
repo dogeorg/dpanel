@@ -97,6 +97,7 @@ class PkgController {
     const pup = this.installedPackages.find(
       p => p.source.name === source && p.manifest.meta.name === pupName
     );
+    if (!pup) { console.warn(`Could not find installed pup marching source.name: "${source}", manifest.meta.name: "${pupName}"`)}
     return pup;
   }
 
@@ -200,8 +201,12 @@ class PkgController {
       return;
     }
 
+    console.log('HERE2', pupId, newPupStateData);
+
     const existingStats = this.installedPackageIndex[pupId]?.stats || {};
     this.installedPackageIndex[pupId] = toEnrichedInstalledPup(pupId, newPupStateData, existingStats);
+
+    console.log({ existingStats, installedPup: this.installedPackageIndex[pupId]});
     
     const foundPkgIndex = this.installedPackages.findIndex(installedPkg => installedPkg.id === newPupStateData.id)
     if (foundPkgIndex !== -1) {
@@ -323,6 +328,7 @@ function toArray(object) {
 
 function isValidState(pupState) {
   // TODO. PupState validity check
+  console.log({ pupState });
   return !!(pupState && pupState.manifest)
 }
 

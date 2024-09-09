@@ -30,7 +30,8 @@ function generateRandomStatsV2(states) {
   return Object.keys(states).reduce((stats, stateId) => {
     stats[stateId] = {
       id: stateId,
-      status: Math.random() > 0.5 ? "running" : "stopped",
+      // status: Math.random() > 0.5 ? "running" : "stopped",
+      status: "stopped",
       status_cpu: generateRandomValues(),
       status_disk: generateRandomValues(),
       status_mem: generateRandomValues(),

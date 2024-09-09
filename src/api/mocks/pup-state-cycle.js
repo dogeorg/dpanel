@@ -1,61 +1,62 @@
 import { asyncTimeout } from "/utils/timeout.js";
 
-const msg = {
+const stateMsg = {
   "id": "",
   "error": "",
-  "type": "status",
+  "type": "pup",
   "update": {}
 }
 
-function asStatusUpdate(pupId, newState) {
-  const out = { ...msg }
-  out.update[pupId] = {
-    installation: newState[0],
-    status: newState[1]
+const statsMsg = {
+  "id": "",
+  "error": "",
+  "type": "stats",
+  "update": {}
+}
+
+function asState(pupId, newState) {
+  const out = { ...stateMsg }
+  out.update = {
+    id: pupId,
+    manifest: { meta: { name: pupId }},
+    source: { name: "fdn", },
+    ...newState,
   }
   return out;
 }
 
-export async function performMockCycle(cycle, fn) {
-  for (let i = 0; i < cycle.length; i++) {
-    await asyncTimeout(8000);
-    await fn(asStatusUpdate("ShibeShop", cycle[i]));
+function asStats(pupId, newStats) {
+  const out = { ...statsMsg }
+  out.update[pupId] = {
+    ...newStats
   }
+  return out;
 }
 
-export const c1 = [
-  ["", ""],
-  ["installing", ""],
-  ["unready", ""],
-  ["ready", ""]
-];
+export async function performMockCycle(fn) {
+  await asyncTimeout(3000);
+  // await fn(asStatsUpdate("ShibeShop", cycle[i]));
 
-export const c2 = [
-  ["", ""],
-  ["installing", ""],
-  ["ready", "configure"],
-];
+  // Install the pup
+  await fn(asState("ShibeShop", { installation: "installing", enabled: true }));
+  await asyncTimeout(8000);
 
-export const c3 = [
-  ["", ""],
-  ["installing", ""],
-  ["ready", "configure"],
-];
+  // After install, pup starts
+  await fn(asState("ShibeShop", { installation: "ready" }));
+  await fn(asStats("ShibeShop", { status: "starting" }));
+  await asyncTimeout(8000);
 
-export const c4 = [
-  ["", ""],
-  ["installing", ""],
-  ["broken", ""],
-  ["ready", "needs_config"],
-  ["ready", "starting"],
-  ["ready", "enabled"],
-  ["ready", "stopping"],
-  ["ready", "disabled"],
-];
+  // At users discretion, they stop pup
+  await fn(asStats("ShibeShop", { status: "stopping" }));
+  await asyncTimeout(8000);
+  await fn(asStats("ShibeShop", { status: "stopped" }));
+  await fn(asStats("ShibeShop", { enabled: false }));
 
-export const c5 = [
-  ["ready", "starting"],
-  ["ready", "running"],
-  ["ready", "stopping"],
-  ["ready", "stopped"]
+  // 
+  // await asyncTimeout(8000);
+}
+
+export const PUP_LIFECYCLE = [
+  "installation"
 ]
+

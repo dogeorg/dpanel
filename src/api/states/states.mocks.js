@@ -31,7 +31,7 @@ function generateSourceLocation(manifest) {
 }
 
 function generateSourceName(manifest) {
-  return manifest.meta.name.toLowerCase().replace(/\s+/g, '');
+  return manifest.meta.name;
 }
 
 function generateConfigValues(config) {

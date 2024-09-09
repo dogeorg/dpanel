@@ -18,6 +18,7 @@ import { StoreSubscriber } from "/state/subscribe.js";
 import { pkgController } from "/controllers/package/index.js";
 import { asyncTimeout } from "/utils/timeout.js";
 import { createAlert } from "/components/common/alert.js";
+import { doBootstrap } from '/api/bootstrap/bootstrap.js';
 
 class PupPage extends LitElement {
   static get properties() {
@@ -29,7 +30,10 @@ class PupPage extends LitElement {
       checks: { type: Object },
       pupEnabled: { type: Boolean },
       _confirmedName: { type: String },
-      inflight: { type: Boolean },
+      inflight_startstop: { type: Boolean },
+      inflight_uninstall: { type: Boolean },
+      inflight_purge: { type: Boolean },
+      _HARDCODED_UNINSTALL_WAIT_TIME: { type: Number },
     };
   }
 
@@ -45,6 +49,7 @@ class PupPage extends LitElement {
     this.checks = [];
     this.pupEnabled = false;
     this._confirmedName = "";
+    this._HARDCODED_UNINSTALL_WAIT_TIME = 0;
   }
 
   connectedCallback() {
@@ -134,15 +139,15 @@ class PupPage extends LitElement {
 
   async handleStartStop(e) {
     const pupId = this.context.store.pupContext.id
-    this.inflight = true;
+    this.inflight_startstop = true;
     this.pupEnabled = e.target.checked;
     this.requestUpdate();
 
     const actionName = e.target.checked ? 'start' : 'stop' ;
     const callbacks = {
-      onSuccess: () => { console.log('WOW'); this.inflight = false; },
-      onError: () => { console.log('NOO..'); this.inflight = false; },
-      onTimeout: () => { console.log('TOO SLOW..'); this.inflight = false; }
+      onSuccess: () => { this.inflight_startstop = false; },
+      onError: () => { console.warning('Txn reported an error'); this.inflight_startstop = false; },
+      onTimeout: () => { console.log('Slow txn, no repsonse within ~30 seconds (start/stop)', ); this.inflight_startstop = false; }
     }
     await this.pkgController.requestPupAction(pupId, actionName, callbacks);
   }
@@ -150,17 +155,30 @@ class PupPage extends LitElement {
   async handleUninstall(e) {
     const pupId = this.context.store.pupContext.id
     this.pupEnabled = false;
-    this.inflight = true;
+    this.inflight_uninstall = true;
     this.requestUpdate();
 
     const actionName = 'uninstall'
     const callbacks = {
-      onSuccess: () => console.log('WOW'),
-      onError: () => console.log('NOO..'),
-      onTimeout: () => { console.log('TOO SLOW..'); this.inflight = false; }
+      onSuccess: async () => {
+        await doBootstrap();
+        this.inflight_uninstall = false;
+      },
+      onError: async () => {
+        await doBootstrap();
+        this.inflight_uninstall = false;
+      },
+      onTimeout: async () => {
+        await doBootstrap();
+        this.inflight_uninstall = false;
+      }
     }
     await this.pkgController.requestPupAction(pupId, actionName, callbacks);
-    await asyncTimeout(1500);
+    // TODO
+    // Backend reports uninstalled state too soon, needs backend fix
+    // Workaround: frontend enforces delay of 15 seconds.
+    this._HARDCODED_UNINSTALL_WAIT_TIME = 15000;
+
     this._confirmedName = "";
     this.clearDialog();
   }
@@ -195,10 +213,30 @@ class PupPage extends LitElement {
 
     const path = this.context.store?.appContext?.path || [];
     const pkg = this.pkgController.getPup(pupContext.id);
-    const { installationId, statusId, statusLabel } = pkg.computed
+
+    if (!pkg) return;
+
     const hasChecks = (pkg?.manifest?.checks || []).length > 0;
-    const isLoadingStatus =  ["starting", "stopping", "uninstalling"].includes(statusId);
-    const disableActions = installationId === "uninstalled"
+
+    let labels = pkg?.computed || {}
+    let isInstallationLoadingStatus =  ["uninstalling", "purging"].includes(labels.installationId);
+    let statusInstallationId = labels.installationId === "ready" ? labels.statusId : labels.installationId
+    const isLoadingStatus =  ["starting", "stopping"].includes(labels.statusId);
+    const disableActions = labels.installationId === "uninstalled";
+
+    // Exagerate the uninstallation time until reported correctly by dogeboxd.
+    if (this._HARDCODED_UNINSTALL_WAIT_TIME) {
+      // Temporarily force label to be uninstalling.
+      isInstallationLoadingStatus = true;
+      labels.installationId = "uninstalling";
+      labels.installationLabel = "uninstalling";
+      statusInstallationId = "uninstalling";
+      setTimeout(() => {
+        this._HARDCODED_UNINSTALL_WAIT_TIME = 0;
+        // After allotted wait time, call bootstrap to retreive and render true state.
+        doBootstrap();
+      }, this._HARDCODED_UNINSTALL_WAIT_TIME)
+    }
 
     const renderHealthChecks = () => {
       return this.checks.map(
@@ -210,16 +248,16 @@ class PupPage extends LitElement {
 
     const renderStatusAndActions = () => {
       return html`
-        ${this.renderStatus()}
-        <sl-progress-bar value="0" ?indeterminate=${isLoadingStatus} class="loading-bar ${statusId}"></sl-progress-bar>
-        ${this.renderActions()}
+        ${this.renderStatus(labels)}
+        <sl-progress-bar value="0" ?indeterminate=${isLoadingStatus || isInstallationLoadingStatus} class="loading-bar ${statusInstallationId}"></sl-progress-bar>
+        ${this.renderActions(labels)}
       `
     }
 
     const renderMenu = () => html`
       <action-row prefix="power" name="state" label="Enabled" ?disabled=${disableActions}>
         Enable or disable this Pup
-        <sl-switch slot="suffix" ?checked=${!disableActions && pkg.enabled} @sl-input=${this.handleStartStop} ?disabled=${this.inflight || installationId !== "ready"}></sl-switch>
+        <sl-switch slot="suffix" ?checked=${!disableActions && pkg.enabled} @sl-input=${this.handleStartStop} ?disabled=${this.inflight_startstop || labels.installationId !== "ready"}></sl-switch>
       </action-row>
 
       <action-row prefix="gear" name="configure" label="Configure" .trigger=${this.handleMenuClick} ?disabled=${disableActions}>
@@ -266,7 +304,7 @@ class PupPage extends LitElement {
           <div class="section-title">
             <h3>Status</h3>
           </div>
-          ${renderStatusAndActions()}
+          ${renderStatusAndActions(labels)}
         </section>
 
         <section>
@@ -378,6 +416,7 @@ class PupPage extends LitElement {
       &.starting { --indicator-color: var(--sl-color-primary-600); }
       &.stopping { --indicator-color: var(--sl-color-danger-600); }
       &.uninstalling { --indicator-color: var(--sl-color-danger-600); }
+      &.purging { --indicator-color: var(--sl-color-danger-600); }
     }
   `;
 }

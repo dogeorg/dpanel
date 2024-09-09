@@ -17,6 +17,7 @@ export default class WebSocketClient {
     if (this.useMocks && this.mockEventGenerator) {
       this.startMocking();
     } else {
+      if (!this.token) return
       this.startWebSocketConnection();
     }
   }

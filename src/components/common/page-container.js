@@ -168,7 +168,6 @@ class PageContainer extends LitElement {
 function navigateBack(store, router) {
   // Retrieve path stack from the store
   const pathStack = store.appContext.pathStack;
-  console.log({ pathStack });
 
   // Check if there is more than one path in the stack
   if (pathStack.length > 1) {

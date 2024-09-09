@@ -200,6 +200,25 @@ class DebugSettingsDialog extends LitElement {
             </sl-input>
           </div>
           <div class="form-control">
+            <sl-switch
+              name="overrideBaseUrl"
+              help-text="Force API calls to use base URL below"
+              .checked=${networkContext.overrideSocketBaseUrl}
+              @sl-change=${this.handleToggle}>
+                Override Web Socket Base URL
+            </sl-input>
+          </div>
+          <div class="form-control">
+            <sl-input
+              type="text"
+              name="wsApiBaseUrl"
+              help-text="Web Socket connections wii use this base URL"
+              value=${networkContext.wsApiBaseUrl}
+              @sl-change=${this.handleInput}>
+                Web Socket Base URL
+            </sl-input>
+          </div>
+          <div class="form-control">
             <sl-input
               type="text"
               name="demoSystemPrompt"

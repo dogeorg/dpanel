@@ -1,11 +1,11 @@
-import { loadPup, loadPupDefinition, asPage, performLogout } from "./middleware.js"
+import { isAuthed, loadPup, loadPupDefinition, asPage, performLogout } from "./middleware.js"
 
 export const routes = [
   {
     path: "/",
     component: "x-page-home",
     pageTitle: "Home",
-    before: [asPage]
+    before: [isAuthed, asPage]
   },
   {
     path: "/logout",
@@ -19,26 +19,26 @@ export const routes = [
     path: "/stats",
     component: "x-page-stats",
     pageTitle: "Stats",
-    before: [asPage]
+    before: [isAuthed, asPage]
   },
   {
     path: "/settings",
     component: "x-page-settings",
     pageTitle: "Settings",
-    before: [asPage]
+    before: [isAuthed, asPage]
   },
   {
     path: "/pups",
     component: "x-page-pup-library",
     pageTitle: "Installed Pups",
-    before: [asPage]
+    before: [isAuthed, asPage]
   },
   {
     path: "/pups/:pup/:name",
     component: "x-page-pup-library-listing",
     dynamicTitle: true,
     pageAction: "back",
-    before: [asPage],
+    before: [isAuthed, asPage],
     after: [loadPup],
     animate: true,
   },
@@ -47,7 +47,7 @@ export const routes = [
     component: "x-page-pup-logs",
     pageTitle: "Logs",
     pageAction: "close",
-    before: [asPage],
+    before: [isAuthed, asPage],
     after: [loadPup],
     animate: true,
   },
@@ -55,14 +55,14 @@ export const routes = [
     path: "/explore",
     component: "x-page-pup-store",
     pageTitle: "Explore Pups",
-    before: [asPage],
+    before: [isAuthed, asPage],
   },
   {
     path: "/explore/:source/:name",
     component: "x-page-pup-store-listing",
     dynamicTitle: true,
     pageAction: "back",
-    before: [asPage],
+    before: [isAuthed, asPage],
     after: [loadPupDefinition],
     animate: true,
   },
@@ -71,7 +71,7 @@ export const routes = [
     component: "x-page-pup-iframe",
     dynamicTitle: true,
     pageAction: "close",
-    before: [loadPup, asPage],
+    before: [isAuthed, asPage],
     animate: true
   }
 ]

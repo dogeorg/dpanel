@@ -5,7 +5,7 @@ import {
   getResponse,
 } from './get-ip.mocks.js'
 
-const client = new ApiClient('http://localhost:3000', store.networkContext)
+const client = new ApiClient(store.networkContext.apiBaseUrl, store.networkContext)
 
 export async function getIP() {
   const res = await client.get(`/reflector/ip`, { mock: getResponse });

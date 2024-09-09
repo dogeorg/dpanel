@@ -78,7 +78,7 @@ class LogViewer extends LitElement {
     }
 
     this.wsClient = new WebSocketClient(
-      `ws://localhost:3000/logs/${this.pupId}`,
+      `${store.networkContext.WsApiBaseUrl}/logs/${this.pupId}`,
       store.networkContext,
       mockedLogRunner
     );

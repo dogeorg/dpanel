@@ -1,4 +1,5 @@
 import { html, css, nothing } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
+import { doBootstrap } from "/api/bootstrap/bootstrap.js";
 
 export function openConfig() {
   this.open_dialog = "configure";
@@ -11,22 +12,33 @@ export function openDeps() {
 }
 
 export async function handlePurgeFunction() {
-  this.inflight = true;
+  this.inflight_purge = true;
   const pupId = this.context.store?.pupContext.id
   this.requestUpdate();
 
   const callbacks = {
-    onSuccess: () => { console.log('WOW'); this.inflight = false; },
-    onError: () => { console.log('NOO..'); this.inflight = false; },
-    onTimeout: () => { console.log('TOO SLOW..'); this.inflight = false; }
+    onSuccess: async () => {
+      await doBootstrap();
+      this.inflight_purge = false;
+      window.location.href = window.location.origin + "/pups";
+    },
+    onError: async () => {
+      await doBootstrap();
+      this.inflight_purge = false;
+    },
+    onTimeout: async () => {
+      await doBootstrap();
+      window.location.href = window.location.origin + "/pups";
+      this.inflight_purge = false;
+    }
   }
   await this.pkgController.requestPupAction(pupId, 'purge', callbacks);
 }
 
-export function renderActions() {
+export function renderActions(labels) {
   const pupContext = this.context.store?.pupContext
   const pkg = this.pkgController.getPup(pupContext.id);
-  const { installationId, statusId, statusLabel } = pkg.computed
+  const { installationId, statusId, statusLabel } = labels
 
   const hasButtons =
     ["needs_deps", "needs_config"].includes(statusId)
@@ -70,10 +82,11 @@ export function renderActions() {
       ` : nothing }
 
       ${installationId === 'uninstalled' ? html`
-        <sl-button variant="danger" size="large" ?loading=${this.inflight} @click=${this.handlePurgeFunction}>
-          Purge Data & Settings
+        <sl-button variant="danger" outline size="large" @click=${this.handlePurgeFunction}>
+          Cleanup storage
         </sl-button>
       ` : nothing }
+
 
       ${pkg.manifest.gui ? html`
         <div style="display: flex; align-items: center;">

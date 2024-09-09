@@ -41,7 +41,7 @@ class SocketChannel {
     }
 
     this.wsClient = new WebSocketClient(
-      "ws://localhost:3000/ws/state/",
+      `${store.networkContext.wsApiBaseUrl}/ws/state/`,
       store.networkContext,
       mockedMainChannelRunner,
     );
@@ -59,9 +59,6 @@ class SocketChannel {
       let err, data;
       try {
         data = JSON.parse(event.data);
-        if (data?.update && data.update[0] && data.update[0]?.status) {
-          // console.log("REPORTED STATUS:", data.update[0].status, data);
-        }
       } catch (err) {
         console.warn("failed to JSON.parse incoming event", event, err);
         err = true;
@@ -78,7 +75,6 @@ class SocketChannel {
       switch (data.type) {
         case "pup":
           // emitted on state change (eg: installing, ready)
-          console.log("PUP EVENT RECEIVED:", data.update.id, data.update.installation, data.update)
           pkgController.updatePupModel(data.update.id, data.update)
           break;
 
@@ -86,7 +82,6 @@ class SocketChannel {
           // emitted on an interval (contains current status and vitals)
           if (data && data.update && Array.isArray(data.update)) {
             data.update.forEach((statsUpdatePayload) => {
-              console.log('stats', statsUpdatePayload.status, statsUpdatePayload.id);
               pkgController.updatePupStatsModel(statsUpdatePayload.id, statsUpdatePayload)
             });
           }

@@ -5,7 +5,7 @@ import {
   storeListingMock
 } from './sources.mocks.js'
 
-const client = new ApiClient('http://localhost:3000', store.networkContext)
+const client = new ApiClient(store.networkContext.apiBaseUrl, store.networkContext)
 
 export async function getStoreListing() {
   return client.get('/sources/store', { mock: storeListingMock });

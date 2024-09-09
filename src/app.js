@@ -123,11 +123,9 @@ class DPanelApp extends LitElement {
   async fetchBootstrap() {
     try {
       const res = await getBootstrapV2()
-      this.pkgController.setData(res);
+      if (res) { this.pkgController.setData(res); }
     } catch (err) {
-      console.error(err);
-    } finally {
-      // this.fetchLoading = false
+      // TODO. improve unauthorised handling
     }
   }
 

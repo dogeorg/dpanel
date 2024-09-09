@@ -5,7 +5,7 @@ import {
   postResponse,
 } from './set-network.mocks.js'
 
-const client = new ApiClient('http://localhost:3000', store.networkContext)
+const client = new ApiClient(store.networkContext.apiBaseUrl, store.networkContext)
 
 export async function putNetwork(body) {
   const res = await client.put(`/system/network/set-pending`, body, { mock: postResponse });

@@ -47,13 +47,13 @@ class PkgController {
   ingestInstalledPup(states, stats) {
     // Convert to array, enrich each state object.
     this.installedPackages = toArray(states)
+      .filter(s => isValidState(s))
       .map(s => toEnrichedInstalledPup(s.id, s, stats[s.id]));
 
     // Index by id.
     this.installedPackageIndex = this.installedPackages
       .toObject({ key: 'id' });
 
-    console.log(this.installedPackages);
   }
 
   ingestAvailablePupDefs(storeListingRes) {
@@ -168,7 +168,6 @@ class PkgController {
       case "PUP-ACTION":
         // TODO.
         if (foundAction.pupId === '--') {
-          console.log('Odd pupId for action', foundAction.pupId);
           return;
         }
         this.updatePupModel(foundAction.pupId, payload.update);
@@ -187,7 +186,6 @@ class PkgController {
   }
 
   updatePupStatsModel(pupId, newPupStatsData) {
-    console.log('updatePupStatsModel', pupId);
     if (this.installedPackageIndex[pupId]) {      
       this.installedPackageIndex[pupId].stats = newPupStatsData;
       this.installedPackageIndex[pupId].computed = computeVals(pupId, this.installedPackageIndex[pupId], newPupStatsData);
@@ -196,20 +194,23 @@ class PkgController {
   }
 
   updatePupModel(pupId, newPupStateData) {
+
+    if (!isValidState(newPupStateData)) {
+      console.warn('Validation error. Invalid pupState structure')
+      return;
+    }
+
     const existingStats = this.installedPackageIndex[pupId]?.stats || {};
     this.installedPackageIndex[pupId] = toEnrichedInstalledPup(pupId, newPupStateData, existingStats);
     
     const foundPkgIndex = this.installedPackages.findIndex(installedPkg => installedPkg.id === newPupStateData.id)
-    console.log('found pkg index:', foundPkgIndex);
     if (foundPkgIndex !== -1) {
       this.installedPackages[foundPkgIndex] = this.installedPackageIndex[pupId];
     } else {
       // Pup not yet present on available array. Push it to array
-      console.log('here. pushing to array');
       this.installedPackages.push(this.installedPackageIndex[pupId]);
     }
 
-    console.log('GOT TO NOTIFY');
     this.notify();
   }
 
@@ -256,7 +257,7 @@ class PkgController {
     }
 
     const actionType = "PUP-ACTION";
-    const timeoutMs = 15000; // 3 seconds
+    const timeoutMs = 15000; // 15 seconds
 
     // Make a network call
     const res = await pickAndPerformPupAction(pupId, action, body).catch((err) => {
@@ -320,6 +321,11 @@ function toArray(object) {
   return Object.values(object);
 }
 
+function isValidState(pupState) {
+  // TODO. PupState validity check
+  return !!(pupState && pupState.manifest)
+}
+
 function toObject(array) {
   return array.reduce((obj, value, index) => {
     obj[index] = value;
@@ -352,6 +358,10 @@ function determineInstallationId(state) {
 
   if (installation === "uninstalled") {
     return { id: "uninstalled", label: "uninstalled" };
+  }
+
+  if (installation === "purging") {
+    return { id: "purging", label: "cleaning" };
   }
 
   return { id: "unknown", label: "unknown" };
@@ -434,7 +444,6 @@ function computeVals(pupId, pupState, pupStats) {
 }
 
 function toEnrichedInstalledPup(pupId, pupState, pupStats) {
-  console.log("toEnrichedInstalledPup", {pupId, pupState, pupStats});
   return {
     ...pupState,
     stats: pupStats,

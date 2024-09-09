@@ -104,6 +104,8 @@ class PupInstallPage extends LitElement {
     const path = this.context.store?.appContext?.path || [];
     const pkg = this.pkgController.getPupDefinition(pupDefinitionContext.source.id, pupDefinitionContext.id);
 
+    if (!pkg) return;
+
     const { statusId, statusLabel, installationId, installationLabel } = pkg.computed
     const hasDependencies = (pkg?.manifest?.deps?.pups || []).length > 0
     const popover_page = path[1];

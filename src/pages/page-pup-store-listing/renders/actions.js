@@ -74,9 +74,9 @@ export async function handleInstall() {
   const def = this.pkgController.getPupDefinition(pupDefinitionContext.source.id, pupDefinitionContext.id);
   this.inflight = true;
   const callbacks = {
-    onSuccess: () => { console.log('WOW'); this.inflight = false; },
-    onError: () => { console.log('NOO..'); this.inflight = false; },
-    onTimeout: () => { console.log('TOO SLOW..'); this.inflight = false; }
+    onSuccess: () => { this.inflight = false; },
+    onError: () => { console.log('Txn reported an error'); this.inflight = false; },
+    onTimeout: () => { console.log('Slow txn, no repsonse within ~30 seconds (install)'); this.inflight = false; }
   }
   const body = {
     sourceName: def.source.id,

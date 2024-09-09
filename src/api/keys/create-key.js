@@ -5,7 +5,7 @@ import {
   postResponse,
 } from './create-key.mocks.js'
 
-const client = new ApiClient('http://localhost:3000', store.networkContext)
+const client = new ApiClient(store.networkContext.apiBaseUrl, store.networkContext)
 
 export async function createKey(password) {
   const res = await client.post(`/keys/create-master`, { password }, { mock: postResponse });

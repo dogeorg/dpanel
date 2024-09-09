@@ -5,8 +5,6 @@ export function renderStatus() {
   const def = this.pkgController.getPupDefinition(pupDefinitionContext.source.id, pupDefinitionContext.id);
   const pkg = this.pkgController.getPupByDefinitionData(pupDefinitionContext?.source?.id, pupDefinitionContext?.id)
 
-  console.log('pkg view', {def, pkg}, );
-
   const installationId = pkg?.computed?.installationId;
   const installationLabel = pkg?.computed?.installationLabel;
 

@@ -9,7 +9,7 @@ import {
   purgeMock
 } from './action.mocks.js'
 
-const client = new ApiClient('http://localhost:3000', store.networkContext)
+const client = new ApiClient(store.networkContext.apiBaseUrl, store.networkContext)
 
 export async function installPup(pupId, body) {
   return client.put(`/pup`, body, { mock: installMock });

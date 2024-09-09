@@ -26,7 +26,7 @@ export function renderDialog() {
   const uninstallEl = html`
     <p>Are you sure you want to uninstall ${pkg.manifest.meta.name}?</p>
     <sl-input placeholder="Type '${pkg.manifest.meta.name}' to confirm" @sl-input=${(e) => this._confirmedName = e.target.value }></sl-input>
-    <sl-button slot="footer" variant="danger" @click=${this.handleUninstall} ?loading=${this.inflight} ?disabled=${this.inflight || this._confirmedName !== pkg.manifest.meta.name}>Uninstall</sl-button>
+    <sl-button slot="footer" variant="danger" @click=${this.handleUninstall} ?loading=${this.inflight_uninstall} ?disabled=${this.inflight_uninstall || this._confirmedName !== pkg.manifest.meta.name}>Uninstall</sl-button>
     <style>p:first-of-type { margin-top: 0px; }</style>
   `;
 

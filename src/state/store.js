@@ -16,12 +16,14 @@ class Store {
     };
     this.networkContext = this.networkContext || {
       // Define network state here
-      apiBaseUrl: "http://localhost:3000",
+      apiBaseUrl: `${window.location.protocol}//${window.location.hostname}:3000`,
+      wsApiBaseUrl: `ws://${window.location.hostname}:3000`,
       overrideBaseUrl: false,
-      useMocks: true,
+      overrideSocketBaseUrl: false,
+      useMocks: false,
       forceFailures: false,
       forceDelayInSeconds: 0,
-      reqLogs: true,
+      reqLogs: false,
       status: "online",
       token: false,
       demoSystemPrompt: "",

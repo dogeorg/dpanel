@@ -1,12 +1,26 @@
-export default class WebSocketClient {
+import { ReactiveClass } from "/utils/class-reactive.js";
+import { store } from "/state/store.js";
+import { StoreSubscriber } from "/state/subscribe.js";
+
+export default class WebSocketClient extends ReactiveClass {
   constructor(url, networkContext, mockEventGenerator) {
+    super();
+
+    this.context = new StoreSubscriber(this, store);
+    this.networkContext = this.context.store.networkContext;
+
     this.url = url;
     this.useMocks = networkContext?.useMocks;
-    this.token = networkContext.token
+    this.token = this.networkContext.token
     this.mockEventGenerator = mockEventGenerator;
     this.stopMocking = () => console.log('Stop function not provided.');
     this.socket = null;
     this._isConnected = false;
+  }
+
+  requestUpdate() {
+    super.requestUpdate();
+    this.networkContext = this.context.store.networkContext;
   }
 
   connect() {

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en" class="sl-theme-dark dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PUP Install DogeBox Alpha</title>
+
+    <!-- Shoelace Dark Theme -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/dark.css">
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Comic Neue', sans-serif;
+            padding: 0;
+            margin: 0;
+            background: radial-gradient(circle, #00374C -69%, #000000 100%);
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            overflow: auto;
+            height: 100vh;
+        }
+
+        .form-container {
+            background-color: #333;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .form-container sl-input,
+        .form-container sl-button {
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        sl-dialog::part(panel) {
+            background-color: #333;
+            color: white;
+        }
+
+        .dogebox-logo {
+            max-width: 200px;
+            margin: 10px auto;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Form Container -->
+    <div class="form-container">
+        <img src="https://raw.githubusercontent.com/dogeorg/dogebox/main/docs/img/dogebox-logo.png" alt="DogeBox PuP Install" class="dogebox-logo">
+        <h2>Easy PuP Install</h2>
+        <sl-input id="ip-address" type="text" placeholder="DogeBox IP Address" required></sl-input>
+        <sl-input id="password" type="password" placeholder="DogeBox Password" required></sl-input>
+        <sl-input id="pup-url" type="url" value="https://github.com/SomeoneWeird/test-pup" required></sl-input>
+        <sl-button variant="warning" id="submit-btn">Much Add PuP</sl-button>
+    </div>
+
+    <!-- Success Dialog -->
+    <sl-dialog label="Success" id="success-dialog">
+        <p>Such request sent successfully! Opening the explore page...</p>
+        <sl-button slot="footer" variant="warning" id="close-dialog">So Close</sl-button>
+    </sl-dialog>
+
+    <!-- jQuery and Custom Script -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function validateIP(ip) {
+            const ipRegex = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+            return ipRegex.test(ip);
+        }
+
+        function getRepoName(url) {
+            return url.substring(url.lastIndexOf('/') + 1);
+        }
+
+        $(document).ready(function () {
+            $('#submit-btn').click(async function () {
+                const ip = $('#ip-address').val();
+                const password = $('#password').val();
+                const pupUrl = $('#pup-url').val();
+
+                // Validate inputs
+                if (!validateIP(ip)) {
+                    alert("Invalid IP Address");
+                    return;
+                }
+
+                if (!password || !pupUrl) {
+                    alert("Please fill all fields.");
+                    return;
+                }
+
+                try {
+                    // Authenticate
+                    const authResponse = await $.ajax({
+                        url: `http://${ip}:3000/authenticate`,
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({ password }),
+                    });
+
+                    if (authResponse.success) {
+                        const token = authResponse.token;
+                        const repoName = getRepoName(pupUrl);
+
+                        // Send PUT request to /source
+                        await $.ajax({
+                            url: `http://${ip}:3000/source`,
+                            type: 'PUT',
+                            contentType: 'application/json',
+                            headers: { Authorization: `Bearer ${token}` },
+                            data: JSON.stringify({
+                                type: 'git',
+                                location: pupUrl,
+                                name: repoName
+                            }),
+                            success: function () {
+                                // Show success dialog
+                                const dialog = document.getElementById('success-dialog');
+                                dialog.show();
+
+                                // After closing the dialog, open the explore page
+                                $('#close-dialog').click(function () {
+                                    dialog.hide();
+                                    window.location.href = `http://${ip}:8080/explore`;
+                                });
+                            },
+                            error: function (xhr) {
+                                if (xhr.status === 500) {
+                                    alert("Much Sad, The PUP is already installed.");
+                                } else {
+                                    alert('Much Sad, An error occurred: ' + xhr.statusText);
+                                }
+                            }
+                        });
+                    } else {
+                        alert('Much Sad, Authentication failed.');
+                    }
+                } catch (error) {
+                    alert('Much Sad, Error during request: ' + error.message);
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>

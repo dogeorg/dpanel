@@ -64,7 +64,7 @@ export function isAuthed(context, commands) {
 }
 
 export function performLogout(context, commands) {
-  store.updateState({ networkContext: { token: false } });
+  store.updateState({ networkContext: { token: null } });
   return commands.redirect("/login");
 }
 

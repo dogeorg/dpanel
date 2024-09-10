@@ -422,8 +422,8 @@ Array.prototype.toObject = function(options = {}) {
 };
 
 function computeVals(pupId, pupState, pupStats) {
-  const urlEncodedPupName = pupState.manifest.meta.name;
-  const urlEncodedSourceName = pupState.source.name;
+  const urlEncodedPupName = encodeURIComponent(pupState.manifest.meta.name);
+  const urlEncodedSourceName = encodeURIComponent(pupState.source.name);
 
   // const urlEncodedPupame = encodeURIComponent(pupState.manifest.meta.name.replaceAll(' ', '-')).toLowerCase();
   // const urlEncodedSourceName = encodeURIComponent(pupState.source.name.replaceAll(' ', '-')).toLowerCase();
@@ -473,8 +473,8 @@ function toFlattenedAvailablePupsArray(sources) {
       const installation = determineInstallationId(pupData);
       // const urlEncodedSourceName = encodeURIComponent(sourceName.replaceAll(' ', '-')).toLowerCase();
       // const urlEncodedPupName = encodeURIComponent(pupName.replaceAll(' ', '-')).toLowerCase();
-      const urlEncodedSourceName = sourceName;
-      const urlEncodedPupName = pupName;
+      const urlEncodedSourceName = encodeURIComponent(sourceName);
+      const urlEncodedPupName = encodeURIComponent(pupName);
 
       const installedId = pupData.installedId;
 

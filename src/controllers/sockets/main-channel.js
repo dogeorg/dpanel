@@ -3,6 +3,7 @@ import { store } from "/state/store.js";
 import { pkgController } from "/controllers/package/index.js";
 import { asyncTimeout } from "/utils/timeout.js";
 import { performMockCycle, c1, c4, c5 } from "/api/mocks/pup-state-cycle.js";
+import { isUnauthedRoute } from "/utils/url-utils.js";
 
 async function mockedMainChannelRunner(onMessageCallback) {
   if (store.networkContext.demoSystemPrompt) {
@@ -31,12 +32,16 @@ class SocketChannel {
     this.setupSocketConnection();
 
     if (!this.isConnected) {
-      this.wsClient.connect();
+      this.wsClient && this.wsClient.connect();
     }
   }
 
   setupSocketConnection() {
     if (this.isConnected) {
+      return;
+    }
+
+    if (isUnauthedRoute()) {
       return;
     }
 

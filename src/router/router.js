@@ -8,11 +8,6 @@ export class Router {
 
     this.setupLinkInterceptor();
 
-    // Ensure route is processed on app start (else no component).
-    window.onload = () => {
-      this.handleNavigation(window.location.pathname);
-    };
-
     // Ensure route is processed on popstate (eg: browser back button)
     // Else no component.
     window.onpopstate = () => {
@@ -24,6 +19,10 @@ export class Router {
     routes.forEach((route) => {
       this.addRoute(route.path, route.component, route);
     });
+  }
+
+  processCurrentRoute() {
+    this.handleNavigation(window.location.pathname);
   }
 
   addRoute(path, component, route) {

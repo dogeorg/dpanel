@@ -1,3 +1,5 @@
+import { isUnauthedRoute, hasFlushParam } from "/utils/url-utils.js";
+
 class Store {
   subscribers = [];
 
@@ -45,13 +47,13 @@ class Store {
       hashedPassword: null,
       view: null,
     };
+
     // Hydrate state from localStorage unless flush parameter is present.
-    const CURRENT_HREF = window.location.href; 
-    if (!["/login", "/logout", "?flush"].includes(CURRENT_HREF)) {
+    if (!isUnauthedRoute() && !hasFlushParam()) {
       this.hydrate();
-      if (CURRENT_HREF.includes("?flush")) {
-        window.location = window.location.origin + window.location.pathname;
-      }
+    }
+    if (hasFlushParam()) {
+      window.location = window.location.origin + window.location.pathname;
     }
   }
 

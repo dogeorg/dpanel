@@ -40,6 +40,7 @@ import { routes } from "/router/config.js";
 // Utils
 import debounce from "/utils/debounce.js";
 import { bindToClass } from "/utils/class-bind.js";
+import { isUnauthedRoute, hasFlushParam } from "/utils/url-utils.js";
 
 // Apis
 import { getBootstrapV2 } from "/api/bootstrap/bootstrap.js";
@@ -55,6 +56,7 @@ import { pkgController } from "/controllers/package/index.js"
 
 class DPanelApp extends LitElement {
   static properties = {
+    ready: { type: Boolean },
     menuAnimating: { type: Boolean },
     systemPromptActive: { type: Boolean },
   };
@@ -68,6 +70,7 @@ class DPanelApp extends LitElement {
 
   constructor() {
     super();
+    this.ready = false;
     this.context = new StoreSubscriber(this, store);
     this.menuAnimating = false;
     this.systemPromptActive = false;
@@ -102,8 +105,8 @@ class DPanelApp extends LitElement {
   }
 
   async firstUpdated() {
-    // Fetch bootstrap first (TODO - improve condition).
-    if (!window.location.href.includes('/log')) {
+    // Fetch bootstrap if not on an unauthenticated route (ie, login/logout);
+    if (!isUnauthedRoute() && !hasFlushParam()) {
       this.fetchBootstrap();
     }
 
@@ -112,12 +115,17 @@ class DPanelApp extends LitElement {
     // this.outletWrapper = this.shadowRoot.querySelector("#OutletWrapper")
     this.router = new Router(outlet);
     this.router.setRoutes(routes)
+    this.router.processCurrentRoute();
 
     // Hide menu on page change
     this.router.addHook(() => store.updateState({ appContext: { menuVisible: false }}))
 
     // Clear some contexts on route change
     this.router.addHook(() => store.clearContext(['pupContext', 'pupDefinitionContext']));
+
+    if (isUnauthedRoute()) {
+      setTimeout(() => { this.ready = true; }, 1500)
+    }
   }
 
   async fetchBootstrap() {
@@ -125,7 +133,9 @@ class DPanelApp extends LitElement {
       const res = await getBootstrapV2()
       if (res) { this.pkgController.setData(res); }
     } catch (err) {
-      // TODO. improve unauthorised handling
+      console.warn('Failed to fetch bootstrap')
+    } finally {
+      this.ready = true;
     }
   }
 
@@ -182,9 +192,13 @@ class DPanelApp extends LitElement {
     });
 
     return html`
+      <div class="loader-overlay" style="display:${!this.ready ? 'flex' : 'none'}"">
+        <sl-spinner style="font-size: 2rem; --indicator-color: #bbb;"></sl-spinner>
+      </div>
+
       ${showChrome ? this.renderNav(CURPATH) : nothing}
       <main id="Main" class=${mainClasses}>
-        <div id="Outlet"></div>
+        <div id="Outlet" style="display:${this.ready ? 'block' : 'none'}"></div>
       </main>
       ${showChrome ? this.renderFooter() : nothing}
 

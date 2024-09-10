@@ -11,8 +11,8 @@ export default class ApiClient extends ReactiveClass {
     this.context = new StoreSubscriber(this, store);
     this.networkContext = this.context.store.networkContext;
 
-    if (networkContext && networkContext.overrideBaseUrl) {
-      this.baseURL = networkContext.apiBaseUrl || 'http://nope.localhost:6969';
+    if (this.networkContext && this.networkContext.overrideBaseUrl) {
+      this.baseURL = this.networkContext.apiBaseUrl || 'http://nope.localhost:6969';
     }
   }
 

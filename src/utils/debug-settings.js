@@ -227,7 +227,12 @@ class DebugSettingsDialog extends LitElement {
               @sl-change=${this.handleInput}>
                 Force Prompt by Name
             </sl-input>
-
+          </div>
+          <div class="form-control">
+            <sl-button variant="warning" @click=${() => store.updateState({ networkContext: { token: "invalid-token-here" }})}>Invalidate Auth Token</sl-buton>
+          </div>
+          <div class="form-control">
+            <sl-button variant="danger" @click=${() => store.updateState({ networkContext: { token: false }})}>Clear Auth Token</sl-buton>
           </div>
         </form>
         <div slot="footer">

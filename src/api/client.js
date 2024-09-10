@@ -1,13 +1,24 @@
 import { mocks } from "./mocks.js";
+import { store } from "/state/store.js";
+import { ReactiveClass } from "/utils/class-reactive.js";
+import { StoreSubscriber } from "/state/subscribe.js";
 
-export default class ApiClient {
+export default class ApiClient extends ReactiveClass {
   constructor(baseURL, networkContext = {}) {
+    super();
     this.baseURL = baseURL
-    this.networkContext = networkContext;
 
-    if (networkContext && networkContext.overrideBaseUrl) {
-      this.baseURL = networkContext.apiBaseUrl || 'http://nope.localhost:6969';
+    this.context = new StoreSubscriber(this, store);
+    this.networkContext = this.context.store.networkContext;
+
+    if (this.networkContext && this.networkContext.overrideBaseUrl) {
+      this.baseURL = this.networkContext.apiBaseUrl || 'http://nope.localhost:6969';
     }
+  }
+
+  requestUpdate() {
+    super.requestUpdate();
+    this.networkContext = this.context.store.networkContext;
   }
 
   async get(path, config = {}) {

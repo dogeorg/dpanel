@@ -2,8 +2,6 @@ class Store {
   subscribers = [];
 
   constructor() {
-    this.hydrate();
-    // If there's no persisted state, initialize with defaults.
     this.appContext = this.appContext || {
       // Define application state here
       orienation: "landscape",
@@ -16,6 +14,8 @@ class Store {
     };
     this.networkContext = this.networkContext || {
       // Define network state here
+      // apiBaseUrl: 'http://192.168.0.110:3000',
+      // wsApiBaseUrl: 'ws://192.168.0.110:3000',
       apiBaseUrl: `${window.location.protocol}//${window.location.hostname}:3000`,
       wsApiBaseUrl: `ws://${window.location.hostname}:3000`,
       overrideBaseUrl: false,
@@ -45,6 +45,14 @@ class Store {
       hashedPassword: null,
       view: null,
     };
+    // Hydrate state from localStorage unless flush parameter is present.
+    const CURRENT_HREF = window.location.href; 
+    if (!["/login", "/logout", "?flush"].includes(CURRENT_HREF)) {
+      this.hydrate();
+      if (CURRENT_HREF.includes("?flush")) {
+        window.location = window.location.origin + window.location.pathname;
+      }
+    }
   }
 
   subscribe(controller) {

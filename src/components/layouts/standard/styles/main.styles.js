@@ -15,6 +15,13 @@ export const mainStyles = css`
     font-style: normal;
   }
 
+  .loader-overlay {
+    height: calc(100vh - 3em);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
   #Main {
     flex-grow: 1;
     

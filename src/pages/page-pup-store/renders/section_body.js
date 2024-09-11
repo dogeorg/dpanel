@@ -10,7 +10,6 @@ var pupCardGrid = css`
 
 export function renderSectionHeader(ready) {
 
-
   return html`
 
     <!-- div class="actions">
@@ -52,15 +51,16 @@ export function renderSectionBody(ready, SKELS, hasItems) {
 
     ${ready && hasItems('packages') ? html`
       <div class="pup-card-grid">
-        ${repeat(this.packageList.getCurrentPageData(), (pkg) => `${pkg.source.id}-${pkg.id}`, (pkg) => html`
+        ${repeat(this.packageList.getCurrentPageData(), (pkg) => `${pkg.def.source.id}-${pkg.def.key}`, (pkg) => html`
           <pup-install-card
             icon="box"
-            pupId="${pkg.source.id}-${pkg.id}"
-            pupName=${pkg.versionLatest.meta.name}
-            version=${pkg.versionLatest.version}
-            short=${pkg.versionLatest.meta.descShort}
-            ?installed=${pkg.isInstalled}
-            href=${pkg.computed.url.store}
+            sourceId="${pkg.def.source.id}"
+            defKey="${pkg.def.key}"
+            pupName=${pkg.def.key}
+            version="${pkg.def.latestVersion}"
+            short="Its over 9000"
+            ?installed=${pkg.computed.isInstalled}
+            href=${pkg.computed.storeURL}
           ></pup-install-card>
         `)}
       </div>

@@ -9,8 +9,8 @@ import '/components/common/paginator/paginator-ui.js';
 import '/components/common/page-banner.js';
 
 const initialSort = (a, b) => {
-  if (a.versionLatest.meta.name < b.versionLatest.meta.name) { return -1; }
-  if (a.versionLatest.meta.name > b.versionLatest.meta.name) { return 1; }
+  if (a?.def?.versions[a?.def?.versionLatest]?.meta?.name < b?.def?.versions[b?.def?.versionLatest]?.meta?.name) { return -1; }
+  if (a?.def?.versions[a?.def?.versionLatest] > b?.def?.versions[b?.def?.versionLatest]?.meta?.name) { return 1; }
   return 0;
 }
 
@@ -113,9 +113,9 @@ class StoreView extends LitElement {
     this.dispatchEvent(new CustomEvent('busy-start', {}));
 
     try {
-      const res = await getStoreListing()
-      this.pkgController.ingestAvailablePupDefs(res);
-      this.packageList.setData(this.pkgController.packageDefinitions);
+      const storeListingRes = await getStoreListing()
+      this.pkgController.setStoreData(storeListingRes);
+      this.packageList.setData(this.pkgController.pups);
     } catch (err) {
       console.error(err);
       this.fetchError = true;

@@ -1,7 +1,8 @@
 export class Router {
   constructor(outlet, options = {}) {
     this.routes = [];
-    this.hooks = [];
+    this.beforeHooks = [];
+    this.afterHooks = [];
     this.outlet = outlet;
     this.transitionDuration = options.transitionDuration || 300;
     this.currentTransition = null;
@@ -40,8 +41,12 @@ export class Router {
     });
   }
 
-  addHook(fn) {
-    this.hooks.push(fn);
+  addBeforeHook(fn) {
+    this.beforeHooks.push(fn);
+  }
+
+  addAfterHook(fn) {
+    this.afterHooks.push(fn);
   }
 
   go(path, replace = false) {
@@ -76,6 +81,10 @@ export class Router {
 
     const processRoute = async () => {
       try {
+        for (const func of this.beforeHooks) {
+          const commandResult = await func(context, commands);
+        }
+
         if (route.before) {
           for (const func of route.before) {
             const commandResult = await func(context, commands);
@@ -92,7 +101,7 @@ export class Router {
           }
         }
 
-        for (const func of this.hooks) {
+        for (const func of this.afterHooks) {
           const commandResult = await func(context, commands);
         }
       } catch (error) {

@@ -31,13 +31,12 @@ class Store {
       demoSystemPrompt: "",
     };
     this.pupContext = {
-      // Define pup state here
-      manifest: {},
-      state: {},
-      computed: {},
-    };
-    this.pupDefinitionContext = {
-      computed: {},
+      computed: null,
+      def: null,
+      state: null,
+      stats: null,
+      ready: false,
+      result: null
     };
     this.promptContext = {
       display: false,
@@ -139,9 +138,6 @@ class Store {
     }
     if (partialState.pupContext) {
       this.pupContext = { ...this.pupContext, ...partialState.pupContext };
-    }
-    if (partialState.pupDefinitionContext) {
-      this.pupDefinitionContext = { ...this.pupDefinitionContext, ...partialState.pupDefinitionContext };
     }
     if (partialState.promptContext) {
       this.promptContext = {

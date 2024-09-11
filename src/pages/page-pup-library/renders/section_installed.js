@@ -61,16 +61,17 @@ export function renderSectionInstalledBody(ready, SKELS, hasItems) {
 
     ${ready && hasItems('installed') ? html`
       <div class="pup-card-grid">
-        ${repeat(this.installedList.getCurrentPageData(), (pkg) => `${pkg.id}-${pkg.version}`, (pkg) => html`
+        ${repeat(this.installedList.getCurrentPageData(), (pkg) => `${pkg.state.id}-${pkg.state.version}`, (pkg) => html`
           <pup-card
             icon="box"
-            pupId=${pkg.id}
-            pupName=${pkg.manifest.meta.name}
-            version=${pkg.version}
-            status=${pkg.computed.statusLabel}
-            href=${pkg.computed.url.library}
-            gref=${pkg.computed.url.ui}
-            ?hasGui=${!!pkg.manifest.gui} // TOMOO
+            pupId=${pkg.state.id}
+            pupName=${pkg.state.manifest.meta.name}
+            version=${pkg.state.version}
+            status="TODO"
+            _status=${pkg.computed.statusLabel}
+            href=${pkg.computed.libraryURL}
+            gref=${pkg.computed.pupURL}
+            ?hasGui=${false}
           ></pup-card>
         `)}
       </div>

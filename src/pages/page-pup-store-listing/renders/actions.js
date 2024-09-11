@@ -79,7 +79,7 @@ export async function handleInstall() {
     onTimeout: () => { console.log('Slow txn, no repsonse within ~30 seconds (install)'); this.inflight = false; }
   }
   const body = {
-    sourceName: def.source.id,
+    sourceId: def.source.id,
     pupName: def.versionLatest.meta.name,
     pupVersion: def.versionLatest.meta.version
   }

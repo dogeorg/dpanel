@@ -423,7 +423,7 @@ Array.prototype.toObject = function(options = {}) {
 
 function computeVals(pupId, pupState, pupStats) {
   const urlEncodedPupName = encodeURIComponent(pupState.manifest.meta.name);
-  const urlEncodedSourceName = encodeURIComponent(pupState.source.name);
+  const urlEncodedSourceId = encodeURIComponent(pupState.source.id);
 
   // const urlEncodedPupame = encodeURIComponent(pupState.manifest.meta.name.replaceAll(' ', '-')).toLowerCase();
   // const urlEncodedSourceName = encodeURIComponent(pupState.source.name.replaceAll(' ', '-')).toLowerCase();
@@ -434,7 +434,7 @@ function computeVals(pupId, pupState, pupStats) {
     url: {
       gui: `/explore/${pupId}/${urlEncodedPupName}/ui`,
       library: `/pups/${pupId}/${urlEncodedPupName}`,
-      store: `/explore/${urlEncodedSourceName}/${urlEncodedPupName}`,
+      store: `/explore/${urlEncodedSourceId}/${urlEncodedPupName}`,
     },
     statusId: status.id,
     statusLabel: status.label,
@@ -454,7 +454,7 @@ function toEnrichedInstalledPup(pupId, pupState, pupStats) {
 function toFlattenedAvailablePupsArray(sources) {
   const pupsArray = [];
 
-  for (const [sourceName, sourceData] of Object.entries(sources)) {
+  for (const [sourceId, sourceData] of Object.entries(sources)) {
     for (const [pupName, pupData] of Object.entries(sourceData.pups)) {
 
       const versions = Object.entries(pupData.versions).map(([version, versionData]) => ({
@@ -465,6 +465,7 @@ function toFlattenedAvailablePupsArray(sources) {
 
       const installedVersionNumber = pupData.installedVersion;
       const versionLatest = pupData.latestVersion && versions.find(v => v.version === pupData.latestVersion) || {}
+
       const versionInstalled = pupData.isInstalled && versions.find(v => v.version === installedVersionNumber) || {}
       const versionOutdated = pupData.isInstalled && pupData.latestVersion !== pupData.installedVersion;
 
@@ -473,7 +474,7 @@ function toFlattenedAvailablePupsArray(sources) {
       const installation = determineInstallationId(pupData);
       // const urlEncodedSourceName = encodeURIComponent(sourceName.replaceAll(' ', '-')).toLowerCase();
       // const urlEncodedPupName = encodeURIComponent(pupName.replaceAll(' ', '-')).toLowerCase();
-      const urlEncodedSourceName = encodeURIComponent(sourceName);
+      const urlEncodedSourceId = encodeURIComponent(sourceId);
       const urlEncodedPupName = encodeURIComponent(pupName);
 
       const installedId = pupData.installedId;
@@ -481,7 +482,7 @@ function toFlattenedAvailablePupsArray(sources) {
       const pup = {
         id: pupName,
         urlId: urlEncodedPupName,
-        source: { id: sourceName, lastUpdated: sourceData.lastUpdated },
+        source: { id: sourceId, lastUpdated: sourceData.lastUpdated },
         ...pupData,
         versionOutdated,
         versionInstalled,
@@ -489,7 +490,7 @@ function toFlattenedAvailablePupsArray(sources) {
         versions,
         computed: {
           url: {
-            store: `/explore/${urlEncodedSourceName}/${urlEncodedPupName}`,
+            store: `/explore/${urlEncodedSourceId}/${urlEncodedPupName}`,
             library: `/pups/${installedId}/${urlEncodedPupName}`,
           },
           statusId: status.id,

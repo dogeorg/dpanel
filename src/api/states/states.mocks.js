@@ -12,6 +12,7 @@ export function generateStatesV2(manifests) {
       needsConf: false,
       needsDeps: false,
       source: {
+        id: generateSourceId(manifest),
         location: generateSourceLocation(manifest),
         name: generateSourceName(manifest),
         type: "git",
@@ -28,6 +29,10 @@ function generateRandomIp() {
 
 function generateSourceLocation(manifest) {
   return `https://github.com/flibble/${manifest.meta.name.toLowerCase().replace(/\s+/g, '-')}.git`;
+}
+
+function generateSourceId(manifest) {
+  return manifest.meta.name.toLowerCase().replace(/\s+/g, '-') + '-source';
 }
 
 function generateSourceName(manifest) {

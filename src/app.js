@@ -118,10 +118,10 @@ class DPanelApp extends LitElement {
     this.router.processCurrentRoute();
 
     // Hide menu on page change
-    this.router.addHook(() => store.updateState({ appContext: { menuVisible: false }}))
+    this.router.addAfterHook(() => store.updateState({ appContext: { menuVisible: false }}))
 
     // Clear some contexts on route change
-    this.router.addHook(() => store.clearContext(['pupContext', 'pupDefinitionContext']));
+    this.router.addBeforeHook(() => store.clearContext(['pupContext']));
 
     if (isUnauthedRoute()) {
       setTimeout(() => { this.ready = true; }, 1500)

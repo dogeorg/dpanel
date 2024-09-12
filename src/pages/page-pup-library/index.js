@@ -8,8 +8,8 @@ import { bindToClass } from '/utils/class-bind.js'
 import * as renderMethods from './renders/index.js';
 
 const initialSort = (a, b) => {
-  if (a.manifest.package < b.manifest.package) { return -1; }
-  if (a.manifest.package > b.manifest.package) { return 1; }
+  if (a.state.manifest.package < b.state.manifest.package) { return -1; }
+  if (a.state.manifest.package > b.state.manifest.package) { return 1; }
   return 0;
 }
 
@@ -104,7 +104,7 @@ class LibraryView extends LitElement {
     try {
       const res = await getBootstrapV2()
       this.pkgController.setData(res);
-      this.installedList.setData(this.pkgController.installedPackages);
+      this.installedList.setData(this.pkgController.pups.filter(p => p.state));
     } catch (err) {
       console.error(err);
       this.fetchError = true;

@@ -40,13 +40,16 @@ class PupInstallPage extends LitElement {
     this.inflight = false;
   }
 
+  getPup() {
+    return this.pkgController.getPupMaster({ 
+      sourceId: this.context.store.pupContext.def.source.id,
+      pupName: this.context.store.pupContext.def.key,
+      lookupType: "byDefSourceIdAndPupName"
+    }).pup
+  }
+
   connectedCallback() {
     super.connectedCallback();
-    // this.pupId = this.context.store.pupDefinitionContext.id;
-    // this.pkg = this.pkgController.getPupDefinition(
-    //   this.context.store.pupDefinitionContext.source.id,
-    //   this.context.store.pupDefinitionContext.id
-    // );
     this.pkgController.addObserver(this);
   }
 
@@ -74,9 +77,9 @@ class PupInstallPage extends LitElement {
   };
 
   render() {
-    const pupDefinitionContext = this.context.store?.pupDefinitionContext
+    const pupContext = this.context.store?.pupContext
 
-    if (!pupDefinitionContext.ready) {
+    if (!pupContext.ready) {
       return html`
       <div id="PageWrapper" class="wrapper">
         <section>
@@ -88,7 +91,7 @@ class PupInstallPage extends LitElement {
       </div>`
     }
 
-    if (pupDefinitionContext.result !== 200) {
+    if (pupContext.result !== 200) {
       return html`
       <div id="PageWrapper" class="wrapper">
         <section>
@@ -102,12 +105,12 @@ class PupInstallPage extends LitElement {
     }
 
     const path = this.context.store?.appContext?.path || [];
-    const pkg = this.pkgController.getPupDefinition(pupDefinitionContext.source.id, pupDefinitionContext.id);
+    const pkg = this.getPup();
 
     if (!pkg) return;
 
-    const { statusId, statusLabel, installationId, installationLabel } = pkg.computed
-    const hasDependencies = (pkg?.manifest?.deps?.pups || []).length > 0
+    const { statusId, statusLabel, installationId, installationLabel } = pkg?.computed
+    // const hasDependencies = (pkg?.state.manifest?.deps?.pups || []).length > 0
     const popover_page = path[1];
 
     const wrapperClasses = classMap({
@@ -115,13 +118,13 @@ class PupInstallPage extends LitElement {
       installed: ["ready", "unready"].includes(installationId),
     });
 
-    const renderDependancyList = () => {
-      return pkg.manifest.deps.pups.map((dep) => html`
-        <action-row prefix="box-seam" name=${dep.id} label=${dep.name} href=${`/explore/${dep.id}/${dep.name}`}>
-          ${dep.condition}
-        </action-row>
-      `);
-    };
+    // const renderDependancyList = () => {
+    //   return pkg.state.manifest.deps.pups.map((dep) => html`
+    //     <action-row prefix="box-seam" name=${dep.id} label=${dep.name} href=${`/explore/${dep.id}/${dep.name}`}>
+    //       ${dep.condition}
+    //     </action-row>
+    //   `);
+    // };
 
     return html`
       <div id="PageWrapper" class="${wrapperClasses}" ?data-freeze=${popover_page}>
@@ -134,12 +137,12 @@ class PupInstallPage extends LitElement {
           <div class="section-title">
             <h3>Description</h3>
             <reveal-row>
-              <p>${pkg?.versionLatest?.meta?.shortDescription}<br/>${pkg?.versionLatest?.meta?.longDescription}</p>
+              <p>${pkg.def.versions[pkg.def.latestVersion].meta.shortDescription}<br/>${pkg?.versionLatest?.meta?.longDescription}</p>
             </reveal-row>
           </div>
         </section>
 
-        ${hasDependencies ? html`
+        ${false && hasDependencies ? html`
           <section>
             <div class="section-title">
               <h3>Dependencies</h3>

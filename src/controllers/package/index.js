@@ -5,13 +5,10 @@ class PkgController {
   observers = [];
   actions = [];
 
-  // Installed packages on system
-  installedPackageIndex = {};
-  installedPackages = [];
-
-  // Available packges to install.
-  packageDefinitionIndex = {};
-  pacakgeDefinitions = [];
+  pups = []
+  stateIndex = {}
+  statsIndex = {}
+  sourcesIndex = {}
 
   constructor() {
     this.transactionTimeoutChecker();
@@ -44,60 +41,151 @@ class PkgController {
     }
   }
 
-  ingestInstalledPup(states, stats) {
-    // Convert to array, enrich each state object.
-    this.installedPackages = toArray(states)
-      .filter(s => isValidState(s))
-      .map(s => toEnrichedInstalledPup(s.id, s, stats[s.id]));
-
-    // Index by id.
-    this.installedPackageIndex = this.installedPackages
-      .toObject({ key: 'id' });
-
-  }
-
-  ingestAvailablePupDefs(storeListingRes) {
-    this.packageDefinitionIndex = storeListingRes;
-    this.packageDefinitions = toFlattenedAvailablePupsArray(storeListingRes);
-    this.notify();
-  }
-
-  getPupDefinition(sourceId, pupId) {
-    const pup = this.packageDefinitions.find(
-      p => p.source.id === sourceId && p.id === pupId
-    );
-    return pup;
-  }
-
-  getInstalledVersion(sourceId, pupId) {
-    const pup = this.packageDefinitions.find(
-      p => p.source.id === sourceId && p.id === pupId
-    );
-    const installedVersion = pup.versions.find(
-      v => v.version === pup.installedVersion
-    )
-    return installedVersion;
-  }
-
   setData(bootstrapResponseV2) {
     const { states, stats } = bootstrapResponseV2;
-    this.ingestInstalledPup(states, stats);
+    this.handleBootstrapResponse(states, stats);
     this.notify();
   }
 
-  getPup(id) {
-    if (!id) return;
-    const key = Object.keys(this.installedPackageIndex).find(
-      (key) => key.toLowerCase() === id.toLowerCase(),
-    );
-    return this.installedPackageIndex[key];
+  setStoreData(storeListingRes) {
+    this.handleSourcesResponse(storeListingRes);
+    this.notify();
   }
 
-  getPupByDefinitionData(source, pupName) {
-    const pup = this.installedPackages.find(
-      p => p.source.name === source && p.manifest.meta.name === pupName
-    );
-    return pup;
+  handleBootstrapResponse(states, stats) {
+    this.stateIndex = states;
+    this.statsIndex = stats
+
+    for (const [stateKey, stateData] of Object.entries(states)) {
+
+      // Do we have this pup in memory?
+      const { pup, index } = this.getPupMaster({ pupId: stateKey })
+
+      // Update it in place.
+      if (pup) {
+        this.pups[index] = {
+          ...this.pups[index],
+          state: stateData,
+          stats: stats[stateKey]
+        }
+        this.pups[index].computed = {
+          ...this.pups[index].computed,
+          ...this.determineCalculatedVals(this.pups[index])
+        }
+      }
+
+      if (!pup) {
+        let newPup = {
+          computed: null,
+          def: null,
+          state: stateData,
+          stats: stats[stateKey],
+        }
+        newPup.computed = this.determineCalculatedVals(newPup);
+        this.pups.push(newPup);
+      }
+    }
+  }
+
+  determineCalculatedVals(pup) {
+    const isInstalled = !!pup.state
+    const status = determineStatusId(pup.state, pup.stats);
+    const installation = determineInstallationId(pup.state);
+    let out;
+    try {
+      out = {
+        isInstalled,
+        statusId: status.id,
+        statusLabel: status.label,
+        installationId: installation.id,
+        installationLabel: installation.label,
+        // Convention: /explore/:source_id/:pup_name
+        storeURL: isInstalled
+          ? `/explore/${pup.state.source.id}/${encodeURIComponent(pup.state.manifest.meta.name)}`
+          : `/explore/${pup.def.source.id}/${encodeURIComponent(pup.def.key)}`,
+        // Convention: /pups/:pup_id/:pup_name
+        libraryURL: isInstalled
+          ? `/pups/${pup.state.id}/${encodeURIComponent(pup.state.manifest.meta.name)}`
+          : null
+      }
+    } catch (err) {
+      console.error('error occurred with computed vals', error);
+    }
+    return out
+  }
+
+  handleSourcesResponse(sources) {
+    this.sourcesIndex = sources;
+
+    try {
+      for (const [sourceId, sourceData] of Object.entries(sources)) {
+        for (const [pkgName, pupDefinitionData] of Object.entries(sourceData.pups)) {
+
+          // Do we have this pup in memory?
+          const foundIndex = this.pups.findIndex(pup => (
+            (pup?.state?.source?.id === sourceId &&
+            pup?.state?.manifest?.meta?.name === pkgName)) ||
+            (pup?.def?.source?.id === sourceId &&
+            pup?.def?.key === pkgName)
+          )
+
+          const def = {
+            ...pupDefinitionData,
+            key: pkgName,
+            source: { id: sourceId, lastChecked: sourceData.lastChecked },
+          }
+
+          // Update it in place.
+          const found = foundIndex >= 0;
+          if (found) {
+            this.pups[foundIndex] = {
+              ...this.pups[foundIndex],
+              def
+            }
+            this.pups[foundIndex].computed = {
+              ...this.pups[foundIndex].computed,
+              ...this.determineCalculatedVals(this.pups[foundIndex])
+            }
+          }
+
+          // Not found. create and push to pups array.
+          if (!found) {
+            let pup = {
+              computed: null,
+              def,
+              state: null,
+              stats: null,
+            }
+            pup.computed = this.determineCalculatedVals(pup);
+            this.pups.push(pup)
+          }
+        }
+      }
+    } catch (definitionProcessingError) {
+      console.debug('Issue while processing pup definiions')
+      console.error(definitionProcessingError);
+    }
+  }
+
+  getPupMaster({ pupId, sourceId, pupName, lookupType }) {
+    try {
+      let result = null;
+      let index = -1;
+
+      if (this.stateIndex[pupId]) {
+        index = this.pups.findIndex(p => p.state.id === pupId);
+        result = index !== -1 ? this.pups[index] : null;
+      }
+
+      if (!result && this.sourcesIndex[sourceId] && this.sourcesIndex[sourceId].pups[pupName]) {
+        index = this.pups.findIndex(p => p.def.source.id === sourceId && p.def.key === pupName);
+        result = index !== -1 ? this.pups[index] : null;
+      }
+
+      return { pup: result, index };
+    } catch (err) {
+      return { pup: null, index: -1 };
+    }
   }
 
   registerAction(txn, callbacks, actionType, pupId, timeout) {
@@ -136,13 +224,16 @@ class PkgController {
       actionType,
       pupId,
       issuedAt,
-      expireAt
+      expireAt,
     });
   }
 
   resolveAction(txn, payload) {
-    const foundActionIndex = this.actions.findIndex((action) => action.txn === txn);
-    const foundAction = foundActionIndex !== -1 ? this.actions[foundActionIndex] : null;
+    const foundActionIndex = this.actions.findIndex(
+      (action) => action.txn === txn,
+    );
+    const foundAction =
+      foundActionIndex !== -1 ? this.actions[foundActionIndex] : null;
     if (!foundAction) {
       console.warn("pkgController: ACTION NOT FOUND.", { txn });
       return;
@@ -167,7 +258,7 @@ class PkgController {
         break;
       case "PUP-ACTION":
         // TODO.
-        if (foundAction.pupId === '--') {
+        if (foundAction.pupId === "--") {
           return;
         }
         this.updatePupModel(foundAction.pupId, payload.update);
@@ -186,31 +277,65 @@ class PkgController {
   }
 
   updatePupStatsModel(pupId, newPupStatsData) {
-    if (this.installedPackageIndex[pupId]) {      
-      this.installedPackageIndex[pupId].stats = newPupStatsData;
-      this.installedPackageIndex[pupId].computed = computeVals(pupId, this.installedPackageIndex[pupId], newPupStatsData);
+    if (this.stateIndex[newPupStatsData.id]) {
+      // Update index data in place.
+      this.statsIndex[newPupStatsData.id] = newPupStatsData
+
+      // Update pup array data in place
+      const foundIndex = this.pups.findIndex(p => p.state.id === newPupStatsData.id)
+      if (foundIndex >= 0) {
+        this.pups[foundIndex].stats = newPupStatsData;
+        this.pups[foundIndex].computed = this.determineCalculatedVals(this.pups[foundIndex])
+      }
+
+      // Notify subscribers of change
       this.notify();
+
+    } else {
+      // Not handled.  Pup stats data only updated if pup is in memory.
+      // Todo. Reconsider this assumption as needed.
     }
   }
 
   updatePupModel(pupId, newPupStateData) {
-
     if (!isValidState(newPupStateData)) {
-      console.warn('Validation error. Invalid pupState structure')
+      console.warn("Validation error. Invalid pupState structure");
       return;
     }
 
-    const existingStats = this.installedPackageIndex[pupId]?.stats || {};
-    this.installedPackageIndex[pupId] = toEnrichedInstalledPup(pupId, newPupStateData, existingStats);
-    
-    const foundPkgIndex = this.installedPackages.findIndex(installedPkg => installedPkg.id === newPupStateData.id)
-    if (foundPkgIndex !== -1) {
-      this.installedPackages[foundPkgIndex] = this.installedPackageIndex[pupId];
+    const n = newPupStateData
+    const { pup, index } = this.getPupMaster({ pupId: n.id, sourceId: n.source.id, pupName: n.manifest.meta.name });
+
+    if (pup) {
+      this.stateIndex[newPupStateData.id] = newPupStateData
+
+      // Update pup array data in place
+      let updated = {
+        ...this.pups[index],
+        state: newPupStateData,
+      }
+
+      updated.computed = this.determineCalculatedVals(updated)
+
+      this.pups[index] = updated
     } else {
-      // Pup not yet present on available array. Push it to array
-      this.installedPackages.push(this.installedPackageIndex[pupId]);
+      // When receiving a pupState event for a pup NOT found in the stateIndex
+      // We add it as a new entry.  This is likely a record for a newly installed pup
+      // The user has clicked "install", and the client has received a pup event before
+      // the user has called /bootstrap.
+      let pup = {
+        computed: null,
+        def: this.sourcesIndex[newPupStateData.source.id]?.pups[newPupStateData.manifest.meta.name] || null,
+        state: newPupStateData,
+        stats: this.statsIndex[newPupStateData.id] || null,
+      }
+      pup.computed = this.determineCalculatedVals(pup);
+
+      this.stateIndex[pup.state.id] = newPupStateData;
+      this.pups.push(pup)
     }
 
+    // Notify subscribers of change
     this.notify();
   }
 
@@ -260,9 +385,11 @@ class PkgController {
     const timeoutMs = 15000; // 15 seconds
 
     // Make a network call
-    const res = await pickAndPerformPupAction(pupId, action, body).catch((err) => {
-      console.error(err);
-    });
+    const res = await pickAndPerformPupAction(pupId, action, body).catch(
+      (err) => {
+        console.error(err);
+      },
+    );
 
     if (!res || res.error) {
       callbacks.onError({
@@ -289,20 +416,25 @@ class PkgController {
       this.actions.forEach((a) => {
         if (!a.expireAt) return;
 
-        if (Date.now() > a.expireAt && typeof a.callbacks.onTimeout === "function") {
+        if (
+          Date.now() > a.expireAt &&
+          typeof a.callbacks.onTimeout === "function"
+        ) {
           try {
-            const registeredActionIndex = this.actions.findIndex((b) => b.id === a.id);
+            const registeredActionIndex = this.actions.findIndex(
+              (b) => b.id === a.id,
+            );
             this.actions.splice(registeredActionIndex, 1);
             a.callbacks.onTimeout();
-          } catch(err) {
-            console.warn('registered onTimeout fn for txn threw an error when called');
+          } catch (err) {
+            console.warn(
+              "registered onTimeout fn for txn threw an error when called",
+            );
           }
         }
-
-      })
+      });
     }, 1000);
   }
-
 }
 
 // Instance holder
@@ -323,7 +455,7 @@ function toArray(object) {
 
 function isValidState(pupState) {
   // TODO. PupState validity check
-  return !!(pupState && pupState.manifest)
+  return !!(pupState && pupState.manifest);
 }
 
 function toObject(array) {
@@ -372,15 +504,15 @@ function determineStatusId(state, stats) {
   const status = stats?.status;
   const flags = {
     needs_deps: state?.needs_deps,
-    needs_config: state?.needs_config
-  }
+    needs_config: state?.needs_config,
+  };
 
   if (installation === "uninstalling") {
-    return { id: "uninstalling", label: "Uninstalling" }
+    return { id: "uninstalling", label: "Uninstalling" };
   }
 
   if (installation === "uninstalled") {
-    return { id: "uninstalled", label: "Uninstalled" }
+    return { id: "uninstalled", label: "Uninstalled" };
   }
 
   if (flags.needs_deps) {
@@ -408,100 +540,4 @@ function determineStatusId(state, stats) {
   }
 
   return { id: "unknown", label: "unknown" };
-}
-
-// Extend Array prototype (for toObject convenience method)
-Array.prototype.toObject = function(options = {}) {
-  const key = options.key || 'id';
-  return this.reduce((obj, item) => {
-    if (item && typeof item === 'object' && key in item) {
-      obj[item[key]] = item;
-    }
-    return obj;
-  }, {});
-};
-
-function computeVals(pupId, pupState, pupStats) {
-  const urlEncodedPupName = encodeURIComponent(pupState.manifest.meta.name);
-  const urlEncodedSourceId = encodeURIComponent(pupState.source.id);
-
-  // const urlEncodedPupame = encodeURIComponent(pupState.manifest.meta.name.replaceAll(' ', '-')).toLowerCase();
-  // const urlEncodedSourceName = encodeURIComponent(pupState.source.name.replaceAll(' ', '-')).toLowerCase();
-  const status = determineStatusId(pupState, pupStats);
-  const installation = determineInstallationId(pupState);
-
-  return {
-    url: {
-      gui: `/explore/${pupId}/${urlEncodedPupName}/ui`,
-      library: `/pups/${pupId}/${urlEncodedPupName}`,
-      store: `/explore/${urlEncodedSourceId}/${urlEncodedPupName}`,
-    },
-    statusId: status.id,
-    statusLabel: status.label,
-    installationId: installation.id,
-    installationLabel: installation.label
-  }
-}
-
-function toEnrichedInstalledPup(pupId, pupState, pupStats) {
-  return {
-    ...pupState,
-    stats: pupStats,
-    computed: computeVals(pupId, pupState, pupStats)
-  }
-}
-
-function toFlattenedAvailablePupsArray(sources) {
-  const pupsArray = [];
-
-  for (const [sourceId, sourceData] of Object.entries(sources)) {
-    for (const [pupName, pupData] of Object.entries(sourceData.pups)) {
-
-      const versions = Object.entries(pupData.versions).map(([version, versionData]) => ({
-        version,
-        ...versionData
-      }));
-
-
-      const installedVersionNumber = pupData.installedVersion;
-      const versionLatest = pupData.latestVersion && versions.find(v => v.version === pupData.latestVersion) || {}
-
-      const versionInstalled = pupData.isInstalled && versions.find(v => v.version === installedVersionNumber) || {}
-      const versionOutdated = pupData.isInstalled && pupData.latestVersion !== pupData.installedVersion;
-
-      // COMPUTED
-      const status = determineStatusId({});
-      const installation = determineInstallationId(pupData);
-      // const urlEncodedSourceName = encodeURIComponent(sourceName.replaceAll(' ', '-')).toLowerCase();
-      // const urlEncodedPupName = encodeURIComponent(pupName.replaceAll(' ', '-')).toLowerCase();
-      const urlEncodedSourceId = encodeURIComponent(sourceId);
-      const urlEncodedPupName = encodeURIComponent(pupName);
-
-      const installedId = pupData.installedId;
-
-      const pup = {
-        id: pupName,
-        urlId: urlEncodedPupName,
-        source: { id: sourceId, lastUpdated: sourceData.lastUpdated },
-        ...pupData,
-        versionOutdated,
-        versionInstalled,
-        versionLatest,
-        versions,
-        computed: {
-          url: {
-            store: `/explore/${urlEncodedSourceId}/${urlEncodedPupName}`,
-            library: `/pups/${installedId}/${urlEncodedPupName}`,
-          },
-          statusId: status.id,
-          statusLabel: status.label,
-          installationId: installation.id,
-          installationLabel: installation.label
-        }
-      };
-      pupsArray.push(pup);
-    }
-  }
-
-  return pupsArray;
 }

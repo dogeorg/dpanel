@@ -59,3 +59,70 @@ export const c5 = [
   ["ready", "stopping"],
   ["ready", "stopped"]
 ]
+
+export const mockInstallEvent = {
+  "id": "internal",
+  "error": "",
+  "type": "pup",
+  "update": {
+    "id": "23956456098893245a104cb39e9c055f",
+    "source": {
+      "id": "b215d6a7bcf215ca00e02f9cb6a41d12",
+      "name": "s1w test pup",
+      "description": "",
+      "location": "https://github.com/SomeoneWeird/test-pup.git",
+      "type": "git"
+    },
+    "manifest": {
+      "manifestVersion": 1,
+      "meta": {
+        "name": "s1w test pup",
+        "version": "0.0.8",
+        "logoPath": "",
+        "shortDescription": "my little test pup",
+        "longDescription": "this pup has two services that run in it, server1 and server2. They each host a http server on port 8080 and 8081 respectively."
+      },
+      "config": { "sections": null },
+      "container": {
+        "build": {
+          "nixFile": "pup.nix",
+          "nixFileSha256": "bb405c5f11b287cf8f01fd9d8dc504ffe43f2efa9ba292902e761c8670d798eb"
+        },
+        "services": [
+          {
+            "name": "server1",
+            "command": { "exec": "/bin/server1", "cwd": "", "env": null }
+          },
+          {
+            "name": "server2",
+            "command": { "exec": "/bin/server2", "cwd": "", "env": null }
+          }
+        ],
+        "exposes": [
+          {
+            "type": "admin",
+            "trafficType": "http",
+            "port": 8080,
+            "interfaces": null
+          },
+          {
+            "type": "admin",
+            "trafficType": "http",
+            "port": 8081,
+            "interfaces": null
+          }
+        ]
+      },
+      "interfaces": null,
+      "dependencies": []
+    },
+    "config": {},
+    "providers": null,
+    "installation": "installing",
+    "enabled": false,
+    "needsConf": false,
+    "needsDeps": false,
+    "ip": "10.0.0.16",
+    "version": "0.0.8"
+  }
+}

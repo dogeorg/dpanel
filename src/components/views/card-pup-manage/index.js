@@ -52,7 +52,7 @@
               <div class="inner">
                 <span class="name">${pupName}</span>
                 <span class="version">${version}</span>
-                <span class=${statusClassMap}>${status === "running" ? "Enabled" : status}</span>
+                <span class=${statusClassMap}>${status}</span>
               </div>
             </div>
 

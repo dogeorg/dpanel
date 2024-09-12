@@ -1,4 +1,4 @@
-import { isAuthed, loadPup, loadPupDefinition, asPage, performLogout } from "./middleware.js"
+import { isAuthed, loadPup, asPage, performLogout } from "./middleware.js"
 
 export const routes = [
   {
@@ -34,7 +34,7 @@ export const routes = [
     before: [isAuthed, asPage]
   },
   {
-    path: "/pups/:pup/:name",
+    path: "/pups/:pupid/:pupname",
     component: "x-page-pup-library-listing",
     dynamicTitle: true,
     pageAction: "back",
@@ -58,16 +58,16 @@ export const routes = [
     before: [isAuthed, asPage],
   },
   {
-    path: "/explore/:source/:name",
+    path: "/explore/:sourceid/:pupname",
     component: "x-page-pup-store-listing",
     dynamicTitle: true,
     pageAction: "back",
     before: [isAuthed, asPage],
-    after: [loadPupDefinition],
+    after: [loadPup],
     animate: true,
   },
   {
-    path: "/explore/:pup/:name/ui",
+    path: "/explore/:pupid/:pupname/ui",
     component: "x-page-pup-iframe",
     dynamicTitle: true,
     pageAction: "close",

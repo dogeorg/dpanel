@@ -11,18 +11,15 @@ export const storeListingMock = {
 function _generateStoreListingResponse(sources) {
   const response = {};
 
-  for (const [sourceName, pups] of Object.entries(sources)) {
-    response[sourceName] = {
+  for (const [sourceId, pups] of Object.entries(sources)) {
+    response[sourceId] = {
       lastUpdated: new Date().toISOString(),
       pups: {}
     };
 
     pups.forEach((pupName, i) => {
-      response[sourceName].pups[pupName.toLowerCase()] = {
-        installedVersion: "1.0.0",
-        installedId: `mock-pup-id-${i}`, // TODO
+      response[sourceId].pups[pupName.toLowerCase()] = {
         latestVersion: "1.0.3",
-        isInstalled: true,
         versions: {
           "0.0.1": generateVersionData("0.0.1", pupName),
           "1.0.0": generateVersionData("1.0.0", pupName),
@@ -62,8 +59,6 @@ function generateStoreListingResponse() {
       lastUpdated: "2024-09-04T10:23:14+10:00",
       pups: {
         "mock-test-pup": {
-          installedVersion: "",
-          isInstalled: false,
           versions: {
             "": {
               config: {

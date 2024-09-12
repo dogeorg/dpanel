@@ -52,12 +52,15 @@ class PupPage extends LitElement {
     this._HARDCODED_UNINSTALL_WAIT_TIME = 0;
   }
 
+  getPup() {
+    return this.pkgController.getPupMaster({ 
+      pupId: this.context.store.pupContext.state.id,
+      lookupType: "byStatePupId"
+    }).pup
+  }
+
   connectedCallback() {
     super.connectedCallback();
-    // Observers with a pupId will be requested to
-    // update when state for that pup changes
-    // this.pupId = this.context.store.pupContext.id;
-    // this.pupEnabled = this.pkgController.getPup(this.pupId)?.enabled
     this.pkgController.addObserver(this);
   }
 
@@ -138,7 +141,7 @@ class PupPage extends LitElement {
   }
 
   async handleStartStop(e) {
-    const pupId = this.context.store.pupContext.id
+    const pupId = this.context.store.pupContext.state.id
     this.inflight_startstop = true;
     this.pupEnabled = e.target.checked;
     this.requestUpdate();
@@ -153,7 +156,7 @@ class PupPage extends LitElement {
   }
 
   async handleUninstall(e) {
-    const pupId = this.context.store.pupContext.id
+    const pupId = this.context.store.pupContext.state.id
     this.pupEnabled = false;
     this.inflight_uninstall = true;
     this.requestUpdate();
@@ -212,11 +215,11 @@ class PupPage extends LitElement {
     }
 
     const path = this.context.store?.appContext?.path || [];
-    const pkg = this.pkgController.getPup(pupContext.id);
+    const pkg = this.getPup();
 
     if (!pkg) return;
 
-    const hasChecks = (pkg?.manifest?.checks || []).length > 0;
+    const hasChecks = (pkg.state.manifest?.checks || []).length > 0;
 
     let labels = pkg?.computed || {}
     let isInstallationLoadingStatus =  ["uninstalling", "purging"].includes(labels.installationId);
@@ -257,11 +260,11 @@ class PupPage extends LitElement {
     const renderMenu = () => html`
       <action-row prefix="power" name="state" label="Enabled" ?disabled=${disableActions}>
         Enable or disable this Pup
-        <sl-switch slot="suffix" ?checked=${!disableActions && pkg.enabled} @sl-input=${this.handleStartStop} ?disabled=${this.inflight_startstop || labels.installationId !== "ready"}></sl-switch>
+        <sl-switch slot="suffix" ?checked=${!disableActions && pkg.state.enabled} @sl-input=${this.handleStartStop} ?disabled=${this.inflight_startstop || labels.installationId !== "ready"}></sl-switch>
       </action-row>
 
       <action-row prefix="gear" name="configure" label="Configure" .trigger=${this.handleMenuClick} ?disabled=${disableActions}>
-        Customize ${pkg.manifest.package}
+        Customize ${pkg.state.manifest.meta.name}
       </action-row>
 
       <!--action-row prefix="archive-fill" name="properties" label="Properties" .trigger=${this.handleMenuClick} ?disabled=${disableActions}>

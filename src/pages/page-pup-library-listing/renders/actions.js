@@ -13,7 +13,7 @@ export function openDeps() {
 
 export async function handlePurgeFunction() {
   this.inflight_purge = true;
-  const pupId = this.context.store?.pupContext.id
+  const pupId = this.getPup().state.id
   this.requestUpdate();
 
   const callbacks = {
@@ -36,14 +36,13 @@ export async function handlePurgeFunction() {
 }
 
 export function renderActions(labels) {
-  const pupContext = this.context.store?.pupContext
-  const pkg = this.pkgController.getPup(pupContext.id);
+  const pkg = this.getPup();
   const { installationId, statusId, statusLabel } = labels
 
   const hasButtons =
     ["needs_deps", "needs_config"].includes(statusId)
     || ["uninstalled"].includes(installationId)
-    || pkg.manifest.gui;
+    || pkg.state.manifest?.gui;
 
   const styles = css`
     .action-wrap {
@@ -88,12 +87,12 @@ export function renderActions(labels) {
       ` : nothing }
 
 
-      ${pkg.manifest.gui ? html`
+      ${pkg.state.manifest?.gui ? html`
         <div style="display: flex; align-items: center;">
           ${statusId === 'needs_config' || statusId === 'needs_deps' ? html`
           <sl-divider class="show-only-wide" vertical style="height: 1.5em; margin-left: 0.1em;"></sl-divider>
           `: nothing}
-          <sl-button size="large" variant="warning" href="${pkg.computed.url.gui}"} ?disabled="${installationId !== "ready" }">
+          <sl-button size="large" variant="warning" href="${pkg.computed.guiURL}"} ?disabled="${installationId !== "ready" }">
             <sl-icon slot="prefix" name="stars"></sl-icon>
             Launch UI
           </sl-button>

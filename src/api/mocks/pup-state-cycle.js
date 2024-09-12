@@ -60,7 +60,7 @@ export const c5 = [
   ["ready", "stopped"]
 ]
 
-export const installEvent = {
+export const mockInstallEvent = {
   "id": "internal",
   "error": "",
   "type": "pup",

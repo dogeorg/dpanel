@@ -7,7 +7,7 @@ export function renderStatus() {
   const installationId = pkg?.computed?.installationId;
   const installationLabel = pkg?.computed?.installationLabel;
 
-  const isInstalled = pkg.computed.isInstalled;
+  const isInstalled = installationId === 'ready' && pkg.computed.isInstalled;
   const isLoadingStatus = ["installing"].includes(installationId);
 
   const normalisedLabel = () => {

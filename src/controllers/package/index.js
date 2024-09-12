@@ -303,17 +303,21 @@ class PkgController {
       return;
     }
 
-    const { pup, index } = this.getPupMaster({ pupId, lookupType: "byStatePupId" });
+    const n = newPupStateData
+    const { pup, index } = this.getPupMaster({ pupId: n.id, sourceId: n.source.id, pupName: n.manifest.meta.name });
 
     if (pup) {
       this.stateIndex[newPupStateData.id] = newPupStateData
 
       // Update pup array data in place
-      this.pups[index] = {
+      let updated = {
         ...this.pups[index],
         state: newPupStateData,
-        computed: this.determineCalculatedVals(this.pups[index])
       }
+
+      updated.computed = this.determineCalculatedVals(updated)
+
+      this.pups[index] = updated
     } else {
       // When receiving a pupState event for a pup NOT found in the stateIndex
       // We add it as a new entry.  This is likely a record for a newly installed pup
@@ -326,6 +330,8 @@ class PkgController {
         stats: this.statsIndex[newPupStateData.id] || null,
       }
       pup.computed = this.determineCalculatedVals(pup);
+
+      this.stateIndex[pup.state.id] = newPupStateData;
       this.pups.push(pup)
     }
 

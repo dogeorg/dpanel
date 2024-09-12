@@ -107,6 +107,5 @@ export async function handleInstall() {
     pupVersion: pkg.def.latestVersion,
   };
 
-  console.log("issuing install request: ", { ...body });
   await this.pkgController.requestPupAction("--", "install", callbacks, body);
 }

@@ -435,6 +435,21 @@ class PkgController {
       });
     }, 1000);
   }
+
+  getSourceList() {
+    if (!pkgController.sourcesIndex) {
+      return [];
+    }
+
+    return Object.entries(pkgController.sourcesIndex).map(([sourceId, sourceData]) => {
+      return {
+        sourceId: sourceId,
+        location: sourceData.location || "",
+        name: sourceData.name || "",
+        pupCount: Object.keys(sourceData.pups || {}).length
+      };
+    });
+  }
 }
 
 // Instance holder

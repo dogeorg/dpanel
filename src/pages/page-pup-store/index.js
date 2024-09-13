@@ -7,6 +7,7 @@ import * as renderMethods from './renders/index.js';
 import '/components/views/card-pup-install/index.js'
 import '/components/common/paginator/paginator-ui.js';
 import '/components/common/page-banner.js';
+import '/components/views/action-manage-sources/index.js';
 
 const initialSort = (a, b) => {
   if (a?.def?.versions[a?.def?.versionLatest]?.meta?.name < b?.def?.versions[b?.def?.versionLatest]?.meta?.name) { return -1; }
@@ -21,7 +22,8 @@ class StoreView extends LitElement {
     fetchError: { type: Boolean },
     busy: { type: Boolean },
     inspectedPup: { type: String },
-    searchValue: { type: String }
+    searchValue: { type: String },
+    _showSourceManagementDialog: { type: Boolean }
   }
 
   constructor() {
@@ -33,6 +35,7 @@ class StoreView extends LitElement {
     this.itemsPerPage = 10;
     this.pkgController = pkgController;
     this.packageList = new PaginationController(this, undefined, this.itemsPerPage,{ initialSort });
+    this._showSourceManagementDialog = false;
 
     this.inspectedPup;
     this.showCategories = false;
@@ -150,6 +153,10 @@ class StoreView extends LitElement {
     this.packageList.setFilter((pkg) => pkg?.manifest?.package?.toLowerCase()?.includes(this.searchValue.toLowerCase()));
   }
 
+  handleManageSourcesClick() {
+    this._showSourceManagementDialog = true;
+  }
+
   render() {
     const ready = (
       !this.fetchLoading &&
@@ -170,12 +177,10 @@ class StoreView extends LitElement {
     return html`
       <page-banner title="Dogecoin" subtitle="Registry">
         Extend your Dogebox with Pups<br/>
-        <!--
-        <sl-button variant="text">
+        <sl-button variant="text" @click=${this.handleManageSourcesClick}>
           <sl-icon name="arrow-left-right" slot="prefix"></sl-icon>
-          Change Registry
+          Manage Sources
         </sl-button>
-        -->
       </page-banner>
 
       <div class="row search-wrap">
@@ -198,6 +203,10 @@ class StoreView extends LitElement {
         ? html`<sl-spinner style="--indicator-color:#777;"></sl-spinner>`
         : this.renderSectionBody(ready, SKELS, hasItems)
       }
+
+      ${this._showSourceManagementDialog ? html`
+        <action-manage-sources></action-manage-sources>
+      ` : nothing }
 
     `;
   }

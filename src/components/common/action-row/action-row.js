@@ -185,7 +185,7 @@ class ActionRow extends LitElement {
 
         <div class="suffix-wrap" part="suffix">
           <slot name="suffix">
-            <sl-icon name="chevron-right"></sl-icon>
+            <sl-icon name="${this.suffix || "chevron-right"}"></sl-icon>
           </slot>
         </div>
       </div>

@@ -33,6 +33,10 @@ export default class ApiClient extends ReactiveClass {
     return this.request(path, { ...config, method: 'PUT', body: JSON.stringify(body) });
   }
 
+  async delete(path, body, config = {}) {
+    return this.request(path, { ...config, method: 'DELETE', body: JSON.stringify(body) });
+  }
+
   async request(path, config) {
     // Debug, if the dev has forceDelay, wait the delay time in seconds before making request
     if (this.networkContext.forceDelayInSeconds) {

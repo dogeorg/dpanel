@@ -42,8 +42,8 @@ class PupInstallPage extends LitElement {
 
   getPup() {
     return this.pkgController.getPupMaster({ 
-      sourceId: this.context.store.pupContext.def.source.id,
-      pupName: this.context.store.pupContext.def.key,
+      sourceId: this.context.store.pupContext?.def?.source?.id,
+      pupName: this.context.store.pupContext?.def?.key,
       lookupType: "byDefSourceIdAndPupName"
     }).pup
   }

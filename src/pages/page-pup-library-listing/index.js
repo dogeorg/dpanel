@@ -54,7 +54,7 @@ class PupPage extends LitElement {
 
   getPup() {
     return this.pkgController.getPupMaster({ 
-      pupId: this.context.store.pupContext.state.id,
+      pupId: this.context.store.pupContext?.state?.id,
       lookupType: "byStatePupId"
     }).pup
   }

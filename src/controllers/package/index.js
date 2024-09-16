@@ -55,6 +55,7 @@ class PkgController {
   handleBootstrapResponse(states, stats) {
     this.stateIndex = states;
     this.statsIndex = stats
+    this.pups = [];
 
     for (const [stateKey, stateData] of Object.entries(states)) {
 
@@ -444,17 +445,26 @@ class PkgController {
     }, 1000);
   }
 
+  getInstalledPupsForSource(sourceId) {
+    return this.pups.filter(p => p.state?.source?.id === sourceId);
+  }
+
   getSourceList() {
     if (!pkgController.sourcesIndex) {
       return [];
     }
 
     return Object.entries(pkgController.sourcesIndex).map(([sourceId, sourceData]) => {
+
+      const installedPupsForSource = pkgController.getInstalledPupsForSource(sourceId);
+      const installedCount = installedPupsForSource.length;
+
       return {
         sourceId: sourceId,
         location: sourceData.location || "",
         name: sourceData.name || "",
-        pupCount: Object.keys(sourceData.pups || {}).length
+        pupCount: Object.keys(sourceData.pups || {}).length,
+        installedCount
       };
     });
   }

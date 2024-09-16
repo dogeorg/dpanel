@@ -3,6 +3,7 @@ import { createAlert } from "/components/common/alert.js";
 import { asyncTimeout } from "/utils/timeout.js";
 import { pkgController } from "/controllers/package/index.js";
 import { addSource, removeSource } from "/api/sources/manage.js";
+import { doBootstrap } from "/api/bootstrap/bootstrap.js";
 import { refreshStoreListing } from "/api/sources/sources.js";
 
 export class SourceManagerView extends LitElement {
@@ -11,8 +12,10 @@ export class SourceManagerView extends LitElement {
     return {
       _ready: { type: Boolean },
       _showSourceRemovalConfirmation: { type: Boolean },
+      _showSourceRemovalRejection: { type: Boolean },
       _showAddSourceDialog: { type: Boolean },
       _sourceRemovaInProgress: { type: Boolean },
+      _refreshInProgress: { type: Boolean },
       _sources: { type: Object, state: true },
       _selectedSourceId: { type: String },
       _addSourceInputURL: { type: String },
@@ -22,12 +25,14 @@ export class SourceManagerView extends LitElement {
 
   constructor() {
     super();
-    this._ready = false;
+    this._ready = true;
     this._sources = [];
     
     this._showSourceRemovalConfirmation = false;
+    this._showSourceRemovalRejection = false;
     this._showAddSourceDialog = false;
-    
+
+    this._refreshInProgress = false;
     this._sourceRemovaInProgress = false;
     this._addSourceInProgress = false;
     
@@ -44,9 +49,27 @@ export class SourceManagerView extends LitElement {
     this._ready = true;
   }
 
-  handleRemoveClick(sourceId) {
-    this._selectedSourceId = sourceId
-    this._showSourceRemovalConfirmation = true;
+  async handleRefreshClick() {
+    this._refreshInProgress = true;
+    try {
+      await doBootstrap();
+      await refreshStoreListing("flush");
+      this.fetchSources();
+      this.dispatchEvent(new CustomEvent("source-change", { bubbles: true, composed: true }));
+    } catch (err) {
+      console.warn('Failed to refresh store listing on refresh click', err)
+    } finally {
+      this._refreshInProgress = false;
+    }
+  }
+
+  handleRemoveClick(sourceObject) {
+    if (sourceObject.installedCount > 0) {
+      this._showSourceRemovalRejection = true;
+    } else {
+      this._selectedSourceId = sourceObject.sourceId
+      this._showSourceRemovalConfirmation = true;
+    }
   }
 
   async handleRemovalConfirmClick() {
@@ -66,7 +89,7 @@ export class SourceManagerView extends LitElement {
         await refreshStoreListing();
         this.fetchSources();
         pkgController.removePupsBySourceId(this._selectedSourceId);
-        this.dispatchEvent(new CustomEvent("source-removed", { bubbles: true, composed: true }));
+        this.dispatchEvent(new CustomEvent("source-change", { bubbles: true, composed: true }));
         
         this._showSourceRemovalConfirmation = false;
       } catch (err) {
@@ -129,19 +152,6 @@ export class SourceManagerView extends LitElement {
 
   render() {
 
-    const renderSourceAction = (sourceId) => {
-      return html`
-        <div class="dropdown-selection-alt" slot="suffix">
-          <sl-dropdown>
-            <sl-button slot="trigger" caret></sl-button>
-            <sl-menu>
-              <sl-menu-item value="copy" @click=${() => this.handleRemoveClick(sourceId)}>Remove</sl-menu-item>
-            </sl-menu>
-          </sl-dropdown>
-        </div>
-      `
-    }
-
     const renderAddSource = () => {
       return html`
         <sl-dialog ?open=${this._showAddSourceDialog} class="wider-dialog" no-header>
@@ -183,6 +193,24 @@ export class SourceManagerView extends LitElement {
       `
     }
 
+    const renderRemovalRejection = () => {
+      return html`
+        <sl-dialog ?open=${this._showSourceRemovalRejection} class="wider-dialog" no-header>
+          <div>
+            <h3>Cannot remove source</h3>
+            A pup source cannot be removed whilst it has pups installed.<br>
+            Uninstall pups from this source before removing it.
+          </div>
+          <div slot="footer">
+            <sl-button variant="primary" @click=${() => this._showSourceRemovalRejection = false}>
+              Dismiss
+            </sl-button>
+          </div>
+          
+        </sl-dialog>
+      `
+    }
+
     return html`
       <sl-dialog id="ManageSourcesDialog" open label="Pup Sources" style="position: relative;" @sl-after-hide=${this.handleClosure}>
         
@@ -195,9 +223,27 @@ export class SourceManagerView extends LitElement {
         ${this._ready ? html`
 
           ${this._sources.map((s) => html`
-            <action-row label="${s.name}" prefix="git">
+            <action-row label="${s.name}" prefix="git" style="--row-height: 72px;">
               ${s.location}
-              ${renderSourceAction(s.sourceId)}
+              <div slot="more" class="source-stats">
+                <div class="stat green">
+                  <span class="stat-value">${s.pupCount}</span>
+                  <span clas="stat-label">Pups</span>
+                </div>
+                <div class="stat blue">
+                  <span class="stat-value">${s.installedCount}</span>
+                  <span clas="stat-label">Installed</span>
+                </div>
+              </div>
+              <div class="dropdown-selection-alt" slot="suffix">
+                <sl-dropdown>
+                  <sl-button slot="trigger" caret></sl-button>
+                  <sl-menu>
+                    <sl-menu-item value="refres" @click=${() => this.handleRefreshClick(s)}>Refresh</sl-menu-item>
+                    <sl-menu-item value="copy" @click=${() => this.handleRemoveClick(s)}>Remove</sl-menu-item>
+                  </sl-menu>
+                </sl-dropdown>
+              </div>
             </action-row>`
           )}
         ` : nothing }
@@ -210,12 +256,22 @@ export class SourceManagerView extends LitElement {
         `: nothing}
 
         <div slot="footer">
-          <sl-button variant=success ?disabled=${!this._ready} @click=${this.handleAddSourceClick}>
+          <sl-button variant="text"
+            ?loading=${this._refreshInProgress}
+            ?disabled=${!this._ready}
+            @click=${this.handleRefreshClick}>
+            Refresh all
+          </sl-button>
+          <sl-button variant=success
+            ?disabled=${!this._ready}
+            @click=${this.handleAddSourceClick}>
             <sl-icon slot="prefix" name="plus-square-fill"></sl-icon>
             Add Source
           </sl-button>
         </div>
+      
       ${renderRemovalConfirmation()}
+      ${renderRemovalRejection()}
       ${renderAddSource()}
       </sl-dialog>
     `
@@ -244,7 +300,26 @@ export class SourceManagerView extends LitElement {
         --width: 65vw;
       }
     }
-  `
+    .source-details {
+      display: flex;
+      flex-direction: column;
+    }
+    .source-stats {
+      display: flex;
+      flex-direction: row;
+      gap: 0.75em;
+    }
+    .stat-label {
+      color: var(--sl-color-neutral-600);
+    }
+
+    .stat.blue {
+      color: var(--sl-color-blue-600);
+    }
+    .stat.green {
+      color: var(--sl-color-green-600);
+    }
+  ` 
 }
 
 customElements.define("action-manage-sources", SourceManagerView);

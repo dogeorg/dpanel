@@ -65,7 +65,7 @@ class StoreView extends LitElement {
     this.addEventListener('pup-installed', this.handlePupInstalled.bind(this));
     this.addEventListener('forced-tab-show', this.handleForcedTabShow.bind(this));
     this.addEventListener('manage-sources-closed', this.handleManageSourcesClosed.bind(this));
-    this.addEventListener('source-removed', this.updatePups.bind(this));
+    this.addEventListener('source-change', this.updatePups.bind(this));
     this.fetchBootstrap();
   }
 
@@ -75,7 +75,7 @@ class StoreView extends LitElement {
     this.removeEventListener('pup-installed', this.handlePupInstalled.bind(this));
     this.removeEventListener('forced-tab-show', this.handleForcedTabShow.bind(this));
     this.removeEventListener('manage-sources-closed', this.handleManageSourcesClosed.bind(this));
-    this.removeEventListener('source-removed', this.updatePups.bind(this));
+    this.removeEventListener('source-change', this.updatePups.bind(this));
     this.pkgController.removeObserver(this);
     super.disconnectedCallback();
   }
@@ -143,7 +143,6 @@ class StoreView extends LitElement {
   }
 
   updatePups() {
-    console.log('CALLED');
     this.pups = this.pkgController.pups;
     this.requestUpdate('pups');
   }

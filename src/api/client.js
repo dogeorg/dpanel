@@ -26,14 +26,28 @@ export default class ApiClient extends ReactiveClass {
   }
 
   async post(path, body, config = {}) {
-    return this.request(path, { ...config, method: 'POST', body: JSON.stringify(body) });
+    return this.request(path, { ...config, method: 'POST', body });
   }
 
   async put(path, body, config = {}) {
-    return this.request(path, { ...config, method: 'PUT', body: JSON.stringify(body) });
+    return this.request(path, { ...config, method: 'PUT', body });
+  }
+
+  async delete(path, body, config = {}) {
+    return this.request(path, { ...config, method: 'DELETE', body });
   }
 
   async request(path, config) {
+
+    // if config.body is an empty object, remove the property.
+    // this is to prevent the browser from sending an empty body to the server
+    // which is not what we want.
+    if (Object.keys(config.body || {}).length === 0) {
+      delete config.body;
+    } else {
+      config.body = JSON.stringify(config.body);
+    }
+
     // Debug, if the dev has forceDelay, wait the delay time in seconds before making request
     if (this.networkContext.forceDelayInSeconds) {
       await new Promise(resolve => setTimeout(resolve, this.networkContext.forceDelayInSeconds * 1000));
@@ -77,7 +91,7 @@ export default class ApiClient extends ReactiveClass {
 
     if (!response.ok) {
       console.warn('Unsuccessful respose', { status: response.status })
-      throw new Error('Fetching returned an unsuccessful response');
+      throw new Error(response.error || `Request failed with error code: ${response.status}`);
     }
 
     try {

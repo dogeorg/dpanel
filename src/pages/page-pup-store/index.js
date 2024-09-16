@@ -3,10 +3,12 @@ import { getStoreListing } from '/api/sources/sources.js';
 import { pkgController } from '/controllers/package/index.js'
 import { PaginationController } from '/components/common/paginator/paginator-controller.js';
 import { bindToClass } from '/utils/class-bind.js'
+import { asyncTimeout } from '/utils/timeout.js'
 import * as renderMethods from './renders/index.js';
 import '/components/views/card-pup-install/index.js'
 import '/components/common/paginator/paginator-ui.js';
 import '/components/common/page-banner.js';
+import '/components/views/action-manage-sources/index.js';
 
 const initialSort = (a, b) => {
   if (a?.def?.versions[a?.def?.versionLatest]?.meta?.name < b?.def?.versions[b?.def?.versionLatest]?.meta?.name) { return -1; }
@@ -16,16 +18,21 @@ const initialSort = (a, b) => {
 
 class StoreView extends LitElement {
 
-  static properties = {
-    fetchLoading: { type: Boolean },
-    fetchError: { type: Boolean },
-    busy: { type: Boolean },
-    inspectedPup: { type: String },
-    searchValue: { type: String }
+  static get properties() {
+    return {
+      pups: { type: Array },
+      fetchLoading: { type: Boolean },
+      fetchError: { type: Boolean },
+      busy: { type: Boolean },
+      inspectedPup: { type: String },
+      searchValue: { type: String },
+      _showSourceManagementDialog: { type: Boolean }
+    }
   }
 
   constructor() {
     super();
+    this.pups = [];
     this.busy = false;
     this.busyQueue = [];
     this.fetchLoading = true;
@@ -33,6 +40,7 @@ class StoreView extends LitElement {
     this.itemsPerPage = 10;
     this.pkgController = pkgController;
     this.packageList = new PaginationController(this, undefined, this.itemsPerPage,{ initialSort });
+    this._showSourceManagementDialog = false;
 
     this.inspectedPup;
     this.showCategories = false;
@@ -56,6 +64,8 @@ class StoreView extends LitElement {
     this.addEventListener('busy-stop', this.handleBusyStop.bind(this));
     this.addEventListener('pup-installed', this.handlePupInstalled.bind(this));
     this.addEventListener('forced-tab-show', this.handleForcedTabShow.bind(this));
+    this.addEventListener('manage-sources-closed', this.handleManageSourcesClosed.bind(this));
+    this.addEventListener('source-change', this.updatePups.bind(this));
     this.fetchBootstrap();
   }
 
@@ -64,8 +74,14 @@ class StoreView extends LitElement {
     this.removeEventListener('busy-stop', this.handleBusyStop.bind(this));
     this.removeEventListener('pup-installed', this.handlePupInstalled.bind(this));
     this.removeEventListener('forced-tab-show', this.handleForcedTabShow.bind(this));
+    this.removeEventListener('manage-sources-closed', this.handleManageSourcesClosed.bind(this));
+    this.removeEventListener('source-change', this.updatePups.bind(this));
     this.pkgController.removeObserver(this);
     super.disconnectedCallback();
+  }
+
+  handleManageSourcesClosed() {
+    this._showSourceManagementDialog = false;
   }
 
   reset() {
@@ -126,6 +142,11 @@ class StoreView extends LitElement {
     }
   }
 
+  updatePups() {
+    this.pups = this.pkgController.pups;
+    this.requestUpdate('pups');
+  }
+
   handleActionsMenuSelect(event) {
     const selectedItemValue = event.detail.item.value;
     switch (selectedItemValue) {
@@ -136,11 +157,14 @@ class StoreView extends LitElement {
   }
 
   updated(changedProperties) {
-    changedProperties.forEach((oldValue, propName) => {
-      if (propName === 'searchValue') {
-        this.filterPackageList();
-      }
-    });
+    if (changedProperties.has('pups')) {
+      this.packageList.setData(this.pups);
+    }
+    
+    // Existing code for other property changes
+    if (changedProperties.has('searchValue')) {
+      this.filterPackageList();
+    }
   }
 
   filterPackageList() {
@@ -148,6 +172,10 @@ class StoreView extends LitElement {
       this.packageList.setFilter();
     }
     this.packageList.setFilter((pkg) => pkg?.manifest?.package?.toLowerCase()?.includes(this.searchValue.toLowerCase()));
+  }
+
+  handleManageSourcesClick() {
+    this._showSourceManagementDialog = true;
   }
 
   render() {
@@ -170,12 +198,10 @@ class StoreView extends LitElement {
     return html`
       <page-banner title="Dogecoin" subtitle="Registry">
         Extend your Dogebox with Pups<br/>
-        <!--
-        <sl-button variant="text">
-          <sl-icon name="arrow-left-right" slot="prefix"></sl-icon>
-          Change Registry
+        <sl-button size="large" variant="text" ?disabled=${this.fetchLoading} @click=${this.handleManageSourcesClick}>
+          <sl-icon name="database-fill-add" slot="prefix"></sl-icon>
+          Manage Sources
         </sl-button>
-        -->
       </page-banner>
 
       <div class="row search-wrap">
@@ -198,6 +224,10 @@ class StoreView extends LitElement {
         ? html`<sl-spinner style="--indicator-color:#777;"></sl-spinner>`
         : this.renderSectionBody(ready, SKELS, hasItems)
       }
+
+      ${this._showSourceManagementDialog ? html`
+        <action-manage-sources></action-manage-sources>
+      ` : nothing }
 
     `;
   }
@@ -241,6 +271,17 @@ class StoreView extends LitElement {
       position: relative;
       top: 2px;
       
+    }
+
+    .empty {
+      width: 100%;
+      color: var(--sl-color-neutral-600);
+      box-sizing: border-box;
+      border: dashed 1px var(--sl-color-neutral-200);
+      border-radius: var(--sl-border-radius-medium);
+      padding: var(--sl-spacing-x-large) var(--sl-spacing-medium);
+      font-family: 'Comic Neue', sans-serif;
+      text-align: center;
     }
   `
 }

@@ -11,8 +11,7 @@ var pupCardGrid = css`
 export function renderSectionHeader(ready) {
 
   return html`
-
-    <!-- div class="actions">
+    <div class="actions">
       <sl-dropdown>
         <sl-button slot="trigger" ?disabled=${this.busy}><sl-icon name="three-dots-vertical"></sl-icon></sl-button>
         <sl-menu @sl-select=${this.handleActionsMenuSelect}>
@@ -28,7 +27,7 @@ export function renderSectionHeader(ready) {
           <sl-menu-item value="refresh">Refresh</sl-menu-item>
         </sl-menu>
       </sl-dropdown>
-    </div -->
+    </div>
   `
 }
 
@@ -44,7 +43,8 @@ export function renderSectionBody(ready, SKELS, hasItems) {
 
     ${ready && !hasItems('packages') ? html`
       <div class="empty">
-        Such empty.  No pups available in this repository.
+        Such empty.<br>
+        No pups available in this repository.
       </div>
       ` : nothing 
     }
@@ -54,11 +54,11 @@ export function renderSectionBody(ready, SKELS, hasItems) {
         ${repeat(this.packageList.getCurrentPageData(), (pkg) => `${pkg.def.source.id}-${pkg.def.key}`, (pkg) => html`
           <pup-install-card
             icon="box"
-            sourceId="${pkg.def.source.id}"
-            defKey="${pkg.def.key}"
+            sourceId=${pkg.def.source.id}
+            defKey=${pkg.def.key}
             pupName=${pkg.def.key}
-            version="${pkg.def.latestVersion}"
-            short="Its over 9000"
+            version=${pkg.def.latestVersion}
+            short="${pkg.def.versions[pkg.def.latestVersion]?.meta?.shortDescription}"
             ?installed=${pkg.computed.isInstalled}
             href=${pkg.computed.storeURL}
           ></pup-install-card>

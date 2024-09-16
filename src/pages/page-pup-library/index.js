@@ -260,6 +260,8 @@ class LibraryView extends LitElement {
       border: dashed 1px var(--sl-color-neutral-200);
       border-radius: var(--sl-border-radius-medium);
       padding: var(--sl-spacing-x-large) var(--sl-spacing-medium);
+      font-family: 'Comic Neue', sans-serif;
+      text-align: center;
     }
   `
 }

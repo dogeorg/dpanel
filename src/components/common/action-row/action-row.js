@@ -85,7 +85,7 @@ class ActionRow extends LitElement {
       display: flex;
       flex-direction: row;
       width: 100%;
-      height: 62px;
+      height: var(--row-height, 62px);
       align-items: center;
     }
 
@@ -99,7 +99,7 @@ class ActionRow extends LitElement {
     }
 
     .body-wrap {
-      height: 62px;
+      height: var(--row-height,62px);
       padding-bottom: 2px;
       flex: 1 0 auto; /* Grow to fill the space, no shrink, basis auto */
       display: flex;
@@ -107,8 +107,10 @@ class ActionRow extends LitElement {
       justify-content: center;
       border-bottom: 1px solid #333;
       max-width: calc(100% - 80px);
+      gap: 0.25em;
 
       .label-wrap {
+        line-height: 1.1;
         font-weight: bold;
         white-space: nowrap;
         overflow: hidden;
@@ -124,8 +126,18 @@ class ActionRow extends LitElement {
         text-overflow: ellipsis;
       }
 
+      .more-wrap {
+        line-height: 1;
+        font-size: 0.9rem;
+        font-family: "Comic Neue";
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
       .label-wrap, 
-      .description-wrap {
+      .description-wrap,
+      .more-wrap  {
         flex-grow: 0;
         flex-shrink: 1;
         max-width: calc(100% - 10px);
@@ -181,11 +193,14 @@ class ActionRow extends LitElement {
           <div class="description-wrap">
             <slot></slot>
           </div>
+          <div class="more-wrap">
+            <slot name="more"></slot>
+          </div>
         </div>
 
         <div class="suffix-wrap" part="suffix">
           <slot name="suffix">
-            <sl-icon name="chevron-right"></sl-icon>
+            <sl-icon name="${this.suffix || "chevron-right"}"></sl-icon>
           </slot>
         </div>
       </div>

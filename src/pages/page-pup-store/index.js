@@ -3,6 +3,7 @@ import { getStoreListing } from '/api/sources/sources.js';
 import { pkgController } from '/controllers/package/index.js'
 import { PaginationController } from '/components/common/paginator/paginator-controller.js';
 import { bindToClass } from '/utils/class-bind.js'
+import { asyncTimeout } from '/utils/timeout.js'
 import * as renderMethods from './renders/index.js';
 import '/components/views/card-pup-install/index.js'
 import '/components/common/paginator/paginator-ui.js';
@@ -17,17 +18,21 @@ const initialSort = (a, b) => {
 
 class StoreView extends LitElement {
 
-  static properties = {
-    fetchLoading: { type: Boolean },
-    fetchError: { type: Boolean },
-    busy: { type: Boolean },
-    inspectedPup: { type: String },
-    searchValue: { type: String },
-    _showSourceManagementDialog: { type: Boolean }
+  static get properties() {
+    return {
+      pups: { type: Array },
+      fetchLoading: { type: Boolean },
+      fetchError: { type: Boolean },
+      busy: { type: Boolean },
+      inspectedPup: { type: String },
+      searchValue: { type: String },
+      _showSourceManagementDialog: { type: Boolean }
+    }
   }
 
   constructor() {
     super();
+    this.pups = [];
     this.busy = false;
     this.busyQueue = [];
     this.fetchLoading = true;
@@ -59,6 +64,8 @@ class StoreView extends LitElement {
     this.addEventListener('busy-stop', this.handleBusyStop.bind(this));
     this.addEventListener('pup-installed', this.handlePupInstalled.bind(this));
     this.addEventListener('forced-tab-show', this.handleForcedTabShow.bind(this));
+    this.addEventListener('manage-sources-closed', this.handleManageSourcesClosed.bind(this));
+    this.addEventListener('source-removed', this.updatePups.bind(this));
     this.fetchBootstrap();
   }
 
@@ -67,8 +74,14 @@ class StoreView extends LitElement {
     this.removeEventListener('busy-stop', this.handleBusyStop.bind(this));
     this.removeEventListener('pup-installed', this.handlePupInstalled.bind(this));
     this.removeEventListener('forced-tab-show', this.handleForcedTabShow.bind(this));
+    this.removeEventListener('manage-sources-closed', this.handleManageSourcesClosed.bind(this));
+    this.removeEventListener('source-removed', this.updatePups.bind(this));
     this.pkgController.removeObserver(this);
     super.disconnectedCallback();
+  }
+
+  handleManageSourcesClosed() {
+    this._showSourceManagementDialog = false;
   }
 
   reset() {
@@ -129,6 +142,12 @@ class StoreView extends LitElement {
     }
   }
 
+  updatePups() {
+    console.log('CALLED');
+    this.pups = this.pkgController.pups;
+    this.requestUpdate('pups');
+  }
+
   handleActionsMenuSelect(event) {
     const selectedItemValue = event.detail.item.value;
     switch (selectedItemValue) {
@@ -139,11 +158,14 @@ class StoreView extends LitElement {
   }
 
   updated(changedProperties) {
-    changedProperties.forEach((oldValue, propName) => {
-      if (propName === 'searchValue') {
-        this.filterPackageList();
-      }
-    });
+    if (changedProperties.has('pups')) {
+      this.packageList.setData(this.pups);
+    }
+    
+    // Existing code for other property changes
+    if (changedProperties.has('searchValue')) {
+      this.filterPackageList();
+    }
   }
 
   filterPackageList() {
@@ -177,8 +199,8 @@ class StoreView extends LitElement {
     return html`
       <page-banner title="Dogecoin" subtitle="Registry">
         Extend your Dogebox with Pups<br/>
-        <sl-button variant="text" @click=${this.handleManageSourcesClick}>
-          <sl-icon name="arrow-left-right" slot="prefix"></sl-icon>
+        <sl-button size="large" variant="text" ?disabled=${this.fetchLoading} @click=${this.handleManageSourcesClick}>
+          <sl-icon name="database-fill-add" slot="prefix"></sl-icon>
           Manage Sources
         </sl-button>
       </page-banner>
@@ -250,6 +272,17 @@ class StoreView extends LitElement {
       position: relative;
       top: 2px;
       
+    }
+
+    .empty {
+      width: 100%;
+      color: var(--sl-color-neutral-600);
+      box-sizing: border-box;
+      border: dashed 1px var(--sl-color-neutral-200);
+      border-radius: var(--sl-border-radius-medium);
+      padding: var(--sl-spacing-x-large) var(--sl-spacing-medium);
+      font-family: 'Comic Neue', sans-serif;
+      text-align: center;
     }
   `
 }

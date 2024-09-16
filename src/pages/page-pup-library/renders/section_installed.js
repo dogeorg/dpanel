@@ -54,7 +54,8 @@ export function renderSectionInstalledBody(ready, SKELS, hasItems) {
 
     ${ready && !hasItems('installed') ? html`
       <div class="empty">
-        Such empty.  No pups available in this repository.
+        Such empty.<br>
+        No pups available in this repository.
       </div>
       ` : nothing 
     }

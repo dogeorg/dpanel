@@ -3,6 +3,7 @@ import { createAlert } from "/components/common/alert.js";
 import { asyncTimeout } from "/utils/timeout.js";
 import { pkgController } from "/controllers/package/index.js";
 import { addSource, removeSource } from "/api/sources/manage.js";
+import { refreshStoreListing } from "/api/sources/sources.js";
 
 export class SourceManagerView extends LitElement {
 
@@ -40,7 +41,7 @@ export class SourceManagerView extends LitElement {
 
   fetchSources() {
     this._sources = pkgController.getSourceList()
-    setTimeout(() => { this._ready = true; }, 1000);
+    this._ready = true;
   }
 
   handleRemoveClick(sourceId) {
@@ -56,15 +57,26 @@ export class SourceManagerView extends LitElement {
     try {
       await asyncTimeout(1000);
       await removeSource(this._selectedSourceId);
-      createAlert("success", 'Source removed.', 'check-square', 2000);
+      createAlert("success", ['Source removed.', 'Updating list'], 'check-square', 2000);
 
-      // TODO better success handling
-      await asyncTimeout(2000);
-      window.location.reload();
+      await asyncTimeout(1000);
+
+      // trigger the fetch of store api
+      try {
+        await refreshStoreListing();
+        this.fetchSources();
+        pkgController.removePupsBySourceId(this._selectedSourceId);
+        this.dispatchEvent(new CustomEvent("source-removed", { bubbles: true, composed: true }));
+        
+        this._showSourceRemovalConfirmation = false;
+      } catch (err) {
+        console.warn('Failed to refresh store listing after removing a source', err)
+        window.location.reload();
+      }
 
     } catch (err) {
       console.log('ERROR', err);
-      const message = ["Source removal failed", "Please refresh your browser and try again"];
+      const message = ["Source removal failed", "<Todo: Show reason>"];
       const action = { text: "View details" };
       createAlert("danger", message, "emoji-frown", null, action, new Error(err));
     } finally {
@@ -82,21 +94,38 @@ export class SourceManagerView extends LitElement {
     try {
       await asyncTimeout(1000);
       await addSource(this._addSourceInputURL);
-      createAlert("success", 'Source added.', 'check-square', 2000);
+      createAlert("success", ['Source added.', 'Updating list'], 'check-square', 2000);
 
       // TODO better success handling
-      await asyncTimeout(2000);
-      window.location.reload();
+      await asyncTimeout(1000);
+      
+      // trigger the fetch of store api
+      try { 
+        await refreshStoreListing();
+        this.fetchSources();
+      } catch (err) {
+        console.warn('Failed to refresh store listing after adding a source', err)
+        window.location.reload();
+      }
+      // then close the dialog
+      this._showAddSourceDialog = false;
 
     } catch (err) {
-      console.log('ERROR', err);
-      const message = ["Failed to add source.", "Please refresh your browser and try again"];
+      const message = ["Failed to add source.", "<Todo: Show reason>"];
       const action = { text: "View details" };
       createAlert("danger", message, "emoji-frown", null, action, new Error(err));
     } finally {
       this._addSourceInProgress = false;
     }
   }
+
+  handleClosure(event) {
+    // Check if the event target is the dialog with id "ManageSourcesDialog"
+    if (event.target.id === "ManageSourcesDialog") {
+      this.dispatchEvent(new CustomEvent("manage-sources-closed", { bubbles: true, composed: true }));
+    }
+  }
+
 
   render() {
 
@@ -115,7 +144,7 @@ export class SourceManagerView extends LitElement {
 
     const renderAddSource = () => {
       return html`
-        <sl-dialog ?open=${this._showAddSourceDialog} style="--width: 55vw" no-header>
+        <sl-dialog ?open=${this._showAddSourceDialog} class="wider-dialog" no-header>
           
           <sl-input
             label="Enter source URL"
@@ -137,8 +166,8 @@ export class SourceManagerView extends LitElement {
 
     const renderRemovalConfirmation = () => {
       return html`
-        <sl-dialog ?open=${this._showSourceRemovalConfirmation} style="--width: auto" no-header>
-          <div style="max-width: 320px;">
+        <sl-dialog ?open=${this._showSourceRemovalConfirmation} class="wider-dialog" no-header>
+          <div>
             <h3>Are you sure?</h3>
             You will no longer see pups from this source.
           </div>
@@ -155,7 +184,7 @@ export class SourceManagerView extends LitElement {
     }
 
     return html`
-      <sl-dialog open label="Pup Sources" style="position: relative;">
+      <sl-dialog id="ManageSourcesDialog" open label="Pup Sources" style="position: relative;" @sl-after-hide=${this.handleClosure}>
         
         ${!this._ready ? html`
           <div class="loader-overlay">
@@ -173,8 +202,15 @@ export class SourceManagerView extends LitElement {
           )}
         ` : nothing }
 
+        ${this._sources.length === 0 ? html`
+          <div class="empty">
+            No sources found.<br>
+            Add a source to get started.
+          </div>
+        `: nothing}
+
         <div slot="footer">
-          <sl-button variant=primary ?disabled=${!this._ready} @click=${this.handleAddSourceClick}>
+          <sl-button variant=success ?disabled=${!this._ready} @click=${this.handleAddSourceClick}>
             <sl-icon slot="prefix" name="plus-square-fill"></sl-icon>
             Add Source
           </sl-button>
@@ -191,6 +227,22 @@ export class SourceManagerView extends LitElement {
       display: flex;
       align-items: center;
       justify-content: center;
+    }
+    .empty {
+      width: 100%;
+      color: var(--sl-color-neutral-600);
+      box-sizing: border-box;
+      border: dashed 1px var(--sl-color-neutral-200);
+      border-radius: var(--sl-border-radius-medium);
+      padding: var(--sl-spacing-x-large) var(--sl-spacing-medium);
+      font-family: 'Comic Neue', sans-serif;
+      text-align: center;
+    }
+    .wider-dialog {
+      --width: 99vw;
+      @media (min-width: 576px) {
+        --width: 65vw;
+      }
     }
   `
 }

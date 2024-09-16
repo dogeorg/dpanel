@@ -188,6 +188,14 @@ class PkgController {
     }
   }
 
+  removePupsBySourceId(sourceId) {
+    this.pups = this.pups.filter(p => p.def.source.id !== sourceId);
+    if (this.sourcesIndex[sourceId]) {
+      delete this.sourcesIndex[sourceId];
+    }
+    this.notify();
+  }
+
   registerAction(txn, callbacks, actionType, pupId, timeout) {
     if (!txn || !callbacks || !actionType || !pupId) {
       console.warn(

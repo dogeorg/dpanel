@@ -7,8 +7,6 @@ export function createAlert(variant, message, icon = 'info-circle', duration = 0
       document.body.setAttribute('listener-on-sl-after-hide', true);
     }
 
-    console.log({ variant, message, icon, duration, action });
-
     const alert = document.createElement('sl-alert');
     alert.variant = variant;
     alert.closable = true;
@@ -67,15 +65,12 @@ function createMoreDetailDialog(messageEl, providedError) {
   dialog.classList.add("error-dialog");
   dialog.classList.add('above-toasts') // Dialogs usually sit below toasts in terms of z-index. This class styles them to sit above.
 
-  let error = new Error(providedError);
+  const error = (providedError instanceof Error)
+    ? providedError
+    : new Error(providedError);
 
-  if (providedError instanceof Error) {
-    error = providedError
-  }
-
-  if (providedError.error) {
-    error = new Error(providedError.error);
-  }
+  // Remove leading "Error:" if present
+  const errorMessage = error.message.replace(/^Error:\s*/, '');
 
   // Limit stack trace
   const maxLines = 4;
@@ -89,7 +84,7 @@ function createMoreDetailDialog(messageEl, providedError) {
   const content = document.createElement('div');
   content.innerHTML = `
   <pre style="text-wrap: wrap; font-size: var(--sl-font-size-small); padding: 1em; background: #333;">${messageEl}</pre>
-  <pre style="text-wrap: wrap; font-size: var(--sl-font-size-small); padding: 1em; background: #a300ff70; margin-bottom: 0;">${error}</pre>
+  <pre style="text-wrap: wrap; font-size: var(--sl-font-size-small); padding: 1em; background: #a300ff70; margin-bottom: 0;">${errorMessage}</pre>
   <pre style="font-size: var(--sl-font-size-x-small); padding: 1em; background: #c700ff21; overflow-x: scroll; margin-top: 0;">${error.stack}</pre>
   `
   dialog.appendChild(content);

@@ -88,6 +88,9 @@ class SocketChannel {
       switch (data.type) {
         case "pup":
           // emitted on state change (eg: installing, ready)
+          if (store.networkContext.logStateUpdates) {
+                console.log(`##-STATE-## installation: ${data.update.installation}`, { payload: data.update });
+              }
           pkgController.updatePupModel(data.update.id, data.update)
           break;
 
@@ -95,6 +98,9 @@ class SocketChannel {
           // emitted on an interval (contains current status and vitals)
           if (data && data.update && Array.isArray(data.update)) {
             data.update.forEach((statsUpdatePayload) => {
+              if (store.networkContext.logStatsUpdates) {
+                console.log('--STATS--', statsUpdatePayload.status, { payload: statsUpdatePayload });
+              }
               pkgController.updatePupStatsModel(statsUpdatePayload.id, statsUpdatePayload)
             });
           }

@@ -126,6 +126,14 @@ class PupInstallPage extends LitElement {
     //   `);
     // };
 
+    const renderInterfacesList = () => {
+      return html`
+        <action-row prefix="ui-checks-grid" name=${dep.id} label=${dep.name} href=${`/explore/${dep.id}/${dep.name}`}>
+          ${dep.condition}
+        </action-row>
+      `
+    }
+
     return html`
       <div id="PageWrapper" class="${wrapperClasses}" ?data-freeze=${popover_page}>
         <section class="status">
@@ -141,6 +149,18 @@ class PupInstallPage extends LitElement {
             </reveal-row>
           </div>
         </section>
+
+        ${false && hasInterfaces ? html`
+          <section>
+            <div class="section-title">
+              <h3>Provides</h3>
+            </div>
+            <div class="grid-list-wrap">
+              ${renderInterfacesList()}
+            </div>
+          </section>`
+          : nothing
+        }
 
         ${false && hasDependencies ? html`
           <section>
@@ -161,6 +181,12 @@ class PupInstallPage extends LitElement {
           <div class="list-wrap">
             <action-row prefix="list-ul" name="readme" label="Read me" .trigger=${this.handleMenuClick}>
               Many info
+            </action-row>
+            <action-row prefix="boxes" name=deps label=Dependencies .trigger=${this.handleMenuClick}>
+              Functionality this pup depends on from other pups.
+            </action-row>
+            <action-row prefix="box-arrow-up" name=ints label=Interfaces .trigger=${this.handleMenuClick}>
+              Functionality this pup provides for other pups.
             </action-row>
           </div>
         </section>

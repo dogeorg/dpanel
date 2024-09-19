@@ -43,7 +43,7 @@ export const routes = [
     animate: true,
   },
   {
-    path: "/pups/:s/:name/logs",
+    path: "/pups/:pupid/:name/logs",
     component: "x-page-pup-logs",
     pageTitle: "Logs",
     pageAction: "close",

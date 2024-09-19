@@ -17,7 +17,7 @@ class LogViewer extends LitElement {
   constructor() {
     super();
     this.logs = [];
-    this.pupId = store.pupContext.manifest.package;
+    this.pupId = "";
     this.isConnected = false;
     this.wsClient = null;
     this.follow = true;
@@ -78,7 +78,7 @@ class LogViewer extends LitElement {
     }
 
     this.wsClient = new WebSocketClient(
-      `${store.networkContext.wsApiBaseUrl}/logs/${this.pupId}`,
+      `${store.networkContext.wsApiBaseUrl}/ws/log/${this.pupId}`,
       store.networkContext,
       mockedLogRunner
     );

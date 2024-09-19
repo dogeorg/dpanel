@@ -42,8 +42,8 @@ class PupPage extends LitElement {
     bindToClass(renderMethods, this);
     this.pkgController = pkgController;
     this.context = new StoreSubscriber(this, store);
-    this.open_dialog = false;
-    this.open_dialog_label = "";
+    this.open_dialog = "deps";
+    this.open_dialog_label = "Dependencies";
     this.open_page = false;
     this.open_page_label = "";
     this.checks = [];
@@ -285,8 +285,8 @@ class PupPage extends LitElement {
         Many info
       </action-row>
 
-      <action-row prefix="box-seam" name="deps" label="Dependencies" .trigger=${this.handleMenuClick}>
-        View software this Pup depends on
+      <action-row prefix="boxes" name="deps" label="Dependencies" .trigger=${this.handleMenuClick}>
+        Functionality this pup depends on from other pups.
       </action-row>
     `
 

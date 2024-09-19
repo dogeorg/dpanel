@@ -20,7 +20,7 @@ import "/components/common/page-container.js";
 class PupInstallPage extends LitElement {
   static get properties() {
     return {
-      open_dialog: { type: Boolean },
+      open_dialog: { type: String },
       open_dialog_label: { type: String },
       busy: { type: Boolean },
       inflight: { type: Boolean },
@@ -32,7 +32,7 @@ class PupInstallPage extends LitElement {
     bindToClass(renderMethods, this);
     this.pkgController = pkgController;
     this.context = new StoreSubscriber(this, store);
-    this.open_dialog = false;
+    this.open_dialog = "";
     this.open_dialog_label = "";
     this.open_page = false;
     this.open_page_label = "";

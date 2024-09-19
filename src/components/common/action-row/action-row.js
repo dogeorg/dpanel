@@ -11,6 +11,8 @@ class ActionRow extends LitElement {
       loading: { type: Boolean },
       href: { type: String },
       disabled: { type: Boolean },
+      expandable: { type: Boolean },
+      expand: { type: Boolean, reflect: true },
     };
   }
 
@@ -22,6 +24,8 @@ class ActionRow extends LitElement {
     this.trigger = false;
     this.href = "";
     this.disabled = false;
+    this.expandable = false;
+    this.expand = false;
   }
 
   static styles = css`
@@ -29,7 +33,40 @@ class ActionRow extends LitElement {
       color: var(--sl-color-neutral-600);
     }
 
-    a, button {
+    :host([expand]) .hidden-wrap {
+      display: block;
+      height: auto;
+      overflow: visible;
+      &:hover { cursor: auto }
+    }
+
+    :host([expand]) {
+      color: var(--sl-color-neutral-800);
+    }
+
+    :host([expand]) .suffix-wrap sl-icon {
+      transform: rotate(90deg);
+    }
+
+    :host([expand]) .body-wrap {
+      border-bottom: none;
+    }
+
+    :host([expand]) .suffix-wrap {
+      border-bottom: none;
+    }
+
+    .suffix-wrap sl-icon {
+      transition: none; /* Ensures no animation */
+    }
+
+    .hidden-wrap {
+      overflow: hidden;
+      height: 0px;
+    }
+
+    a,
+    button {
       touch-action: manipulation;
     }
 
@@ -80,6 +117,10 @@ class ActionRow extends LitElement {
       color: var(--sl-color-neutral-400);
     }
 
+    .outer {
+      display: flex;
+      flex-direction: column;
+    }
 
     .base-wrap {
       display: flex;
@@ -99,7 +140,7 @@ class ActionRow extends LitElement {
     }
 
     .body-wrap {
-      height: var(--row-height,62px);
+      height: var(--row-height, 62px);
       padding-bottom: 2px;
       flex: 1 0 auto; /* Grow to fill the space, no shrink, basis auto */
       display: flex;
@@ -135,9 +176,9 @@ class ActionRow extends LitElement {
         text-overflow: ellipsis;
       }
 
-      .label-wrap, 
+      .label-wrap,
       .description-wrap,
-      .more-wrap  {
+      .more-wrap {
         flex-grow: 0;
         flex-shrink: 1;
         max-width: calc(100% - 10px);
@@ -160,6 +201,18 @@ class ActionRow extends LitElement {
   `;
 
   handleClick = (e) => {
+    if (this.expandable) {
+      this.expand = !this.expand;
+      this.dispatchEvent(
+        new CustomEvent("row-expand", {
+          bubbles: true,
+          composed: true,
+          detail: {
+            expanded: this.expand,
+          },
+        }),
+      );
+    }
     if (this.trigger) {
       if (typeof this.trigger === "function") {
         this.trigger(e, this);
@@ -174,41 +227,46 @@ class ActionRow extends LitElement {
   };
 
   render() {
-
     const el = html`
-      <div class="base-wrap" part="base" @click=${this.handleClick}>
-        <div class="prefix-wrap" part="prefix">
-          ${this.loading
-            ? html` <sl-spinner></sl-spinner> `
-            : html`
-                <slot name="prefix"></slot>
-                <sl-icon name="${this.prefix}"></sl-icon>
-              `}
+      <div class="outer">
+        <div class="base-wrap" part="base" @click=${this.handleClick}>
+          <div class="prefix-wrap" part="prefix">
+            ${this.loading
+              ? html` <sl-spinner></sl-spinner> `
+              : html`
+                  <slot name="prefix"></slot>
+                  <sl-icon name="${this.prefix}"></sl-icon>
+                `}
+          </div>
+
+          <div class="body-wrap" part="body">
+            <div class="label-wrap">
+              <slot name="label">${this.label}</slot>
+            </div>
+            <div class="description-wrap" part="desc">
+              <slot></slot>
+            </div>
+            <div class="more-wrap" part="more" style="display:none !important;">
+              <slot name="more"></slot>
+            </div>
+          </div>
+
+          <div class="suffix-wrap" part="suffix">
+            <slot name="suffix">
+              <sl-icon name="${this.suffix || "chevron-right"}"></sl-icon>
+            </slot>
+          </div>
         </div>
 
-        <div class="body-wrap" part="body">
-          <div class="label-wrap">
-            <slot name="label">${this.label}</slot>
-          </div>
-          <div class="description-wrap">
-            <slot></slot>
-          </div>
-          <div class="more-wrap">
-            <slot name="more"></slot>
-          </div>
-        </div>
-
-        <div class="suffix-wrap" part="suffix">
-          <slot name="suffix">
-            <sl-icon name="${this.suffix || "chevron-right"}"></sl-icon>
-          </slot>
+        <div class="hidden-wrap" part="hidden">
+          <slot name="hidden"></slot>
         </div>
       </div>
-    `
+    `;
     return html`
-      ${this.href ? html`
-        <a class="anchor" href="${this.href}" target="_self">${el}</a>
-      ` : el}
+      ${this.href
+        ? html` <a class="anchor" href="${this.href}" target="_self">${el}</a> `
+        : el}
     `;
   }
 }

@@ -557,7 +557,7 @@ function determineStatusId(state, stats) {
   }
 
   if (flags.needs_deps) {
-    return { id: "needs_deps", label: "Missing Dependencies" };
+    return { id: "needs_deps", label: "Unmet Dependencies" };
   }
 
   if (flags.needs_config) {

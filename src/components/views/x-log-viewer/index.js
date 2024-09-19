@@ -17,7 +17,7 @@ class LogViewer extends LitElement {
   constructor() {
     super();
     this.logs = [];
-    this.pupId = store.pupContext.manifest.package;
+    this.pupId = "";
     this.isConnected = false;
     this.wsClient = null;
     this.follow = true;

@@ -7,21 +7,28 @@ import {
 import "/components/common/action-row/action-row.js";
 
 import { getProviders } from "/api/providers/providers.js";
+import { pkgController } from "/controllers/package/index.js";
+import { asyncTimeout } from "/utils/timeout.js";
+import { createAlert } from "/components/common/alert.js";
 
 class DependencyList extends LitElement {
   static get properties() {
     return {
+      ready: { type: Boolean },
       dependencies: { type: Array },
-      providers: { type: Array },
+      current_providers: { type: Object }, // pup.state.providers
+      possible_providers: { type: Array }, // Obtained from providers API
       expandedDependency: { type: String },
       editMode: { type: Boolean },
       pupId: { type: String },
+      inflight: { type: Boolean },
     };
   }
 
   constructor() {
     super();
-    this.providers = [];
+    this.possible_providers = [];
+    this.current_providers = {};
   }
 
   firstUpdated() {
@@ -46,26 +53,53 @@ class DependencyList extends LitElement {
   }
 
   handleProviderSelection(event, dependency) {
-    const selectedProvider = event.detail.item.value;
-    const providerInfo = this.providers.find(p => p.interface === dependency.interfaceName);
-    if (providerInfo) {
-      providerInfo.currentProvider = selectedProvider;
+    // selected an installed pup or installable?
+    const isInstallable = event.detail.item.value.startsWith('pupId::')
+
+    if (!isInstallable) {
+      window.open(window.location.origin + "/explore", "_blank");
+      return
     }
+
+    // When installable, allow it to be set.
+    const pupId = event.detail.item.value.split('::')[1]
+    const { pup } = pkgController.getPupMaster({ pupId });
+
+    const providerInfo = this.possible_providers.find(p => p.interface === dependency.interfaceName);
+    if (providerInfo) {
+      providerInfo.currentProvider = pupId;
+    }
+
     this.requestUpdate();
   }
 
   async refreshProviders() {
+    this.ready = false;
+    await asyncTimeout(1000);
     try {
       const res = await getProviders(this.pupId);
-      this.providers = res;
+      this.possible_providers = res;
       this.requestUpdate();
     } catch (error) {
       console.error("Error fetching providers:", error);
+    } finally {
+      this.ready = true;
     }
   }
 
   handleRefreshClick() {
     this.refreshProviders();
+  }
+
+  toInstallableProviderObj(pupId) {
+    const { pup } = pkgController.getPupMaster({ pupId });
+    const out = {
+      pupId: pup.state.id,
+      pupName: pup.state.manifest.meta.name,
+      sourceName: pup.state.source.name,
+      sourceLocation: pup.state.source.location
+    }
+    return out;
   }
 
   renderPermissionGroups(groups) {
@@ -77,9 +111,55 @@ class DependencyList extends LitElement {
         ${groups.map((group) => html`<sl-tag size="small">${group}</sl-tag>`)}
       </div>`;
   }
+  
+  renderProviderForInterface(providerInfo, dependency) {
+    if (!providerInfo || !providerInfo.currentProvider) {
+      return html`No provider set`
+    }
+
+    // display selected/current provider
+    if (providerInfo && providerInfo.currentProvider) {
+      const pup = this.toInstallableProviderObj(providerInfo.currentProvider)
+      return html`
+        <x-puplibrary-item
+          id="${pup.pupId}"
+          name=${pup.pupName}
+          location=${pup.sourceLocation}>
+        </x-pup-item>
+      `
+    }
+  }
+
+  async handleSaveProviderClick(providerInfo) {
+    this.inflight = true;
+    
+    let body = {}
+    body[providerInfo.interface] = providerInfo.currentProvider
+    // Eg: { "pingpong": "a662052f6dc3d95d69a7604fa7b12b23" }
+
+    const callbacks = {
+      onSuccess: async () => {
+        createAlert("success", ['Provider set.', 'Such wow!'], 'check-square', 2000);
+        this.inflight = false;
+      },
+      onError: async (err) => {
+        console.log('Failed to set provider', err);
+        const message = ["Failed to set provider"];
+        const action = { text: "View details" };
+        createAlert("danger", message, "emoji-frown", null, action, new Error(err.error));
+        this.inflight = false;
+      },
+      onTimeout: async () => {
+        await doBootstrap();
+        window.location.href = window.location.origin + "/pups";
+        this.inflight = false;
+      }
+    }
+    await pkgController.requestPupAction(this.pupId, 'set-provider', callbacks, body);
+  }
 
   renderDependency(dependency) {
-    const providerInfo = this.providers.find(p => p.interface === dependency.interfaceName);
+    const providerInfo = this.possible_providers.find(p => p.interface === dependency.interfaceName);
     
     return html`
       <sl-card class="dependency" style="--width: 100%">
@@ -92,48 +172,82 @@ class DependencyList extends LitElement {
           ${this.editMode ? html`
             <div class="label-wrap">
               <span class="label">Select Provider</span>
-              <sl-button variant="text" size="small" class="button-no-pad" @click=${this.handleRefreshClick}>Refresh</sl-button>
+              <sl-button variant="text" size="small" class="button-no-pad" ?disabled=${!this.ready || this.inflight } @click=${this.handleRefreshClick}>Refresh</sl-button>
             </div>
             
-            <sl-dropdown hoist @sl-select="${(e) => this.handleProviderSelection(e, dependency)}">
-              <sl-button slot="trigger" class="provider-selector">
-                <span id="selected-text-${dependency.interfaceName}">
-                  ${providerInfo && providerInfo.currentProvider ? providerInfo.currentProvider : 'No Provider Selected'}
-                </span>
+            <sl-dropdown class="provider-picker" hoist @sl-select="${(e) => this.handleProviderSelection(e, dependency)}">
+              <sl-button size="large" slot="trigger" class="provider-selector" ?disabled=${!this.ready || this.inflight }>
+                ${!this.ready
+                  ? html`<span style="display: flex; flex-direction: row; align-items: center; gap: 1em;"><sl-spinner></sl-spinner> Checking..</span>`
+                  : html `
+                    <span id="selected-text-${dependency.interfaceName}">
+                    ${this.renderProviderForInterface(providerInfo, dependency)}
+                  </span>`
+                }
+                
                 <sl-icon name="chevron-down"></sl-icon>
               </sl-button>
-              <sl-menu>
-                <sl-menu-label>Installed Pups</sl-menu-label>
-                
-                ${providerInfo && providerInfo.installedProviders.length ? 
-                  providerInfo.installedProviders.map(provider => html`
-                    <sl-menu-item value="${provider.pupName}">
-                      ${provider.pupName}
-                      <small>${provider.sourceLocation}</small>
-                    </sl-menu-item>
-                  `) : 
-                  html`<sl-menu-item disabled>--</sl-menu-item>`
-                }
+              
+              ${!this.ready ? html`
+                <sl-menu>
+                  <sl-menu-item disabled>
+                    <div style="display: flex; flex-direction: row; align-items: center; gap: 1em;">
+                      <sl-spinner></sl-spinner> Fetching ..
+                    </div>
+                  </sl-menu-item>
+                </sl-menu>
+              `: nothing } 
+              
+              ${this.ready ? html`
+                <sl-menu>
+                  <sl-menu-label>Installed Pups</sl-menu-label>
 
-                <sl-divider></sl-divider>
-                
-                <sl-menu-label>Available Pups (from your Sources)</sl-menu-label>
+                  ${ providerInfo &&
+                     !providerInfo.installedProviders.length &&
+                     !providerInfo.InstallableProviders.length ? html`
+                      <sl-menu-item disabled><small>-- Such empty --</small></sl-menu-item>
+                    ` : nothing
+                   }
+                  
+                  ${providerInfo && providerInfo.installedProviders.length ? 
+                    providerInfo.installedProviders
+                      .map(pupId => this.toInstallableProviderObj(pupId))
+                      .map(provider => html`
+                      <sl-menu-item value="pupId::${provider.pupId}">
+                        <x-puplibrary-item
+                          id="${provider.pupId}"
+                          name=${provider.pupName}
+                          location=${provider.sourceLocation}>
+                        </x-pup-item>
+                      </sl-menu-item>
+                    `) : nothing
+                  }
+                  
+                  <sl-menu-label>Available Pups</sl-menu-label>
 
-                ${providerInfo && providerInfo.InstallableProviders.length ? 
-                  providerInfo.InstallableProviders.map(provider => html`
-                    <sl-menu-item value="${provider.pupName}">
-                      ${provider.pupName}
-                      <small>${provider.sourceLocation}</small>
-                    </sl-menu-item>
-                  `) : 
-                  html`<sl-menu-item disabled><small>-- Such empty --</small></sl-menu-item>`
-                }
-                
-              </sl-menu>
+                  ${providerInfo && providerInfo.InstallableProviders.length ? 
+                    providerInfo.InstallableProviders
+                      .map(provider => html`
+                      <sl-menu-item value="sourceLocation::${provider.sourceLocation}::pupName=${provider.pupName}">
+                        <x-pupstore-item
+                          name=${provider.pupName}
+                          location=${provider.sourceLocation}>
+                        </x-pup-item>
+                      </sl-menu-item>
+                    `) : nothing
+                  }
+                  
+                </sl-menu>
+              `: nothing }
             </sl-dropdown>
 
-            <sl-button size="small" style="width: 115px; align-self: end; margin-top: 0.5em;" variant="primary">
-              Save Selection
+            <sl-button
+              @click=${() => this.handleSaveProviderClick(providerInfo, dependency)}
+              ?loading=${this.inflight}
+              ?disabled=${this.inflight || (providerInfo && !providerInfo.currentProvider)}
+              class="submit-provider-button"
+              size="small" variant="primary">
+                Save Selection
             </sl-button>
 
             <sl-divider></sl-divider>
@@ -309,9 +423,100 @@ class DependencyList extends LitElement {
       }
     }
 
+    .submit-provider-button {
+      width: 115px;
+      align-self: end;
+      margin-top: 0.5em;
+    }
+
     sl-button.link-button-left::part(base) { justify-content: left; }
     sl-button.link-button-left::part(label) { padding-left:0px; }
+
+    .provider-picker {
+      sl-menu-label { display: none; }
+      sl-menu-label::part(base) { font-size: 0.8rem; }
+    }
   `;
 }
 
 customElements.define("x-action-manage-deps", DependencyList);
+
+class PupStoreItem extends LitElement {
+  static get properties() {
+    return {
+      name: { type: String },
+      location: { type: String }
+    }
+  }
+  render() {
+    return html`
+      <span class="name">
+        ${this.name}
+        <small class="tag">(Not installed)</small>
+      </span><br>
+      <small class="location">${this.location}</small>
+    `
+  }
+
+  static styles = css`
+    :host {
+      display: flex;
+      flex-direction: column;
+      align-items: start;
+      line-height: 1.35;
+    }
+    .name {
+      font-weight: bold;
+      font-size: 0.9rem;
+      color: grey;
+    }
+    .location {
+      font-size: 0.7rem;
+      font-family: 'Comic Neue';
+    }
+    .tag {
+      font-size: 0.7rem;
+      color: grey;
+      font-weight: normal;
+    }
+    `
+}
+
+customElements.define('x-pupstore-item', PupStoreItem);
+
+class PupLibraryItem extends LitElement {
+
+  static get properties() {
+    return {
+      name: { type: String },
+      location: { type: String },
+      id: { type: String }
+    }
+  }
+  render() {
+    return html`
+      <span class="name">${this.name}</span><br>
+      <small class="location">${this.location}</small><br>
+    `
+  }
+
+  static styles = css`
+    :host {
+      display: flex;
+      flex-direction: column;
+      align-items: start;
+      line-height: 1.35;
+    }
+    .name {
+      font-weight: bold;
+      font-size: 0.9rem;
+      color: white;
+    }
+    .location {
+      font-size: 0.7rem;
+      font-family: 'Comic Neue';
+    }
+  `
+}
+
+customElements.define('x-puplibrary-item', PupLibraryItem);

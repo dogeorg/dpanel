@@ -1,5 +1,5 @@
 export default {
-  port: 8080,
+  port: 9090,
   rootDir: '../src',
   appIndex: '../src/index.html',
   watch: true,

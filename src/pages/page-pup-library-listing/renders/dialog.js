@@ -8,10 +8,11 @@ import "/components/views/action-dependency-manage/dependency.js";
 
 export function renderDialog() {
   const pkg = this.getPup();
+  console.log("PACKAGE CHANGED", { pkg });
   const { statusId } = pkg.computed
   const readmeEl = html`<div style="padding: 1em; text-align: center;"> Such empty. This pup does not provide a README.</div>`;
   const depdenciesArray = pkg?.state?.manifest?.dependencies || [];
-  const depsEl = html`<x-action-manage-deps .dependencies=${depdenciesArray} editMode pupId=${pkg.state.id}></x-action-manage-deps>`;
+  const depsEl = html`<x-action-manage-deps .dependencies=${depdenciesArray} .providers=${pkg.state.providers} editMode pupId=${pkg.state.id}></x-action-manage-deps>`;
 
   const preventUninstallEl = html`
     <p>Cannot uninstall a running Pup.<br/>Please disable ${pkg.state.manifest.meta.name } and try again.</p>

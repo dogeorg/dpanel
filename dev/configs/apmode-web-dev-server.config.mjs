@@ -1,5 +1,5 @@
 export default {
-  port: 8081,
+  port: 9091,
   rootDir: '../src',
   appIndex: '../src/index_recovery.html',
   watch: true,

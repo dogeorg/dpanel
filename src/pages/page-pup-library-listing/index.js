@@ -42,8 +42,8 @@ class PupPage extends LitElement {
     bindToClass(renderMethods, this);
     this.pkgController = pkgController;
     this.context = new StoreSubscriber(this, store);
-    this.open_dialog = "deps";
-    this.open_dialog_label = "Dependencies";
+    this.open_dialog = "";
+    this.open_dialog_label = "";
     this.open_page = false;
     this.open_page_label = "";
     this.checks = [];

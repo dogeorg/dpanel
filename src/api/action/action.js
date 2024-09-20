@@ -9,6 +9,8 @@ import {
   purgeMock
 } from './action.mocks.js'
 
+import { setProvider } from '../providers/providers.js';
+
 const client = new ApiClient(store.networkContext.apiBaseUrl, store.networkContext)
 
 export async function installPup(pupId, body) {
@@ -48,6 +50,8 @@ export function pickAndPerformPupAction(pupId, action, body) {
     case 'stop':
       return stopPup(pupId);
       break;
+    case 'set-provider':
+      return setProvider(pupId, body);
     default:
       console.warn('unsupported pup action requested', action);
   }

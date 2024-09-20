@@ -21,3 +21,10 @@ export const getProvidersResponse = {
     }
   }]
 }
+
+export const setProviderResponse = {
+  name: "/providers/:pupid",
+  group: "provders",
+  method: "post",
+  res: { success: true }
+}

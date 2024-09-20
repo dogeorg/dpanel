@@ -544,8 +544,8 @@ function determineStatusId(state, stats) {
   const installation = state?.installation;
   const status = stats?.status;
   const flags = {
-    needs_deps: state?.needs_deps,
-    needs_config: state?.needs_config,
+    needs_deps: state?.needsDeps,
+    needs_config: state?.needsConf,
   };
 
   if (installation === "uninstalling") {

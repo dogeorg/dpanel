@@ -11,7 +11,7 @@ import { postResponse as networkSet } from "./network/set-network.mocks.js";
 import { postResponse as changePass } from "./password/change-pass.mocks.js"
 import { getResponse as checkReflector } from "./reflector/get-ip.mocks.js";
 import { getResponse as apModeFacts } from "./system/get-bootstrap.mocks.js";
-import { getProvidersResponse } from "./providers/providers.mocks.js";
+import { getProvidersResponse, setProviderResponse } from "./providers/providers.mocks.js";
 
 export const mocks = [
   storeListingMock,
@@ -32,5 +32,6 @@ export const mocks = [
   changePass,
   checkReflector,
   apModeFacts,
-  getProvidersResponse
+  getProvidersResponse,
+  setProviderResponse
 ]

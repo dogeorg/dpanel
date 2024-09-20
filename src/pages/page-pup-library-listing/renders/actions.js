@@ -38,8 +38,6 @@ export async function handlePurgeFunction() {
 export function renderActions(labels) {
   const pkg = this.getPup();
   let { installationId, statusId, statusLabel } = labels
-  statusId = "needs_deps";
-  statusLabel = "Unmet Dependencies";
 
   const hasButtons =
     ["needs_deps", "needs_config"].includes(statusId)

@@ -11,6 +11,7 @@ import "/components/common/action-row/action-row.js";
 import "/components/common/dynamic-form/dynamic-form.js";
 import "/components/views/x-check/index.js";
 import "/components/common/page-container.js";
+import "/components/common/sparkline-chart/sparkline-chart-v2.js";
 import { bindToClass } from "/utils/class-bind.js";
 import * as renderMethods from "./renders/index.js";
 import { store } from "/state/store.js";
@@ -257,6 +258,56 @@ class PupPage extends LitElement {
       `
     }
 
+    const renderStats = () => {
+      const metrics = Object.entries(pkg.stats.metrics).filter(([key, value]) => 
+        Array.isArray(value) && value.every(item => typeof item === 'number')
+      );
+
+      if (metrics.length === 0) {
+        return html`
+          <div class="metrics-wrap">
+            <small style="font-family: 'Comic Neue'; color: var(--sl-color-neutral-600);">Such empty. Pup reports no metrics</small>
+          </div>
+        `;
+      }
+
+      return html`
+        <div class="metrics-wrap">
+          ${metrics.map(([key, value]) => html`
+            <div class="metric-container">
+              <sparkline-chart-v2 .data="${value}" .label="${key}"></sparkline-chart-v2>
+            </div>
+          `)}
+        </div>
+      `;
+    };
+
+    const renderResources = () => {
+    const resourceKeys = ["statusCpuPercent", "statusMemTotal", "statusMemPercent", "statusDisk"];
+
+    const metrics = resourceKeys
+      .filter(key => Array.isArray(pkg.stats[key]) && pkg.stats[key].every(item => typeof item === 'number'))
+      .map(key => [key, pkg.stats[key]]);
+
+    if (metrics.length === 0) {
+      return html`
+        <div class="metrics-wrap">
+          <p class="no-metrics">No resource metrics available</p>
+        </div>
+      `;
+    }
+
+    return html`
+      <div class="metrics-wrap">
+        ${metrics.map(([key, value]) => html`
+          <div class="metric-container">
+            <sparkline-chart-v2 .data="${value}" .label="${key}"></sparkline-chart-v2>
+          </div>
+        `)}
+      </div>
+    `;
+  };
+
     const renderMenu = () => html`
       <action-row prefix="power" name="state" label="Enabled" ?disabled=${disableActions}>
         Enable or disable this Pup
@@ -312,6 +363,13 @@ class PupPage extends LitElement {
 
         <section>
           <div class=${sectionTitleClasses}>
+            <h3>Stats</h3>
+          </div>
+          ${renderStats()}
+        </section>
+
+        <section>
+          <div class=${sectionTitleClasses}>
             <h3>Menu</h3>
           </div>
           <div class="list-wrap">${renderMenu()}</div>
@@ -331,6 +389,13 @@ class PupPage extends LitElement {
             <h3>Such More</h3>
           </div>
           <div class="list-wrap">${renderMore()}</div>
+        </section>
+
+        <section>
+          <div class=${sectionTitleClasses}>
+            <h3>Resources</h3>
+          </div>
+          ${renderResources()}
         </section>
 
         <section>
@@ -421,6 +486,15 @@ class PupPage extends LitElement {
       &.uninstalling { --indicator-color: var(--sl-color-danger-600); }
       &.purging { --indicator-color: var(--sl-color-danger-600); }
     }
+
+    .metrics-wrap {
+      display: flex;
+      flex-direction: row;
+      gap: 1em;
+      overflow-x: auto;
+    }
+
+    .metric-container {}
   `;
 }
 

@@ -261,6 +261,10 @@ class SelectNetwork extends LitElement {
       return;
     }
 
+    // temp: wait, because this needs to move to being an async call inside dogeboxd
+    //       so that the putNetwork above can "complete".
+    await asyncTimeout(5000)
+
     // temp: also call our final initialisation API here.
     // TODO: move this into post-network flow.
     const finalSystemBootstrap = await postSetupBootstrap({

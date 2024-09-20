@@ -227,6 +227,7 @@ class PupPage extends LitElement {
     let statusInstallationId = labels.installationId === "ready" ? labels.statusId : labels.installationId
     const isLoadingStatus =  ["starting", "stopping"].includes(labels.statusId);
     const disableActions = labels.installationId === "uninstalled";
+    const isRunning = labels.statusId === "running";
 
     // Exagerate the uninstallation time until reported correctly by dogeboxd.
     if (this._HARDCODED_UNINSTALL_WAIT_TIME) {
@@ -361,12 +362,14 @@ class PupPage extends LitElement {
           ${renderStatusAndActions(labels)}
         </section>
 
+        ${isRunning ? html`
         <section>
           <div class=${sectionTitleClasses}>
             <h3>Stats</h3>
           </div>
           ${renderStats()}
         </section>
+        ` : nothing }
 
         <section>
           <div class=${sectionTitleClasses}>
@@ -391,12 +394,14 @@ class PupPage extends LitElement {
           <div class="list-wrap">${renderMore()}</div>
         </section>
 
+        ${isRunning ? html`
         <section>
           <div class=${sectionTitleClasses}>
             <h3>Resources</h3>
           </div>
           ${renderResources()}
         </section>
+        `: nothing }
 
         <section>
           <div class="section-title">

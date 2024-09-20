@@ -37,7 +37,7 @@ export async function handlePurgeFunction() {
 
 export function renderActions(labels) {
   const pkg = this.getPup();
-  const { installationId, statusId, statusLabel } = labels
+  let { installationId, statusId, statusLabel } = labels
 
   const hasButtons =
     ["needs_deps", "needs_config"].includes(statusId)
@@ -76,7 +76,7 @@ export function renderActions(labels) {
 
       ${statusId === 'needs_deps' ? html`
         <sl-button variant="warning" size="large" name="deps" label="dependencies" @click=${this.openDeps}>
-          View List
+          Resolve Now
         </sl-button>
       ` : nothing }
 

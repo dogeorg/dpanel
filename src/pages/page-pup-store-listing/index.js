@@ -20,7 +20,7 @@ import "/components/common/page-container.js";
 class PupInstallPage extends LitElement {
   static get properties() {
     return {
-      open_dialog: { type: Boolean },
+      open_dialog: { type: String },
       open_dialog_label: { type: String },
       busy: { type: Boolean },
       inflight: { type: Boolean },
@@ -32,7 +32,7 @@ class PupInstallPage extends LitElement {
     bindToClass(renderMethods, this);
     this.pkgController = pkgController;
     this.context = new StoreSubscriber(this, store);
-    this.open_dialog = false;
+    this.open_dialog = "";
     this.open_dialog_label = "";
     this.open_page = false;
     this.open_page_label = "";
@@ -126,6 +126,14 @@ class PupInstallPage extends LitElement {
     //   `);
     // };
 
+    const renderInterfacesList = () => {
+      return html`
+        <action-row prefix="ui-checks-grid" name=${dep.id} label=${dep.name} href=${`/explore/${dep.id}/${dep.name}`}>
+          ${dep.condition}
+        </action-row>
+      `
+    }
+
     return html`
       <div id="PageWrapper" class="${wrapperClasses}" ?data-freeze=${popover_page}>
         <section class="status">
@@ -141,6 +149,18 @@ class PupInstallPage extends LitElement {
             </reveal-row>
           </div>
         </section>
+
+        ${false && hasInterfaces ? html`
+          <section>
+            <div class="section-title">
+              <h3>Provides</h3>
+            </div>
+            <div class="grid-list-wrap">
+              ${renderInterfacesList()}
+            </div>
+          </section>`
+          : nothing
+        }
 
         ${false && hasDependencies ? html`
           <section>
@@ -161,6 +181,12 @@ class PupInstallPage extends LitElement {
           <div class="list-wrap">
             <action-row prefix="list-ul" name="readme" label="Read me" .trigger=${this.handleMenuClick}>
               Many info
+            </action-row>
+            <action-row prefix="boxes" name=deps label=Dependencies .trigger=${this.handleMenuClick}>
+              Functionality this pup depends on from other pups.
+            </action-row>
+            <action-row prefix="box-arrow-up" name=ints label=Interfaces .trigger=${this.handleMenuClick}>
+              Functionality this pup provides for other pups.
             </action-row>
           </div>
         </section>

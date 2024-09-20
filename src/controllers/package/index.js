@@ -116,7 +116,7 @@ class PkgController {
   }
 
   handleSourcesResponse(sources) {
-    this.sourcesIndex = sources;
+    this.sourcesIndex = sources
 
     try {
       for (const [sourceId, sourceData] of Object.entries(sources)) {
@@ -291,7 +291,7 @@ class PkgController {
       this.statsIndex[newPupStatsData.id] = newPupStatsData
 
       // Update pup array data in place
-      const foundIndex = this.pups.findIndex(p => p.state.id === newPupStatsData.id)
+      const foundIndex = this.pups.findIndex(p => p?.state?.id === newPupStatsData.id)
       if (foundIndex >= 0) {
         this.pups[foundIndex].stats = newPupStatsData;
         this.pups[foundIndex].computed = this.determineCalculatedVals(this.pups[foundIndex])
@@ -313,9 +313,12 @@ class PkgController {
     }
 
     const n = newPupStateData
+    console.debug('PUPS ARRAY', { pups: this.pups, stateIndex: this.stateIndex})
+    console.debug('Attempting to find in PUPS using', { pupId: n.id, sourceId: n.source.id, pupName: n.manifest.meta.name })
     const { pup, index } = this.getPupMaster({ pupId: n.id, sourceId: n.source.id, pupName: n.manifest.meta.name });
 
     if (pup) {
+      console.debug('Pup found, updating in place');
       this.stateIndex[newPupStateData.id] = newPupStateData
 
       // Update pup array data in place
@@ -326,19 +329,24 @@ class PkgController {
 
       updated.computed = this.determineCalculatedVals(updated)
 
+      console.debug('this is the found pup, now with updated state', { updated })
+
       this.pups[index] = updated
     } else {
+      console.debug('Pup NOT found, adding new');
       // When receiving a pupState event for a pup NOT found in the stateIndex
       // We add it as a new entry.  This is likely a record for a newly installed pup
       // The user has clicked "install", and the client has received a pup event before
       // the user has called /bootstrap.
       let pup = {
         computed: null,
-        def: this.sourcesIndex[newPupStateData.source.id]?.pups[newPupStateData.manifest.meta.name] || null,
+        def: toEnrichedDef(this.sourcesIndex[newPupStateData.source.id]?.pups[newPupStateData.manifest.meta.name] || null),
         state: newPupStateData,
         stats: this.statsIndex[newPupStateData.id] || null,
       }
       pup.computed = this.determineCalculatedVals(pup);
+
+      console.debug('this is the pup to be added', { pup })
 
       this.stateIndex[pup.state.id] = newPupStateData;
       this.pups.push(pup)
@@ -391,7 +399,7 @@ class PkgController {
     }
 
     const actionType = "PUP-ACTION";
-    const timeoutMs = 15000; // 15 seconds
+    const timeoutMs = 45000; // 45 seconds
 
     // Make a network call
     const res = await pickAndPerformPupAction(pupId, action, body).catch(
@@ -536,8 +544,8 @@ function determineStatusId(state, stats) {
   const installation = state?.installation;
   const status = stats?.status;
   const flags = {
-    needs_deps: state?.needs_deps,
-    needs_config: state?.needs_config,
+    needs_deps: state?.needsDeps,
+    needs_config: state?.needsConf,
   };
 
   if (installation === "uninstalling") {
@@ -549,7 +557,7 @@ function determineStatusId(state, stats) {
   }
 
   if (flags.needs_deps) {
-    return { id: "needs_deps", label: "Missing Dependencies" };
+    return { id: "needs_deps", label: "Unmet Dependencies" };
   }
 
   if (flags.needs_config) {
@@ -573,4 +581,9 @@ function determineStatusId(state, stats) {
   }
 
   return { id: "unknown", label: "unknown" };
+}
+
+function toEnrichedDef(input) {
+  console.debug({ input });
+  return input;
 }

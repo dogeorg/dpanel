@@ -1,7 +1,7 @@
 import { html, css, classMap, nothing } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 
 export function renderStatus(labels) {
-  const { statusId, statusLabel, installationId, installationLabel } = labels;
+  let { statusId, statusLabel, installationId, installationLabel } = labels;
   const isInstallationLoadingStatus = ["uninstalling", "purging"].includes(installationId)
 
   const styles = css`

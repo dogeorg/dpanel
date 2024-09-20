@@ -29,6 +29,8 @@ class Store {
       status: "online",
       token: false,
       demoSystemPrompt: "",
+      logStatsUpdates: true,
+      logStateUpdates: true,
     };
     this.pupContext = {
       computed: null,

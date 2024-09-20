@@ -4,17 +4,15 @@ import {
   unsafeHTML,
 } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 
+import "/components/views/action-dependency-manage/dependency.js";
+
 export function renderDialog() {
   const pkg = this.getPup();
+  console.log("PACKAGE CHANGED", { pkg });
   const { statusId } = pkg.computed
   const readmeEl = html`<div style="padding: 1em; text-align: center;"> Such empty. This pup does not provide a README.</div>`;
-  const depsEl = pkg.state.manifest?.deps?.pups?.length > 0 
-    ? pkg.state.manifest.deps.pups.map((dep) => html`
-      <action-row prefix="box-seam" name=${dep.id} label=${dep.name} href=${`/explore/${dep.id}/${dep.name}`}>
-        ${dep.condition}
-      </action-row>`)
-    : html`<div style="padding: 1em; text-align: center;"> Such empty. This pup depends on no other.</div>
-  `;
+  const depdenciesArray = pkg?.state?.manifest?.dependencies || [];
+  const depsEl = html`<x-action-manage-deps .dependencies=${depdenciesArray} .providers=${pkg.state.providers} editMode pupId=${pkg.state.id}></x-action-manage-deps>`;
 
   const preventUninstallEl = html`
     <p>Cannot uninstall a running Pup.<br/>Please disable ${pkg.state.manifest.meta.name } and try again.</p>

@@ -12,6 +12,7 @@ import "/components/common/dynamic-form/dynamic-form.js";
 import "/components/views/x-check/index.js";
 import "/components/common/page-container.js";
 import "/components/common/sparkline-chart/sparkline-chart-v2.js";
+import "/components/views/x-metric/metric.js";
 import { bindToClass } from "/utils/class-bind.js";
 import * as renderMethods from "./renders/index.js";
 import { store } from "/state/store.js";
@@ -260,9 +261,8 @@ class PupPage extends LitElement {
     }
 
     const renderStats = () => {
-      const metrics = Object.entries(pkg.stats.metrics).filter(([key, value]) => 
-        Array.isArray(value) && value.every(item => typeof item === 'number')
-      );
+      const metrics = Object.entries(pkg.stats.metrics)
+        .filter(([key, value]) => Array.isArray(value) && value.every(item => typeof item === 'number'))
 
       if (metrics.length === 0) {
         return html`
@@ -272,13 +272,17 @@ class PupPage extends LitElement {
         `;
       }
 
+      metrics[1] = ["ppm", [7,7,7,8,9,10,13,13,13,16,14,17]];
+
       return html`
         <div class="metrics-wrap">
-          ${metrics.map(([key, value]) => html`
+          ${metrics.map(([key, value]) => {
+            const metricDefinition = pkg?.state?.manifest?.metrics.find(m => m.name === key) || {}
+            return html`
             <div class="metric-container">
-              <sparkline-chart-v2 .data="${value}" .label="${key}"></sparkline-chart-v2>
+              <x-metric name=${key} .definition=${metricDefinition} .values=${value}></x-metric>
             </div>
-          `)}
+          `})}
         </div>
       `;
     };
@@ -493,6 +497,7 @@ class PupPage extends LitElement {
     }
 
     .metrics-wrap {
+      margin-top: .5em;
       display: flex;
       flex-direction: row;
       gap: 1em;

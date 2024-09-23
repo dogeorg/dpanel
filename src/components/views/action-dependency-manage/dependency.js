@@ -343,7 +343,7 @@ class DependencyList extends LitElement {
               label="${dep.interfaceName}"
               prefix="box"
               expandable
-              ?expand=${true || this.expandedDependency === dep.interfaceName}
+              ?expand=${this.expandedDependency === dep.interfaceName}
               @row-expand=${() => this.handleExpand(dep.interfaceName)}
             >
               <span>Version: ${dep.interfaceVersion}</span>

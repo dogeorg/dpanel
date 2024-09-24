@@ -53,11 +53,12 @@ export function renderSectionBody(ready, SKELS, hasItems) {
       <div class="pup-card-grid">
         ${repeat(this.packageList.getCurrentPageData(), (pkg) => `${pkg.def.source.id}-${pkg.def.key}`, (pkg) => html`
           <pup-install-card
-            icon="box"
+            defaultIcon="box"
             sourceId=${pkg.def.source.id}
             defKey=${pkg.def.key}
             pupName=${pkg.def.key}
             version=${pkg.def.latestVersion}
+            logoBase64=${pkg.def.logoBase64}
             short="${pkg.def.versions[pkg.def.latestVersion]?.meta?.shortDescription}"
             ?installed=${pkg.computed.isInstalled}
             href=${pkg.computed.storeURL}

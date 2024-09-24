@@ -8,9 +8,10 @@
   class PupInstallCard extends LitElement {
     static get properties() {
       return {
-        icon: { type: String },
         pupId: { type: String },
         pupName: { type: String },
+        logoBase64: { type: String },
+        defaultIcon: { type: String },
         version: { type: String },
         short: { type: String },
         status: { type: String },
@@ -37,12 +38,12 @@
     }
 
     render() {
-      const { pupName, version, icon, status, gui, short, href } = this;
+      const { defaultIcon, pupName, version, logoBase64, status, gui, short, href } = this;
       return html`
         <a class="anchor" href=${href} target="_self">
           <div class="pup-card-wrap">
             <div class="icon-wrap">
-              <sl-icon name="${icon}"></sl-icon>
+              ${logoBase64 ? html`<img style="width: 100%" src="${logoBase64}" />` : html`<sl-icon name="${defaultIcon}"></sl-icon>`}
             </div>
             <div class="details-wrap">
               <div class="inner">

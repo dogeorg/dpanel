@@ -230,6 +230,11 @@ class PupPage extends LitElement {
     const disableActions = labels.installationId === "uninstalled";
     const isRunning = labels.statusId === "running";
 
+    // descriptions
+    console.log(pkg.state);
+    const short = pkg?.state?.manifest?.meta?.shortDescription || '';
+    const long = pkg?.state?.manifest?.meta?.longDescription || ''
+
     // Exagerate the uninstallation time until reported correctly by dogeboxd.
     if (this._HARDCODED_UNINSTALL_WAIT_TIME) {
       // Temporarily force label to be uninstalling.
@@ -372,6 +377,31 @@ class PupPage extends LitElement {
           ${renderStats()}
         </section>
         ` : nothing }
+
+        <section>
+          <div class=${sectionTitleClasses}>
+            <h3>About</h3>
+          </div>
+          <reveal-row style="margin-top:-1em;">
+            ${short && long
+              ? html`
+                <p>${short}</p>
+                <p>${long}</p>
+                `
+              : nothing
+            }
+
+            ${short || long
+              ? html`<p>${short || long}</p>`
+              : nothing
+            }
+
+            ${!short && !long
+              ? html`<small style="font-family: 'Comic Neue'; color: var(--sl-color-neutral-600);">Such empty, no description.</small>`
+              : nothing
+            }
+          </reveal-row>
+        </section>
 
         <section>
           <div class=${sectionTitleClasses}>

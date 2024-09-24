@@ -163,7 +163,7 @@ class PupInstallPage extends LitElement {
               }
 
               ${!short && !long
-                ? html`<p>Such empty, no description provided.`
+                ? html`<p>Such empty, no description provided.</p>`
                 : nothing
               }
             </reveal-row>

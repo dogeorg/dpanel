@@ -272,8 +272,6 @@ class PupPage extends LitElement {
         `;
       }
 
-      metrics[1] = ["ppm", [7,7,7,8,9,10,13,13,13,16,14,17]];
-
       return html`
         <div class="metrics-wrap">
           ${metrics.map(([key, value]) => {

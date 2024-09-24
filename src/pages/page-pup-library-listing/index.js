@@ -265,10 +265,7 @@ class PupPage extends LitElement {
     }
 
     const renderStats = () => {
-      const metrics = Object.entries(pkg.stats.metrics)
-        .filter(([key, value]) => Array.isArray(value) && value.every(item => typeof item === 'number'))
-
-      if (metrics.length === 0) {
+      if (pkg.stats.metrics.length === 0) {
         return html`
           <div class="metrics-wrap">
             <small style="font-family: 'Comic Neue'; color: var(--sl-color-neutral-600);">Such empty. Pup reports no metrics</small>
@@ -278,42 +275,36 @@ class PupPage extends LitElement {
 
       return html`
         <div class="metrics-wrap">
-          ${metrics.map(([key, value]) => {
-            const metricDefinition = pkg?.state?.manifest?.metrics.find(m => m.name === key) || {}
+          ${pkg.stats.metrics.map((metric) => {
             return html`
-            <div class="metric-container">
-              <x-metric name=${key} .definition=${metricDefinition} .values=${value}></x-metric>
-            </div>
-          `})}
+              <div class="metric-container">
+                <x-metric .metric=${metric}></x-metric>
+              </div>
+            `;
+          })}
         </div>
       `;
     };
 
     const renderResources = () => {
-    const resourceKeys = ["statusCpuPercent", "statusMemTotal", "statusMemPercent", "statusDisk"];
+      if (pkg.stats.systemMetrics.length === 0) {
+        return html`
+          <div class="metrics-wrap">
+            <p class="no-metrics">No resource metrics available</p>
+          </div>
+        `;
+      }
 
-    const metrics = resourceKeys
-      .filter(key => Array.isArray(pkg.stats[key]) && pkg.stats[key].every(item => typeof item === 'number'))
-      .map(key => [key, pkg.stats[key]]);
-
-    if (metrics.length === 0) {
       return html`
         <div class="metrics-wrap">
-          <p class="no-metrics">No resource metrics available</p>
+          ${pkg.stats.systemMetrics.map((metric) => html`
+            <div class="metric-container">
+              <x-metric .metric="${metric}"></sparkline-chart-v2>
+            </div>
+          `)}
         </div>
       `;
-    }
-
-    return html`
-      <div class="metrics-wrap">
-        ${metrics.map(([key, value]) => html`
-          <div class="metric-container">
-            <sparkline-chart-v2 .data="${value}" .label="${key}"></sparkline-chart-v2>
-          </div>
-        `)}
-      </div>
-    `;
-  };
+    };
 
     const renderMenu = () => html`
       <action-row prefix="power" name="state" label="Enabled" ?disabled=${disableActions}>

@@ -4,26 +4,21 @@ import "/components/common/sparkline-chart/sparkline-chart-v2.js";
 class MetricView extends LitElement {
   static get properties() {
     return {
-      name: { type: String },
-      definition: { type: Object },
-      values: { type: Object },
+      metric: { type: Object },
     }
   }
 
   constructor() {
     super();
-    this.definition = {}
-    this.values = {}
-    this.name = ""
+    this.metric = {}
   }
 
   render () {
-
-    const type = this.definition.type || null
+    const type = this.metric.type || null
 
     return html`
-      <sl-tooltip content="${this.definition.label}" placement="top-start" hoist>
-        <span class="label">${this.name}</span>
+      <sl-tooltip content="${this.metric.name}" placement="top-start" hoist>
+        <span class="label">${this.metric.label}</span>
       </sl-tooltip>
 
       <div class="value-container">
@@ -40,13 +35,13 @@ class MetricView extends LitElement {
 
   renderChart = () => {
     return html`
-      <sparkline-chart-v2 .data="${this.values}"></sparkline-chart-v2>
+      <sparkline-chart-v2 .data="${this.metric.values}"></sparkline-chart-v2>
     `
   }
 
   renderText = () => {
     return html`
-      text..
+      ${this.metric.values[this.metric.values.length - 1]}
     `
   }
 

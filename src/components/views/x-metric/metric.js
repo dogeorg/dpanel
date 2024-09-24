@@ -34,15 +34,26 @@ class MetricView extends LitElement {
   }
 
   renderChart = () => {
+    const values = this.metric.values.filter(Boolean)
+
+    // Make sure we have at least 2 data points to make a line.
+    if (values.length < 2) {
+      return html`<span style="font-weight: bold;">-</span>`
+    }
+
     return html`
-      <sparkline-chart-v2 .data="${this.metric.values}"></sparkline-chart-v2>
+      <sparkline-chart-v2 .data="${values}"></sparkline-chart-v2>
     `
   }
 
   renderText = () => {
-    return html`
-      ${this.metric.values[this.metric.values.length - 1]}
-    `
+    let value = this.metric.values[this.metric.values.length - 1]
+
+    if (!value) {
+      value = '-'
+    }
+
+    return html`<span style="font-weight: bold;">${value}</span>`
   }
 
   static styles = css`

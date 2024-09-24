@@ -147,8 +147,8 @@ class PupInstallPage extends LitElement {
 
         <section>
           <div class="section-title">
-            <h3>Description</h3>
-            <reveal-row>
+            <h3>About</h3>
+            <reveal-row style="margin-top:-1em;">
               ${short && long
                 ? html`
                   <p>${short}</p>

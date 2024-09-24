@@ -36,8 +36,27 @@
       this.requestUpdate();
     }
 
+    renderUpstreamVersions(upstreamVersions) {
+      const entries = Object.entries(upstreamVersions);
+      const displayCount = 3;
+      const remainingCount = entries.length - displayCount;
+
+      return html`
+        ${entries.slice(0, displayCount).map(([key, value], index) => {
+          const variant = index === 0 ? 'success' : 'neutral';
+          return html`
+            <sl-tag size="small" variant="${variant}">${key}: ${value}</sl-tag>
+          `;
+        })}
+        ${remainingCount > 0 ? html`
+          <sl-tag size="small" variant="neutral">+${remainingCount} more</sl-tag>
+        ` : ''}
+      `;
+    }
+
     render() {
-      const { defaultIcon, logoBase64, pupName, version, status, hasGui, href, gref } = this;
+      const { defaultIcon, logoBase64, pupName, version, status, hasGui, href, gref, upstreamVersions } = this;
+
       const statusClassMap = classMap({
         status: true,
         running: status === "running"
@@ -51,8 +70,10 @@
 
             <div class="details-wrap">
               <div class="inner">
-                <span class="name">${pupName}</span>
-                <span class="version">${version}</span>
+                <span class="name">${pupName} <small style="color: #777">v${version}</small></span>
+                <div class="labels">
+                  ${this.renderUpstreamVersions(upstreamVersions)}
+                </div>
                 <span class=${statusClassMap}>${status}</span>
               </div>
             </div>
@@ -76,7 +97,7 @@
     static styles = css`
       :host {
         --icon-size: 72px;
-        --row-height: 84px;
+        --row-height: 114px;
       }
 
       a, button {
@@ -96,6 +117,7 @@
         width: 100%;
         padding: 1em;
         box-sizing: border-box;
+        overflow: hidden;
       }
 
       .pup-card-wrap:hover {
@@ -135,7 +157,7 @@
         display: flex;
         flex-direction: column;
         align-items: start;
-        line-height: 1.3;
+        line-height: 1.5;
       }
 
       .suffix-wrap {
@@ -159,13 +181,26 @@
         font-weight: bold;
       }
 
+      div.labels {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        font-size: 0.7rem;
+        align-items: center;
+        gap: 0.25em;
+        min-width: 300px;
+        overflow: hidden;
+      }
+
+      div.labels .service {}
+
       span.version {
         font-weight: 100;
         font-size: 0.9rem;
       }
 
       span.status {
-        line-height: 1.5;
+        line-height: 1.7;
         text-transform: capitalize;
         font-size: 0.9rem;
         color: grey;

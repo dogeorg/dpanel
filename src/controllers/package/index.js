@@ -9,6 +9,7 @@ class PkgController {
   stateIndex = {}
   statsIndex = {}
   sourcesIndex = {}
+  assetIndex = {}
 
   constructor() {
     this.transactionTimeoutChecker();
@@ -42,8 +43,8 @@ class PkgController {
   }
 
   setData(bootstrapResponseV2) {
-    const { states, stats } = bootstrapResponseV2;
-    this.handleBootstrapResponse(states, stats);
+    const { states, stats, assets } = bootstrapResponseV2;
+    this.handleBootstrapResponse(states, stats, assets);
     this.notify();
   }
 
@@ -52,9 +53,10 @@ class PkgController {
     this.notify();
   }
 
-  handleBootstrapResponse(states, stats) {
-    this.stateIndex = states;
-    this.statsIndex = stats
+  handleBootstrapResponse(states, stats, assets) {
+    this.stateIndex = states || {};
+    this.statsIndex = stats || {};
+    this.assetIndex = assets || {};
     this.pups = [];
 
     for (const [stateKey, stateData] of Object.entries(states)) {
@@ -67,7 +69,8 @@ class PkgController {
         this.pups[index] = {
           ...this.pups[index],
           state: stateData,
-          stats: stats[stateKey]
+          stats: stats[stateKey],
+          assets: assets[stateKey],
         }
         this.pups[index].computed = {
           ...this.pups[index].computed,
@@ -81,6 +84,7 @@ class PkgController {
           def: null,
           state: stateData,
           stats: stats[stateKey],
+          assets: assets[stateKey],
         }
         newPup.computed = this.determineCalculatedVals(newPup);
         this.pups.push(newPup);
@@ -156,6 +160,7 @@ class PkgController {
               def,
               state: null,
               stats: null,
+              assets: null,
             }
             pup.computed = this.determineCalculatedVals(pup);
             this.pups.push(pup)
@@ -342,6 +347,7 @@ class PkgController {
         computed: null,
         def: toEnrichedDef(this.sourcesIndex[newPupStateData.source.id]?.pups[newPupStateData.manifest.meta.name] || null),
         state: newPupStateData,
+        assets: null,
         stats: this.statsIndex[newPupStateData.id] || null,
       }
       pup.computed = this.determineCalculatedVals(pup);

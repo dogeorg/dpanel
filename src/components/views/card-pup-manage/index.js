@@ -9,10 +9,11 @@
   class PupCard extends LitElement {
     static get properties() {
       return {
-        icon: { type: String },
         pupId: { type: String },
         pupName: { type: String },
         version: { type: String },
+        logoBase64: { type: String },
+        defaultIcon: { type: String },
         status: { type: String },
         running: { type: Boolean },
         hasGui: { type: Boolean },
@@ -36,7 +37,7 @@
     }
 
     render() {
-      const { pupName, version, icon, status, hasGui, href, gref } = this;
+      const { defaultIcon, logoBase64, pupName, version, status, hasGui, href, gref } = this;
       const statusClassMap = classMap({
         status: true,
         running: status === "running"
@@ -44,8 +45,8 @@
       return html`
         <a class="anchor" href=${href} target="_self">
           <div class="pup-card-wrap">
-            <div class="icon-wrap">
-              <sl-icon name="${icon}"></sl-icon>
+            <div class="icon-wrap ${logoBase64 ? 'has-logo' : ''}">
+              ${logoBase64 ? html`<img style="width: 100%" src="${logoBase64}" />` : html`<sl-icon name="${defaultIcon}"></sl-icon>`}
             </div>
 
             <div class="details-wrap">
@@ -115,6 +116,10 @@
         box-sizing: border-box;
         margin-right: 0.5em;
         margin-top: calc((var(--row-height) - var(--icon-size)) / 2);
+      }
+
+      .icon-wrap.has-logo {
+        background: none;
       }
 
       .details-wrap {

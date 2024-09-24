@@ -42,7 +42,7 @@
       return html`
         <a class="anchor" href=${href} target="_self">
           <div class="pup-card-wrap">
-            <div class="icon-wrap">
+            <div class="icon-wrap ${logoBase64 ? 'has-logo' : ''}">
               ${logoBase64 ? html`<img style="width: 100%" src="${logoBase64}" />` : html`<sl-icon name="${defaultIcon}"></sl-icon>`}
             </div>
             <div class="details-wrap">
@@ -104,6 +104,10 @@
         box-sizing: border-box;
         margin-right: 0.5em;
         margin-top: calc((var(--row-height) - var(--icon-size)) / 2);
+      }
+
+      .icon-wrap.has-logo {
+        background: none;
       }
 
       .details-wrap {

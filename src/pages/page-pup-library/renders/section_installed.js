@@ -43,6 +43,7 @@ export function renderSectionInstalledHeader(ready) {
 }
 
 export function renderSectionInstalledBody(ready, SKELS, hasItems) {
+
   return html`
     ${this.fetchLoading ? html`
       <div class="details-group">
@@ -62,18 +63,21 @@ export function renderSectionInstalledBody(ready, SKELS, hasItems) {
 
     ${ready && hasItems('installed') ? html`
       <div class="pup-card-grid">
-        ${repeat(this.installedList.getCurrentPageData(), (pkg) => `${pkg.state.id}-${pkg.state.version}`, (pkg) => html`
-          <pup-card
-            icon="box"
-            pupId=${pkg.state.id}
-            pupName=${pkg.state.manifest.meta.name}
-            version=${pkg.state.version}
-            status=${pkg.computed.statusLabel}
-            href=${pkg.computed.libraryURL}
-            gref=${pkg.computed.pupURL}
-            ?hasGui=${false}
-          ></pup-card>
-        `)}
+        ${repeat(this.installedList.getCurrentPageData(), (pkg) => `${pkg.state.id}-${pkg.state.version}`, (pkg) => {
+          return html`
+            <pup-card
+              defaultIcon="box"
+              pupId=${pkg.state.id}
+              pupName=${pkg.state.manifest.meta.name}
+              version=${pkg.state.version}
+              logoBase64=${pkg?.assets?.logos?.mainLogoBase64}
+              status=${pkg.computed.statusLabel}
+              href=${pkg.computed.libraryURL}
+              gref=${pkg.computed.pupURL}
+              ?hasGui=${false}
+            ></pup-card>
+          `}
+        )}
       </div>
       <style>${pupCardGrid}</style>
 

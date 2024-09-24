@@ -20,7 +20,6 @@ class MetricView extends LitElement {
   render () {
 
     const type = this.definition.type || null
-    console.log({ type });
 
     return html`
       <sl-tooltip content="${this.definition.label}" placement="top-start" hoist>

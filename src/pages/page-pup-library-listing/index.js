@@ -231,7 +231,6 @@ class PupPage extends LitElement {
     const isRunning = labels.statusId === "running";
 
     // descriptions
-    console.log(pkg.state);
     const short = pkg?.state?.manifest?.meta?.shortDescription || '';
     const long = pkg?.state?.manifest?.meta?.longDescription || ''
 

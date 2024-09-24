@@ -93,7 +93,6 @@ class RevealRow extends LitElement {
 
   render() {
     const showToggle = this.contentLength > 130;
-    console.log({showToggle, len: this.contentLength });
     return html`
       <div>
         <div part="body" @click=${showToggle ? this.performExpand : null} class="body-wrap ${this.expanded ? 'expanded' : 'collapsed'}">

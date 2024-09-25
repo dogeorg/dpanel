@@ -3,8 +3,7 @@ import { html, css, nothing, repeat } from '/vendor/@lit/all@3.1.2/lit-all.min.j
 var pupCardGrid = css`
   .pup-card-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1em;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
   }
 `
 
@@ -72,6 +71,7 @@ export function renderSectionInstalledBody(ready, SKELS, hasItems) {
               version=${pkg.state.version}
               logoBase64=${pkg?.assets?.logos?.mainLogoBase64}
               status=${pkg.computed.statusLabel}
+              .upstreamVersions=${pkg.state.manifest?.meta?.upstreamVersions || {}}
               href=${pkg.computed.libraryURL}
               gref=${pkg.computed.pupURL}
               ?hasGui=${false}

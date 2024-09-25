@@ -373,22 +373,9 @@ class PupPage extends LitElement {
             <h3>About</h3>
           </div>
           <reveal-row style="margin-top:-1em;">
-            ${short && long
-              ? html`
-                <p>${short}</p>
-                <p>${long}</p>
-                `
-              : nothing
-            }
-
-            ${short || long
-              ? html`<p>${short || long}</p>`
-              : nothing
-            }
-
-            ${!short && !long
-              ? html`<small style="font-family: 'Comic Neue'; color: var(--sl-color-neutral-600);">Such empty, no description.</small>`
-              : nothing
+            ${long
+              ? html`<p>${long}</p>`
+              : html`<small style="font-family: 'Comic Neue'; color: var(--sl-color-neutral-600);">Such empty, no description.</small>`
             }
           </reveal-row>
         </section>

@@ -6,6 +6,8 @@
     classMap
   } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 
+  import "/components/common/tag-set/tag-set.js";
+
   class PupCard extends LitElement {
     static get properties() {
       return {
@@ -18,7 +20,8 @@
         running: { type: Boolean },
         hasGui: { type: Boolean },
         href: { type: String },
-        gref: { type: String }
+        gref: { type: String },
+        upstreamVersions: { type: Object },
       };
     }
 
@@ -37,7 +40,8 @@
     }
 
     render() {
-      const { defaultIcon, logoBase64, pupName, version, status, hasGui, href, gref } = this;
+      const { defaultIcon, logoBase64, pupName, version, status, hasGui, href, gref, upstreamVersions } = this;
+
       const statusClassMap = classMap({
         status: true,
         running: status === "running"
@@ -51,8 +55,8 @@
 
             <div class="details-wrap">
               <div class="inner">
-                <span class="name">${pupName}</span>
-                <span class="version">${version}</span>
+                <span class="name">${pupName} <small style="color: #777">v${version}</small></span>
+                <x-tag-set .tags=${upstreamVersions} highlight max=1></x-tag-set>
                 <span class=${statusClassMap}>${status}</span>
               </div>
             </div>
@@ -76,7 +80,7 @@
     static styles = css`
       :host {
         --icon-size: 72px;
-        --row-height: 84px;
+        --row-height: 114px;
       }
 
       a, button {
@@ -96,6 +100,7 @@
         width: 100%;
         padding: 1em;
         box-sizing: border-box;
+        overflow: hidden;
       }
 
       .pup-card-wrap:hover {
@@ -135,7 +140,7 @@
         display: flex;
         flex-direction: column;
         align-items: start;
-        line-height: 1.3;
+        line-height: 1.5;
       }
 
       .suffix-wrap {
@@ -165,7 +170,7 @@
       }
 
       span.status {
-        line-height: 1.5;
+        line-height: 1.7;
         text-transform: capitalize;
         font-size: 0.9rem;
         color: grey;

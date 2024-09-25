@@ -17,6 +17,10 @@ class RevealRow extends LitElement {
       font-size: 1rem;
     }
 
+    .wrap.has-more .collapsed {
+      cursor: pointer;
+    }
+
     .body-wrap {
       transition: max-height 0.2s ease-in-out;
       overflow: hidden;
@@ -25,7 +29,6 @@ class RevealRow extends LitElement {
 
     .collapsed {
       max-height: 7em;
-      cursor: pointer;
     }
 
     .expanded {
@@ -42,7 +45,7 @@ class RevealRow extends LitElement {
       display: none;
     }
 
-    shadow.show {
+    .shadow.show {
       display: var(--shadow-display, block);
     }
 
@@ -94,7 +97,7 @@ class RevealRow extends LitElement {
   render() {
     const showToggle = this.contentLength > 130;
     return html`
-      <div>
+      <div class="wrap ${showToggle ? 'has-more' : ''}">
         <div part="body" @click=${showToggle ? this.performExpand : null} class="body-wrap ${this.expanded ? 'expanded' : 'collapsed'}">
           <slot></slot>
           <div class="shadow ${showToggle ? 'show' : ''}"></div>

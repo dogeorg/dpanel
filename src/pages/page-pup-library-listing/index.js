@@ -337,6 +337,10 @@ class PupPage extends LitElement {
       <action-row prefix="boxes" name="deps" label="Dependencies" .trigger=${this.handleMenuClick}>
         Functionality this pup depends on from other pups.
       </action-row>
+
+      <action-row prefix="box-arrow-up" name="ints" label="Interfaces" .trigger=${this.handleMenuClick}>
+        Functionality this pup provides for other pups.
+      </action-row>
     `
 
     const renderCareful = () => html`

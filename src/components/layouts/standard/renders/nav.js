@@ -1,4 +1,5 @@
 import { html, classMap } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
+import { notYet } from "/components/common/not-yet-implemented.js";
 
 export function renderNav(CURPATH) {
   const gutterNavClasses = classMap({
@@ -34,12 +35,12 @@ export function renderNav(CURPATH) {
               Explore
             </a>
 
-            <a href="/stats" class="menu-item ${CURPATH.startsWith("/stats") ? "active" : ""}">
+            <a href="/stats" @click="${(e) => { e.stopPropagation(); e.preventDefault(); notYet(); }}" class="menu-item ${CURPATH.startsWith("/stats") ? "active" : ""}">
               <sl-icon name="heart-pulse-fill"></sl-icon>
               Monitor
             </a>
 
-            <a href="/settings" class="menu-item ${CURPATH.startsWith("/settings") ? "active" : ""}">
+            <a href="/settings" @click="${(e) => { e.stopPropagation(); e.preventDefault(); notYet(); }}" class="menu-item ${CURPATH.startsWith("/settings") ? "active" : ""}">
               <sl-icon name="sliders"></sl-icon>
               Settings
             </a>

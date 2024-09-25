@@ -5,19 +5,35 @@ class MetricView extends LitElement {
   static get properties() {
     return {
       metric: { type: Object },
+      expand: { type: Boolean, reflect: true }
     }
   }
 
   constructor() {
     super();
     this.metric = {}
+    this.expand = false;
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    this.addEventListener('click', this.handleClick)
+  }
+
+  disconnectedCallback() {
+    this.removeEventListener('click', this.handleClick)
+    super.disconnectedCallback();
+  }
+
+  handleClick() {
+    this.expand = !this.expand
   }
 
   render () {
     const type = this.metric.type || null
 
     return html`
-      <sl-tooltip content="${this.metric.name}" placement="top-start" hoist>
+      <sl-tooltip content="${this.metric.label}" placement="top-start" hoist>
         <span class="label">${this.metric.label}</span>
       </sl-tooltip>
 
@@ -38,7 +54,7 @@ class MetricView extends LitElement {
 
     // Make sure we have at least 2 data points to make a line.
     if (values.length < 2) {
-      return html`<span style="font-weight: bold;">-</span>`
+      return html`<span>-</span>`
     }
 
     return html`
@@ -53,7 +69,7 @@ class MetricView extends LitElement {
       value = '-'
     }
 
-    return html`<span style="font-weight: bold;">${value}</span>`
+    return html`<span>${value}</span>`
   }
 
   static styles = css`
@@ -64,12 +80,24 @@ class MetricView extends LitElement {
       border-radius: 4px;
       padding: 6px 10px 10px 10px;
       border: 1px solid #1d5145;
+      min-width: 120px;
+      width: auto;
+    }
+    :host([expand]) {
+      min-width: max-content;
     }
     .label {
       font-size: 0.8rem;
       color: #07ffae;
       font-weight: bold;
       text-transform: uppercase;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-height: 1.5rem;
+      line-height: 1.5rem;
     }
     .label:hover {
       cursor: help;
@@ -77,6 +105,9 @@ class MetricView extends LitElement {
     .value-container {
       max-height: 40px;
       min-height: 40px;
+      font-family: Monospace;
+      font-weight: normal;
+      font-size: 0.9rem;
     }
   `
 }

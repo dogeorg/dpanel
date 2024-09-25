@@ -4,7 +4,8 @@ class RevealRow extends LitElement {
   static get properties() {
     return {
       label: { type: String },
-      expanded: { type: Boolean }
+      expanded: { type: Boolean },
+      contentLength: { type: Number }
     };
   }
 
@@ -38,13 +39,20 @@ class RevealRow extends LitElement {
       right: 0;
       height: 30px;
       background: linear-gradient(to bottom, transparent, rgba(35, 37, 42, 0.7));
+      display: none;
+    }
+
+    shadow.show {
       display: var(--shadow-display, block);
     }
 
     .footer {
-      display: flex;
+      display: none;
       align-items: start;
       justify-content: center;
+    }
+    .footer.show {
+      display: flex;
     }
     .footer .suffix {
       border-top: 1px solid rgb(51, 51, 51);
@@ -59,6 +67,18 @@ class RevealRow extends LitElement {
     super();
     this.label = "";
     this.expanded = false;
+    this.contentLength = 0;
+  }
+
+  firstUpdated() {
+    this.updateContentLength();
+  }
+
+  updateContentLength() {
+    const slot = this.shadowRoot.querySelector('slot');
+    const nodes = slot.assignedNodes();
+    this.contentLength = nodes.reduce((acc, node) => acc + (node.textContent || '').length, 0);
+    this.requestUpdate();
   }
 
   performExpand() {
@@ -72,13 +92,14 @@ class RevealRow extends LitElement {
   }
 
   render() {
+    const showToggle = this.contentLength > 130;
     return html`
       <div>
-        <div part="body" @click=${this.performExpand} class="body-wrap ${this.expanded ? 'expanded' : 'collapsed'}">
+        <div part="body" @click=${showToggle ? this.performExpand : null} class="body-wrap ${this.expanded ? 'expanded' : 'collapsed'}">
           <slot></slot>
-          <div class="shadow"></div>
+          <div class="shadow ${showToggle ? 'show' : ''}"></div>
         </div>
-        <div class="footer">
+        <div class="footer ${showToggle ? 'show' : ''}">
           <div class="suffix">
             <sl-button
               variant="text"

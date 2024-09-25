@@ -23,7 +23,7 @@ export function renderStatus(labels) {
 
       &.starting { color: var(--sl-color-primary-600); }
       &.stopping { color: var(--sl-color-danger-600); }
-      &.running { color: var(--sl-color-success-600); }
+      &.running { color: #07ffae; }
       &.stopped { color: var(--color-neutral); }
 
       &.broken { color: var(--sl-color-danger-600);}

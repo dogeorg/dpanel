@@ -134,6 +134,10 @@ class PupInstallPage extends LitElement {
       `
     }
 
+    const short = pkg.def.versions[pkg.def.latestVersion]?.meta?.shortDescription || '';
+    const long = pkg.def.versions[pkg.def.latestVersion]?.meta?.longDescription || ''
+    const noDescription = !short && !long
+
     return html`
       <div id="PageWrapper" class="${wrapperClasses}" ?data-freeze=${popover_page}>
         <section class="status">
@@ -143,9 +147,25 @@ class PupInstallPage extends LitElement {
 
         <section>
           <div class="section-title">
-            <h3>Description</h3>
-            <reveal-row>
-              <p>${pkg.def.versions[pkg.def.latestVersion].meta.shortDescription}<br/>${pkg?.versionLatest?.meta?.longDescription}</p>
+            <h3>About</h3>
+            <reveal-row style="margin-top:-1em;">
+              ${short && long
+                ? html`
+                  <p>${short}</p>
+                  <p>${long}</p>
+                  `
+                : nothing
+              }
+
+              ${short || long
+                ? html`<p>${short || long}</p>`
+                : nothing
+              }
+
+              ${!short && !long
+                ? html`<p>Such empty, no description provided.</p>`
+                : nothing
+              }
             </reveal-row>
           </div>
         </section>

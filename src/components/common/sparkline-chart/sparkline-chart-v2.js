@@ -15,11 +15,11 @@ class SparklineChart extends LitElement {
       display: flex;
       flex-direction: column;
       position: relative;
-      border-bottom:1px solid #444;
+      border-bottom:1px solid #1d5145;
     }
     svg {
       width: auto;
-      height: 30px;
+      height: 40px;
     }
     .tooltip {
       position: absolute;
@@ -73,7 +73,7 @@ class SparklineChart extends LitElement {
       ${this.label ? html`<span class="label" ?disabled=${this.disabled}>${this.label}</span>` : ''}
       <svg
         part="sparkline-svg"
-        width="100" height="30"
+        width="130" height="40"
         stroke-width="2"
         stroke="${this.disabled ? 'grey' : 'rgb(7, 255, 174)'}"
         fill="${fill}">

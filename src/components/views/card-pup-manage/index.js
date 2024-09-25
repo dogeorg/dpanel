@@ -167,7 +167,7 @@
       }
 
       span.status.running {
-        color: #2ede75;
+        color: #07ffae;
       }
     `;
   }

@@ -12,6 +12,7 @@ import "/components/common/dynamic-form/dynamic-form.js";
 import "/components/views/x-check/index.js";
 import "/components/common/page-container.js";
 import "/components/common/sparkline-chart/sparkline-chart-v2.js";
+import "/components/views/x-metric/metric.js";
 import { bindToClass } from "/utils/class-bind.js";
 import * as renderMethods from "./renders/index.js";
 import { store } from "/state/store.js";
@@ -229,6 +230,10 @@ class PupPage extends LitElement {
     const disableActions = labels.installationId === "uninstalled";
     const isRunning = labels.statusId === "running";
 
+    // descriptions
+    const short = pkg?.state?.manifest?.meta?.shortDescription || '';
+    const long = pkg?.state?.manifest?.meta?.longDescription || ''
+
     // Exagerate the uninstallation time until reported correctly by dogeboxd.
     if (this._HARDCODED_UNINSTALL_WAIT_TIME) {
       // Temporarily force label to be uninstalling.
@@ -260,11 +265,7 @@ class PupPage extends LitElement {
     }
 
     const renderStats = () => {
-      const metrics = Object.entries(pkg.stats.metrics).filter(([key, value]) => 
-        Array.isArray(value) && value.every(item => typeof item === 'number')
-      );
-
-      if (metrics.length === 0) {
+      if (pkg.stats.metrics.length === 0) {
         return html`
           <div class="metrics-wrap">
             <small style="font-family: 'Comic Neue'; color: var(--sl-color-neutral-600);">Such empty. Pup reports no metrics</small>
@@ -274,40 +275,36 @@ class PupPage extends LitElement {
 
       return html`
         <div class="metrics-wrap">
-          ${metrics.map(([key, value]) => html`
-            <div class="metric-container">
-              <sparkline-chart-v2 .data="${value}" .label="${key}"></sparkline-chart-v2>
-            </div>
-          `)}
+          ${pkg.stats.metrics.map((metric) => {
+            return html`
+              <div class="metric-container">
+                <x-metric .metric=${metric}></x-metric>
+              </div>
+            `;
+          })}
         </div>
       `;
     };
 
     const renderResources = () => {
-    const resourceKeys = ["statusCpuPercent", "statusMemTotal", "statusMemPercent", "statusDisk"];
+      if (pkg.stats.systemMetrics.length === 0) {
+        return html`
+          <div class="metrics-wrap">
+            <p class="no-metrics">No resource metrics available</p>
+          </div>
+        `;
+      }
 
-    const metrics = resourceKeys
-      .filter(key => Array.isArray(pkg.stats[key]) && pkg.stats[key].every(item => typeof item === 'number'))
-      .map(key => [key, pkg.stats[key]]);
-
-    if (metrics.length === 0) {
       return html`
         <div class="metrics-wrap">
-          <p class="no-metrics">No resource metrics available</p>
+          ${pkg.stats.systemMetrics.map((metric) => html`
+            <div class="metric-container">
+              <x-metric .metric="${metric}"></sparkline-chart-v2>
+            </div>
+          `)}
         </div>
       `;
-    }
-
-    return html`
-      <div class="metrics-wrap">
-        ${metrics.map(([key, value]) => html`
-          <div class="metric-container">
-            <sparkline-chart-v2 .data="${value}" .label="${key}"></sparkline-chart-v2>
-          </div>
-        `)}
-      </div>
-    `;
-  };
+    };
 
     const renderMenu = () => html`
       <action-row prefix="power" name="state" label="Enabled" ?disabled=${disableActions}>
@@ -370,6 +367,31 @@ class PupPage extends LitElement {
           ${renderStats()}
         </section>
         ` : nothing }
+
+        <section>
+          <div class=${sectionTitleClasses}>
+            <h3>About</h3>
+          </div>
+          <reveal-row style="margin-top:-1em;">
+            ${short && long
+              ? html`
+                <p>${short}</p>
+                <p>${long}</p>
+                `
+              : nothing
+            }
+
+            ${short || long
+              ? html`<p>${short || long}</p>`
+              : nothing
+            }
+
+            ${!short && !long
+              ? html`<small style="font-family: 'Comic Neue'; color: var(--sl-color-neutral-600);">Such empty, no description.</small>`
+              : nothing
+            }
+          </reveal-row>
+        </section>
 
         <section>
           <div class=${sectionTitleClasses}>
@@ -493,6 +515,7 @@ class PupPage extends LitElement {
     }
 
     .metrics-wrap {
+      margin-top: .5em;
       display: flex;
       flex-direction: row;
       gap: 1em;

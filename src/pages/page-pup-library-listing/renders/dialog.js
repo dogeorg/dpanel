@@ -11,7 +11,9 @@ export function renderDialog() {
   const { statusId } = pkg.computed
   const readmeEl = html`<div style="padding: 1em; text-align: center;"> Such empty. This pup does not provide a README.</div>`;
   const deps = pkg?.state?.manifest?.dependencies || [];
+  const ints = pkg?.state?.manifest?.interfaces || [];
   const depsEl = html`<x-action-manage-deps .dependencies=${deps} .providers=${pkg.state.providers} editMode pupId=${pkg.state.id}></x-action-manage-deps>`;
+  const intsEl = html`<x-action-interface-list .interfaces=${ints}></x-action-interface-list>`;
 
   const preventUninstallEl = html`
     <p>Cannot uninstall a running Pup.<br/>Please disable ${pkg.state.manifest.meta.name } and try again.</p>
@@ -46,6 +48,7 @@ export function renderDialog() {
       [
         ["readme", () => readmeEl],
         ["deps", () => depsEl],
+        ["ints", () => intsEl],
         ["configure", () => configEl],
         ["uninstall", () => isStopped ? uninstallEl : preventUninstallEl],
       ],

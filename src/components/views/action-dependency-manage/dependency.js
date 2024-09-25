@@ -333,7 +333,7 @@ class DependencyList extends LitElement {
           ? html`
               <div class="empty">
                 Wow, such independence.<br />
-                This pup has no dependencies. That's cool too.
+                This pup has no dependencies.
               </div>
             `
           : nothing}

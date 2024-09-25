@@ -21,6 +21,9 @@ export class InterfaceList extends LitElement {
   }
 
   render() {
+    if (!this.interfaces || !this.interfaces.length) {
+      return;
+    }
 
     const renderSeverityOptions = (severityNumber) => {
       if (!severityNumber || severityNumber < 1 || severityNumber > 3) {
@@ -40,7 +43,7 @@ export class InterfaceList extends LitElement {
     };
 
     const renderPermissionGroup = (group) => {
-      const routeCount = group.routes.length;
+      const routeCount = group?.routes?.length || 0;
       const routeLabel = routeCount === 1 ? "Route" : "Routes";
 
       return html`
@@ -53,11 +56,13 @@ export class InterfaceList extends LitElement {
             <span class="label">Permission description</span>
             <span class="value">${group.description}</span>
           </div>
-          <sl-divider></sl-divider>
-          <div class="routes">
-            <div class="label">${routeCount} ${routeLabel}:</div>
-            <div class="value">${group.routes.map((r) => html`${r}`)}</div>
-          </div>
+          ${group.routes && group.routes.length ? html`
+            <sl-divider></sl-divider>
+            <div class="routes">
+              <div class="label">${routeCount} ${routeLabel}:</div>
+              <div class="value">${group.routes.map((r) => html`${r}`)}</div>
+            </div>`: nothing
+          }
           <sl-divider></sl-divider>
           <div class="severity">
             <span class="label">Severity:</span>

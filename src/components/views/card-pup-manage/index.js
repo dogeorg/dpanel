@@ -6,6 +6,8 @@
     classMap
   } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 
+  import "/components/common/tag-set/tag-set.js";
+
   class PupCard extends LitElement {
     static get properties() {
       return {
@@ -18,7 +20,8 @@
         running: { type: Boolean },
         hasGui: { type: Boolean },
         href: { type: String },
-        gref: { type: String }
+        gref: { type: String },
+        upstreamVersions: { type: Object },
       };
     }
 
@@ -34,24 +37,6 @@
       this._status = newStatus;
       this.running = newStatus === 'running';
       this.requestUpdate();
-    }
-
-    renderUpstreamVersions(upstreamVersions) {
-      const entries = Object.entries(upstreamVersions);
-      const displayCount = 3;
-      const remainingCount = entries.length - displayCount;
-
-      return html`
-        ${entries.slice(0, displayCount).map(([key, value], index) => {
-          const variant = index === 0 ? 'success' : 'neutral';
-          return html`
-            <sl-tag size="small" variant="${variant}">${key}: ${value}</sl-tag>
-          `;
-        })}
-        ${remainingCount > 0 ? html`
-          <sl-tag size="small" variant="neutral">+${remainingCount} more</sl-tag>
-        ` : ''}
-      `;
     }
 
     render() {
@@ -71,9 +56,7 @@
             <div class="details-wrap">
               <div class="inner">
                 <span class="name">${pupName} <small style="color: #777">v${version}</small></span>
-                <div class="labels">
-                  ${this.renderUpstreamVersions(upstreamVersions)}
-                </div>
+                <x-tag-set .tags=${upstreamVersions} highlight max=1></x-tag-set>
                 <span class=${statusClassMap}>${status}</span>
               </div>
             </div>
@@ -180,19 +163,6 @@
         font-size: 1.2rem;
         font-weight: bold;
       }
-
-      div.labels {
-        display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
-        font-size: 0.7rem;
-        align-items: center;
-        gap: 0.25em;
-        min-width: 300px;
-        overflow: hidden;
-      }
-
-      div.labels .service {}
 
       span.version {
         font-weight: 100;

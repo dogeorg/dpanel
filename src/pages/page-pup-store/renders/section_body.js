@@ -3,8 +3,7 @@ import { html, css, nothing, repeat } from '/vendor/@lit/all@3.1.2/lit-all.min.j
 var pupCardGrid = css`
   .pup-card-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1em;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
   }
 `
 
@@ -51,7 +50,8 @@ export function renderSectionBody(ready, SKELS, hasItems) {
 
     ${ready && hasItems('packages') ? html`
       <div class="pup-card-grid">
-        ${repeat(this.packageList.getCurrentPageData(), (pkg) => `${pkg.def.source.id}-${pkg.def.key}`, (pkg) => html`
+        ${repeat(this.packageList.getCurrentPageData(), (pkg) => `${pkg.def.source.id}-${pkg.def.key}`, (pkg) => {
+          return html`
           <pup-install-card
             defaultIcon="box"
             sourceId=${pkg.def.source.id}
@@ -59,11 +59,12 @@ export function renderSectionBody(ready, SKELS, hasItems) {
             pupName=${pkg.def.key}
             version=${pkg.def.latestVersion}
             logoBase64=${pkg.def.logoBase64}
+            .upstreamVersions=${pkg.def.versions[pkg.def.latestVersion]?.meta?.upstreamVersions || {}}
             short="${pkg.def.versions[pkg.def.latestVersion]?.meta?.shortDescription}"
             ?installed=${pkg.computed.isInstalled}
             href=${pkg.computed.storeURL}
           ></pup-install-card>
-        `)}
+        `})}
       </div>
       <style>${pupCardGrid}</style>
 

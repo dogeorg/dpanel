@@ -1,11 +1,15 @@
 import { isAuthed, loadPup, asPage, performLogout } from "./middleware.js"
 
 export const routes = [
+  // {
+  //   path: "/",
+  //   component: "x-page-home",
+  //   pageTitle: "Home",
+  //   before: [isAuthed, asPage]
+  // },
   {
     path: "/",
-    component: "x-page-home",
-    pageTitle: "Home",
-    before: [isAuthed, asPage]
+    before:[(ctx, cmd) => cmd.redirect("/explore")]
   },
   {
     path: "/logout",

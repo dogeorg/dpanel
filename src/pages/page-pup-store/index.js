@@ -196,12 +196,14 @@ class StoreView extends LitElement {
     const SKELS = Array.from({ length: 1 })
 
     return html`
-      <page-banner title="Dogecoin" subtitle="Registry">
-        Extend your Dogebox with Pups<br/>
-        <sl-button size="large" variant="text" ?disabled=${this.fetchLoading} @click=${this.handleManageSourcesClick}>
-          <sl-icon name="database-fill-add" slot="prefix"></sl-icon>
-          Manage Sources
-        </sl-button>
+      <page-banner title="Pup Store" subtitle="Dogebox">
+        <div class="slogan-wrap">
+          Extend your Dogebox with Pups
+          <sl-button size="large" variant="text" ?disabled=${this.fetchLoading} @click=${this.handleManageSourcesClick}>
+            <sl-icon name="database-fill-add" slot="prefix"></sl-icon>
+            Manage Sources
+          </sl-button>
+        </div>
       </page-banner>
 
       <div class="row search-wrap">
@@ -282,6 +284,20 @@ class StoreView extends LitElement {
       padding: var(--sl-spacing-x-large) var(--sl-spacing-medium);
       font-family: 'Comic Neue', sans-serif;
       text-align: center;
+    }
+
+    .slogan-wrap {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      @media (min-width: 800px) {
+        display: flex;
+        flex-direction: row;
+        gap: 1.5em;
+        justify-content: center;
+        align-items: center;
+      }
     }
   `
 }

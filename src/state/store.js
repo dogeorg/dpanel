@@ -5,7 +5,6 @@ class Store {
 
   constructor() {
     this.appContext = this.appContext || {
-      // Define application state here
       orienation: "landscape",
       menuVisible: false,
       pathname: "/",
@@ -15,9 +14,6 @@ class Store {
       navigationDirection: ""
     };
     this.networkContext = this.networkContext || {
-      // Define network state here
-      // apiBaseUrl: 'http://192.168.0.110:3000',
-      // wsApiBaseUrl: 'ws://192.168.0.110:3000',
       apiBaseUrl: `${window.location.protocol}//${window.location.hostname}:3000`,
       wsApiBaseUrl: `ws://${window.location.hostname}:3000`,
       overrideBaseUrl: false,
@@ -29,8 +25,8 @@ class Store {
       status: "online",
       token: false,
       demoSystemPrompt: "",
-      logStatsUpdates: true,
-      logStateUpdates: true,
+      logStatsUpdates: false,
+      logStateUpdates: false,
     };
     this.pupContext = {
       computed: null,

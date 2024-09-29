@@ -46,7 +46,9 @@
         <a class="anchor" href=${href} target="_self">
           <div class="pup-card-wrap">
             <div class="icon-wrap ${logoBase64 ? 'has-logo' : ''}">
-              ${logoBase64 ? html`<img style="width: 100%" src="${logoBase64}" />` : html`<sl-icon name="${defaultIcon}"></sl-icon>`}
+              ${logoBase64 
+                ? html`<div class="circular-image"><img src="${logoBase64}" alt="${pupName} logo" /></div>` 
+                : html`<sl-icon name="${defaultIcon}"></sl-icon>`}
             </div>
             <div class="details-wrap">
               <div class="inner">
@@ -66,6 +68,31 @@
         --icon-size: 72px;
         --row-height: 114px;
       }
+
+      .icon-wrap {
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .icon-wrap.has-logo {
+    padding: 0;
+  }
+
+  .circular-image {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    overflow: hidden;
+  }
+
+  .circular-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 
       a, button {
         touch-action: manipulation;

@@ -39,7 +39,6 @@ class SelectNetwork extends LitElement {
     return {
       showSuccessAlert: { type: Boolean },
       reflectorToken: { type: String },
-      reflectorHost: { type: String },
       _server_fault: { type: Boolean },
       _invalid_creds: { type: Boolean },
       _setNetworkFields: { type: Object },
@@ -280,7 +279,7 @@ class SelectNetwork extends LitElement {
       hostname: state['device-name'],
       initialSSHKey: state['ssh-key'],
       reflectorToken: this.reflectorToken,
-      reflectorHost: this.reflectorHost
+      reflectorHost: store.networkContext.reflectorHost
     }).catch(() => { console.log('bootstrap called but no response returned')});
 
     // if (!finalSystemBootstrap) {

@@ -8,7 +8,6 @@ class SetupCompleteView extends LitElement {
   static get properties() {
     return {
       isFirstTimeSetup: { type: Boolean },
-      reflectorHost: { type: String },
       reflectorToken: { type: String },
     }
   }
@@ -87,7 +86,6 @@ class SetupCompleteView extends LitElement {
           </p>
 
           <x-launcher-button
-            .reflectorHost=${this.reflectorHost}
             .reflectorToken=${this.reflectorToken}
           ></x-launcher-button>
 

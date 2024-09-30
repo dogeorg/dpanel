@@ -212,7 +212,7 @@ class DebugSettingsDialog extends LitElement {
             <sl-input
               type="text"
               name="wsApiBaseUrl"
-              help-text="Web Socket connections wii use this base URL"
+              help-text="Web Socket connections will use this base URL"
               value=${networkContext.wsApiBaseUrl}
               @sl-change=${this.handleInput}>
                 Web Socket Base URL
@@ -228,6 +228,18 @@ class DebugSettingsDialog extends LitElement {
                 Force Prompt by Name
             </sl-input>
           </div>
+
+          <div class="form-control">
+            <sl-input
+              type="text"
+              name="reflectorHost"
+              help-text="Override reflector host"
+              value="${networkContext.reflectorHost ?? "https://reflector.dogebox.org"}"
+              @sl-change=${this.handleInput}>
+              Override reflector host
+            </sl-input>
+          </div>
+
           <div class="form-control">
             <sl-button variant="warning" @click=${() => store.updateState({ networkContext: { token: "invalid-token-here" }})}>Invalidate Auth Token</sl-buton>
           </div>

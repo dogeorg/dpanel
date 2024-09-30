@@ -8,7 +8,6 @@ class DogeboxLauncherButton extends LitElement {
 
   static get properties() {
     return {
-      reflectorHost: { type: String },
       reflectorToken: { type: String },
       _ready: { type: Boolean },
       _ip: { type: String }
@@ -42,7 +41,7 @@ class DogeboxLauncherButton extends LitElement {
   }
 
   async check() {
-    const res = await getIP(this.reflectorHost, this.reflectorToken);
+    const res = await getIP(this.reflectorToken);
     if (!res || res.error) {
       this.handleError(res)
       return;

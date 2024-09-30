@@ -1,11 +1,12 @@
 import ApiClient from '/api/client.js';
+import { store } from "/state/store.js";
 
 import { 
   getResponse,
 } from './get-ip.mocks.js'
 
-export async function getIP(reflectorHost, reflectorToken) {
-  const client = new ApiClient(reflectorHost, {
+export async function getIP(reflectorToken) {
+  const client = new ApiClient(store.networkContext.reflectorHost, {
     // Set externalAPI so we don't leak our authentication token to the reflector.
     externalAPI: true
   })

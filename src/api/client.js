@@ -12,7 +12,7 @@ export default class ApiClient extends ReactiveClass {
     this.networkContext = this.context.store.networkContext;
     this.options = options;
 
-    if (this.networkContext && this.networkContext.overrideBaseUrl) {
+    if (this.networkContext && this.networkContext.overrideBaseUrl && !this.options.externalAPI) {
       this.baseURL = this.networkContext.apiBaseUrl || 'http://nope.localhost:6969';
     }
   }

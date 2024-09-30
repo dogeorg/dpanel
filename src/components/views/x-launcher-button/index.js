@@ -8,6 +8,8 @@ class DogeboxLauncherButton extends LitElement {
 
   static get properties() {
     return {
+      reflectorHost: { type: String },
+      reflectorToken: { type: String },
       _ready: { type: Boolean },
       _ip: { type: String }
     }
@@ -23,11 +25,10 @@ class DogeboxLauncherButton extends LitElement {
     this._intervalId = setInterval(() => {
       if (this._ready) {
         clearInterval(this._intervalId);
-        this._intervalId = setInterval(() => this.check(), 7000);
       } else {
         this.check();
       }
-    }, 10000);
+    }, 3000);
   }
 
   disconnectedCallback() {
@@ -41,9 +42,14 @@ class DogeboxLauncherButton extends LitElement {
   }
 
   async check() {
-    const res = await getIP();
-    if (!res || !res.success || res.error || !res.ip) {
+    const res = await getIP(this.reflectorHost, this.reflectorToken);
+    if (!res || res.error) {
       this.handleError(res)
+      return;
+    }
+
+    if (!res.ip) {
+      // No entry yet.
       return;
     }
 
@@ -71,7 +77,7 @@ class DogeboxLauncherButton extends LitElement {
     return html`
       <div class="action-wrap">
         <sl-tooltip content=${this._ready ? this._ip : "Dogebox IP unknown"}>
-          <sl-button size="large" href="http://${this._ip}" target="_blank" ?disabled=${!this._ready} variant="${this._ready ? "primary" : null }">Launch Dogebox</sl-button>
+          <sl-button size="large" href="http://${this._ip}:8080" target="_blank" ?disabled=${!this._ready} variant="${this._ready ? "primary" : null }">Launch Dogebox</sl-button>
         </sl-tooltip>
         <span class="side-text" href="http://${this._ip}">
           <text-loader .texts=${["Checking", "HOdL tight"]} ?loopEnd=${this._ready} endText="${this._ip}" loop></text-loader>

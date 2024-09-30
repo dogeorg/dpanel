@@ -15,7 +15,7 @@ export const sourceAddMock = {
   res: { success: true }
 }
 
-const client = new ApiClient(store.networkContext.apiBaseUrl, store.networkContext)
+const client = new ApiClient(store.networkContext.apiBaseUrl)
 
 export async function removeSource(sourceId) {
   return client.delete(`/source/${sourceId}`, null, { mock: sourceRemovalMock });

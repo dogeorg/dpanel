@@ -68,6 +68,10 @@ class AppModeApp extends LitElement {
     this.setupState = null;
     bindToClass(renderChunks, this);
     this.context = new StoreSubscriber(this, store);
+
+    this.reflectorToken = Math.random().toString(36).substring(2, 14);
+    // this.reflectorHost = 'https://reflector.dogebox.org'
+    this.reflectorHost = "http://127.0.0.1:9999"
   }
 
   set setupState(newValue) {
@@ -225,11 +229,16 @@ class AppModeApp extends LitElement {
                         () =>
                           html`<x-action-select-network
                             .onSuccess=${async () => { await asyncTimeout(750); this._nextStep() }}
+                            .reflectorHost=${this.reflectorHost}
+                            .reflectorToken=${this.reflectorToken}
                           ></x-action-select-network>`,
                       ],
                       [
                         STEP_DONE,
-                        () => html`<x-page-recovery></x-page-recovery>`,
+                        () => html`<x-page-recovery
+                          .reflectorHost=${this.reflectorHost}
+                          .reflectorToken=${this.reflectorToken}
+                        ></x-page-recovery>`,
                       ],
                     ],
                     () => html`<h1>Error</h1>`,

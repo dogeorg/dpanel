@@ -38,6 +38,8 @@ class SelectNetwork extends LitElement {
   static get properties() {
     return {
       showSuccessAlert: { type: Boolean },
+      reflectorToken: { type: String },
+      reflectorHost: { type: String },
       _server_fault: { type: Boolean },
       _invalid_creds: { type: Boolean },
       _setNetworkFields: { type: Object },
@@ -276,8 +278,9 @@ class SelectNetwork extends LitElement {
     // TODO: move this into post-network flow.
     const finalSystemBootstrap = await postSetupBootstrap({
       hostname: state['device-name'],
-      reflectorToken: null,
-      initialSSHKey: state['ssh-key']
+      initialSSHKey: state['ssh-key'],
+      reflectorToken: this.reflectorToken,
+      reflectorHost: this.reflectorHost
     }).catch(() => { console.log('bootstrap called but no response returned')});
 
     // if (!finalSystemBootstrap) {

@@ -5,7 +5,7 @@ import {
   generateManifests
 } from './manifest.mocks.js'
 
-const client = new ApiClient(store.networkContext.apiBaseUrl, store.networkContext)
+const client = new ApiClient(store.networkContext.apiBaseUrl)
 
 export async function getManifest() {
   return client.get('/manifest/', { mock: generateManifests });

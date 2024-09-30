@@ -4,12 +4,13 @@ import { ReactiveClass } from "/utils/class-reactive.js";
 import { StoreSubscriber } from "/state/subscribe.js";
 
 export default class ApiClient extends ReactiveClass {
-  constructor(baseURL, networkContext = {}) {
+  constructor(baseURL, options = {}) {
     super();
     this.baseURL = baseURL
 
     this.context = new StoreSubscriber(this, store);
     this.networkContext = this.context.store.networkContext;
+    this.options = options;
 
     if (this.networkContext && this.networkContext.overrideBaseUrl) {
       this.baseURL = this.networkContext.apiBaseUrl || 'http://nope.localhost:6969';
@@ -65,7 +66,7 @@ export default class ApiClient extends ReactiveClass {
     const url = new URL(path, this.baseURL).href;
     const headers = { 'Content-Type': 'application/json', ...config.headers };
 
-    if (this.networkContext.token) {
+    if (this.networkContext.token && !this.options.externalAPI) {
       headers.Authorization = `Bearer ${this.networkContext.token}`
     }
 

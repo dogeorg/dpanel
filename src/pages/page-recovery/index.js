@@ -5,6 +5,13 @@ import { notYet } from "/components/common/not-yet-implemented.js"
 import "/components/views/x-launcher-button/index.js";
 
 class SetupCompleteView extends LitElement {
+  static get properties() {
+    return {
+      reflectorHost: { type: String },
+      reflectorToken: { type: String },
+    }
+  }
+
   static styles = [
     themes,
     css`
@@ -77,7 +84,10 @@ class SetupCompleteView extends LitElement {
             password, key and connection.
           </p>
 
-          <x-launcher-button></x-launcher-button>
+          <x-launcher-button
+            .reflectorHost=${this.reflectorHost}
+            .reflectorToken=${this.reflectorToken}
+          ></x-launcher-button>
 
           <p>
             Need help? Visit

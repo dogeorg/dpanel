@@ -268,6 +268,7 @@ class SelectNetwork extends LitElement {
     // temp: also call our final initialisation API here.
     // TODO: move this into post-network flow.
     const finalSystemBootstrap = await postSetupBootstrap({
+      hostname: state['device-name'],
       reflectorToken: null
     }).catch(() => { console.log('bootstrap called but no response returned')});
 

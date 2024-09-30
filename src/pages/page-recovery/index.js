@@ -65,8 +65,8 @@ class SetupCompleteView extends LitElement {
     `,
   ];
 
-  handleMgmtOptionClick(e) {
-    store.updateState({ setupContext: { view: e.currentTarget.getAttribute('data-id') }});
+  handleMgmtOptionClick(e, hideViewClose) {
+    store.updateState({ setupContext: { view: e.currentTarget.getAttribute('data-id'), hideViewClose: hideViewClose }});
   }
 
   render() {
@@ -123,7 +123,15 @@ class SetupCompleteView extends LitElement {
             @click=${this.handleMgmtOptionClick}>Change Password
           </sl-button>
 
-          <sl-button variant="neutral" outline data-id="factory-reset"
+          <sl-button variant="neutral" outline data-id="reboot"
+            @click=${(e) => this.handleMgmtOptionClick(e, true)}>Reboot
+          </sl-button>
+
+          <sl-button variant="neutral" outline data-id="power-off"
+            @click=${(e) => this.handleMgmtOptionClick(e, true)}>Power Off
+          </sl-button>
+
+          <sl-button variant="danger" outline data-id="factory-reset"
             @click=${notYet}>Factory Reset
           </sl-button>
         </div>

@@ -21,6 +21,8 @@ import "/components/views/action-change-pass/index.js";
 import "/components/views/action-create-key/index.js";
 import "/components/views/action-select-network/index.js";
 import "/components/views/setup-dislaimer/index.js";
+import "/components/views/confirmation-prompt/index.js";
+
 import "/pages/page-recovery/index.js";
 
 // Components
@@ -40,6 +42,8 @@ import { asyncTimeout } from "/utils/timeout.js";
 
 // APIS
 import { getSetupBootstrap } from "/api/system/get-bootstrap.js";
+import { postHostReboot } from "/api/system/post-host-reboot.js";
+import { postHostShutdown } from "/api/system/post-host-shutdown.js";
 
 // Do this once to set the location of shoelace assets (icons etc..)
 setBasePath("/vendor/@shoelace/cdn@2.14.0/");
@@ -143,7 +147,7 @@ class AppModeApp extends LitElement {
     });
     this.dialogMgmt.addEventListener("sl-after-hide", (event) => {
       if (event.target.id === "MgmtDialog") {
-        store.updateState({ setupContext: { view: null }});
+        store.updateState({ setupContext: { view: null, hideViewClose: false }});
       }
     });
   }
@@ -164,8 +168,18 @@ class AppModeApp extends LitElement {
     }
   }
 
+  triggerReboot = async () => {
+    await postHostReboot()
+    this._closeMgmtDialog()
+  }
+
+  triggerPoweroff = async () => {
+    await postHostShutdown()
+    this._closeMgmtDialog()
+  }
+
   _closeMgmtDialog = () => {
-    store.updateState({ setupContext: { view: null }});
+    store.updateState({ setupContext: { view: null, hideViewClose: false }});
   }
 
   render() {
@@ -271,12 +285,34 @@ class AppModeApp extends LitElement {
                 resetMethod="credentials"
                 showSuccessAlert
               ></x-action-change-pass>`],
+            ['reboot', () => html`
+              <x-confirmation-prompt
+                title="Are you sure you want to reboot?"
+                description="Remove your USB recovery stick if you want to boot back into normal mode"
+                leftButtonText="Cancel"
+                .leftButtonClick=${this._closeMgmtDialog}
+                rightButtonText="Reboot"
+                .rightButtonClick=${this.triggerReboot}
+              ></x-confirmation-prompt>
+            `],
+            ['power-off', () => html`
+              <x-confirmation-prompt
+                title="Are you sure you want to power off?"
+                description="Physical access may be required to turn your Dogebox on again"
+                leftButtonText="Cancel"
+                .leftButtonClick=${this._closeMgmtDialog}
+                rightButtonText="Yes, turn it off."
+                .rightButtonClick=${this.triggerPoweroff}
+              ></x-confirmation-prompt>
+            `],
             ['factory-reset', () => html`
               <div class="coming-soon">
                 <h3>Not yet implemented</h3>
               </div>`],
           ])}
-          <sl-button slot="footer" outline @click=${this._closeMgmtDialog}>Close</sl-button>
+          ${this.context.store.setupContext.hideViewClose ? nothing : html`
+            <sl-button slot="footer" outline @click=${this._closeMgmtDialog}>Close</sl-button>
+          `}
         </sl-dialog>
       `)}
       <x-debug-panel></x-debug-panel>

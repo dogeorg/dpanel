@@ -1,4 +1,4 @@
-import { LitElement, html, css } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
+import { LitElement, html, css, nothing } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 import { themes } from "/components/common/dynamic-form/themes.js";
 import { store } from "/state/store.js";
 import { notYet } from "/components/common/not-yet-implemented.js"
@@ -7,6 +7,7 @@ import "/components/views/x-launcher-button/index.js";
 class SetupCompleteView extends LitElement {
   static get properties() {
     return {
+      isFirstTimeSetup: { type: Boolean },
       reflectorHost: { type: String },
       reflectorToken: { type: String },
     }
@@ -70,6 +71,7 @@ class SetupCompleteView extends LitElement {
 
   render() {
     return html`
+      ${this.isFirstTimeSetup ? html`
       <div class="upper">
         <img class="hero" src="/static/img/celebrate.png" />
         <div class="actions">
@@ -100,15 +102,17 @@ class SetupCompleteView extends LitElement {
       <div class="center">
         <sl-divider></sl-divider>
       </div>
+      ` : nothing}
 
       <div class="lower">
+        ${this.isFirstTimeSetup ? html`
+          <h2>Recovery Actions</h2>
 
-        <h2>Recovery Actions</h2>
-
-        <p>
-          Insert your recovery USB at any time to perform the following
-          administrative actions
-        </p>
+          <p>
+            Insert your recovery USB at any time to perform the following
+            administrative actions
+          </p>
+        ` : nothing}
 
         <div class="actions gapped">
           <sl-button variant="neutral" outline data-id="network"

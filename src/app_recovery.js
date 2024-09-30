@@ -58,6 +58,7 @@ class AppModeApp extends LitElement {
     isLoggedIn: { type: Boolean },
     activeStepNumber: { type: Number },
     setupState: { type: Object },
+    isFirstTimeSetup: { type: Boolean },
   };
 
   constructor() {
@@ -66,6 +67,8 @@ class AppModeApp extends LitElement {
     this.isLoggedIn = false;
     this.activeStepNumber = 0;
     this.setupState = null;
+    this.isFirstTimeSetup = false;
+
     bindToClass(renderChunks, this);
     this.context = new StoreSubscriber(this, store);
 
@@ -107,6 +110,10 @@ class AppModeApp extends LitElement {
 
   _determineStartingStep(setupState) {
     const { hasCompletedInitialConfiguration, hasGeneratedKey, hasConfiguredNetwork } = setupState;
+
+    if (!hasCompletedInitialConfiguration) {
+      this.isFirstTimeSetup = true;
+    }
 
     // If we're already fully set up, or if we've generated a key, show our login step.
     if ((hasCompletedInitialConfiguration || hasGeneratedKey) && !this.isLoggedIn) {
@@ -185,10 +192,10 @@ class AppModeApp extends LitElement {
         ? html`
             <div id="App" class="chrome">
               <nav class="${navClasses}">
-                ${guard([this.activeStepNumber, this.context.store.networkContext.token], () => this.renderNav())}
+                ${guard([this.isFirstTimeSetup, this.activeStepNumber, this.context.store.networkContext.token], () => this.renderNav(this.isFirstTimeSetup))}
               </nav>
 
-              <main id="Main">
+              <main id="Main" style="padding-top: ${this.isFirstTimeSetup ? '0px;' : '100px'}">
                 <div class="${stepWrapperClasses}">
                   ${choose(
                     this.activeStepNumber,
@@ -238,6 +245,7 @@ class AppModeApp extends LitElement {
                         () => html`<x-page-recovery
                           .reflectorHost=${this.reflectorHost}
                           .reflectorToken=${this.reflectorToken}
+                          .isFirstTimeSetup=${this.isFirstTimeSetup}
                         ></x-page-recovery>`,
                       ],
                     ],

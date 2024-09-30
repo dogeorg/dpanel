@@ -141,13 +141,13 @@ class AppModeApp extends LitElement {
     // Prevent dialog closures on overlay click
     this.dialogMgmt = this.shadowRoot.querySelector("#MgmtDialog");
     this.dialogMgmt.addEventListener("sl-request-close", (event) => {
-      if (event.detail.source === "overlay") {
+      if (event.detail.source === "overlay" || this.context.store.setupContext.preventClose) {
         event.preventDefault();
       }
     });
     this.dialogMgmt.addEventListener("sl-after-hide", (event) => {
       if (event.target.id === "MgmtDialog") {
-        store.updateState({ setupContext: { view: null, hideViewClose: false }});
+        store.updateState({ setupContext: { view: null, hideViewClose: false, preventClose: false }});
       }
     });
   }
@@ -169,17 +169,27 @@ class AppModeApp extends LitElement {
   }
 
   triggerReboot = async () => {
-    await postHostReboot()
-    this._closeMgmtDialog()
+    try {
+      await postHostReboot()
+    } catch {
+      // Ignore.
+    }
+
+    store.updateState({ setupContext: { view: 'post-reboot', hideViewClose: true, preventClose: true }});
   }
 
   triggerPoweroff = async () => {
-    await postHostShutdown()
-    this._closeMgmtDialog()
+    try {
+      await postHostShutdown()
+    } catch {
+      // Ignore.
+    }
+
+    store.updateState({ setupContext: { view: 'post-power-off', hideViewClose: true, preventClose: true }});
   }
 
   _closeMgmtDialog = () => {
-    store.updateState({ setupContext: { view: null, hideViewClose: false }});
+    store.updateState({ setupContext: { view: null, hideViewClose: false, preventClose: false }});
   }
 
   render() {
@@ -295,6 +305,7 @@ class AppModeApp extends LitElement {
                 .rightButtonClick=${this.triggerReboot}
               ></x-confirmation-prompt>
             `],
+            ['post-reboot', () => html`Please re-reconnect to the same network as your Dogebox and refresh.`],
             ['power-off', () => html`
               <x-confirmation-prompt
                 title="Are you sure you want to power off?"
@@ -305,6 +316,7 @@ class AppModeApp extends LitElement {
                 .rightButtonClick=${this.triggerPoweroff}
               ></x-confirmation-prompt>
             `],
+            ['post-power-off', () => html`Dogebox turned off successfully. You may close this page.`],
             ['factory-reset', () => html`
               <div class="coming-soon">
                 <h3>Not yet implemented</h3>

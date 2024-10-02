@@ -19,12 +19,17 @@ export function renderStatus() {
   }
 
   return html`
-    <div class="section-title">
-      <h3 class="installation-label ${isInstalled ? "installed" : "not_installed"}">${normalisedLabel()}</h3>
-    </div>
-    <div>
-      <span class="status-label">${pkg.def.versions[pkg.def.latestVersion].meta.name}</span>
-      <sl-progress-bar class="loading-bar" value="0" ?indeterminate=${isLoadingStatus}></sl-progress-bar>
+    <div style="display: flex; flex-direction: row; gap: 1em;">
+      ${pkg.def.logoBase64 ? html`<img style="width: 82px; height: 82px;" src="${pkg.def.logoBase64}" />` : nothing}
+      <div>
+        <div class="section-title">
+          <h3 class="installation-label ${isInstalled ? "installed" : "not_installed"}">${normalisedLabel()}</h3>
+        </div>
+        <div>
+          <span class="status-label">${pkg.def.versions[pkg.def.latestVersion].meta.name}</span>
+          <sl-progress-bar class="loading-bar" value="0" ?indeterminate=${isLoadingStatus}></sl-progress-bar>
+        </div>
+      </div>
     </div>
     <style>${styles}</style>
   `

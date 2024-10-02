@@ -240,10 +240,6 @@ class PupInstallPage extends LitElement {
       margin-bottom: 2em;
     }
 
-    section div {
-      margin-bottom: 1em;
-    }
-
     section .section-title {
       margin-bottom: 0em;
     }

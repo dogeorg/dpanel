@@ -64,7 +64,9 @@ export function renderActions(labels) {
     }
   `
 
-  const uiButtons = pkg.state.webUIs.map((entry) => {
+  const webUIs = Array.isArray(pkg.state.webUIs) ? pkg.state.webUIs : []
+
+  const uiButtons = webUIs.map((entry) => {
     return html`
       <div style="display: flex; align-items: center;">
         <sl-button
@@ -82,7 +84,7 @@ export function renderActions(labels) {
     `
   })
 
-  const uiButtonsDiv = uiButtons.length > 0 ? html`
+  const uiButtonsDiv = installationId === 'ready' && statusId === 'running' && uiButtons.length > 0 ? html`
     <div style="display: flex; flex-wrap: wrap;gap: 1em;align-items: center; margin-top: 20px;">
       ${uiButtons}
     </div>

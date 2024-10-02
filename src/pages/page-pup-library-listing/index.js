@@ -234,6 +234,8 @@ class PupPage extends LitElement {
     const short = pkg?.state?.manifest?.meta?.shortDescription || '';
     const long = pkg?.state?.manifest?.meta?.longDescription || ''
 
+    const logo = pkg?.assets?.logos?.mainLogoBase64
+
     // Exagerate the uninstallation time until reported correctly by dogeboxd.
     if (this._HARDCODED_UNINSTALL_WAIT_TIME) {
       // Temporarily force label to be uninstalling.
@@ -356,11 +358,14 @@ class PupPage extends LitElement {
 
     return html`
       <div id="PageWrapper" class="wrapper">
-        <section>
-          <div class="section-title">
-            <h3>Status</h3>
+        <section style="display: flex; flex-direction: row; gap: 1em;">
+          ${logo ? html`<img style="width: 91px; height: 91px;" src="${logo}" />` : nothing}
+          <div style="margin-bottom: 0em; width: 100%">
+            <div class="section-title">
+              <h3>Status</h3>
+            </div>
+            ${renderStatusAndActions()}
           </div>
-          ${renderStatusAndActions(labels)}
         </section>
 
         ${isRunning ? html`

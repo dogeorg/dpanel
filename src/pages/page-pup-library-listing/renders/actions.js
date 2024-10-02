@@ -64,6 +64,30 @@ export function renderActions(labels) {
     }
   `
 
+  const uiButtons = pkg.state.webUIs.map((entry) => {
+    return html`
+      <div style="display: flex; align-items: center;">
+        <sl-button
+          size="large"
+          variant="warning"
+          ?disabled="${statusId !== 'running'}"
+          @click=${() => {
+            window.open(`${window.location.protocol}//${window.location.hostname}:${entry.port}/`, "_blank");
+          }}
+        ">
+          <sl-icon slot="prefix" name="stars"></sl-icon>
+          Launch ${entry.name}
+        </sl-button>
+      </div>
+    `
+  })
+
+  const uiButtonsDiv = uiButtons.length > 0 ? html`
+    <div style="display: flex; flex-wrap: wrap;gap: 1em;align-items: center; margin-top: 20px;">
+      ${uiButtons}
+    </div>
+  ` : nothing
+
   return html`
     <div class="action-wrap ${hasButtons ? "margin" : ""}">
 
@@ -86,19 +110,7 @@ export function renderActions(labels) {
         </sl-button>
       ` : nothing }
 
-
-      ${pkg.state.manifest?.gui ? html`
-        <div style="display: flex; align-items: center;">
-          ${statusId === 'needs_config' || statusId === 'needs_deps' ? html`
-          <sl-divider class="show-only-wide" vertical style="height: 1.5em; margin-left: 0.1em;"></sl-divider>
-          `: nothing}
-          <sl-button size="large" variant="warning" href="${pkg.computed.guiURL}"} ?disabled="${installationId !== "ready" }">
-            <sl-icon slot="prefix" name="stars"></sl-icon>
-            Launch UI
-          </sl-button>
-        </div>
-      ` : nothing }
-
+      ${uiButtonsDiv}
     </div>
     <style>${styles}</style>
   `

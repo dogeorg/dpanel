@@ -230,7 +230,7 @@ class CreateKey extends LitElement {
         <div class="phraseProceedActions">
           <sl-checkbox
             @sl-change=${(e) => (this._termsChecked = e.target.checked)}
-            >I understand this prhase is the only way to recover my
+            >I understand this phrase is the only way to recover my
             Dogebox</sl-checkbox
           >
           <sl-button
@@ -270,9 +270,6 @@ class CreateKey extends LitElement {
               <span>Master Key</span>
               <sl-tag pill size="small" variant="success">Set</sl-tag>
             </span>
-            <span class="actions">
-              <sl-icon-button name="trash" @click=${notYet}></sl-icon-button>
-            </span>
           </div>
           <sl-input
             placeholder="XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
@@ -283,6 +280,13 @@ class CreateKey extends LitElement {
         </sl-card>
       </div>
     `;
+
+    // Remove from UI for the moment.
+    const importKeyHTML = html`
+      <sl-button variant="text" @click=${notYet} ?disabled=${this._keyReady}
+        >Import key</sl-button
+      >
+    `
 
     const hasMasterKey = this._keyList.length > 0;
     return html`
@@ -312,9 +316,6 @@ class CreateKey extends LitElement {
                       variant="primary"
                       ?disabled=${this._keyReady}
                       >Generate Master Key</sl-button
-                    >
-                    <sl-button variant="text" @click=${notYet} ?disabled=${this._keyReady}
-                      >Import key</sl-button
                     >
                   `
                 : nothing}

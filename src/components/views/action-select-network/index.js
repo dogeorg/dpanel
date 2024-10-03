@@ -278,7 +278,8 @@ class SelectNetwork extends LitElement {
     const finalSystemBootstrap = await postSetupBootstrap({
       hostname: state['device-name'],
       initialSSHKey: state['ssh-key'],
-      reflectorToken: this.reflectorToken,
+      // Temporarily don't submit reflectorToken until the service is up and running.
+      // reflectorToken: this.reflectorToken,
       reflectorHost: store.networkContext.reflectorHost
     }).catch(() => { console.log('bootstrap called but no response returned')});
 

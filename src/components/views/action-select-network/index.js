@@ -339,6 +339,13 @@ class SelectNetwork extends LitElement {
             >
             </dynamic-form>
             `: nothing }
+
+            <div style="margin-top: 2em;">
+              <sl-alert variant="warning" open>
+                <sl-icon slot="icon" name="exclamation-triangle"></sl-icon>
+                Hitting connect may take up to 10 minutes while we configure your Dogebox!
+              </sl-alert>
+            </div>
         </div>
       </div>
     `;

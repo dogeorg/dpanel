@@ -106,6 +106,7 @@ export function renderNav() {
   });
 
   const steps = [
+    { name: "intro", label: "Intro" },
     { name: "pass", label: "Set Password" },
     { name: "key", label: "Create Key" },
     { name: "connect", label: "Connect" },

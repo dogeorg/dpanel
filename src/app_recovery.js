@@ -20,6 +20,7 @@ import "/components/views/action-login/index.js";
 import "/components/views/action-change-pass/index.js";
 import "/components/views/action-create-key/index.js";
 import "/components/views/action-select-network/index.js";
+import "/components/views/setup-dislaimer/index.js";
 import "/pages/page-recovery/index.js";
 
 // Components
@@ -42,6 +43,13 @@ import { getSetupBootstrap } from "/api/system/get-bootstrap.js";
 
 // Do this once to set the location of shoelace assets (icons etc..)
 setBasePath("/vendor/@shoelace/cdn@2.14.0/");
+
+const STEP_LOGIN = 0;
+const STEP_INTRO = 1;
+const STEP_SET_PASSWORD = 2;
+const STEP_GENERATE_KEY = 3;
+const STEP_NETWORK = 4;
+const STEP_DONE = 5;
 
 class AppModeApp extends LitElement {
   static styles = [appModeStyles, navStyles];
@@ -98,18 +106,18 @@ class AppModeApp extends LitElement {
 
     // If we're already fully set up, or if we've generated a key, show our login step.
     if ((hasCompletedInitialConfiguration || hasGeneratedKey) && !this.isLoggedIn) {
-      return 0;
+      return STEP_LOGIN;
     }
 
     if (!hasGeneratedKey) {
-      return 1;
+      return STEP_INTRO;
     }
 
     if (hasGeneratedKey && !hasConfiguredNetwork) {
-      return 2;
+      return STEP_NETWORK;
     }
 
-    return 4;
+    return STEP_DONE;
   }
 
   firstUpdated() {
@@ -153,6 +161,12 @@ class AppModeApp extends LitElement {
     const navClasses = classMap({
       solid: true,
     });
+
+    const stepWrapperClasses = classMap({
+      "main-step-wrapper": this.activeStepNumber !== STEP_INTRO,
+      "main-step-wrapper-disclaimer": this.activeStepNumber === STEP_INTRO,
+    });
+
     return html`
       ${!this.setupState
         ? html`
@@ -171,17 +185,24 @@ class AppModeApp extends LitElement {
               </nav>
 
               <main id="Main">
-                <div class="main-step-wrapper">
+                <div class="${stepWrapperClasses}">
                   ${choose(
                     this.activeStepNumber,
                     [
                       [
-                        0,
+                        STEP_LOGIN,
                         () =>
                           html`<x-action-login retainHash></x-action-login>`,
                       ],
                       [
-                        1,
+                        STEP_INTRO,
+                        () =>
+                          html`<x-setup-dislaimer
+                            .nextStep=${this._nextStep}
+                          ></x-setup-dislaimer>`,
+                      ],
+                      [
+                        STEP_SET_PASSWORD,
                         () =>
                           html`<x-action-change-pass
                             label="Secure your Dogebox"
@@ -193,21 +214,21 @@ class AppModeApp extends LitElement {
                           ></x-action-change-pass>`,
                       ],
                       [
-                        2,
+                        STEP_GENERATE_KEY,
                         () =>
                           html`<x-action-create-key
                             .onSuccess=${this._nextStep}
                           ></x-action-create-key>`,
                       ],
                       [
-                        3,
+                        STEP_NETWORK,
                         () =>
                           html`<x-action-select-network
                             .onSuccess=${async () => { await asyncTimeout(750); this._nextStep() }}
                           ></x-action-select-network>`,
                       ],
                       [
-                        4,
+                        STEP_DONE,
                         () => html`<x-page-recovery></x-page-recovery>`,
                       ],
                     ],

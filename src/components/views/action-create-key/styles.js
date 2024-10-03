@@ -96,7 +96,7 @@ export const createKeyStyles = css`
 
   .phrase-grid.blur sl-tag span.term {
     color: transparent;
-    text-shadow: 1px 1px 10px rgba(255, 255, 255, 0.5);
+    text-shadow: 1px 1px 10px rgba(255, 255, 255, 0.8);
   }
 
   .phrase-actions {

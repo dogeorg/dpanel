@@ -279,7 +279,7 @@ class SelectNetwork extends LitElement {
       hostname: state['device-name'],
       initialSSHKey: state['ssh-key'],
       // Temporarily don't submit reflectorToken until the service is up and running.
-      // reflectorToken: this.reflectorToken,
+      reflectorToken: this.reflectorToken,
       reflectorHost: store.networkContext.reflectorHost
     }).catch(() => { console.log('bootstrap called but no response returned')});
 

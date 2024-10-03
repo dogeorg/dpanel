@@ -6,7 +6,7 @@ import {
   setProviderResponse,
 } from './providers.mocks.js'
 
-const client = new ApiClient(store.networkContext.apiBaseUrl, store.networkContext)
+const client = new ApiClient(store.networkContext.apiBaseUrl)
 
 export async function getProviders(pupId) {
   const res = await client.get(`/providers/${pupId}`, { mock: getProvidersResponse });

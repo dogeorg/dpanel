@@ -1,10 +1,17 @@
-import { LitElement, html, css } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
+import { LitElement, html, css, nothing } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 import { themes } from "/components/common/dynamic-form/themes.js";
 import { store } from "/state/store.js";
 import { notYet } from "/components/common/not-yet-implemented.js"
 import "/components/views/x-launcher-button/index.js";
 
 class SetupCompleteView extends LitElement {
+  static get properties() {
+    return {
+      isFirstTimeSetup: { type: Boolean },
+      reflectorToken: { type: String },
+    }
+  }
+
   static styles = [
     themes,
     css`
@@ -57,12 +64,13 @@ class SetupCompleteView extends LitElement {
     `,
   ];
 
-  handleMgmtOptionClick(e) {
-    store.updateState({ setupContext: { view: e.currentTarget.getAttribute('data-id') }});
+  handleMgmtOptionClick(e, hideViewClose) {
+    store.updateState({ setupContext: { view: e.currentTarget.getAttribute('data-id'), hideViewClose: hideViewClose }});
   }
 
   render() {
     return html`
+      ${this.isFirstTimeSetup ? html`
       <div class="upper">
         <img class="hero" src="/static/img/celebrate.png" />
         <div class="actions">
@@ -77,11 +85,13 @@ class SetupCompleteView extends LitElement {
             password, key and connection.
           </p>
 
-          <x-launcher-button></x-launcher-button>
+          <x-launcher-button
+            .reflectorToken=${this.reflectorToken}
+          ></x-launcher-button>
 
           <p>
             Need help? Visit
-            <a href="https://setup.dogebox.net">setup.dogebox.net</a>
+            <a href="https://discord.gg/VEUMWpThg9">our discord</a>
           </p>
 
         </div>
@@ -90,15 +100,17 @@ class SetupCompleteView extends LitElement {
       <div class="center">
         <sl-divider></sl-divider>
       </div>
+      ` : nothing}
 
       <div class="lower">
+        ${this.isFirstTimeSetup ? html`
+          <h2>Recovery Actions</h2>
 
-        <h2>Recovery Actions</h2>
-
-        <p>
-          Insert your recovery USB at any time to perform the following
-          administrative actions
-        </p>
+          <p>
+            Insert your recovery USB at any time to perform the following
+            administrative actions
+          </p>
+        ` : nothing}
 
         <div class="actions gapped">
           <sl-button variant="neutral" outline data-id="network"
@@ -109,7 +121,15 @@ class SetupCompleteView extends LitElement {
             @click=${this.handleMgmtOptionClick}>Change Password
           </sl-button>
 
-          <sl-button variant="neutral" outline data-id="factory-reset"
+          <sl-button variant="neutral" outline data-id="reboot"
+            @click=${(e) => this.handleMgmtOptionClick(e, true)}>Reboot
+          </sl-button>
+
+          <sl-button variant="neutral" outline data-id="power-off"
+            @click=${(e) => this.handleMgmtOptionClick(e, true)}>Power Off
+          </sl-button>
+
+          <sl-button variant="danger" outline data-id="factory-reset"
             @click=${notYet}>Factory Reset
           </sl-button>
         </div>

@@ -4,7 +4,7 @@ import { pkgController } from '/controllers/package/index.js';
 import { mock } from './bootstrap.mocks.js'
 import { mockV2 } from './bootstrap.mocks.v2.js'
 
-const client = new ApiClient(store.networkContext.apiBaseUrl, store.networkContext)
+const client = new ApiClient(store.networkContext.apiBaseUrl)
 
 export async function getBootstrap() {
   return client.get('/setup/bootstrap', { mock });

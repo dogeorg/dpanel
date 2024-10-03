@@ -5,7 +5,7 @@ import {
   getResponse,
 } from './get-networks.mocks.js'
 
-const client = new ApiClient(store.networkContext.apiBaseUrl, store.networkContext)
+const client = new ApiClient(store.networkContext.apiBaseUrl)
 
 export async function getNetworks(body) {
   const res = await client.get(`/system/network/list`, { mock: getResponse });

@@ -6,7 +6,7 @@ import {
   storeListingMock
 } from './sources.mocks.js'
 
-const client = new ApiClient(store.networkContext.apiBaseUrl, store.networkContext)
+const client = new ApiClient(store.networkContext.apiBaseUrl)
 
 export async function getStoreListing(shouldFlush = false) {
   const url = shouldFlush ? '/sources/store?refresh=true' : '/sources/store';

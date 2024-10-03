@@ -38,6 +38,7 @@ class SelectNetwork extends LitElement {
   static get properties() {
     return {
       showSuccessAlert: { type: Boolean },
+      reflectorToken: { type: String },
       _server_fault: { type: Boolean },
       _invalid_creds: { type: Boolean },
       _setNetworkFields: { type: Object },
@@ -276,8 +277,10 @@ class SelectNetwork extends LitElement {
     // TODO: move this into post-network flow.
     const finalSystemBootstrap = await postSetupBootstrap({
       hostname: state['device-name'],
-      reflectorToken: null,
-      initialSSHKey: state['ssh-key']
+      initialSSHKey: state['ssh-key'],
+      // Temporarily don't submit reflectorToken until the service is up and running.
+      // reflectorToken: this.reflectorToken,
+      reflectorHost: store.networkContext.reflectorHost
     }).catch(() => { console.log('bootstrap called but no response returned')});
 
     // if (!finalSystemBootstrap) {
@@ -343,7 +346,7 @@ class SelectNetwork extends LitElement {
             <div style="margin-top: 2em;">
               <sl-alert variant="warning" open>
                 <sl-icon slot="icon" name="exclamation-triangle"></sl-icon>
-                Hitting connect may take up to 10 minutes while we configure your Dogebox!
+                After you hit connect it may take up to 10 minutes while your Dogebox is configured!
               </sl-alert>
             </div>
         </div>

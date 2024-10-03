@@ -5,7 +5,7 @@ import {
   postResponse,
 } from './login.mocks.js'
 
-const client = new ApiClient(store.networkContext.apiBaseUrl, store.networkContext)
+const client = new ApiClient(store.networkContext.apiBaseUrl)
 
 export async function postLogin(body) {
   const res = await client.post(`/authenticate`, body, { mock: postResponse });

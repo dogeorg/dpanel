@@ -3,11 +3,11 @@ import { store } from '/state/store.js'
 
 import { 
   postResponse,
-} from './set-network.mocks.js'
+} from './post-host-reboot.mocks.js'
 
 const client = new ApiClient(store.networkContext.apiBaseUrl)
 
-export async function putNetwork(body) {
-  const res = await client.put(`/system/network/set-pending`, body, { mock: postResponse });
+export async function postHostReboot() {
+  const res = await client.post(`/system/host/reboot`, {}, { mock: postResponse });
   return res
 }

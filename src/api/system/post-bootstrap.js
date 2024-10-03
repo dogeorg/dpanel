@@ -5,7 +5,7 @@ import {
   postResponse,
 } from './post-bootstrap.mocks.js'
 
-const client = new ApiClient(store.networkContext.apiBaseUrl, store.networkContext)
+const client = new ApiClient(store.networkContext.apiBaseUrl)
 
 export async function postSetupBootstrap(body) {
   const res = await client.post(`/system/bootstrap`, body, { mock: postResponse });

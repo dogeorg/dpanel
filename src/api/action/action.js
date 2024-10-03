@@ -11,7 +11,7 @@ import {
 
 import { setProvider } from '../providers/providers.js';
 
-const client = new ApiClient(store.networkContext.apiBaseUrl, store.networkContext)
+const client = new ApiClient(store.networkContext.apiBaseUrl)
 
 export async function installPup(pupId, body) {
   return client.put(`/pup`, body, { mock: installMock });

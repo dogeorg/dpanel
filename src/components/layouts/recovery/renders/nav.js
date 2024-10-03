@@ -23,6 +23,10 @@ export const navStyles = css`
     border-bottom: 1px solid var(--sl-input-border-color);
   }
 
+  nav.bottomPadding {
+    margin-bottom: 50px;
+  }
+
   nav .center-steps {
     display: flex;
     flex-direction: row;
@@ -99,7 +103,16 @@ export const navStyles = css`
   }
 `;
 
-export function renderNav() {
+export function renderNav(isFirstTimeSetup) {
+  if (!isFirstTimeSetup) {
+    return html`
+      <div class="recovery-mode-container" style="display: flex; gap: 0px 20px; justify-content: center; align-items: center;">
+        <img style="max-height: 150px;" src="/static/img/dogebox-logo-small.png" />
+        <span style="font-weight: bold; font-size: 2em; margin-top: 20px;">Dogebox Recovery Mode</span>
+      </div>
+    `
+  }
+
   const centerStepClasses = classMap({
     "center-steps": true,
     hidden: this.activeStepNumber === 0,

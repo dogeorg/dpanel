@@ -136,6 +136,13 @@ class SelectNetwork extends LitElement {
                 return false
               }
             },
+            {
+              name: "ssh-key",
+              label: "SSH Key (Optional)",
+              type: "text",
+              required: false,
+              placeholder: "Pasting an SSH key here will also enable SSH"
+            }
           ],
         },
       ],
@@ -269,7 +276,8 @@ class SelectNetwork extends LitElement {
     // TODO: move this into post-network flow.
     const finalSystemBootstrap = await postSetupBootstrap({
       hostname: state['device-name'],
-      reflectorToken: null
+      reflectorToken: null,
+      initialSSHKey: state['ssh-key']
     }).catch(() => { console.log('bootstrap called but no response returned')});
 
     // if (!finalSystemBootstrap) {

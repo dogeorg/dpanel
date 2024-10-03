@@ -32,6 +32,14 @@ export const appModeStyles = css`
     text-align: center;
   }
 
+  main .main-step-wrapper-disclaimer {
+    margin-top: 7em;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+  }
+
   main .main-step-wrapper {
     margin-top: 7em;
     display: block;

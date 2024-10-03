@@ -27,7 +27,7 @@ class Store {
       demoSystemPrompt: "",
       logStatsUpdates: false,
       logStateUpdates: false,
-      reflectorHost: `https://reflector.dogebox.org`
+      reflectorHost: `https://reflector.dogecoin.org`
     };
     this.pupContext = {
       computed: null,

@@ -234,7 +234,7 @@ class DebugSettingsDialog extends LitElement {
               type="text"
               name="reflectorHost"
               help-text="Override reflector host"
-              value="${networkContext.reflectorHost ?? "https://reflector.dogebox.org"}"
+              value="${networkContext.reflectorHost ?? "https://reflector.dogecoin.org"}"
               @sl-change=${this.handleInput}>
               Override reflector host
             </sl-input>

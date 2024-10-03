@@ -346,7 +346,7 @@ class SelectNetwork extends LitElement {
             <div style="margin-top: 2em;">
               <sl-alert variant="warning" open>
                 <sl-icon slot="icon" name="exclamation-triangle"></sl-icon>
-                Hitting connect may take up to 10 minutes while we configure your Dogebox!
+                After you hit connect it may take up to 10 minutes while your Dogebox is configured!
               </sl-alert>
             </div>
         </div>

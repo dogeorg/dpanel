@@ -314,9 +314,11 @@ class PupPage extends LitElement {
         <sl-switch slot="suffix" ?checked=${!disableActions && pkg.state.enabled} @sl-input=${this.handleStartStop} ?disabled=${this.inflight_startstop || labels.installationId !== "ready"}></sl-switch>
       </action-row>
 
-      <action-row prefix="gear" name="configure" label="Configure" .trigger=${this.handleMenuClick} ?disabled=${disableActions}>
-        Customize ${pkg.state.manifest.meta.name}
-      </action-row>
+      ${nothing || html`
+        <action-row prefix="gear" name="configure" label="Configure" .trigger=${this.handleMenuClick} ?disabled=${disableActions}>
+          Customize ${pkg.state.manifest.meta.name}
+        </action-row>
+      `}
 
       <!--action-row prefix="archive-fill" name="properties" label="Properties" .trigger=${this.handleMenuClick} ?disabled=${disableActions}>
         Ea sint dolor commodo.
@@ -332,9 +334,11 @@ class PupPage extends LitElement {
     `;
 
     const renderMore = () => html`
-      <action-row prefix="list-ul" name="readme" label="Read me" .trigger=${this.handleMenuClick}>
-        Many info
-      </action-row>
+      ${nothing || html`
+        <action-row prefix="list-ul" name="readme" label="Read me" .trigger=${this.handleMenuClick}>
+          Many info
+        </action-row>
+      `}
 
       <action-row prefix="boxes" name="deps" label="Dependencies" .trigger=${this.handleMenuClick}>
         Functionality this pup depends on from other pups.

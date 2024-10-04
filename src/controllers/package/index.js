@@ -179,12 +179,12 @@ class PkgController {
       let index = -1;
 
       if (this.stateIndex[pupId]) {
-        index = this.pups.findIndex(p => p.state.id === pupId);
+        index = this.pups.findIndex(p => p?.state?.id === pupId);
         result = index !== -1 ? this.pups[index] : null;
       }
 
       if (!result && this.sourcesIndex[sourceId] && this.sourcesIndex[sourceId].pups[pupName]) {
-        index = this.pups.findIndex(p => p.def.source.id === sourceId && p.def.key === pupName);
+        index = this.pups.findIndex(p => p?.def?.source?.id === sourceId && p?.def?.key === pupName);
         result = index !== -1 ? this.pups[index] : null;
       }
 

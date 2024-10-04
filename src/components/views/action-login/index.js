@@ -1,6 +1,5 @@
-import { LitElement, html, css } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
+import { LitElement, html, css, nothing } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 import { postLogin } from "/api/login/login.js";
-import { hash } from "/utils/hash.js";
 import { store } from "/state/store.js";
 
 // Components
@@ -176,9 +175,9 @@ class LoginView extends LitElement {
           >
           </dynamic-form>
         </div>
-        <sl-button variant="text" @click="${this.handleForgotPass}">
+        ${false ? html`<sl-button variant="text" @click="${this.handleForgotPass}">
           I forgot my password
-        </sl-button>
+        </sl-button>` : nothing}
       </div>
 
       <sl-dialog id="ChangePassDialog">

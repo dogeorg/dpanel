@@ -171,6 +171,26 @@ class DebugSettingsDialog extends LitElement {
           </div>
 
           <div class="form-control">
+            <sl-switch
+              name="logStateUpdates"
+              help-text="When enabled, websocket STATE messages are logged"
+              .checked=${networkContext.logStateUpdates}
+              @sl-change=${this.handleToggle}>
+                Log websocket STATE messages
+            </sl-switch>
+          </div>
+
+          <div class="form-control">
+            <sl-switch
+              name="logStatsUpdates"
+              help-text="When enabled, websocket STATS messages are logged"
+              .checked=${networkContext.logStatsUpdates}
+              @sl-change=${this.handleToggle}>
+                Log websocket STATS messages
+            </sl-switch>
+          </div>
+
+          <div class="form-control">
             <sl-input
               type="number"
               name="forceDelayInSeconds"

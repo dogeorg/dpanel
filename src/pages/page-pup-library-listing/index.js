@@ -260,7 +260,7 @@ class PupPage extends LitElement {
 
     const renderStatusAndActions = () => {
       return html`
-        ${this.renderStatus(labels)}
+        ${this.renderStatus(labels, pkg)}
         <sl-progress-bar value="0" ?indeterminate=${isLoadingStatus || isInstallationLoadingStatus} class="loading-bar ${statusInstallationId}"></sl-progress-bar>
         ${this.renderActions(labels)}
       `

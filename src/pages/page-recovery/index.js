@@ -91,7 +91,7 @@ class SetupCompleteView extends LitElement {
 
           <p>
             Need help? Visit
-            <a href="https://discord.gg/VEUMWpThg9">our discord</a>
+            <a href="https://discord.gg/VEUMWpThg9" target="_blank">our discord</a>
           </p>
 
         </div>

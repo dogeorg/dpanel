@@ -18,6 +18,7 @@ class DogeboxLauncherButton extends LitElement {
     super();
     this._ready = false;
     this.ip = "";
+    this._serverFault = false;
   }
 
   firstUpdated() {
@@ -36,24 +37,23 @@ class DogeboxLauncherButton extends LitElement {
     }
   }
 
-  handleError() {
+  handleError(e) {
+    clearInterval(this._intervalId);
     this._serverFault = true;
+    console.error("Failed to contact reflector", e);
+    this.requestUpdate();
   }
 
   async check() {
-    const res = await getIP(this.reflectorToken);
-    if (!res || res.error) {
-      this.handleError(res)
-      return;
+    try {
+      const res = await getIP(this.reflectorToken);
+      if (res.ip) {
+        this._ip = res.ip;
+        this._ready = true;
+      }
+    } catch (e) {
+      this.handleError(e)
     }
-
-    if (!res.ip) {
-      // No entry yet.
-      return;
-    }
-
-    this._ip = res.ip;
-    this._ready = true;
   }
 
   static styles = [themes, css`
@@ -72,7 +72,19 @@ class DogeboxLauncherButton extends LitElement {
       font-family: var(--sl-font-sans);
     }
   `];
+
   render() {
+    if (this._serverFault) {
+      return html`
+        <div class="action-wrap">
+          <sl-alert variant="danger" open>
+            <sl-icon slot="icon" name="exclamation-triangle"></sl-icon>
+            Failed to determine your Dogebox IP address. Please refresh to try and connect, or join the Dogebox Discord server if the problem persists.
+          </sl-alert>
+        </div>
+      `;
+    }
+
     return html`
       <div class="action-wrap">
         <sl-tooltip content=${this._ready ? this._ip : "Dogebox IP unknown"}>

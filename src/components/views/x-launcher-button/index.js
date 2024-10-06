@@ -18,7 +18,17 @@ class DogeboxLauncherButton extends LitElement {
     super();
     this._ready = false;
     this.ip = "";
+
+    this.errcode = null;
+
     this._serverFault = false;
+
+    // This gives us 30 seconds of checking.
+    this.checkInterval = 3000;
+    this.checkCount = 0;
+    this.maxCheckCount = 10;
+
+    this._timedOut = false;
   }
 
   firstUpdated() {
@@ -27,21 +37,22 @@ class DogeboxLauncherButton extends LitElement {
         clearInterval(this._intervalId);
       } else {
         this.check();
+        this.checkCount++;
+
+        if (this.checkCount >= this.maxCheckCount) {
+          this._timedOut = true;
+          this.errcode = 'ip_wait_timeout';
+          clearInterval(this._intervalId);
+          this.requestUpdate();
+        }
       }
-    }, 3000);
+    }, this.checkInterval);
   }
 
   disconnectedCallback() {
     if (this._intervalId) {
       clearInterval(this._intervalId);
     }
-  }
-
-  handleError(e) {
-    clearInterval(this._intervalId);
-    this._serverFault = true;
-    console.error("Failed to contact reflector", e);
-    this.requestUpdate();
   }
 
   async check() {
@@ -52,7 +63,16 @@ class DogeboxLauncherButton extends LitElement {
         this._ready = true;
       }
     } catch (e) {
-      this.handleError(e)
+      if (e.message.includes('not found')) {
+        // Ignore, we just haven't got an IP address yet.
+        return
+      }
+
+      clearInterval(this._intervalId);
+      this._serverFault = true;
+      this.errcode = 'contacting_reflector';
+      console.error("Failed to contact reflector", e);
+      this.requestUpdate();
     }
   }
 
@@ -74,14 +94,23 @@ class DogeboxLauncherButton extends LitElement {
   `];
 
   render() {
-    if (this._serverFault) {
+    if (this._serverFault || this._timedOut) {
+      const alertVariant = this._serverFault ? "danger" : "warning";
+
+      const text = this._serverFault
+        ? "Failed to determine your Dogebox IP address."
+        : "Timed out while waiting for Dogebox to come online.";
+
       return html`
         <div class="action-wrap">
-          <sl-alert variant="danger" open>
+          <sl-alert variant="${alertVariant}" open>
             <sl-icon slot="icon" name="exclamation-triangle"></sl-icon>
-            Failed to determine your Dogebox IP address. Please refresh to try and connect, or join the Dogebox Discord server if the problem persists.
+            ${text} Please refresh to try and connect, or join the Dogebox Discord server if the problem persists.
           </sl-alert>
         </div>
+        <span style="font-size: 0.8rem; color: #808080;">
+          Error code: ${this.errcode}
+        </span>
       `;
     }
 

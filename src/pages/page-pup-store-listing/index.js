@@ -148,9 +148,9 @@ class PupInstallPage extends LitElement {
         <section>
           <div class="section-title">
             <h3>About</h3>
-            <reveal-row style="margin-top:-1em;">
+            <reveal-row">
               ${long
-                ? html`<p>${long}</p>`
+                ? html`<p style="margin-top: -12px;>${long}</p>`
                 : html`<small style="font-family: 'Comic Neue'; color: var(--sl-color-neutral-600);">Such empty, no description.</small>`
               }
             </reveal-row>

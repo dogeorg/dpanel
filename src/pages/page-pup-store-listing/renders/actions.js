@@ -65,7 +65,18 @@ export function renderActions() {
             </sl-button>
           `
         : nothing}
-      ${isInstalled && installationId !== "installing"
+      ${installationId === "broken"
+        ? html`
+            <sl-button
+              variant="danger"
+              size="large"
+              href="${pkg.computed.libraryURL}"
+            >
+              View issue
+            </sl-button>
+          `
+      : nothing}
+      ${isInstalled && installationId !== "installing" && installationId !== "broken"
         ? html`
             <sl-button
               variant="primary"

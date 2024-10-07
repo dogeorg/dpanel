@@ -4,17 +4,19 @@ class SetupDisclaimerView extends LitElement {
 
   static styles = css`
     .wrap {
-      padding: 20px;
+      padding: 10px 0px;
       max-width: 100%;
       @media (min-width: 576px) {
+        padding: 20px;
         max-width: 520px;
       }
     }
 
     .banner {
       text-align: center;
+      margin-top: 0.5em;
       padding: 1em 1em 1.8em 1em; 
-      background: #151515;
+      background: #622395;
       font-family: 'Comic Neue';
 
       h1 {

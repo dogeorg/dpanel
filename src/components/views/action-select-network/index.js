@@ -56,6 +56,10 @@ class SelectNetwork extends LitElement {
     this._setNetworkValues = {};
     this._networks = [];
 
+    // Device name helper text.
+    this.helperTextDeviceName = "Allows alpha/numeric, underscore, hypen and period."
+    this.helperTextDeviceNameAlt = "Allows alpha/numeric segments separated by, underscore, hypen and period. Cannot start or end in special characters."
+
     // Set initial fields
     this.updateSetNetworkFields();
   }
@@ -83,10 +87,11 @@ class SelectNetwork extends LitElement {
           fields: [
             {
               name: "device-name",
-              label: "Set device name",
-              placeholder: "Eg: MyDogebox",
-              help: "This is how your dogebox appears on your own network (not public).",
+              label: "Set local device name",
+              placeholder: "Eg: My_Dogebox_69",
+              help: this.helperTextDeviceNameAlt,
               labelAction: { name: "generate-name", label: "Randomize" },
+              pattern: "^$|^[a-zA-Z0-9]([a-zA-Z0-9_\\-]{0,61}[a-zA-Z0-9])?$",
               type: "text",
               required: true,
               breakline: true,
@@ -246,8 +251,16 @@ class SelectNetwork extends LitElement {
   }
 
   _attemptSetNetwork = async (data, form, dynamicFormInstance) => {
-    const state = dynamicFormInstance.getState()
+    // Check if any field is invalid
+    const formFields = this.shadowRoot.querySelectorAll('sl-input, sl-textarea, sl-select');
+    const hasInvalidField = Array.from(formFields).some(field => field.hasAttribute('data-invalid'));
 
+    if (hasInvalidField) {
+      createAlert('warning', 'Uh oh, invalid data detected.');
+      return;
+    }
+
+    const state = dynamicFormInstance.getState()
     const isHiddenNetwork = state.network.value === 'hidden'
 
     const apiData = {

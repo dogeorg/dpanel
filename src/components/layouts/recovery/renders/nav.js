@@ -119,7 +119,7 @@ export function renderNav(isFirstTimeSetup) {
   });
 
   const steps = [
-    { name: "intro", label: "Intro" },
+    { name: "intro", label: "Terms" },
     { name: "pass", label: "Set Password" },
     { name: "key", label: "Create Key" },
     { name: "connect", label: "Connect" },
@@ -144,7 +144,7 @@ export function renderNav(isFirstTimeSetup) {
             </div>
           `,
         )}
-        ${this.activeStepNumber === 4 ? html`
+        ${this.activeStepNumber === 5 ? html`
           <div class="step mobile-only" data-completed-step>
             <sl-button size="small" circle>✓</sl-button>
             <span class="step-title">Ready!</span>

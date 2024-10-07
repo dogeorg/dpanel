@@ -84,6 +84,8 @@ class SelectNetwork extends LitElement {
             {
               name: "device-name",
               label: "Set device name",
+              placeholder: "Eg: MyDogebox",
+              help: "This is how your dogebox appears on your own network (not public).",
               labelAction: { name: "generate-name", label: "Randomize" },
               type: "text",
               required: true,
@@ -343,7 +345,7 @@ class SelectNetwork extends LitElement {
             </dynamic-form>
             `: nothing }
 
-            <div style="margin-top: 2em;">
+            <div style="margin: 2em 8px">
               <sl-alert variant="warning" open>
                 <sl-icon slot="icon" name="exclamation-triangle"></sl-icon>
                 After you hit connect it may take up to 10 minutes while your Dogebox is configured!

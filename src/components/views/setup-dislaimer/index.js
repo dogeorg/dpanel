@@ -1,6 +1,42 @@
-import { LitElement, html } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
+import { LitElement, html, css } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 
 class SetupDisclaimerView extends LitElement {
+
+  static styles = css`
+    .wrap {
+      padding: 10px 0px;
+      max-width: 100%;
+      @media (min-width: 576px) {
+        padding: 20px;
+        max-width: 520px;
+      }
+    }
+
+    .banner {
+      text-align: center;
+      margin-top: 0.5em;
+      padding: 1em 1em 1.8em 1em;
+      border-radius: 16px;
+      background: var(--sl-color-purple-300);
+      background-image: linear-gradient(to bottom right, var(--sl-color-purple-500), var(--sl-color-purple-300));
+      font-family: 'Comic Neue';
+
+      h1 {
+        line-height: 1rem;
+      }
+
+      span {
+        display: inline-block;
+        font-size: 1.2rem;
+        line-height: 1.5rem;
+        max-width: 100%;
+        @media (min-width: 576px) {
+          max-width: 380px;
+        }
+      }
+    }
+  `
+
   static get properties() {
     return {
       nextStep: { type: Function },
@@ -9,13 +45,12 @@ class SetupDisclaimerView extends LitElement {
 
   render() {
     return html`
-      <div>
-        <div style="text-align: center;">
-          <img src="/static/img/dogebox-logo-small.png" alt="Dogebox Logo" />
+      <div class="wrap">
+        <img src="/static/img/dogebox-logo.jpg" alt="Dogebox Logo" width="100%" />
+        <div class="banner">
           <h1>Welcome to Dogebox!</h1>
           <span>
-            We hope you’ll like it here, before we start just a few words to cover your butt<br />
-            ...and ours!
+            We hope you’ll like it here, before we start just a few words to cover your butt ...and ours!
           <span>
         </div>
 
@@ -40,9 +75,9 @@ class SetupDisclaimerView extends LitElement {
             THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           </span>
         </div>
-
-        <div style="margin-top: 5rem; float: right; margin-bottom: 2em;">
-          <sl-button variant="success" slot="footer" outline @click=${this.nextStep}>I Agree</sl-button>
+        <sl-divider style="--spacing: 2rem;"></sl-divider>
+        <div style="display: flex; justify-content: end; margin-bottom: 2em;">
+          <sl-button class="cta" style="width:180px" variant="success" slot="footer" outline @click=${this.nextStep}>I Agree</sl-button>
         </div>
       </div>
     `;

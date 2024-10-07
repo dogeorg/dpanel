@@ -17,6 +17,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
+  <script>
+    if (window.location.pathname !== '/') {
+      window.location.href = '/';
+    }
+  </script>
+
   <style>html, body { background-color: var(--sl-color-neutral-0); }</style>
   <apmode-app></apmode-app>
 </body>

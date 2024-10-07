@@ -18,6 +18,17 @@ class DogeboxLauncherButton extends LitElement {
     super();
     this._ready = false;
     this.ip = "";
+
+    this.errcode = null;
+
+    this._serverFault = false;
+
+    // This gives us 30 seconds of checking.
+    this.checkInterval = 3000;
+    this.checkCount = 0;
+    this.maxCheckCount = 10;
+
+    this._timedOut = false;
   }
 
   firstUpdated() {
@@ -26,8 +37,16 @@ class DogeboxLauncherButton extends LitElement {
         clearInterval(this._intervalId);
       } else {
         this.check();
+        this.checkCount++;
+
+        if (this.checkCount >= this.maxCheckCount) {
+          this._timedOut = true;
+          this.errcode = 'ip_wait_timeout';
+          clearInterval(this._intervalId);
+          this.requestUpdate();
+        }
       }
-    }, 3000);
+    }, this.checkInterval);
   }
 
   disconnectedCallback() {
@@ -36,24 +55,25 @@ class DogeboxLauncherButton extends LitElement {
     }
   }
 
-  handleError() {
-    this._serverFault = true;
-  }
-
   async check() {
-    const res = await getIP(this.reflectorToken);
-    if (!res || res.error) {
-      this.handleError(res)
-      return;
-    }
+    try {
+      const res = await getIP(this.reflectorToken);
+      if (res.ip) {
+        this._ip = res.ip;
+        this._ready = true;
+      }
+    } catch (e) {
+      if (e.message.includes('not found')) {
+        // Ignore, we just haven't got an IP address yet.
+        return
+      }
 
-    if (!res.ip) {
-      // No entry yet.
-      return;
+      clearInterval(this._intervalId);
+      this._serverFault = true;
+      this.errcode = 'contacting_reflector';
+      console.error("Failed to contact reflector", e);
+      this.requestUpdate();
     }
-
-    this._ip = res.ip;
-    this._ready = true;
   }
 
   static styles = [themes, css`
@@ -72,7 +92,28 @@ class DogeboxLauncherButton extends LitElement {
       font-family: var(--sl-font-sans);
     }
   `];
+
   render() {
+    if (this._serverFault || this._timedOut) {
+      const alertVariant = this._serverFault ? "danger" : "warning";
+
+      const text = this._serverFault
+        ? "Failed to determine your Dogebox IP address."
+        : "Timed out while waiting for Dogebox to come online.";
+
+      return html`
+        <div class="action-wrap">
+          <sl-alert variant="${alertVariant}" open>
+            <sl-icon slot="icon" name="exclamation-triangle"></sl-icon>
+            ${text} Please refresh to try and connect, or join the Dogebox Discord server if the problem persists.
+          </sl-alert>
+        </div>
+        <span style="font-size: 0.8rem; color: #808080;">
+          Error code: ${this.errcode}
+        </span>
+      `;
+    }
+
     return html`
       <div class="action-wrap">
         <sl-tooltip content=${this._ready ? this._ip : "Dogebox IP unknown"}>

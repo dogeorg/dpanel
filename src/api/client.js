@@ -87,7 +87,11 @@ export default class ApiClient extends ReactiveClass {
     }
 
     if (response.status === 401) {
-      return window.location.href = window.location.origin + "/logout"
+      if (config.noLogoutRedirect) {
+        return { success: false, error: true, status: 401 }
+      } else {
+        return window.location.href = window.location.origin + "/logout"
+      }
     }
 
     if (!response.ok) {

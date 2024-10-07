@@ -33,7 +33,7 @@ export const appModeStyles = css`
   }
 
   main .main-step-wrapper-disclaimer {
-    margin-top: 7em;
+    margin-top: 5em;
     display: block;
     margin-left: auto;
     margin-right: auto;

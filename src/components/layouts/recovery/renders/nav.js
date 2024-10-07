@@ -23,6 +23,10 @@ export const navStyles = css`
     border-bottom: 1px solid var(--sl-input-border-color);
   }
 
+  nav.hidden {
+    display: none;
+  }
+
   nav.bottomPadding {
     margin-bottom: 50px;
   }
@@ -104,11 +108,35 @@ export const navStyles = css`
 `;
 
 export function renderNav(isFirstTimeSetup) {
+  const renderMenu = () => {
+    return html`
+      <div class="dropmenu">
+        <sl-dropdown distance="7">
+          <sl-button slot="trigger" circle>
+            <sl-icon name="three-dots"></sl-icon>
+          </sl-button>
+          <sl-menu>
+            <sl-menu-item>Visit Forum</sl-menu-item>
+            <sl-divider></sl-divider>
+            <sl-menu-item
+              ?disabled=${!this.isLoggedIn}
+              @click=${this.performLogout}
+              >Logout</sl-menu-item
+            >
+          </sl-menu>
+        </sl-dropdown>
+      </div>
+    `
+  }
+
   if (!isFirstTimeSetup) {
     return html`
-      <div class="recovery-mode-container" style="display: flex; gap: 0px 20px; justify-content: center; align-items: center;">
-        <img style="max-height: 150px;" src="/static/img/dogebox-logo-small.png" />
-        <span style="font-weight: bold; font-size: 2em; margin-top: 20px;">Dogebox Recovery Mode</span>
+      <div class="nav-inner">
+        <div class="logo"></div>
+        <div class="center-steps">
+          Recovery Mode
+        </div>
+        ${renderMenu()}
       </div>
     `
   }
@@ -151,22 +179,7 @@ export function renderNav(isFirstTimeSetup) {
           </div>
         ` : nothing }
       </div>
-      <div class="dropmenu">
-        <sl-dropdown distance="7">
-          <sl-button slot="trigger" circle>
-            <sl-icon name="three-dots"></sl-icon>
-          </sl-button>
-          <sl-menu>
-            <sl-menu-item>Visit Forum</sl-menu-item>
-            <sl-divider></sl-divider>
-            <sl-menu-item
-              ?disabled=${!this.isLoggedIn}
-              @click=${this.performLogout}
-              >Logout</sl-menu-item
-            >
-          </sl-menu>
-        </sl-dropdown>
-      </div>
+      ${renderMenu()}
     </div>
   `;
 }

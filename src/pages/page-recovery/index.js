@@ -68,6 +68,46 @@ class SetupCompleteView extends LitElement {
     store.updateState({ setupContext: { view: e.currentTarget.getAttribute('data-id'), hideViewClose: hideViewClose }});
   }
 
+  firstUpdated() {
+    // Clear auth token when user is completing first time setup.
+    if (this.isFirstTimeSetup) {
+      console.log('CLEARING', store);
+      store.updateState({ networkContext: { token: null } });
+      console.log('DONE', store);
+    }
+  }
+
+  renderRecoverActions() {
+    return html`
+      <div class="actions gapped">
+        <sl-button variant="neutral" outline data-id="network"
+          @click=${this.handleMgmtOptionClick}>Change Network
+        </sl-button>
+
+        <sl-button variant="neutral" outline data-id="password"
+          @click=${this.handleMgmtOptionClick}>Change Password
+        </sl-button>
+
+        <sl-button variant="neutral" outline data-id="reboot"
+          @click=${(e) => this.handleMgmtOptionClick(e, true)}>Reboot
+        </sl-button>
+
+        <sl-button variant="neutral" outline data-id="power-off"
+          @click=${(e) => this.handleMgmtOptionClick(e, true)}>Power Off
+        </sl-button>
+
+        <sl-button variant="danger" outline data-id="factory-reset"
+          @click=${notYet}>Factory Reset
+        </sl-button>
+      </div>
+
+      <div class="pictoral-instruction" style="display:none;">
+        <sl-icon class="usb" name="usb-drive-fill"></sl-icon>
+        <span>Insert the startup USB to perform these actions</span>
+      </div>
+    `
+  }
+
   render() {
     return html`
       ${this.isFirstTimeSetup ? html`
@@ -103,41 +143,17 @@ class SetupCompleteView extends LitElement {
       ` : nothing}
 
       <div class="lower">
-        ${this.isFirstTimeSetup ? html`
+        ${!this.isFirstTimeSetup ? html`
           <h2>Recovery Actions</h2>
 
           <p>
             Insert your recovery USB at any time to perform the following
             administrative actions
           </p>
+
+          ${this.renderRecoverActions()}
         ` : nothing}
 
-        <div class="actions gapped">
-          <sl-button variant="neutral" outline data-id="network"
-            @click=${this.handleMgmtOptionClick}>Change Network
-          </sl-button>
-
-          <sl-button variant="neutral" outline data-id="password"
-            @click=${this.handleMgmtOptionClick}>Change Password
-          </sl-button>
-
-          <sl-button variant="neutral" outline data-id="reboot"
-            @click=${(e) => this.handleMgmtOptionClick(e, true)}>Reboot
-          </sl-button>
-
-          <sl-button variant="neutral" outline data-id="power-off"
-            @click=${(e) => this.handleMgmtOptionClick(e, true)}>Power Off
-          </sl-button>
-
-          <sl-button variant="danger" outline data-id="factory-reset"
-            @click=${notYet}>Factory Reset
-          </sl-button>
-        </div>
-
-        <div class="pictoral-instruction" style="display:none;">
-          <sl-icon class="usb" name="usb-drive-fill"></sl-icon>
-          <span>Insert the startup USB to perform these actions</span>
-        </div>
       </div>
     `;
   }

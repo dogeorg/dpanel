@@ -15,8 +15,10 @@ class SetupDisclaimerView extends LitElement {
     .banner {
       text-align: center;
       margin-top: 0.5em;
-      padding: 1em 1em 1.8em 1em; 
-      background: #622395;
+      padding: 1em 1em 1.8em 1em;
+      border-radius: 16px;
+      background: var(--sl-color-purple-300);
+      background-image: linear-gradient(to bottom right, var(--sl-color-purple-500), var(--sl-color-purple-300));
       font-family: 'Comic Neue';
 
       h1 {

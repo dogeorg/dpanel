@@ -63,6 +63,7 @@ class AppModeApp extends LitElement {
     activeStepNumber: { type: Number },
     setupState: { type: Object },
     isFirstTimeSetup: { type: Boolean },
+    isForbidden: { type: Boolean },
   };
 
   constructor() {
@@ -72,11 +73,10 @@ class AppModeApp extends LitElement {
     this.activeStepNumber = 0;
     this.setupState = null;
     this.isFirstTimeSetup = false;
+    this.isForbidden = false;
 
     bindToClass(renderChunks, this);
     this.context = new StoreSubscriber(this, store);
-
-    this.reflectorToken = Math.random().toString(36).substring(2, 14);
   }
 
   set setupState(newValue) {
@@ -98,7 +98,13 @@ class AppModeApp extends LitElement {
 
   async fetchSetupState() {
     this.loading = true;
-    const response = await getSetupBootstrap();
+    const response = await getSetupBootstrap({ noLogoutRedirect: true });
+
+    if (!response.success && response.status === 401) {
+      this.setupState = { isForbidden: true };
+      this.loading = false;
+      return;
+    }
 
     if (!response.setupFacts) {
       // TODO (error handling)
@@ -111,7 +117,11 @@ class AppModeApp extends LitElement {
   }
 
   _determineStartingStep(setupState) {
-    const { hasCompletedInitialConfiguration, hasGeneratedKey, hasConfiguredNetwork } = setupState;
+    const { hasCompletedInitialConfiguration, hasGeneratedKey, hasConfiguredNetwork, isForbidden } = setupState;
+
+    if (isForbidden) {
+      return STEP_LOGIN;
+    }
 
     if (!hasCompletedInitialConfiguration) {
       this.isFirstTimeSetup = true;
@@ -193,12 +203,15 @@ class AppModeApp extends LitElement {
   render() {
     const navClasses = classMap({
       solid: true,
+      hidden: this.activeStepNumber === STEP_LOGIN,
     });
 
     const stepWrapperClasses = classMap({
       "main-step-wrapper": this.activeStepNumber !== STEP_INTRO,
       "main-step-wrapper-disclaimer": this.activeStepNumber === STEP_INTRO,
     });
+
+    const reflectorToken = this.context.store.networkContext.reflectorToken;
 
     return html`
       ${!this.setupState
@@ -258,13 +271,13 @@ class AppModeApp extends LitElement {
                         () =>
                           html`<x-action-select-network
                             .onSuccess=${async () => { await asyncTimeout(750); this._nextStep() }}
-                            .reflectorToken=${this.reflectorToken}
+                            .reflectorToken=${reflectorToken}
                           ></x-action-select-network>`,
                       ],
                       [
                         STEP_DONE,
                         () => html`<x-page-recovery
-                          .reflectorToken=${this.reflectorToken}
+                          .reflectorToken=${reflectorToken}
                           .isFirstTimeSetup=${this.isFirstTimeSetup}
                         ></x-page-recovery>`,
                       ],

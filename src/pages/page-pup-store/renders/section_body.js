@@ -3,7 +3,10 @@ import { html, css, nothing, repeat } from '/vendor/@lit/all@3.1.2/lit-all.min.j
 var pupCardGrid = css`
   .pup-card-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    @media (min-width:576px) {
+      grid-template-columns: repeat(auto-fit, minmax(576px, 1fr));
+    }
   }
 `
 
@@ -51,6 +54,7 @@ export function renderSectionBody(ready, SKELS, hasItems) {
     ${ready && hasItems('packages') ? html`
       <div class="pup-card-grid">
         ${repeat(this.packageList.getCurrentPageData(), (pkg) => `${pkg.def.source.id}-${pkg.def.key}`, (pkg) => {
+          if (pkg.def.key === "Identity") { console.log(pkg.def.source) };
           return html`
           <pup-install-card
             defaultIcon="box"
@@ -63,6 +67,7 @@ export function renderSectionBody(ready, SKELS, hasItems) {
             short="${pkg.def.versions[pkg.def.latestVersion]?.meta?.shortDescription}"
             ?installed=${pkg.computed.isInstalled}
             href=${pkg.computed.storeURL}
+            .source=${pkg.def.source}
           ></pup-install-card>
         `})}
       </div>

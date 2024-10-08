@@ -134,10 +134,13 @@ class PkgController {
             pup?.def?.key === pkgName)
           )
 
+          // Avoid adding the .pups[] property of the source to a specific pups def.
+          delete sourceData.pups
+
           const def = {
             ...pupDefinitionData,
             key: pkgName,
-            source: { id: sourceId, lastChecked: sourceData.lastChecked },
+            source: { ...sourceData },
           }
 
           // Update it in place.

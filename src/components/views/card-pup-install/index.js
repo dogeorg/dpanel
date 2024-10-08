@@ -22,12 +22,15 @@
         href: { type: String },
         gref: { type: String },
         upstreamVersions: { type: Object },
+        installed: { type: Boolean },
+        source: { type: Object }
       };
     }
 
     constructor() {
       super();
       this.href = ""
+      this.source = {};
     }
 
     get status() {
@@ -41,21 +44,44 @@
     }
 
     render() {
-      const { defaultIcon, pupName, version, logoBase64, status, gui, short, href, upstreamVersions } = this;
+      const { 
+        defaultIcon, pupName, version, logoBase64, 
+        status, gui, short, href, upstreamVersions,
+        installed, hasUpdate, source
+      } = this;
+      if (pupName === "Identity") { console.log('MEOW', {source}) }
       return html`
         <a class="anchor" href=${href} target="_self">
           <div class="pup-card-wrap">
-            <div class="icon-wrap ${logoBase64 ? 'has-logo' : ''}">
-              ${logoBase64 ? html`<img style="width: 100%" src="${logoBase64}" />` : html`<sl-icon name="${defaultIcon}"></sl-icon>`}
-            </div>
-            <div class="details-wrap">
-              <div class="inner">
-                <span class="name">${pupName}  <small style="color: #777">v${version}</small></span>
-                <span class="description">${short}</span>
-                <x-tag-set .tags=${upstreamVersions} highlight max=1></x-tag-set>
-                <span class="status">${status === "running" ? "Installed" : status}</span>
+            <div class="primary-details">
+              <div class="icon-wrap ${logoBase64 ? 'has-logo' : ''}">
+                ${logoBase64 ? html`<img style="width: 100%" src="${logoBase64}" />` : html`<sl-icon name="${defaultIcon}"></sl-icon>`}
+              </div>
+              <div class="details-wrap">
+                <div class="inner">
+                  <span class="name">${pupName}  <small style="color: #777">v${version}</small></span>
+                  <span class="description">${short}</span>
+                  <span class="source">${source?.location}</span>
+
+                  <x-tag-set class="tag-set" .tags=${upstreamVersions} max=1></x-tag-set>
+                </div>
               </div>
             </div>
+
+            <div class="details-wrap secondary-details">
+              <div class="inner">
+                ${installed && hasUpdate ? html`
+                  <sl-tag class="card-installation-tag" pill variant="primary">
+                    Update Available </sl-tag>
+                ` : nothing }
+                ${installed && !hasUpdate ? html`
+                  <sl-tag pill variant="neutral">
+                    Installed <sl-icon class="card-installation-tag-icon" name="check-circle-fill"></sl-icon>
+                  </sl-tag>
+                ` : nothing }
+              </div>
+            </div>
+
           </div>
         </a>
       `;
@@ -89,6 +115,7 @@
         padding: 1em;
         box-sizing: border-box;
         overflow: hidden;
+        gap: 0em;
       }
 
       .pup-card-wrap:hover {
@@ -107,12 +134,21 @@
         align-items: center;
         font-size: 2em;
         box-sizing: border-box;
-        margin-right: 0.5em;
         margin-top: calc((var(--row-height) - var(--icon-size)) / 2);
       }
 
       .icon-wrap.has-logo {
         background: none;
+      }
+
+      .primary-details {
+        display: flex;
+        flex-direction: row;
+        gap: 1em;
+      }
+
+      .details-wrap.secondary-details {
+        justify-content: center;
       }
 
       .details-wrap {
@@ -141,20 +177,20 @@
         overflow: hidden;
         text-overflow: ellipsis;
         max-height: 2.4em;
-        line-height: 1.2em;
+        line-height: 1.2;
       }
 
       span.description {
-        margin-bottom: 4px;
-        font-weight: 100;
-        font-size: 0.9rem;
+        margin-bottom:;
+        font-weight: normal;
+        font-size: .9rem;
         display: -webkit-box;
-        -webkit-line-clamp: 2;
+        -webkit-line-clamp: 1;
         -webkit-box-orient: vertical;
         overflow: hidden;
         text-overflow: ellipsis;
-        max-height: 2em;
-        line-height: 1em;
+        max-height: 2.4em;
+        line-height: 1.1;
       }
 
       span.version {
@@ -167,6 +203,22 @@
         text-transform: capitalize;
         color: #00c3ff;
         font-size: 0.9rem;
+      }
+
+      .tag-set {
+        margin-top: 6px;
+      }
+
+      .card-installation-tag-icon {
+        display: inline-block;
+        margin-left: 6px;
+      }
+
+      span.source {
+        margin-top: 1px;
+        display: block;
+        font-size: 0.85rem;
+        color: #b5a1ff;
       }
     `;
   }

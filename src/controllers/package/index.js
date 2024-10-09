@@ -492,6 +492,23 @@ class PkgController {
 
   ingestProgressUpdate(data) {
     console.log('PROGRESS', data); 
+
+    /* EXAMPLE PROGRESS UPDATE
+     * {
+        "id": "ecdbe08ced2d80ac27d5e6207eb7da06",
+        "error": "",
+        "type": "progress",
+        "update": {
+          "actionID": "ecdbe08ced2d80ac27d5e6207eb7da06",
+          "PupID": "6203e80306289be08edf1f61d9651af7",
+          "progress": 0,
+          "step": "install",
+          "msg": "Installing pup from dogeorg.pups: Gigawallet @ 0.0.1",
+          "error": false,
+          "step_taken": 11476960
+        }
+      }
+     */
   }
 }
 

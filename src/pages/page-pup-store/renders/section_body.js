@@ -65,7 +65,7 @@ export function renderSectionBody(ready, SKELS, hasItems) {
             .upstreamVersions=${pkg.def.versions[pkg.def.latestVersion]?.meta?.upstreamVersions || {}}
             short="${pkg.def.versions[pkg.def.latestVersion]?.meta?.shortDescription}"
             ?installed=${pkg.computed.isInstalled}
-            ?updateAvailable=${true}
+            ?updateAvailable=""
             href=${pkg.computed.storeURL}
             .source=${pkg.def.source}
           ></pup-install-card>

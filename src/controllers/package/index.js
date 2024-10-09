@@ -193,6 +193,7 @@ class PkgController {
 
       return { pup: result, index };
     } catch (err) {
+      console.warn('pup lookup warning:', err)
       return { pup: null, index: -1 };
     }
   }

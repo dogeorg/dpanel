@@ -35,6 +35,7 @@ export async function loadPup(context, commands) {
       // Fetch Store listing (if on store type page);
       isStoreListingPage && pkgController.setStoreData(await getStoreListing());
       // Now attempt to get pup from memory
+      console.log( {pupId, sourceId, pupName })
       pup = pkgController.getPupMaster({ pupId, sourceId, pupName, lookupType }).pup;
     }
 

@@ -23,6 +23,7 @@
         gref: { type: String },
         upstreamVersions: { type: Object },
         installed: { type: Boolean },
+        updateAvailable: { type: Boolean },
         source: { type: Object }
       };
     }
@@ -43,13 +44,28 @@
       this.requestUpdate();
     }
 
+    renderSourceIcon(sourceType) {
+      let icon;
+      switch (sourceType) {
+        case 'git':
+          icon = 'git';
+          break;
+        case 'disk':
+           icon = 'hdd-fill'
+          break;
+      }
+      if (!icon) return nothing;
+      return html`
+        <sl-icon name=${icon}></sl-icon>
+      `
+    }
+
     render() {
       const { 
         defaultIcon, pupName, version, logoBase64, 
         status, gui, short, href, upstreamVersions,
-        installed, hasUpdate, source
+        installed, updateAvailable, source
       } = this;
-      if (pupName === "Identity") { console.log('MEOW', {source}) }
       return html`
         <a class="anchor" href=${href} target="_self">
           <div class="pup-card-wrap">
@@ -61,8 +77,10 @@
                 <div class="inner">
                   <span class="name">${pupName}  <small style="color: #777">v${version}</small></span>
                   <span class="description">${short}</span>
-                  <span class="source">${source?.location}</span>
-
+                  <span class="source">
+                    ${this.renderSourceIcon(source?.type)}
+                    ${source?.location}
+                  </span>
                   <x-tag-set class="tag-set" .tags=${upstreamVersions} max=1></x-tag-set>
                 </div>
               </div>
@@ -70,11 +88,12 @@
 
             <div class="details-wrap secondary-details">
               <div class="inner">
-                ${installed && hasUpdate ? html`
+                ${installed && updateAvailable ? html`
                   <sl-tag class="card-installation-tag" pill variant="primary">
-                    Update Available </sl-tag>
+                    Update Available <sl-icon class="card-installation-tag-icon" name="info-circle-fill"></sl-icon>
+                  </sl-tag>
                 ` : nothing }
-                ${installed && !hasUpdate ? html`
+                ${installed && !updateAvailable ? html`
                   <sl-tag pill variant="neutral">
                     Installed <sl-icon class="card-installation-tag-icon" name="check-circle-fill"></sl-icon>
                   </sl-tag>
@@ -108,6 +127,7 @@
       }
 
       .pup-card-wrap {
+        position: relative;
         display: flex;
         flex-direction: row;
         margin-bottom: 1em;
@@ -116,6 +136,15 @@
         box-sizing: border-box;
         overflow: hidden;
         gap: 0em;
+      }
+      .pup-card-wrap::after {
+        content: "";
+        height: 1px;
+        margin-left: calc(var(--icon-size) + 1em);
+        width: 75%;
+        background: #444;
+        position: absolute;
+        bottom: 16px;
       }
 
       .pup-card-wrap:hover {
@@ -148,14 +177,23 @@
       }
 
       .details-wrap.secondary-details {
-        justify-content: center;
+        position: absolute;
+        justify-content: end;
+        top: -30px;
+        right: 8px;
+        @media (min-width: 576px) {
+          position: relative;
+          justify-content: center;
+          top: 0px;
+          right: 0px;
+        }
       }
 
       .details-wrap {
         flex: 1 1 auto; /* can grow, can shrink */
         display: flex;
         align-items: center;
-        border-bottom: 1px solid #333;
+        /*border-bottom: 1px solid #333;*/
         width: 100%;
         height: var(--row-height);
       }
@@ -215,11 +253,15 @@
       }
 
       span.source {
-        margin-top: 1px;
-        display: block;
+        margin-top: 2px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 4px;
         font-size: 0.85rem;
         color: #b5a1ff;
       }
+      span.source sl-icon { position: relative; top: 2px; }
     `;
   }
 

@@ -54,7 +54,6 @@ export function renderSectionBody(ready, SKELS, hasItems) {
     ${ready && hasItems('packages') ? html`
       <div class="pup-card-grid">
         ${repeat(this.packageList.getCurrentPageData(), (pkg) => `${pkg.def.source.id}-${pkg.def.key}`, (pkg) => {
-          if (pkg.def.key === "Identity") { console.log(pkg.def.source) };
           return html`
           <pup-install-card
             defaultIcon="box"
@@ -66,6 +65,7 @@ export function renderSectionBody(ready, SKELS, hasItems) {
             .upstreamVersions=${pkg.def.versions[pkg.def.latestVersion]?.meta?.upstreamVersions || {}}
             short="${pkg.def.versions[pkg.def.latestVersion]?.meta?.shortDescription}"
             ?installed=${pkg.computed.isInstalled}
+            ?updateAvailable=${true}
             href=${pkg.computed.storeURL}
             .source=${pkg.def.source}
           ></pup-install-card>

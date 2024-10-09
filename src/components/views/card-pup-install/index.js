@@ -193,7 +193,6 @@
         flex: 1 1 auto; /* can grow, can shrink */
         display: flex;
         align-items: center;
-        /*border-bottom: 1px solid #333;*/
         width: 100%;
         height: var(--row-height);
       }

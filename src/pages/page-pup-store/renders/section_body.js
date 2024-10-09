@@ -3,7 +3,10 @@ import { html, css, nothing, repeat } from '/vendor/@lit/all@3.1.2/lit-all.min.j
 var pupCardGrid = css`
   .pup-card-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    @media (min-width:576px) {
+      grid-template-columns: repeat(auto-fit, minmax(576px, 1fr));
+    }
   }
 `
 
@@ -62,7 +65,9 @@ export function renderSectionBody(ready, SKELS, hasItems) {
             .upstreamVersions=${pkg.def.versions[pkg.def.latestVersion]?.meta?.upstreamVersions || {}}
             short="${pkg.def.versions[pkg.def.latestVersion]?.meta?.shortDescription}"
             ?installed=${pkg.computed.isInstalled}
+            ?updateAvailable=""
             href=${pkg.computed.storeURL}
+            .source=${pkg.def.source}
           ></pup-install-card>
         `})}
       </div>

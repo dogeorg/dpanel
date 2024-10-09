@@ -22,12 +22,16 @@
         href: { type: String },
         gref: { type: String },
         upstreamVersions: { type: Object },
+        installed: { type: Boolean },
+        updateAvailable: { type: Boolean },
+        source: { type: Object }
       };
     }
 
     constructor() {
       super();
       this.href = ""
+      this.source = {};
     }
 
     get status() {
@@ -40,22 +44,63 @@
       this.requestUpdate();
     }
 
+    renderSourceIcon(sourceType) {
+      let icon;
+      switch (sourceType) {
+        case 'git':
+          icon = 'git';
+          break;
+        case 'disk':
+           icon = 'hdd-fill'
+          break;
+      }
+      if (!icon) return nothing;
+      return html`
+        <sl-icon name=${icon}></sl-icon>
+      `
+    }
+
     render() {
-      const { defaultIcon, pupName, version, logoBase64, status, gui, short, href, upstreamVersions } = this;
+      const { 
+        defaultIcon, pupName, version, logoBase64, 
+        status, gui, short, href, upstreamVersions,
+        installed, updateAvailable, source
+      } = this;
       return html`
         <a class="anchor" href=${href} target="_self">
           <div class="pup-card-wrap">
-            <div class="icon-wrap ${logoBase64 ? 'has-logo' : ''}">
-              ${logoBase64 ? html`<img style="width: 100%" src="${logoBase64}" />` : html`<sl-icon name="${defaultIcon}"></sl-icon>`}
-            </div>
-            <div class="details-wrap">
-              <div class="inner">
-                <span class="name">${pupName}  <small style="color: #777">v${version}</small></span>
-                <span class="description">${short}</span>
-                <x-tag-set .tags=${upstreamVersions} highlight max=1></x-tag-set>
-                <span class="status">${status === "running" ? "Installed" : status}</span>
+            <div class="primary-details">
+              <div class="icon-wrap ${logoBase64 ? 'has-logo' : ''}">
+                ${logoBase64 ? html`<img style="width: 100%" src="${logoBase64}" />` : html`<sl-icon name="${defaultIcon}"></sl-icon>`}
+              </div>
+              <div class="details-wrap">
+                <div class="inner">
+                  <span class="name">${pupName}  <small style="color: #777">v${version}</small></span>
+                  <span class="description">${short}</span>
+                  <span class="source">
+                    ${this.renderSourceIcon(source?.type)}
+                    ${source?.location}
+                  </span>
+                  <x-tag-set class="tag-set" .tags=${upstreamVersions} max=1></x-tag-set>
+                </div>
               </div>
             </div>
+
+            <div class="details-wrap secondary-details">
+              <div class="inner">
+                ${installed && updateAvailable ? html`
+                  <sl-tag class="card-installation-tag" pill variant="primary">
+                    Update Available <sl-icon class="card-installation-tag-icon" name="info-circle-fill"></sl-icon>
+                  </sl-tag>
+                ` : nothing }
+                ${installed && !updateAvailable ? html`
+                  <sl-tag pill variant="neutral">
+                    Installed <sl-icon class="card-installation-tag-icon" name="check-circle-fill"></sl-icon>
+                  </sl-tag>
+                ` : nothing }
+              </div>
+            </div>
+
           </div>
         </a>
       `;
@@ -82,6 +127,7 @@
       }
 
       .pup-card-wrap {
+        position: relative;
         display: flex;
         flex-direction: row;
         margin-bottom: 1em;
@@ -89,6 +135,16 @@
         padding: 1em;
         box-sizing: border-box;
         overflow: hidden;
+        gap: 0em;
+      }
+      .pup-card-wrap::after {
+        content: "";
+        height: 1px;
+        margin-left: calc(var(--icon-size) + 1em);
+        width: 75%;
+        background: #444;
+        position: absolute;
+        bottom: 16px;
       }
 
       .pup-card-wrap:hover {
@@ -107,7 +163,6 @@
         align-items: center;
         font-size: 2em;
         box-sizing: border-box;
-        margin-right: 0.5em;
         margin-top: calc((var(--row-height) - var(--icon-size)) / 2);
       }
 
@@ -115,11 +170,29 @@
         background: none;
       }
 
+      .primary-details {
+        display: flex;
+        flex-direction: row;
+        gap: 1em;
+      }
+
+      .details-wrap.secondary-details {
+        position: absolute;
+        justify-content: end;
+        top: -30px;
+        right: 8px;
+        @media (min-width: 576px) {
+          position: relative;
+          justify-content: center;
+          top: 0px;
+          right: 0px;
+        }
+      }
+
       .details-wrap {
         flex: 1 1 auto; /* can grow, can shrink */
         display: flex;
         align-items: center;
-        border-bottom: 1px solid #333;
         width: 100%;
         height: var(--row-height);
       }
@@ -141,20 +214,20 @@
         overflow: hidden;
         text-overflow: ellipsis;
         max-height: 2.4em;
-        line-height: 1.2em;
+        line-height: 1.2;
       }
 
       span.description {
-        margin-bottom: 4px;
-        font-weight: 100;
-        font-size: 0.9rem;
+        margin-bottom:;
+        font-weight: normal;
+        font-size: .9rem;
         display: -webkit-box;
-        -webkit-line-clamp: 2;
+        -webkit-line-clamp: 1;
         -webkit-box-orient: vertical;
         overflow: hidden;
         text-overflow: ellipsis;
-        max-height: 2em;
-        line-height: 1em;
+        max-height: 2.4em;
+        line-height: 1.1;
       }
 
       span.version {
@@ -168,6 +241,26 @@
         color: #00c3ff;
         font-size: 0.9rem;
       }
+
+      .tag-set {
+        margin-top: 6px;
+      }
+
+      .card-installation-tag-icon {
+        display: inline-block;
+        margin-left: 6px;
+      }
+
+      span.source {
+        margin-top: 2px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 4px;
+        font-size: 0.85rem;
+        color: #b5a1ff;
+      }
+      span.source sl-icon { position: relative; top: 2px; }
     `;
   }
 

@@ -137,8 +137,14 @@ class PkgController {
           const def = {
             ...pupDefinitionData,
             key: pkgName,
-            source: { id: sourceId, lastChecked: sourceData.lastChecked },
+            source: { 
+              id: sourceId,
+              ...sourceData 
+            },
           }
+
+          // Avoid adding the .pups[] property of the source to a specific pups def.
+          delete def.source.pups
 
           // Update it in place.
           const found = foundIndex >= 0;
@@ -190,6 +196,7 @@ class PkgController {
 
       return { pup: result, index };
     } catch (err) {
+      console.warn('pup lookup warning:', err)
       return { pup: null, index: -1 };
     }
   }

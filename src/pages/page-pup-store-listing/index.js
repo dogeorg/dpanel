@@ -142,6 +142,7 @@ class PupInstallPage extends LitElement {
       <div id="PageWrapper" class="${wrapperClasses}" ?data-freeze=${popover_page}>
         <section class="status">
           ${this.renderStatus()}
+          ${this.renderInstallationLogs({ pupId: pkg?.state?.id, installationId: pkg?.computed?.installationId })}
           ${this.renderActions()}
         </section>
 

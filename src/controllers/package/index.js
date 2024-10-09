@@ -489,6 +489,10 @@ class PkgController {
       };
     });
   }
+
+  ingestProgressUpdate(data) {
+    console.log('PROGRESS', data); 
+  }
 }
 
 // Instance holder

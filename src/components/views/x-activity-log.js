@@ -108,13 +108,13 @@ class ActivityLog extends LitElement {
               variant="text"
               target="_blank"
               @click=${this.handleDownloadClick}
-            >Download
+            >
               <sl-icon name="download" slot="suffix"></sl-icon>
             </sl-button>
             <sl-button 
               variant="text"
               @click=${() => this.expanded = !this.expanded}
-            >${!this.expanded ? "Expand" : "Collapse"}
+            >
               <sl-icon name="${!this.expanded ? 'arrows-expand' : 'arrows-collapse'}" slot="suffix"></sl-icon>
             </sl-button>
         </div>
@@ -127,9 +127,12 @@ class ActivityLog extends LitElement {
       :host {
         --log-footer-height: 48px;
         --log-viewer-height: 120px;
+        --margin-top: 0;
+        --margin-bottom: 0;
         display: block;
         position: relative;
-        margin-top: 1em;
+        margin-top: var(--margin-top);
+        margin-bottom: var(--margin-bottom);
         overflow: hidden;
         transition: max-height 500ms ease-in-out;
         max-height: calc(var(--log-viewer-height) + var(--log-footer-height));

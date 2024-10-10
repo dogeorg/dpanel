@@ -329,7 +329,6 @@ class PkgController {
     const { pup, index } = this.getPupMaster({ pupId: n.id, sourceId: n.source.id, pupName: n.manifest.meta.name });
 
     if (pup) {
-      console.debug('Pup found, updating in place');
       this.stateIndex[newPupStateData.id] = newPupStateData
 
       // Update pup array data in place
@@ -339,8 +338,6 @@ class PkgController {
       }
 
       updated.computed = this.determineCalculatedVals(updated)
-
-      console.debug('this is the found pup, now with updated state', { updated })
 
       this.pups[index] = updated
     } else {

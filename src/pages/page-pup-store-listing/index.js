@@ -154,12 +154,13 @@ class PupInstallPage extends LitElement {
     const short = pkg.def.versions[pkg.def.latestVersion]?.meta?.shortDescription || '';
     const long = pkg.def.versions[pkg.def.latestVersion]?.meta?.longDescription || ''
     const noDescription = !short && !long
+    const hasLogs = this.activityLogs.length
 
     return html`
       <div id="PageWrapper" class="${wrapperClasses}" ?data-freeze=${popover_page}>
         <section class="status">
           ${this.renderStatus()}
-          <x-activity-log .logs=${this.activityLogs} name=${pkg.def.key}></x-activity-log>
+          <x-activity-log .logs=${this.activityLogs} name=${pkg.def.key} style="--margin-top:${hasLogs ? '20px' : 0}"></x-activity-log>
           ${this.renderActions()}
         </section>
 

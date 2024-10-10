@@ -13,6 +13,7 @@ import "/components/views/x-check/index.js";
 import "/components/common/page-container.js";
 import "/components/common/sparkline-chart/sparkline-chart-v2.js";
 import "/components/views/x-metric/metric.js";
+import "/components/views/x-activity-log.js";
 import { bindToClass } from "/utils/class-bind.js";
 import * as renderMethods from "./renders/index.js";
 import { store } from "/state/store.js";
@@ -36,6 +37,7 @@ class PupPage extends LitElement {
       inflight_uninstall: { type: Boolean },
       inflight_purge: { type: Boolean },
       _HARDCODED_UNINSTALL_WAIT_TIME: { type: Number },
+      activityLogs: { type: Array },
     };
   }
 
@@ -52,6 +54,7 @@ class PupPage extends LitElement {
     this.pupEnabled = false;
     this._confirmedName = "";
     this._HARDCODED_UNINSTALL_WAIT_TIME = 0;
+    this.activityLogs = [];
   }
 
   getPup() {
@@ -69,6 +72,20 @@ class PupPage extends LitElement {
   disconnectedCallback() {
     this.pkgController.removeObserver(this);
     super.disconnectedCallback();
+  }
+
+  requestUpdate(options = {}) {
+    if (this.pkgController && options.type === 'activity') {
+      if (this.context.store.pupContext?.state?.id) {
+        this.updateActivityLogs();
+      }
+    }
+    super.requestUpdate();
+  }
+
+  updateActivityLogs() {
+    const pupId = this.context.store.pupContext?.state?.id
+    this.activityLogs = [...this.pkgController.activityIndex[pupId]];
   }
 
   async firstUpdated() {
@@ -258,14 +275,6 @@ class PupPage extends LitElement {
       );
     };
 
-    const renderStatusAndActions = () => {
-      return html`
-        ${this.renderStatus(labels, pkg)}
-        <sl-progress-bar value="0" ?indeterminate=${isLoadingStatus || isInstallationLoadingStatus} class="loading-bar ${statusInstallationId}"></sl-progress-bar>
-        ${this.renderActions(labels)}
-      `
-    }
-
     const renderStats = () => {
       if (pkg.stats.metrics.length === 0) {
         return html`
@@ -360,16 +369,26 @@ class PupPage extends LitElement {
       "disabled": disableActions
     })
 
+    const hasLogs = this.activityLogs.length
+
     return html`
       <div id="PageWrapper" class="wrapper">
-        <section style="display: flex; flex-direction: row; gap: 1em;">
-          ${logo ? html`<img style="width: 91px; height: 91px;" src="${logo}" />` : nothing}
-          <div style="margin-bottom: 0em; width: 100%">
-            <div class="section-title">
-              <h3>Status</h3>
+        <section>
+          <div style="display:flex; flex-direction: row; gap: 1em; margin-bottom: 6px;">
+            ${logo ? html`<img style="width: 91px; height: 91px;" src="${logo}" />` : nothing}
+            <div style="display: flex; flex-direction: column; width: 100%;">
+              <div class="section-title">
+                <h3>Status</h3>
+              </div>
+              ${this.renderStatus(labels, pkg)}
+              <sl-progress-bar value="0" ?indeterminate=${isLoadingStatus || isInstallationLoadingStatus} class="loading-bar ${statusInstallationId}"></sl-progress-bar>
             </div>
-            ${renderStatusAndActions()}
           </div>
+          <x-activity-log
+            .logs=${this.activityLogs}
+            name="${pkg.state.manifest.meta.name}"
+          ></x-activity-log>
+          ${this.renderActions(labels, hasLogs)}
         </section>
 
         ${isRunning ? html`

@@ -27,6 +27,7 @@ class Store {
       demoSystemPrompt: "",
       logStatsUpdates: false,
       logStateUpdates: false,
+      logProgressUpdates: false,
       reflectorHost: `https://reflector.dogecoin.org`,
       reflectorToken: Math.random().toString(36).substring(2, 14),
     };

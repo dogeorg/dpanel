@@ -35,7 +35,7 @@ export async function handlePurgeFunction() {
   await this.pkgController.requestPupAction(pupId, 'purge', callbacks);
 }
 
-export function renderActions(labels) {
+export function renderActions(labels, hasLogs) {
   const pkg = this.getPup();
   let { installationId, statusId, statusLabel } = labels
 
@@ -52,7 +52,7 @@ export function renderActions(labels) {
       gap: 1em;
 
       &.margin {
-        margin-top: 1.2em;
+        margin-top: 20px;
       }
     }
 
@@ -91,7 +91,7 @@ export function renderActions(labels) {
   ` : nothing
 
   return html`
-    <div class="action-wrap ${hasButtons ? "margin" : ""}">
+    <div class="action-wrap ${hasLogs ? "margin" : ""}">
 
       ${statusId === 'needs_config' ? html`
         <sl-button variant="warning" size="large" @click=${this.openConfig}>

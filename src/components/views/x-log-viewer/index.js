@@ -43,7 +43,7 @@ class LogViewer extends LitElement {
   }
 
   firstUpdated() {
-  const logContainer = this.shadowRoot.querySelector('#LogContainer');
+    const logContainer = this.shadowRoot.querySelector('#LogContainer');
     logContainer.addEventListener('scroll', () => {
       // Check if the user has scrolled up from the bottom
       if (logContainer.scrollTop < logContainer.scrollHeight - logContainer.clientHeight) {

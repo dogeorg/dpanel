@@ -120,6 +120,13 @@ class SocketChannel {
             },
           });
           break;
+
+        case "progress":
+          if (store.networkContext.logProgressUpdates) {
+            console.log("--PROGRESS", data);
+          }
+          pkgController.ingestProgressUpdate(data);
+          break;
       }
       this.notify();
     };

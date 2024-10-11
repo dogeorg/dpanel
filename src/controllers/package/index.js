@@ -10,6 +10,7 @@ class PkgController {
   statsIndex = {}
   sourcesIndex = {}
   assetIndex = {}
+  activityIndex = {}
 
   constructor() {
     this.transactionTimeoutChecker();
@@ -31,13 +32,13 @@ class PkgController {
   }
 
   // Notify all registered observers of a state change
-  notify(pupId) {
+  notify(pupId, options = {}) {
     for (const observer of this.observers) {
       if (!pupId) {
-        observer.requestUpdate();
+        observer.requestUpdate(options);
       }
       if (pupId === observer.pupId) {
-        observer.requestUpdate();
+        observer.requestUpdate(options);
       }
     }
   }
@@ -325,12 +326,9 @@ class PkgController {
     }
 
     const n = newPupStateData
-    console.debug('PUPS ARRAY', { pups: this.pups, stateIndex: this.stateIndex})
-    console.debug('Attempting to find in PUPS using', { pupId: n.id, sourceId: n.source.id, pupName: n.manifest.meta.name })
     const { pup, index } = this.getPupMaster({ pupId: n.id, sourceId: n.source.id, pupName: n.manifest.meta.name });
 
     if (pup) {
-      console.debug('Pup found, updating in place');
       this.stateIndex[newPupStateData.id] = newPupStateData
 
       // Update pup array data in place
@@ -341,11 +339,8 @@ class PkgController {
 
       updated.computed = this.determineCalculatedVals(updated)
 
-      console.debug('this is the found pup, now with updated state', { updated })
-
       this.pups[index] = updated
     } else {
-      console.debug('Pup NOT found, adding new');
       // When receiving a pupState event for a pup NOT found in the stateIndex
       // We add it as a new entry.  This is likely a record for a newly installed pup
       // The user has clicked "install", and the client has received a pup event before
@@ -358,8 +353,6 @@ class PkgController {
         stats: this.statsIndex[newPupStateData.id] || null,
       }
       pup.computed = this.determineCalculatedVals(pup);
-
-      console.debug('this is the pup to be added', { pup })
 
       this.stateIndex[pup.state.id] = newPupStateData;
       this.pups.push(pup)
@@ -488,6 +481,19 @@ class PkgController {
         installedCount
       };
     });
+  }
+
+  ingestProgressUpdate(data) {
+    if (this.activityIndex[data.update.PupID]) {
+      // Prior acitivity exists for pup, add more.
+      this.activityIndex[data.update.PupID].push(data.update)
+    } else {
+      // First activity for pup, creates activity array.
+      this.activityIndex[data.update.PupID] = [];
+      this.activityIndex[data.update.PupID].push(data.update);
+    }
+    // Notify observers with an 'activity' type
+    this.notify(null, { type: 'activity' });
   }
 }
 

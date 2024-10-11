@@ -6,6 +6,7 @@ import {
   choose,
   unsafeHTML,
   classMap,
+  guard
 } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 import { bindToClass } from "/utils/class-bind.js";
 import * as renderMethods from "./renders/index.js";
@@ -16,6 +17,7 @@ import { asyncTimeout } from "/utils/timeout.js";
 import "/components/common/action-row/action-row.js";
 import "/components/common/reveal-row/reveal-row.js";
 import "/components/common/page-container.js";
+import "/components/views/x-activity-log.js";
 
 class PupInstallPage extends LitElement {
   static get properties() {
@@ -24,12 +26,14 @@ class PupInstallPage extends LitElement {
       open_dialog_label: { type: String },
       busy: { type: Boolean },
       inflight: { type: Boolean },
+      activityLogs: { type: Array },
     };
   }
 
   constructor() {
     super();
     bindToClass(renderMethods, this);
+    this.pupId = null;
     this.pkgController = pkgController;
     this.context = new StoreSubscriber(this, store);
     this.open_dialog = "";
@@ -38,6 +42,7 @@ class PupInstallPage extends LitElement {
     this.open_page_label = "";
     this.busy = false;
     this.inflight = false;
+    this.activityLogs = [];
   }
 
   getPup() {
@@ -58,8 +63,24 @@ class PupInstallPage extends LitElement {
     super.disconnectedCallback();
   }
 
-  async firstUpdated() {
+  firstUpdated() {
     this.addEventListener("sl-hide", this.handleDialogClose);
+  }
+
+  updated(changedProperties) {
+    super.updated(changedProperties);
+  }
+
+  requestUpdate(options = {}) {
+    if (this.pkgController && options.type === 'activity') {
+      if (!this.pupId) {
+        this.pupId = this.getPup()?.state?.id;
+      }
+      if (this.pupId) {
+        this.updateActivityLogs();
+      }
+    }
+    super.requestUpdate();
   }
 
   handleDialogClose() {
@@ -76,8 +97,13 @@ class PupInstallPage extends LitElement {
     this.open_dialog_label = el.getAttribute("label");
   };
 
+  updateActivityLogs() {
+    this.activityLogs = [...this.pkgController.activityIndex[this.pupId]];
+  }
+
   render() {
     const pupContext = this.context.store?.pupContext
+    const activityLogs = this.pupId ? pkgController.activityIndex[this.pupId] : []
 
     if (!pupContext.ready) {
       return html`
@@ -110,21 +136,12 @@ class PupInstallPage extends LitElement {
     if (!pkg) return;
 
     const { statusId, statusLabel, installationId, installationLabel } = pkg?.computed
-    // const hasDependencies = (pkg?.state.manifest?.deps?.pups || []).length > 0
     const popover_page = path[1];
 
     const wrapperClasses = classMap({
       wrapper: true,
       installed: ["ready", "unready"].includes(installationId),
     });
-
-    // const renderDependancyList = () => {
-    //   return pkg.state.manifest.deps.pups.map((dep) => html`
-    //     <action-row prefix="box-seam" name=${dep.id} label=${dep.name} href=${`/explore/${dep.id}/${dep.name}`}>
-    //       ${dep.condition}
-    //     </action-row>
-    //   `);
-    // };
 
     const renderInterfacesList = () => {
       return html`
@@ -137,11 +154,13 @@ class PupInstallPage extends LitElement {
     const short = pkg.def.versions[pkg.def.latestVersion]?.meta?.shortDescription || '';
     const long = pkg.def.versions[pkg.def.latestVersion]?.meta?.longDescription || ''
     const noDescription = !short && !long
+    const hasLogs = this.activityLogs.length
 
     return html`
       <div id="PageWrapper" class="${wrapperClasses}" ?data-freeze=${popover_page}>
         <section class="status">
           ${this.renderStatus()}
+          <x-activity-log .logs=${this.activityLogs} name=${pkg.def.key} style="--margin-top:${hasLogs ? '20px' : 0}"></x-activity-log>
           ${this.renderActions()}
         </section>
 

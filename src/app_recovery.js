@@ -128,8 +128,6 @@ class AppModeApp extends LitElement {
       installationMode,
     } = setupState;
 
-    // const installationMode = 'canInstall'
-
     if (isForbidden) {
       return STEP_LOGIN;
     }

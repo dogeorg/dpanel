@@ -6,7 +6,7 @@ import { getResponse, postResponse } from "./disks.mocks.js";
 const client = new ApiClient(store.networkContext.apiBaseUrl);
 
 export async function getDisks() {
-  const res = await client.get(`/system/install/disks`, {
+  const res = await client.get(`/system/disks`, {
     mock: getResponse,
     noLogoutRedirect: true,
   });

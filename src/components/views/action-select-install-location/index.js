@@ -139,6 +139,8 @@ export class LocationPickerView extends LitElement {
             </sl-alert>
           `: nothing }
         <div>
+
+        <p style="line-height: 1.1; color: #777"><small>You can select your <u>mass storage location</u> later<br>(for blockchain, app data, etc..)</small></p>
       </div>
     `;
   };
@@ -375,6 +377,16 @@ export class LocationPickerView extends LitElement {
       min-height: 200px;
       text-align: center;
       font-size: 2em;
+    }
+
+    .disk-empty {
+      color: #666;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      h3 { font-family: 'Comic Neue'; margin-bottom: -1em; }
+      p { font-size: 0.9rem; }
     }
 
     .action-wrap {

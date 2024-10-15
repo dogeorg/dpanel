@@ -54,6 +54,7 @@ const STEP_SET_PASSWORD = 2;
 const STEP_GENERATE_KEY = 3;
 const STEP_NETWORK = 4;
 const STEP_DONE = 5;
+const STEP_INSTALL = 6;
 
 class AppModeApp extends LitElement {
   static styles = [appModeStyles, navStyles];
@@ -64,6 +65,7 @@ class AppModeApp extends LitElement {
     setupState: { type: Object },
     isFirstTimeSetup: { type: Boolean },
     isForbidden: { type: Boolean },
+    installationMode: { type: String },
   };
 
   constructor() {
@@ -74,6 +76,7 @@ class AppModeApp extends LitElement {
     this.setupState = null;
     this.isFirstTimeSetup = false;
     this.isForbidden = false;
+    this.installationMode = "";
 
     bindToClass(renderChunks, this);
     this.context = new StoreSubscriber(this, store);
@@ -122,7 +125,10 @@ class AppModeApp extends LitElement {
       hasGeneratedKey,
       hasConfiguredNetwork,
       isForbidden,
+      installationMode,
     } = setupState;
+
+    // const installationMode = 'canInstall'
 
     if (isForbidden) {
       return STEP_LOGIN;
@@ -130,6 +136,10 @@ class AppModeApp extends LitElement {
 
     if (!hasCompletedInitialConfiguration) {
       this.isFirstTimeSetup = true;
+    }
+
+    if (installationMode) {
+      this.installationMode = installationMode;
     }
 
     // If we're already fully set up, or if we've generated a key, show our login step.
@@ -273,7 +283,6 @@ class AppModeApp extends LitElement {
                 style="padding-top: ${this.isFirstTimeSetup ? "0px;" : "100px"}"
               >
                 <div class="${stepWrapperClasses}">
-                  <action-select-install-location></action-select-install-location>
                   ${choose(
                     this.activeStepNumber,
                     [
@@ -331,6 +340,13 @@ class AppModeApp extends LitElement {
                     () => html`<h1>Error</h1>`,
                   )}
                 </div>
+                  ${true ? html`
+                    <action-select-install-location
+                    style="z-index: 999"
+                    mode=${this.installationMode}
+                    ?open=${["canInstall", "mustInstall"].includes(this.installationMode)}
+                  ></action-select-install-location>
+                  `: nothing }
               </main>
             </div>
           `

@@ -4,7 +4,7 @@ import {
   nothing,
   classMap,
   choose,
-  guard
+  guard,
 } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 
 // Add shoelace once. Use components anywhere.
@@ -20,9 +20,9 @@ import "/components/views/action-login/index.js";
 import "/components/views/action-change-pass/index.js";
 import "/components/views/action-create-key/index.js";
 import "/components/views/action-select-network/index.js";
+import "/components/views/action-select-install-location/index.js";
 import "/components/views/setup-dislaimer/index.js";
 import "/components/views/confirmation-prompt/index.js";
-
 import "/pages/page-recovery/index.js";
 
 // Components
@@ -54,6 +54,7 @@ const STEP_SET_PASSWORD = 2;
 const STEP_GENERATE_KEY = 3;
 const STEP_NETWORK = 4;
 const STEP_DONE = 5;
+const STEP_INSTALL = 6;
 
 class AppModeApp extends LitElement {
   static styles = [appModeStyles, navStyles];
@@ -64,6 +65,7 @@ class AppModeApp extends LitElement {
     setupState: { type: Object },
     isFirstTimeSetup: { type: Boolean },
     isForbidden: { type: Boolean },
+    installationMode: { type: String },
   };
 
   constructor() {
@@ -74,6 +76,7 @@ class AppModeApp extends LitElement {
     this.setupState = null;
     this.isFirstTimeSetup = false;
     this.isForbidden = false;
+    this.installationMode = "";
 
     bindToClass(renderChunks, this);
     this.context = new StoreSubscriber(this, store);
@@ -108,7 +111,7 @@ class AppModeApp extends LitElement {
 
     if (!response.setupFacts) {
       // TODO (error handling)
-      alert('Failed to fetch bootstrap.');
+      alert("Failed to fetch bootstrap.");
       return;
     }
 
@@ -117,7 +120,13 @@ class AppModeApp extends LitElement {
   }
 
   _determineStartingStep(setupState) {
-    const { hasCompletedInitialConfiguration, hasGeneratedKey, hasConfiguredNetwork, isForbidden } = setupState;
+    const {
+      hasCompletedInitialConfiguration,
+      hasGeneratedKey,
+      hasConfiguredNetwork,
+      isForbidden,
+      installationMode,
+    } = setupState;
 
     if (isForbidden) {
       return STEP_LOGIN;
@@ -127,8 +136,15 @@ class AppModeApp extends LitElement {
       this.isFirstTimeSetup = true;
     }
 
+    if (installationMode) {
+      this.installationMode = installationMode;
+    }
+
     // If we're already fully set up, or if we've generated a key, show our login step.
-    if ((hasCompletedInitialConfiguration || hasGeneratedKey) && !this.isLoggedIn) {
+    if (
+      (hasCompletedInitialConfiguration || hasGeneratedKey) &&
+      !this.isLoggedIn
+    ) {
       return STEP_LOGIN;
     }
 
@@ -149,13 +165,22 @@ class AppModeApp extends LitElement {
     // Prevent dialog closures on overlay click
     this.dialogMgmt = this.shadowRoot.querySelector("#MgmtDialog");
     this.dialogMgmt.addEventListener("sl-request-close", (event) => {
-      if (event.detail.source === "overlay" || this.context.store.setupContext.preventClose) {
+      if (
+        event.detail.source === "overlay" ||
+        this.context.store.setupContext.preventClose
+      ) {
         event.preventDefault();
       }
     });
     this.dialogMgmt.addEventListener("sl-after-hide", (event) => {
       if (event.target.id === "MgmtDialog") {
-        store.updateState({ setupContext: { view: null, hideViewClose: false, preventClose: false }});
+        store.updateState({
+          setupContext: {
+            view: null,
+            hideViewClose: false,
+            preventClose: false,
+          },
+        });
       }
     });
   }
@@ -178,27 +203,41 @@ class AppModeApp extends LitElement {
 
   triggerReboot = async () => {
     try {
-      await postHostReboot()
+      await postHostReboot();
     } catch {
       // Ignore.
     }
 
-    store.updateState({ setupContext: { view: 'post-reboot', hideViewClose: true, preventClose: true }});
-  }
+    store.updateState({
+      setupContext: {
+        view: "post-reboot",
+        hideViewClose: true,
+        preventClose: true,
+      },
+    });
+  };
 
   triggerPoweroff = async () => {
     try {
-      await postHostShutdown()
+      await postHostShutdown();
     } catch {
       // Ignore.
     }
 
-    store.updateState({ setupContext: { view: 'post-power-off', hideViewClose: true, preventClose: true }});
-  }
+    store.updateState({
+      setupContext: {
+        view: "post-power-off",
+        hideViewClose: true,
+        preventClose: true,
+      },
+    });
+  };
 
   _closeMgmtDialog = () => {
-    store.updateState({ setupContext: { view: null, hideViewClose: false, preventClose: false }});
-  }
+    store.updateState({
+      setupContext: { view: null, hideViewClose: false, preventClose: false },
+    });
+  };
 
   render() {
     const navClasses = classMap({
@@ -227,10 +266,20 @@ class AppModeApp extends LitElement {
         ? html`
             <div id="App" class="chrome">
               <nav class="${navClasses}">
-                ${guard([this.isFirstTimeSetup, this.activeStepNumber, this.context.store.networkContext.token], () => this.renderNav(this.isFirstTimeSetup))}
+                ${guard(
+                  [
+                    this.isFirstTimeSetup,
+                    this.activeStepNumber,
+                    this.context.store.networkContext.token,
+                  ],
+                  () => this.renderNav(this.isFirstTimeSetup),
+                )}
               </nav>
 
-              <main id="Main" style="padding-top: ${this.isFirstTimeSetup ? '0px;' : '100px'}">
+              <main
+                id="Main"
+                style="padding-top: ${this.isFirstTimeSetup ? "0px;" : "100px"}"
+              >
                 <div class="${stepWrapperClasses}">
                   ${choose(
                     this.activeStepNumber,
@@ -270,72 +319,121 @@ class AppModeApp extends LitElement {
                         STEP_NETWORK,
                         () =>
                           html`<x-action-select-network
-                            .onSuccess=${async () => { await asyncTimeout(750); this._nextStep() }}
+                            .onSuccess=${async () => {
+                              await asyncTimeout(750);
+                              this._nextStep();
+                            }}
                             .reflectorToken=${reflectorToken}
                           ></x-action-select-network>`,
                       ],
                       [
                         STEP_DONE,
-                        () => html`<x-page-recovery
-                          .reflectorToken=${reflectorToken}
-                          .isFirstTimeSetup=${this.isFirstTimeSetup}
-                        ></x-page-recovery>`,
+                        () =>
+                          html`<x-page-recovery
+                            .reflectorToken=${reflectorToken}
+                            .isFirstTimeSetup=${this.isFirstTimeSetup}
+                          ></x-page-recovery>`,
                       ],
                     ],
                     () => html`<h1>Error</h1>`,
                   )}
                 </div>
+                  ${true ? html`
+                    <action-select-install-location
+                    style="z-index: 999"
+                    mode=${this.installationMode}
+                    ?open=${["canInstall", "mustInstall"].includes(this.installationMode)}
+                  ></action-select-install-location>
+                  `: nothing }
               </main>
             </div>
           `
         : nothing}
-
-      ${guard([this.context.store.setupContext.view], () => html`
-        <sl-dialog id="MgmtDialog" no-header ?open=${this.context.store.setupContext.view !== null }>
-          ${choose(store.setupContext.view, [
-            ['network', () => html`
-              <x-action-select-network
-                showSuccessAlert
-                .onClose=${() => this._closeMgmtDialog()}>
-              </x-action-select-network>
-            `],
-            ['password', () => html`
-              <x-action-change-pass
-                resetMethod="credentials"
-                showSuccessAlert
-              ></x-action-change-pass>`],
-            ['reboot', () => html`
-              <x-confirmation-prompt
-                title="Are you sure you want to reboot?"
-                description="Remove your USB recovery stick if you want to boot back into normal mode"
-                leftButtonText="Cancel"
-                .leftButtonClick=${this._closeMgmtDialog}
-                rightButtonText="Reboot"
-                .rightButtonClick=${this.triggerReboot}
-              ></x-confirmation-prompt>
-            `],
-            ['post-reboot', () => html`Please re-reconnect to the same network as your Dogebox and refresh.`],
-            ['power-off', () => html`
-              <x-confirmation-prompt
-                title="Are you sure you want to power off?"
-                description="Physical access may be required to turn your Dogebox on again"
-                leftButtonText="Cancel"
-                .leftButtonClick=${this._closeMgmtDialog}
-                rightButtonText="Yes, turn it off."
-                .rightButtonClick=${this.triggerPoweroff}
-              ></x-confirmation-prompt>
-            `],
-            ['post-power-off', () => html`Dogebox turned off successfully. You may close this page.`],
-            ['factory-reset', () => html`
-              <div class="coming-soon">
-                <h3>Not yet implemented</h3>
-              </div>`],
-          ])}
-          ${this.context.store.setupContext.hideViewClose ? nothing : html`
-            <sl-button slot="footer" outline @click=${this._closeMgmtDialog}>Close</sl-button>
-          `}
-        </sl-dialog>
-      `)}
+      ${guard(
+        [this.context.store.setupContext.view],
+        () => html`
+          <sl-dialog
+            id="MgmtDialog"
+            no-header
+            ?open=${this.context.store.setupContext.view !== null}
+          >
+            ${choose(store.setupContext.view, [
+              [
+                "network",
+                () => html`
+                  <x-action-select-network
+                    showSuccessAlert
+                    .onClose=${() => this._closeMgmtDialog()}
+                  >
+                  </x-action-select-network>
+                `,
+              ],
+              [
+                "password",
+                () =>
+                  html` <x-action-change-pass
+                    resetMethod="credentials"
+                    showSuccessAlert
+                  ></x-action-change-pass>`,
+              ],
+              [
+                "reboot",
+                () => html`
+                  <x-confirmation-prompt
+                    title="Are you sure you want to reboot?"
+                    description="Remove your USB recovery stick if you want to boot back into normal mode"
+                    leftButtonText="Cancel"
+                    .leftButtonClick=${this._closeMgmtDialog}
+                    rightButtonText="Reboot"
+                    .rightButtonClick=${this.triggerReboot}
+                  ></x-confirmation-prompt>
+                `,
+              ],
+              [
+                "post-reboot",
+                () =>
+                  html`Please re-reconnect to the same network as your Dogebox
+                  and refresh.`,
+              ],
+              [
+                "power-off",
+                () => html`
+                  <x-confirmation-prompt
+                    title="Are you sure you want to power off?"
+                    description="Physical access may be required to turn your Dogebox on again"
+                    leftButtonText="Cancel"
+                    .leftButtonClick=${this._closeMgmtDialog}
+                    rightButtonText="Yes, turn it off."
+                    .rightButtonClick=${this.triggerPoweroff}
+                  ></x-confirmation-prompt>
+                `,
+              ],
+              [
+                "post-power-off",
+                () =>
+                  html`Dogebox turned off successfully. You may close this page.`,
+              ],
+              [
+                "factory-reset",
+                () =>
+                  html` <div class="coming-soon">
+                    <h3>Not yet implemented</h3>
+                  </div>`,
+              ],
+            ])}
+            ${this.context.store.setupContext.hideViewClose
+              ? nothing
+              : html`
+                  <sl-button
+                    slot="footer"
+                    outline
+                    @click=${this._closeMgmtDialog}
+                    >Close</sl-button
+                  >
+                `}
+          </sl-dialog>
+        `,
+      )}
       <x-debug-panel></x-debug-panel>
     `;
   }

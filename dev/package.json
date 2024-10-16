@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "setup": "./scripts/setup.sh",
-    "check": "./scripts/check.sh",
-    "start": "./scripts/check.sh && node ./scripts/start.js",
+    "start": "node ./scripts/start.js",
     "test": "web-test-runner --config ./configs/web-test-runner.config.mjs",
     "test:watch": "web-test-runner --config ./configs/web-test-runner.config.mjs --watch"
   },

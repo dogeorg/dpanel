@@ -37,7 +37,9 @@ export class LocationPickerView extends LitElement {
     this.open = false;
     this._ready = false;
     this._page = PAGE_ONE;
-    this._disks = [];
+    this._allDisks = [];
+    this._installDisks = [];
+    this._bootMediaDisk = null;
     this._selected_disk_index = null;
     this._confirmation_checked = false;
     this._inflight_install = false;
@@ -48,12 +50,14 @@ export class LocationPickerView extends LitElement {
   firstUpdated() {
     if (this.open) {
       this._inflight_disks = true;
-      this._disks = this.fetchDisks() || [];
+      this.fetchDisks();
     }
   }
 
   async fetchDisks() {
-    this._disks = await getDisks();
+    this._allDisks = await getDisks();
+    this._installDisks = this._allDisks.filter(d => d.suitableInstallDrive);
+    this._bootMediaDisk = this._allDisks.find(d => d.bootMedia);
     this._inflight_disks = false;
   }
 
@@ -68,7 +72,17 @@ export class LocationPickerView extends LitElement {
   }
 
   denyClose (e) {
-    if (e.detail.source === 'overlay') { e.preventDefault(); }
+    // If we're installing, prevent close.
+    if (this._inflight_install) {
+      e.preventDefault();
+    }
+
+    // If we MUST install, prevent close.
+    if (this.mode === 'mustInstall') {
+      e.preventDefault();
+    }
+
+    // Otherwise, do nothing, allow close.
   }
 
   render() {
@@ -115,7 +129,7 @@ export class LocationPickerView extends LitElement {
         <div class="alert-wrap">
           ${this.mode === 'canInstall' ? html`
             <sl-alert open>
-              Dogebox OS is currently running from a suitable disk (read/write, over 100gb). You can continue running from this disk OR select another.
+              Dogebox OS is currently running from a suitable disk (${this._bootMediaDisk ? `${this._bootMediaDisk.name} - ${this._bootMediaDisk.sizePretty}` : `read/write, over 100gb`}). You can continue running from this disk OR select another.
             </sl-alert>
           `: nothing }
 
@@ -125,6 +139,8 @@ export class LocationPickerView extends LitElement {
             </sl-alert>
           `: nothing }
         <div>
+
+        <p style="line-height: 1.1; color: #777"><small>You can select your <u>mass storage location</u> later<br>(for blockchain, app data, etc..)</small></p>
       </div>
     `;
   };
@@ -147,14 +163,14 @@ export class LocationPickerView extends LitElement {
             </div>
           ` : nothing}
 
-          ${!this._inflight_disks && !this._disks.length ? html`
+          ${!this._inflight_disks && !this._installDisks.length ? html`
             <div class="disk-empty">
-              Such empty.
+              <h3>Such empty.</h3>
               <p>No suitable installation disks found.</p>
             </div>
           ` : nothing}
 
-          ${this._disks.length ? this._disks.map((disk) => html`
+          ${this._installDisks.length ? this._installDisks.map((disk) => html`
             <action-row prefix="hdd-fill" data-name=${disk.name}
               label=${disk.name}
               .trigger=${this.handleDiskSelection}
@@ -164,14 +180,14 @@ export class LocationPickerView extends LitElement {
           `): nothing}
         </div>
 
-        <p><small>Installation disks must be read/write and have >100Gb capacity.</small></p>
+        <p><small>Installation disks must be unmounted and have >10Gb capacity.</small></p>
       </div>
     `;
   };
 
 
   renderConfirm = () => {
-    const selectedDisk = this._disks[this._selected_disk_index]
+    const selectedDisk = this._installDisks[this._selected_disk_index]
     return html`
       <div class="page">
 
@@ -201,7 +217,7 @@ export class LocationPickerView extends LitElement {
   };
 
   renderInstallation = () => {
-    const selectedDisk = this._disks[this._selected_disk_index]
+    const selectedDisk = this._installDisks[this._selected_disk_index]
     return html`
       <div class="page">
 
@@ -253,7 +269,7 @@ export class LocationPickerView extends LitElement {
 
   handleDiskSelection = (e, row) => {
     const diskName = row.getAttribute('data-name');
-    const found = this._disks.findIndex(d => d.name === diskName);
+    const found = this._installDisks.findIndex(d => d.name === diskName);
     if (found !== -1) {
       this._selected_disk_index = found;
       this._page = PAGE_THREE;
@@ -274,7 +290,7 @@ export class LocationPickerView extends LitElement {
 
     try {
       await asyncTimeout(3000);
-      const diskName = this._disks[this._selected_disk_index].name;
+      const diskName = this._installDisks[this._selected_disk_index].name;
       const res = await postInstallToDisk({
         disk: diskName,
         secret: "yes-i-will-destroy-everything-on-this-disk"
@@ -361,6 +377,16 @@ export class LocationPickerView extends LitElement {
       min-height: 200px;
       text-align: center;
       font-size: 2em;
+    }
+
+    .disk-empty {
+      color: #666;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      h3 { font-family: 'Comic Neue'; margin-bottom: -1em; }
+      p { font-size: 0.9rem; }
     }
 
     .action-wrap {

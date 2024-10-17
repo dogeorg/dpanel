@@ -83,6 +83,7 @@ class SystemSettings extends LitElement {
   }
 
   async firstUpdated() {
+    window.scrollTo({ top: 0 });
     await this._fetch();
     this._generateName();
   }

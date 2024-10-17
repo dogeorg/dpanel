@@ -1,4 +1,9 @@
-import { html, css, classMap, nothing } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
+import {
+  html,
+  css,
+  classMap,
+  nothing,
+} from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 
 export const navStyles = css`
   nav {
@@ -126,19 +131,17 @@ export function renderNav(isFirstTimeSetup) {
           </sl-menu>
         </sl-dropdown>
       </div>
-    `
-  }
+    `;
+  };
 
   if (!isFirstTimeSetup) {
     return html`
       <div class="nav-inner">
         <div class="logo"></div>
-        <div class="center-steps">
-          Recovery Mode
-        </div>
+        <div class="center-steps">Recovery Mode</div>
         ${renderMenu()}
       </div>
-    `
+    `;
   }
 
   const centerStepClasses = classMap({
@@ -148,6 +151,7 @@ export function renderNav(isFirstTimeSetup) {
 
   const steps = [
     { name: "intro", label: "Terms" },
+    { name: "settings", label: "Config" },
     { name: "pass", label: "Set Password" },
     { name: "key", label: "Create Key" },
     { name: "connect", label: "Connect" },
@@ -162,7 +166,11 @@ export function renderNav(isFirstTimeSetup) {
             <div
               class="step"
               ?data-active-step=${this.activeStepNumber === i + 1}
-              ?data-partial-complete-step=${checkPartialComplete(this.activeStepNumber, s, i)}
+              ?data-partial-complete-step=${checkPartialComplete(
+                this.activeStepNumber,
+                s,
+                i,
+              )}
               ?data-completed-step=${this.activeStepNumber > i + 1}
             >
               <sl-button size="small" circle>
@@ -172,12 +180,14 @@ export function renderNav(isFirstTimeSetup) {
             </div>
           `,
         )}
-        ${this.activeStepNumber === 5 ? html`
-          <div class="step mobile-only" data-completed-step>
-            <sl-button size="small" circle>✓</sl-button>
-            <span class="step-title">Ready!</span>
-          </div>
-        ` : nothing }
+        ${this.activeStepNumber === 6
+          ? html`
+              <div class="step mobile-only" data-completed-step>
+                <sl-button size="small" circle>✓</sl-button>
+                <span class="step-title">Ready!</span>
+              </div>
+            `
+          : nothing}
       </div>
       ${renderMenu()}
     </div>

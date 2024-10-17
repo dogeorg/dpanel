@@ -56,10 +56,6 @@ class SelectNetwork extends LitElement {
     this._setNetworkValues = {};
     this._networks = [];
 
-    // Device name helper text.
-    this.helperTextDeviceName = "Allows alpha/numeric, underscore, hypen and period."
-    this.helperTextDeviceNameAlt = "Allows alpha/numeric segments separated by, underscore, hypen and period. Cannot start or end in special characters."
-
     // Set initial fields
     this.updateSetNetworkFields();
   }
@@ -85,17 +81,6 @@ class SelectNetwork extends LitElement {
           name: "select-network",
           submitLabel: "Much Connect",
           fields: [
-            {
-              name: "device-name",
-              label: "Set local device name",
-              placeholder: "Eg: My_Dogebox_69",
-              help: this.helperTextDeviceNameAlt,
-              labelAction: { name: "generate-name", label: "Randomize" },
-              pattern: "^$|^[a-zA-Z0-9]([a-zA-Z0-9_\\-]{0,61}[a-zA-Z0-9])?$",
-              type: "text",
-              required: true,
-              breakline: true,
-            },
             {
               name: "network",
               label: "Select Network",
@@ -231,23 +216,12 @@ class SelectNetwork extends LitElement {
   async handleLabelActionClick(event) {
     event.stopPropagation();
     switch (event.detail.actionName) {
-      case "generate-name":
-        this._form.toggleLabelLoader(event.detail.fieldName);
-        await asyncTimeout(300);
-        this._generateName();
-        this._form.toggleLabelLoader(event.detail.fieldName);
-        break;
       case "refresh":
         await this._fetchAvailableNetworks();
         break;
       default:
         console.warn("Unhandled form action received", event.detail);
     }
-  }
-
-  _generateName() {
-    const rando = Math.round(Math.random() * 1000);
-    this._form.setValue("device-name", `my_dogebox_${rando}`);
   }
 
   _attemptSetNetwork = async (data, form, dynamicFormInstance) => {
@@ -291,7 +265,6 @@ class SelectNetwork extends LitElement {
     // temp: also call our final initialisation API here.
     // TODO: move this into post-network flow.
     const finalSystemBootstrap = await postSetupBootstrap({
-      hostname: state['device-name'],
       initialSSHKey: state['ssh-key'],
       // Temporarily don't submit reflectorToken until the service is up and running.
       reflectorToken: this.reflectorToken,

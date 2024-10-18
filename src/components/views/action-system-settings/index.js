@@ -136,7 +136,7 @@ class SystemSettings extends LitElement {
 
     try {
       await setHostname({ hostname: this._changes['device-name'] });
-      //await setKeymap({ keymap: this._changes.keymap });
+      await setKeymap({ keymap: this._changes.keymap });
       await setStorageDisk({ storageDevice: this._changes.disk });
       didSucceed = true;
     } catch (err) {
@@ -217,11 +217,10 @@ class SystemSettings extends LitElement {
               help-text="For if/when you plug in a physical keyboard"
               @sl-change=${this._handleKeymapInputChange}
             >
-              <sl-option value="us">US-International (US)</sl-option>
               ${this._keymaps.map(
                 (keymap) =>
                   html`<sl-option value=${keymap.id}
-                    >${keymap.label} (${keymap.id.toUpperCase()})</sl-option
+                    >${keymap.label} ${!keymap.label.includes(keymap.id.toUpperCase()) ? `(${keymap.id.toUpperCase()})` : ''}</sl-option
                   >`,
               )}
             </sl-select>

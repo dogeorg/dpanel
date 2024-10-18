@@ -21,6 +21,7 @@ import "/components/views/action-change-pass/index.js";
 import "/components/views/action-create-key/index.js";
 import "/components/views/action-select-network/index.js";
 import "/components/views/action-select-install-location/index.js";
+import "/components/views/action-system-settings/index.js";
 import "/components/views/setup-dislaimer/index.js";
 import "/components/views/confirmation-prompt/index.js";
 import "/pages/page-recovery/index.js";
@@ -50,11 +51,12 @@ setBasePath("/vendor/@shoelace/cdn@2.14.0/");
 
 const STEP_LOGIN = 0;
 const STEP_INTRO = 1;
-const STEP_SET_PASSWORD = 2;
-const STEP_GENERATE_KEY = 3;
-const STEP_NETWORK = 4;
-const STEP_DONE = 5;
-const STEP_INSTALL = 6;
+const STEP_SYS_SETTINGS = 2;
+const STEP_SET_PASSWORD = 3;
+const STEP_GENERATE_KEY = 4;
+const STEP_NETWORK = 5;
+const STEP_DONE = 6;
+const STEP_INSTALL = 7;
 
 class AppModeApp extends LitElement {
   static styles = [appModeStyles, navStyles];
@@ -122,6 +124,7 @@ class AppModeApp extends LitElement {
   _determineStartingStep(setupState) {
     const {
       hasCompletedInitialConfiguration,
+      hasConfiguredStorageLocation,
       hasGeneratedKey,
       hasConfiguredNetwork,
       isForbidden,
@@ -141,18 +144,19 @@ class AppModeApp extends LitElement {
     }
 
     // If we're already fully set up, or if we've generated a key, show our login step.
-    if (
-      (hasCompletedInitialConfiguration || hasGeneratedKey) &&
-      !this.isLoggedIn
-    ) {
+    if ((hasCompletedInitialConfiguration || hasGeneratedKey) && !this.isLoggedIn) {
       return STEP_LOGIN;
     }
 
-    if (!hasGeneratedKey) {
+    if (!hasConfiguredStorageLocation) {
       return STEP_INTRO;
     }
 
-    if (hasGeneratedKey && !hasConfiguredNetwork) {
+    if (!hasGeneratedKey) {
+      return STEP_SET_PASSWORD;
+    }
+
+    if (!hasConfiguredNetwork) {
       return STEP_NETWORK;
     }
 
@@ -297,6 +301,13 @@ class AppModeApp extends LitElement {
                           ></x-setup-dislaimer>`,
                       ],
                       [
+                        STEP_SYS_SETTINGS,
+                        () =>
+                          html`<x-action-system-settings
+                            .onSuccess=${this._nextStep}
+                          ></x-action-system-settings>`,
+                      ],
+                      [
                         STEP_SET_PASSWORD,
                         () =>
                           html`<x-action-change-pass
@@ -338,13 +349,17 @@ class AppModeApp extends LitElement {
                     () => html`<h1>Error</h1>`,
                   )}
                 </div>
-                  ${true ? html`
-                    <action-select-install-location
-                    style="z-index: 999"
-                    mode=${this.installationMode}
-                    ?open=${["canInstall", "mustInstall"].includes(this.installationMode)}
-                  ></action-select-install-location>
-                  `: nothing }
+                ${true
+                  ? html`
+                      <action-select-install-location
+                        style="z-index: 999"
+                        mode=${this.installationMode}
+                        ?open=${["canInstall", "mustInstall"].includes(
+                          this.installationMode,
+                        )}
+                      ></action-select-install-location>
+                    `
+                  : nothing}
               </main>
             </div>
           `

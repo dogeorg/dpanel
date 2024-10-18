@@ -13,6 +13,14 @@ export const getResponse = {
     },
     {
       name: "/dev/sda",
+      size: 37580963840,
+      sizePretty: "35.00 GB",
+      suitableInstallDisk: false,
+      suitableDataDisk: false,
+      bootMedia: false,
+    },
+    {
+      name: "/dev/sdb",
       size: 500107862016,
       sizePretty: "465.76 GB",
       suitableInstallDisk: true,
@@ -28,8 +36,15 @@ export const getResponse = {
   ],
 };
 
-export const postResponse = {
+export const postInstallLocationResponse = {
   name: "/system/install",
+  group: "setup",
+  method: "post",
+  res: { success: true }
+};
+
+export const postStorageLocationResponse = {
+  name: "/system/storage",
   group: "setup",
   method: "post",
   res: { success: true }

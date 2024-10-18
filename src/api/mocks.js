@@ -24,7 +24,15 @@ import {
   getProvidersResponse,
   setProviderResponse,
 } from "./providers/providers.mocks.js";
-import { getResponse as getDisksResponse, postResponse as postDiskResponse } from "./disks/disks.mocks.js";
+import {
+  getResponse as getDisksResponse,
+  postInstallLocationResponse,
+  postStorageLocationResponse,
+} from "./disks/disks.mocks.js";
+import {
+  getResponse as getKeymaps,
+  postResponse as setKeymap,
+} from "./system/keymaps.mocks.js";
 
 export const mocks = [
   storeListingMock,
@@ -48,5 +56,8 @@ export const mocks = [
   getProvidersResponse,
   setProviderResponse,
   getDisksResponse,
-  postDiskResponse,
+  postInstallLocationResponse,
+  postStorageLocationResponse,
+  getKeymaps,
+  setKeymap,
 ];

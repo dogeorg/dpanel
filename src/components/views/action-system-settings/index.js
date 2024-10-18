@@ -4,6 +4,7 @@ import { asyncTimeout } from "/utils/timeout.js";
 import { createAlert } from "/components/common/alert.js";
 import { getKeymaps, setKeymap } from "/api/system/keymaps.js";
 import { getDisks, setStorageDisk } from "/api/disks/disks.js";
+import { setHostname } from "/api/system/hostname.js";
 
 // Render chunks
 import { renderBanner } from "./banner.js";
@@ -118,7 +119,6 @@ class SystemSettings extends LitElement {
   }
 
   async _attemptSubmit() {
-
     this._inflight = true;
 
     const formFields = this.shadowRoot.querySelectorAll('sl-input, sl-select');
@@ -135,8 +135,9 @@ class SystemSettings extends LitElement {
     let didSucceed = false
 
     try {
-      await setKeymap({ keymap: this._changes.keymap });
-      await setStorageDisk({ disk: this._changes.disk });
+      await setHostname({ hostname: this._changes['device-name'] });
+      //await setKeymap({ keymap: this._changes.keymap });
+      await setStorageDisk({ storageDevice: this._changes.disk });
       didSucceed = true;
     } catch (err) {
       console.error('Error occurred when saving config during setup', err);

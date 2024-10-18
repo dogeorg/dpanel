@@ -21,8 +21,8 @@ export async function postInstallToDisk({ disk, secret }) {
   return res;
 }
 
-export async function setStorageDisk({ disk }) {
-  const res = await client.post(`/system/storage`, { disk }, {
+export async function setStorageDisk({ storageDevice }) {
+  const res = await client.post(`/system/storage`, { storageDevice }, {
     mock: postStorageLocationResponse,
     noLogoutRedirect: true,
   });

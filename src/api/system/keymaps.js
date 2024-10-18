@@ -14,7 +14,7 @@ export async function getKeymaps() {
 }
 
 export async function setKeymap({ keymap }) {
-  const res = await client.post(`/system/keymaps`, { keymap }, {
+  const res = await client.post(`/system/keymap`, { keymap }, {
     noLogoutRedirect: true,
     mock: postResponse,
   });

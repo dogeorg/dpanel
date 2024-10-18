@@ -34,8 +34,12 @@ class MetricView extends LitElement {
 
     return html`
       <sl-tooltip content="${this.metric.label}" placement="top-start" hoist>
-        <span class="label">${this.metric.label}</span>
+        <span class="label">
+          ${this.metric.label}
+          </span>
       </sl-tooltip>
+
+      <sl-copy-button class="copy" value="${this.metric.values}" @click=${(e) => e.stopPropagation()}></sl-copy-button>
 
       <div class="value-container">
       ${choose(type, [
@@ -69,12 +73,13 @@ class MetricView extends LitElement {
       value = '-'
     }
 
-    return html`<span>${value}</span>`
+    return html`<span class="string">${value}</span>`
   }
 
   static styles = css`
     :host {
       display: flex;
+      position: relative;
       flex-direction: column;
       align-items: start;
       border-radius: 4px;
@@ -85,6 +90,10 @@ class MetricView extends LitElement {
     }
     :host([expand]) {
       min-width: max-content;
+      padding-right: 40px;
+    }
+    :host(:hover) .copy {
+      visibility: visible;
     }
     .label {
       font-size: 0.8rem;
@@ -108,6 +117,37 @@ class MetricView extends LitElement {
       font-family: Monospace;
       font-weight: normal;
       font-size: 0.9rem;
+    }
+    .string {
+      position: relative;
+      display: inline-block;
+      max-width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-height: 2.9rem;
+      line-height: 1.1rem;
+
+      &::after {
+        content: "";
+        display: inline-block;
+        position: absolute;
+        bottom: 0px;
+        left: 0px;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(to bottom, transparent, #23252a);
+      }
+    }
+    .copy {
+      position: absolute;
+      visibility: hidden;
+      color: #555;
+      right: 3px;
+      top: 0px;
     }
   `
 }

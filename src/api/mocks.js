@@ -34,6 +34,8 @@ import {
   postResponse as setKeymap,
 } from "./system/keymaps.mocks.js";
 
+import { postResponse as setHostname } from "./system/hostname.mocks.js";
+
 export const mocks = [
   storeListingMock,
   bootstrapV2Mocks,
@@ -60,4 +62,5 @@ export const mocks = [
   postStorageLocationResponse,
   getKeymaps,
   setKeymap,
+  setHostname,
 ];

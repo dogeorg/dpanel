@@ -5,16 +5,8 @@ import { getResponse, postResponse } from "./keymaps.mocks.js";
 
 const client = new ApiClient(store.networkContext.apiBaseUrl);
 
-export async function getKeymaps() {
-  const res = await client.get(`/system/keymaps`, {
-    noLogoutRedirect: true,
-    mock: getResponse,
-  });
-  return res;
-}
-
-export async function setKeymap({ keymap }) {
-  const res = await client.post(`/system/keymap`, { keymap }, {
+export async function setHostname({ hostname }) {
+  const res = await client.post(`/system/hostname`, { hostname }, {
     noLogoutRedirect: true,
     mock: postResponse,
   });

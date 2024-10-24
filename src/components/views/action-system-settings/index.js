@@ -236,8 +236,9 @@ class SystemSettings extends LitElement {
               value=${this._changes.disk}
               @sl-change=${this._handleDiskInputChange}
             >
-              ${this._disks.map(
-                (disk) =>
+              ${this._disks
+                .filter((disk) => disk.usable)
+                .map((disk) =>
                   html`
                     <sl-option value=${disk.name}>${disk.name} (${disk.sizePretty}) ${disk.bootMedia ? "[Running Dogebox OS]" : ""}</sl-option>
                   `,
@@ -246,7 +247,7 @@ class SystemSettings extends LitElement {
 
             <sl-alert variant="primary" ?open=${this._show_disk_size_warning} style="margin: 1em 0em;">
               <sl-icon slot="icon" name="info-circle"></sl-icon>
-              You have selected a disk with less than 300GB capacity.  You can proceed, however syncing the Blockchain will be prohibited as it will exhaust your disk.
+              You have selected a disk with less than 300GB capacity.  You can proceed, however syncing the Blockchain could exhaust your disk.
             </sl-alert>
           </div>
 

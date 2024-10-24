@@ -23,10 +23,10 @@ class DogeboxLauncherButton extends LitElement {
 
     this._serverFault = false;
 
-    // This gives us 30 seconds of checking.
+    // This gives us 60 seconds of checking.
     this.checkInterval = 3000;
     this.checkCount = 0;
-    this.maxCheckCount = 10;
+    this.maxCheckCount = 20;
 
     this._timedOut = false;
   }

@@ -176,7 +176,7 @@ class SystemSettings extends LitElement {
     }
 
     this._is_boot_media = diskObject.bootMedia;
-    this._show_disk_size_warning = !diskObject.suitableDataDisk;
+    this._show_disk_size_warning = !diskObject?.suitability?.storage?.size;
   }
 
   handleCheckboxChange(e) {
@@ -237,7 +237,7 @@ class SystemSettings extends LitElement {
               @sl-change=${this._handleDiskInputChange}
             >
               ${this._disks
-                .filter((disk) => disk.usable)
+                .filter((disk) => disk?.suitability?.storage?.usable)
                 .map((disk) =>
                   html`
                     <sl-option value=${disk.name}>${disk.name} (${disk.sizePretty}) ${disk.bootMedia ? "[Running Dogebox OS]" : ""}</sl-option>

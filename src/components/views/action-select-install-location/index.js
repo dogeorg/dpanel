@@ -56,7 +56,7 @@ export class LocationPickerView extends LitElement {
 
   async fetchDisks() {
     this._allDisks = await getDisks();
-    this._installDisks = this._allDisks.filter(d => d.suitableInstallDrive);
+    this._installDisks = this._allDisks.filter(d => d?.suitability?.install?.usable);
     this._bootMediaDisk = this._allDisks.find(d => d.bootMedia);
     this._inflight_disks = false;
   }

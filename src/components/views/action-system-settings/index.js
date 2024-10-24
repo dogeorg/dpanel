@@ -176,7 +176,7 @@ class SystemSettings extends LitElement {
     }
 
     this._is_boot_media = diskObject.bootMedia;
-    this._show_disk_size_warning = !diskObject?.suitability?.storage?.size;
+    this._show_disk_size_warning = !diskObject?.suitability?.storage?.sizeOK;
   }
 
   handleCheckboxChange(e) {

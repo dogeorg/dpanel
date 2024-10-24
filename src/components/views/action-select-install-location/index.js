@@ -246,7 +246,7 @@ export class LocationPickerView extends LitElement {
         `: nothing }
 
         ${this._inflight_install ? html`
-          <p><small>Do not power off your Dogebox while installation is in progress.</small></p>`
+          <p><small>This may take 10 minutes or more.  Do not refresh or power off your Dogebox while installation is in progress.</small></p>`
         : nothing }
 
         ${!this._inflight_install && this._install_outcome ? html`

@@ -231,7 +231,7 @@ class SystemSettings extends LitElement {
               required
               label="Select Mass Storage Disk"
               ?disabled=${this._inflight}
-              help-text="To sync the Dogecoin Blockchain, a disk with >200GB capacity is required"
+              help-text="To sync the Dogecoin Blockchain, a disk with >300GB capacity is required"
               data-field="disk"
               value=${this._changes.disk}
               @sl-change=${this._handleDiskInputChange}

@@ -176,7 +176,7 @@ class SystemSettings extends LitElement {
     }
 
     this._is_boot_media = diskObject.bootMedia;
-    this._show_disk_size_warning = !diskObject.suitableDataDisk;
+    this._show_disk_size_warning = !diskObject?.suitability?.storage?.sizeOK;
   }
 
   handleCheckboxChange(e) {
@@ -231,13 +231,14 @@ class SystemSettings extends LitElement {
               required
               label="Select Mass Storage Disk"
               ?disabled=${this._inflight}
-              help-text="To sync the Dogecoin Blockchain, a disk with >200GB capacity is required"
+              help-text="To sync the Dogecoin Blockchain, a disk with >300GB capacity is required"
               data-field="disk"
               value=${this._changes.disk}
               @sl-change=${this._handleDiskInputChange}
             >
-              ${this._disks.map(
-                (disk) =>
+              ${this._disks
+                .filter((disk) => disk?.suitability?.storage?.usable)
+                .map((disk) =>
                   html`
                     <sl-option value=${disk.name}>${disk.name} (${disk.sizePretty}) ${disk.bootMedia ? "[Running Dogebox OS]" : ""}</sl-option>
                   `,
@@ -246,7 +247,7 @@ class SystemSettings extends LitElement {
 
             <sl-alert variant="primary" ?open=${this._show_disk_size_warning} style="margin: 1em 0em;">
               <sl-icon slot="icon" name="info-circle"></sl-icon>
-              You have selected a disk with less than 300GB capacity.  You can proceed, however syncing the Blockchain will be prohibited as it will exhaust your disk.
+              You have selected a disk with less than 300GB capacity.  You can proceed, however syncing the Blockchain could exhaust your disk.
             </sl-alert>
           </div>
 

@@ -22,6 +22,7 @@ import { themes } from "/components/common/dynamic-form/themes.js";
 import "/components/common/text-loader/text-loader.js";
 import "/components/common/dynamic-form/dynamic-form.js";
 import { notYet } from "/components/common/not-yet-implemented.js"
+import "/components/views/action-import-key/import-key.js";
 
 // Render chunks
 import { renderBanner } from "./renders/banner.js";
@@ -43,6 +44,7 @@ class CreateKey extends LitElement {
       _revealPhrase: { type: Boolean },
       _termsChecked: { type: Boolean },
       _phrase: { type: String },
+      _show_key_import_dialog: { type: Boolean },
       onSuccess: { type: Object },
     };
   }
@@ -166,6 +168,10 @@ class CreateKey extends LitElement {
     this.handleSuccess();
   }
 
+  displayKeyImportDialog() {
+    this._show_key_import_dialog = true;
+  }
+
   render() {
     const emptyPhrase =
       "one two three four five six seven eight nine ten eleven twelve".split(" ");
@@ -283,9 +289,20 @@ class CreateKey extends LitElement {
 
     // Remove from UI for the moment.
     const importKeyHTML = html`
-      <sl-button variant="text" @click=${notYet} ?disabled=${this._keyReady}
-        >Import key</sl-button
+      <sl-button variant="text" @click=${this.displayKeyImportDialog} ?disabled=${this._keyReady}>
+        Import key
+      </sl-button>
+
+      <sl-dialog
+        label="Import an existing key"
+        ?open=${this._show_key_import_dialog}
+        @sl-request-close=${() => this._show_key_import_dialog = false }
       >
+        <x-action-import-key .onSuccess=${() => {
+          this._show_key_import_dialog = false;
+          this._fetchKeyList(getMockList.keys);
+        }}></x-action-import-key>
+      </sl-dialog>
     `
 
     const hasMasterKey = this._keyList.length > 0;
@@ -317,6 +334,7 @@ class CreateKey extends LitElement {
                       ?disabled=${this._keyReady}
                       >Generate Master Key</sl-button
                     >
+                    ${importKeyHTML}
                   `
                 : nothing}
               ${!this._keyListLoading && hasMasterKey

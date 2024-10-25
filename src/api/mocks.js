@@ -35,6 +35,7 @@ import {
 } from "./system/keymaps.mocks.js";
 
 import { postResponse as setHostname } from "./system/hostname.mocks.js";
+import { postResponse as postImportKey } from "./keys/import-key.mocks.js";
 
 export const mocks = [
   storeListingMock,
@@ -63,4 +64,5 @@ export const mocks = [
   getKeymaps,
   setKeymap,
   setHostname,
+  postImportKey,
 ];

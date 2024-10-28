@@ -121,7 +121,7 @@ class MetricView extends LitElement {
     .string {
       position: relative;
       display: inline-block;
-      max-width: 200px;
+      max-width: 275px;
       overflow: hidden;
       text-overflow: ellipsis;
       -webkit-line-clamp: 1;

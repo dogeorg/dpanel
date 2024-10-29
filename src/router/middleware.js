@@ -5,11 +5,11 @@ import { getBootstrapV2 } from "/api/bootstrap/bootstrap.js";
 import { getStoreListing } from "/api/sources/sources.js";
 
 export async function loadPup(context, commands) {
-  const pupId = context.params.pupid
-  const sourceId = context.params.sourceid
-  const pupName = decodeURIComponent(context.params.pupname)
+  const pupId = context.params.pupid;
+  const sourceId = context.params.sourceid;
+  const pupName = decodeURIComponent(context.params.pupname);
 
-  // Bad params. 
+  // Bad params.
   // Must have one of pupId OR (sourceId AND pupName)
   if (!pupId && (!sourceId || !pupName)) {
     store.updateState({
@@ -20,14 +20,20 @@ export async function loadPup(context, commands) {
 
   // What type of lookup to perform?
   const lookupType = !!pupId ? "byStatePupId" : "byDefSourceIdAndPupName";
-  
+
   // What type of bootstrapping to perform?
-  const isStoreListingPage = !!context.route.path.startsWith("/explore/:sourceid/:pupname");
+  const isStoreListingPage = !!context.route.path.startsWith(
+    "/explore/:sourceid/:pupname",
+  );
 
   try {
-
     // Attempt to get the pup from memory
-    let pup = pkgController.getPupMaster({ pupId, sourceId, pupName, lookupType }).pup;
+    let pup = pkgController.getPupMaster({
+      pupId,
+      sourceId,
+      pupName,
+      lookupType,
+    }).pup;
 
     if (!pup) {
       // Fetch bootstrap
@@ -35,12 +41,17 @@ export async function loadPup(context, commands) {
       // Fetch Store listing (if on store type page);
       isStoreListingPage && pkgController.setStoreData(await getStoreListing());
       // Now attempt to get pup from memory
-      pup = pkgController.getPupMaster({ pupId, sourceId, pupName, lookupType }).pup;
+      pup = pkgController.getPupMaster({
+        pupId,
+        sourceId,
+        pupName,
+        lookupType,
+      }).pup;
     }
 
     if (!pup) {
       // Still no pup after bootstrapping. That's a proper 404.
-      console.warn("[404] loadPup middleware: pup not found in memory")
+      console.warn("[404] loadPup middleware: pup not found in memory");
       store.updateState({
         pupContext: { ready: true, result: 404 },
       });
@@ -50,13 +61,11 @@ export async function loadPup(context, commands) {
     store.updateState({
       pupContext: { ...pup, ready: true, result: 200 },
     });
-
   } catch (error) {
-    console.warn("[500] loadPup middleware: failure.", error)
+    console.warn("[500] loadPup middleware: failure.", error);
     store.updateState({
       pupContext: { ready: true, result: 500 },
     });
-
   }
 }
 
@@ -79,20 +88,30 @@ export function asPage(context, commands) {
     context.route.pageAction = "back";
   }
 
-  const { componentClass: ComponentClass, pageTitle, pageAction } = context.route;
+  const {
+    componentClass: ComponentClass,
+    pageTitle,
+    pageAction,
+  } = context.route;
 
   // Create instance of page-container
-  const PageContainer = customElements.get('page-container');
-  const pageContainer = new PageContainer()
-  
+  const PageContainer = customElements.get("page-container");
+  const pageContainer = new PageContainer();
+
   // Set properties on the page-container per the route definition.
   pageContainer.pageTitle = pageTitle;
   pageContainer.pageAction = pageAction;
-  
+
   // Wrap route component in page-container.
   const childComponent = new ComponentClass();
   pageContainer.appendChild(childComponent);
 
   // Override route component withly newly wrapped component
   context.route.componentInstance = pageContainer;
+}
+
+export function withDialog(context, commands) {
+  store.updateState({
+    dialogContext: { name: context?.params?.dialog },
+  });
 }

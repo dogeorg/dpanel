@@ -11,14 +11,14 @@ class Store {
       pageTitle: "",
       pageAction: "",
       pageCount: 0,
-      navigationDirection: ""
+      navigationDirection: "",
     };
     this.networkContext = this.networkContext || {
       apiBaseUrl: `${window.location.protocol}//${window.location.hostname}:3000`,
       wsApiBaseUrl: `ws://${window.location.hostname}:3000`,
       overrideBaseUrl: false,
       overrideSocketBaseUrl: false,
-      useMocks: false,
+      useMocks: true,
       forceFailures: false,
       forceDelayInSeconds: 0,
       reqLogs: false,
@@ -30,6 +30,7 @@ class Store {
       logProgressUpdates: false,
       reflectorHost: `https://reflector.dogecoin.org`,
       reflectorToken: Math.random().toString(36).substring(2, 14),
+      "mock::updates::/system/updates::get":true,
     };
     this.pupContext = {
       computed: null,
@@ -37,16 +38,19 @@ class Store {
       state: null,
       stats: null,
       ready: false,
-      result: null
+      result: null,
     };
     this.promptContext = {
       display: false,
       name: "transaction",
     };
-    this.setupContext = {
-      hashedPassword: null,
-      view: null,
-    };
+    (this.dialogContext = {
+      name: null,
+    }),
+      (this.setupContext = {
+        hashedPassword: null,
+        view: null,
+      });
 
     // Hydrate state from localStorage unless flush parameter is present.
     if (!isUnauthedRoute() && !hasFlushParam()) {
@@ -144,6 +148,12 @@ class Store {
       this.promptContext = {
         ...this.promptContext,
         ...partialState.promptContext,
+      };
+    }
+    if (partialState.dialogContext) {
+      this.dialogContext = {
+        ...this.dialogContext,
+        ...partialState.dialogContext,
       };
     }
     if (partialState.setupContext) {

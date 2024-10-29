@@ -144,19 +144,26 @@ class DebugPanel extends LitElement {
           })}
         </div>
         <div class="floating-controls-container">
-          <div class="left">
-            <sl-button
-              size="small"
-              @click=${() => this.toggleVisibility(null, "close")}
-            >
-              Close Debug Panel
-            </sl-button>
-          </div>
+          <div class="left"></div>
           <div class="right">
-            <sl-button size="small" @click=${this.showSettingsDialog}>
-              <sl-icon name="tools" slot="prefix"></sl-icon>
-              Debugger Config
+
+            <sl-button variant="text"  size="small" @click=${() => this.toggleVisibility(null, "close")}>
+              Hide
             </sl-button>
+
+            <sl-dropdown hoist>
+              <sl-button slot="trigger" size="small" caret>Dev Tools</sl-button>
+              <sl-menu>
+                <sl-menu-item>
+                  Commands
+                  <sl-menu slot="submenu">
+                    <sl-menu-item value="find" @click=${() => window.alert('bump')}>Bump version</sl-menu-item>
+                  </sl-menu>
+                </sl-menu-item>
+                <sl-menu-item @click=${this.showSettingsDialog}>Open Config</sl-menu-item>
+              </sl-menu>
+            </sl-dropdown>
+
           </div>
         </div>
 

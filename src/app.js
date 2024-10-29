@@ -34,9 +34,10 @@ import { notYet } from "/components/common/not-yet-implemented.js";
 // Render chunks
 import * as renderMethods from "/components/layouts/standard/renders/index.js";
 
-// Router (singleton)
+// Router
 import { Router } from "/router/router.js";
 import { routes } from "/router/config.js";
+import { setRouterInstance } from "/router/index.js";
 
 // Utils
 import debounce from "/utils/debounce.js";
@@ -115,6 +116,7 @@ class DPanelApp extends LitElement {
     const outlet = this.shadowRoot.querySelector("#Outlet");
     // this.outletWrapper = this.shadowRoot.querySelector("#OutletWrapper")
     this.router = new Router(outlet);
+    setRouterInstance(this.router);
     this.router.setRoutes(routes)
     this.router.processCurrentRoute();
 

@@ -49,8 +49,8 @@ export class Router {
     this.afterHooks.push(fn);
   }
 
-  go(path, replace = false) {
-    const changeState = replace ? 'replaceState' : 'pushState';
+  go(path, options = {}) {
+    const changeState = options?.replace ? 'replaceState' : 'pushState';
 
     // Update the URL without refreshing the page
     window.history[changeState]({}, '', path);

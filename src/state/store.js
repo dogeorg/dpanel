@@ -12,6 +12,7 @@ class Store {
       pageAction: "",
       pageCount: 0,
       navigationDirection: "",
+      dbxVersion: "",
     };
     this.networkContext = this.networkContext || {
       apiBaseUrl: `${window.location.protocol}//${window.location.hostname}:3000`,
@@ -93,7 +94,6 @@ class Store {
     if (this.supportsLocalStorage()) {
       try {
         const stateToPersist = {
-          appContext: this.appContext,
           networkContext: this.networkContext,
           // Include other slices of state as needed
         };

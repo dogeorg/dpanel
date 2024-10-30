@@ -11,6 +11,8 @@ import "/components/common/action-row/action-row.js";
 import "/components/common/reveal-row/reveal-row.js";
 import "/components/views/x-activity-log.js";
 import { checkForUpdates, commenceUpdate } from "/api/system/updates.js";
+import { store } from "/state/store.js";
+import { getBootstrapV2 } from "/api/bootstrap/bootstrap.js";
 
 const PAGE_ONE = "checking";
 const PAGE_TWO = "confirmation";
@@ -113,8 +115,8 @@ export class CheckUpdatesView extends LitElement {
     // Finish
     this._logs = [...this._logs, { msg: 'Updates complete' }];
 
-    this._inflight_update = false;
-    this._update_outcome = 'success';
+    // this._inflight_update = false;
+    // this._update_outcome = 'success';
   }
 
   render() {
@@ -282,11 +284,29 @@ export class CheckUpdatesView extends LitElement {
     }
 
     if (!didErr) {
-      // Update has commenced
-      // Track it somehow.
-      // Idea: initiate polling to assert version change
-      // and then congratulate on version change.
+      // Initiate a poll for version change.
+      // When version change is detected, flick to success screen.
+      this.pollForUpdateChange({ currentVersion: store.appContext.dbxVersion })
     }
+  }
+
+  async pollForUpdateChange({ currentVersion }) {
+    const intervalId = setInterval(async () => {
+      try {
+        const { version } = await getBootstrapV2();
+
+        if (version?.release && version.release !== currentVersion) {
+          clearInterval(intervalId);
+          console.debug('New version found:', version.release);
+          this._inflight_update = false;
+          this._update_outcome = "success";
+        }
+      } catch {
+        // Squelch errs.  If bootstrap failed, it will try again.
+      }
+    }, 10000);
+
+    return () => clearInterval(intervalId);
   }
 
   static styles = css`

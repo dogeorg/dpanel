@@ -62,6 +62,18 @@ class Store {
     }
   }
 
+  getContext(contextName) {
+    if (!contextName.endsWith('Context')) {
+      contextName = `${contextName}Context`;
+    }
+
+    if (this[contextName]) {
+      return { ...this[contextName] };
+    }
+
+    return null;
+  }
+
   subscribe(controller) {
     this.subscribers.push(controller);
   }

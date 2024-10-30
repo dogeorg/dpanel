@@ -55,7 +55,7 @@ export class CheckUpdatesView extends LitElement {
 
     // Fetch
     this._updates = await checkForUpdates();
-    await asyncTimeout(2200);
+    await asyncTimeout(1000);
 
     // TODO
     this._has_updates = true;
@@ -143,7 +143,6 @@ export class CheckUpdatesView extends LitElement {
         </sl-alert>
 
         <p style="line-height: 1.1; color: #777">
-          <small>Explanation..</small>
           <sl-button size="small" variant="text" disabled>Check again</sl-button>
         </p>
         `: nothing}
@@ -168,7 +167,6 @@ export class CheckUpdatesView extends LitElement {
         </sl-alert>
 
         <p style="line-height: 1.1; color: #777">
-          <small>Explanation..</small>
           <sl-button size="small" variant="text" @click=${this.fetchUpdates}>Check again</sl-button>
         </p>
         `: nothing}
@@ -232,6 +230,13 @@ export class CheckUpdatesView extends LitElement {
         </sl-alert>
         `: nothing }
 
+        ${!this._inflight_update && this._update_outcome === "timeout" ? html`
+          <sl-alert open variant="warning" style="text-align: left">
+          <small style="display:inline-block; margin-bottom: 4px;">Update timeout</small>
+          <sl-progress-bar value=80 style="--indicator-color: var(--sl-color-warning-600)"></sl-progress-bar>
+        </sl-alert>
+        `: nothing }
+
         ${this._inflight_update ? html`
         <sl-alert open variant="primary" style="text-align: left">
           <small style="display:inline-block; margin-bottom: 4px;">
@@ -246,13 +251,23 @@ export class CheckUpdatesView extends LitElement {
         </div>
 
         ${this._inflight_update ? html`
-          <p style="line-height: 1.1"><small>This may take 10 minutes or more.  Do not refresh or power off your Dogebox while update is in progress.</small></p>`
+          <p style="line-height: 1.1"><small>This may take up to 2 minutes.<br>Do not refresh or power off your Dogebox while update is in progress.</small></p>`
         : nothing }
 
-        ${!this._inflight_update && this._update_outcome ? html`
-          <p><small>Explanation..</small> <sl-button size="small" variant="text">Dismiss</sl-button></p>`
-        : nothing }
-
+        ${!this._inflight_update ? html`
+          <p style="line-height: 1.1">
+          ${!this._inflight_update && this._update_outcome === "timeout" ? html`
+            <small>Try refreshing your browser</small>
+          `: nothing}
+          ${!this._inflight_update && this._update_outcome === "error" ? html`
+            <small>Please refresh and try again</small>
+          `: nothing}
+          ${!this._inflight_update && this._update_outcome === "success" ? html`
+            <small>Much update! Such wow.</small>
+          `: nothing}
+            <sl-button size="small" variant="text" @click=${() => window.location.replace('/settings')}>Dismiss</sl-button>
+          </p>
+        `: nothing }
       </div>
     `;
   }
@@ -267,12 +282,12 @@ export class CheckUpdatesView extends LitElement {
     this._inflight_update = true;
 
     // TODO: remove mocked activity logs.
-    this.mockUpdateLogs();
+    // this.mockUpdateLogs();
 
     let didErr = false;
 
     try {
-      await asyncTimeout(3000);
+      await asyncTimeout(1000);
       const res = await commenceUpdate();
       this._update_commenced = true;
     } catch (err) {
@@ -286,25 +301,40 @@ export class CheckUpdatesView extends LitElement {
     if (!didErr) {
       // Initiate a poll for version change.
       // When version change is detected, flick to success screen.
-      this.pollForUpdateChange({ currentVersion: store.appContext.dbxVersion })
+      this.pollForUpdateChange()
     }
   }
 
-  async pollForUpdateChange({ currentVersion }) {
+  async pollForUpdateChange() {
+    let attempts = 0;
+    const maxAttempts = 12 // 24*5000ms = 120 seconds;
+
     const intervalId = setInterval(async () => {
       try {
+        if (attempts >= maxAttempts) {
+          clearInterval(intervalId);
+          this._inflight_update = false;
+          this._update_outcome = "timeout";
+          return;
+        }
+        const { dbxVersion } = store.getContext('app');
+        console.log('Current version is:', dbxVersion, 'Checking for new version now..')
         const { version } = await getBootstrapV2();
 
-        if (version?.release && version.release !== currentVersion) {
+        if (version?.release && version.release !== dbxVersion) {
           clearInterval(intervalId);
           console.debug('New version found:', version.release);
           this._inflight_update = false;
           this._update_outcome = "success";
         }
-      } catch {
-        // Squelch errs.  If bootstrap failed, it will try again.
+      } catch (err) {
+        // Squelch errs.
+        // If bootstrap failed, it will try again.
+        console.warn('Strange', err)
+      } finally {
+        attempts++;
       }
-    }, 10000);
+    }, 5000);
 
     return () => clearInterval(intervalId);
   }

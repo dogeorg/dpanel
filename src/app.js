@@ -133,8 +133,18 @@ class DPanelApp extends LitElement {
 
   async fetchBootstrap() {
     try {
+      // Fetch bootstrap
       const res = await getBootstrapV2()
-      if (res) { this.pkgController.setData(res); }
+
+      // Set version on appContext
+      if (res?.version?.release) {
+        store.updateState({ appContext: { dbxVersion: res?.version?.release }})
+      }
+
+      // Process pups
+      if (res) {
+        this.pkgController.setData(res);
+      }
     } catch (err) {
       console.warn('Failed to fetch bootstrap')
     } finally {

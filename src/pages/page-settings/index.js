@@ -51,7 +51,7 @@ class SettingsPage extends LitElement {
 
   render() {
     const dialog = this?.context?.store?.dialogContext || {};
-    const hasSettingsDialog = ["updates"].includes(dialog.name);
+    const hasSettingsDialog = ["updates", "versions"].includes(dialog.name);
     return html`
       <div class="padded">
         <section>
@@ -59,11 +59,14 @@ class SettingsPage extends LitElement {
             <h3>Menu</h3>
           </div>
           <div class="list-wrap">
-            <action-row prefix="wifi" label="Wifi" disabled @click=${notYet}>
-              Add or remove Wifi networks
+            <action-row prefix="info-circle" label="Version" href="/settings/versions">
+              View version details
             </action-row>
             <action-row prefix="arrow-repeat" label="Updates" href="/settings/updates">
               Check for updates
+            </action-row>
+            <action-row prefix="wifi" label="Wifi" @click=${notYet}>
+              Add or remove Wifi networks
             </action-row>
           <div class="list-wrap">
         </section>
@@ -72,11 +75,11 @@ class SettingsPage extends LitElement {
           <div class="section-title">
             <h3>Power</h3>
           </div>
-          <action-row prefix="power" label="Shutdown" disabled @click=${notYet}>
+          <action-row prefix="power" label="Shutdown" @click=${notYet}>
             Gracefully shutdown your Dogebox
           </action-row>
 
-          <action-row prefix="arrow-counterclockwise" label="Restart" disabled @click=${notYet}>
+          <action-row prefix="arrow-counterclockwise" label="Restart" @click=${notYet}>
             Gracefully restart your Dogebox
           </action-row>
         </section>
@@ -85,7 +88,8 @@ class SettingsPage extends LitElement {
       <sl-dialog no-header
         ?open=${hasSettingsDialog} @sl-request-close=${this.handleDialogClose}>
         ${choose(dialog.name, [
-          ["updates", () => html`<x-action-check-updates></x-action-check-updates>`]
+          ["updates", () => html`<x-action-check-updates></x-action-check-updates>`],
+          ["versions", () => renderVersionsDialog(store, this.handleDialogClose)]
         ])}
       </sl-dialog>
 
@@ -94,3 +98,21 @@ class SettingsPage extends LitElement {
 }
 
 customElements.define("x-page-settings", SettingsPage);
+
+function renderVersionsDialog(store, closeFn) {
+  const { dbxVersion } = store.getContext('app')
+  return html`
+    <div style="text-align: center;">
+      <h1>Versions</h1>
+
+      <div style="text-align: left; margin-bottom: 1em;">
+        <action-row prefix="box" expandable label="Dogebox ${dbxVersion}">
+          Bundles Dogeboxd, DKM & dPanel
+          <div slot="hidden"><small style="line-height: 1.1; display: block;">Lorem ad ex nostrud magna nisi ea enim magna exercitation aliquip enim amet ad deserunt sit irure aute proident.</div>
+        </action-row>
+      </div>
+
+      <sl-button variant="text" @click=${closeFn}>Dismiss</sl-button>
+    </div>
+  `
+}

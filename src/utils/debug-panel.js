@@ -5,12 +5,16 @@ import {
   classMap,
 } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 
+// Import hook manager
+import { hookManager } from "/api/hooks.js";
+
 // Import dependent components
 import "./debug-settings.js";
 
 class DebugPanel extends LitElement {
   static properties = {
     isVisible: { type: Boolean },
+    _hook_bump_version: { type: Boolean },
   };
 
   static styles = css`
@@ -127,6 +131,12 @@ class DebugPanel extends LitElement {
     this.shadowRoot.querySelector("debug-settings-dialog").openDialog();
   }
 
+  handleBumpVersionToggle() {
+    const newState = !this._hook_bump_version;
+    this._hook_bump_version = newState;
+    hookManager.set('bump-version', newState);
+  }
+
   render() {
     const classes = {
       "debugger-container": true,
@@ -157,7 +167,7 @@ class DebugPanel extends LitElement {
                 <sl-menu-item>
                   Commands
                   <sl-menu slot="submenu">
-                    <sl-menu-item value="find" @click=${() => window.alert('bump')}>Bump version</sl-menu-item>
+                    <sl-menu-item value="find" type="checkbox" ?checked=${this._hook_bump_version} @click=${this.handleBumpVersionToggle}>Bump version</sl-menu-item>
                   </sl-menu>
                 </sl-menu-item>
                 <sl-menu-item @click=${this.showSettingsDialog}>Open Config</sl-menu-item>

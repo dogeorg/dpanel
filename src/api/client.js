@@ -2,6 +2,7 @@ import { mocks } from "./mocks.js";
 import { store } from "/state/store.js";
 import { ReactiveClass } from "/utils/class-reactive.js";
 import { StoreSubscriber } from "/state/subscribe.js";
+import { hookManager } from "./hooks.js";
 
 export default class ApiClient extends ReactiveClass {
   constructor(baseURL, options = {}) {
@@ -99,6 +100,7 @@ export default class ApiClient extends ReactiveClass {
       throw new Error(response.error || `Request failed with error code: ${response.status}`);
     }
 
+    // Parse JSON body
     try {
       data = await response.json();
     } catch (jsonParseErr) {
@@ -106,7 +108,24 @@ export default class ApiClient extends ReactiveClass {
       throw new Error('Could not JSON parse response from server');
     }
 
-    return data;
+    // Return payload, unmodified.
+    if (!config.hooks) {
+      return data;
+    }
+
+    // Process response hooks (dev tool)
+    if (config.hooks) {
+      try {
+        // iterate over hooks
+        // if hook enabled, process and return adusted data.
+        // if hook not enabled, return unmodified data.
+        return hookManager.process(config.hooks, data)
+      } catch (hookProcessingErr) {
+        console.warn('Hook failed to process with the following error:', hookProcessingErr);
+        console.log('Returning unmodified data')
+        return data;
+      }
+    }
   }
 }
 

@@ -168,10 +168,11 @@ class DebugPanel extends LitElement {
                   Commands
                   <sl-menu slot="submenu">
                     <sl-menu-label>Response Hooks</sl-menu-label>
-                    <sl-menu-item value="find" type="checkbox" ?checked=${this._hook_bump_version} @click=${this.handleBumpVersionToggle}>Bump version</sl-menu-item>
+                    <sl-menu-item type="checkbox" ?checked=${this._hook_bump_version} @click=${this.handleBumpVersionToggle}>Bump version</sl-menu-item>
                     <sl-divider></sl-divider>
                     <sl-menu-label>Synethic Events</sl-menu-label>
-                    <sl-menu-item value="find" @click=${this.emitSyntheticSystemProgress}>System Progress</sl-menu-item>
+                    <sl-menu-item @click=${this.emitSyntheticSystemProgress}>System Progress</sl-menu-item>
+                    <sl-menu-item @click=${this.emitSyntheticUpdateAvailable}>Update Available</sl-menu-item>
                   </sl-menu>
                 </sl-menu-item>
                 <sl-menu-item @click=${this.showSettingsDialog}>Open Config</sl-menu-item>

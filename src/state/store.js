@@ -14,6 +14,9 @@ class Store {
       navigationDirection: "",
       dbxVersion: "",
     };
+    this.sysContext = this.sysContext || {
+      updateAvailable: null,
+    };
     this.networkContext = this.networkContext || {
       apiBaseUrl: `${window.location.protocol}//${window.location.hostname}:3000`,
       wsApiBaseUrl: `ws://${window.location.hostname}:3000`,
@@ -146,6 +149,9 @@ class Store {
     // Update the state properties with the partial state provided
     if (partialState.appContext) {
       this.appContext = { ...this.appContext, ...partialState.appContext };
+    }
+    if (partialState.sysContext) {
+      this.sysContext = { ...this.sysContext, ...partialState.sysContext };
     }
     if (partialState.networkContext) {
       this.networkContext = {

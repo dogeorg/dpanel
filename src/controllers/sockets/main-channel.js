@@ -1,6 +1,7 @@
 import WebSocketClient from "/api/sockets.js";
 import { store } from "/state/store.js";
 import { pkgController } from "/controllers/package/index.js";
+import { sysController } from "/controllers/system/index.js";
 import { asyncTimeout } from "/utils/timeout.js";
 import { performMockCycle, c1, c4, c5, mockInstallEvent } from "/api/mocks/pup-state-cycle.js";
 import { isUnauthedRoute } from "/utils/url-utils.js";
@@ -126,6 +127,10 @@ class SocketChannel {
             console.log("--PROGRESS", data);
           }
           pkgController.ingestProgressUpdate(data);
+          break;
+
+        case "system-state":
+          sysController.ingestSystemStateUpdate(data)
           break;
       }
       this.notify();

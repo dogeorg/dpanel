@@ -50,7 +50,8 @@ class SettingsPage extends LitElement {
   }
 
   render() {
-    const dialog = this?.context?.store?.dialogContext || {};
+    const { updateAvailable } = store.getContext('sys')
+    const dialog = store.getContext('dialog')
     const hasSettingsDialog = ["updates", "versions"].includes(dialog.name);
     return html`
       <div class="padded">
@@ -62,7 +63,7 @@ class SettingsPage extends LitElement {
             <action-row prefix="info-circle" label="Version" href="/settings/versions">
               View version details
             </action-row>
-            <action-row prefix="arrow-repeat" label="Updates" href="/settings/updates">
+            <action-row prefix="arrow-repeat" ?dot=${updateAvailable} label="Updates" href="/settings/updates">
               Check for updates
             </action-row>
             <action-row prefix="wifi" label="Wifi" @click=${notYet}>

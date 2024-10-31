@@ -27,3 +27,12 @@ sl-dialog.above-toasts::part(base) {
 a, button {
   touch-action: manipulation;
 }
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 10px;
+  background: red;
+  display: inline-block;
+  position: absolute;
+}

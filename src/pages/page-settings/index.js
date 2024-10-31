@@ -92,7 +92,6 @@ class SettingsPage extends LitElement {
           ["versions", () => renderVersionsDialog(store, this.handleDialogClose)]
         ])}
       </sl-dialog>
-
     `;
   }
 }

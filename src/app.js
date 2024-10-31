@@ -28,7 +28,7 @@ import "/components/views/prompt-welcome/index.js";
 import "/components/views/prompt-system/index.js";
 
 // Components
-import "/utils/debug-panel.js";
+import "/utils/devtools/debug-panel.js";
 import { notYet } from "/components/common/not-yet-implemented.js";
 
 // Render chunks

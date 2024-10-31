@@ -28,7 +28,7 @@ import "/pages/page-recovery/index.js";
 
 // Components
 import "/components/common/dynamic-form/dynamic-form.js";
-import "/utils/debug-panel.js";
+import "/utils/devtools/debug-panel.js";
 
 // Render chunks
 import * as renderChunks from "/components/layouts/recovery/renders/index.js";

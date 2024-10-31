@@ -13,6 +13,7 @@ import "/components/views/x-activity-log.js";
 import { checkForUpdates, commenceUpdate } from "/api/system/updates.js";
 import { store } from "/state/store.js";
 import { getBootstrapV2 } from "/api/bootstrap/bootstrap.js";
+import { pkgController } from "/controllers/package/index.js";
 
 const PAGE_ONE = "checking";
 const PAGE_TWO = "confirmation";
@@ -38,10 +39,23 @@ export class CheckUpdatesView extends LitElement {
 
   constructor() {
     super();
+    this.pkgController = pkgController;
     this.mode = "";
     this._ready = false;
     this._page = PAGE_ONE;
     this._logs = [];
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    // Observe pkgController changes
+    // In order for System update logs to be displayed to the user.
+    this.pkgController.addObserver(this);
+  }
+
+  disconnectedCallback() {
+    this.pkgController.removeObserver(this);
+    super.disconnectedCallback();
   }
 
   firstUpdated() {
@@ -64,6 +78,22 @@ export class CheckUpdatesView extends LitElement {
 
   handleReviewUpdates() {
     this._page = PAGE_TWO;
+  }
+
+  requestUpdate(options = {}) {
+    // This component is an observer of pkgController changes
+    // In response to pkgControllers notification of an 'activity'
+    // this function can determine whether there are new system logs
+    // to display to the user.
+    if (this.pkgController && options.type === 'system-activity') {
+
+      // TODO
+      // Filter these logs so only lines relating to the particular
+      // activityId relating to this update are shown.
+
+      this._logs = [...this.pkgController.activityIndex['system']];
+    }
+    super.requestUpdate();
   }
 
   async mockUpdateLogs() {
@@ -289,6 +319,11 @@ export class CheckUpdatesView extends LitElement {
     try {
       await asyncTimeout(1000);
       const res = await commenceUpdate();
+
+      // TODO.  Obtain "acitivityId" from response
+      // Use this ID to display acitivty logs filtered
+      // to that ID.
+
       this._update_commenced = true;
     } catch (err) {
       didErr = true;

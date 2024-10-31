@@ -484,16 +484,38 @@ class PkgController {
   }
 
   ingestProgressUpdate(data) {
-    if (this.activityIndex[data.update.PupID]) {
-      // Prior acitivity exists for pup, add more.
-      this.activityIndex[data.update.PupID].push(data.update)
+    // Two types of updates: 
+    // those with a PupID (obviously relating to that Pup
+    // those without (related to system)
+
+    /* SAMPLE {
+      "id": "26db9ffa272e796826d156e593f1f930",
+      "error": "",
+      "type": "progress",
+      "update": {
+        "actionID": "26db9ffa272e796826d156e593f1f930",
+        "PupID": "208f8f19ebcc479cb0a9f1e5d12bda2d", <-- Not present for System updates.
+        "progress": 0,
+        "step": "enable",
+        "msg": "[patch-a37bafc7f518] Applied all patch operations, rebuilding..",
+        "error": false,
+        "step_taken": 8015165
+      }
+    }*/
+
+    const id = data?.update?.PupID || 'system'
+
+    if (this.activityIndex[id]) {
+      // Prior acitivity exists for id, add more.
+      this.activityIndex[id].push(data.update)
     } else {
-      // First activity for pup, creates activity array.
-      this.activityIndex[data.update.PupID] = [];
-      this.activityIndex[data.update.PupID].push(data.update);
+      // First activity for id, creates activity array.
+      this.activityIndex[id] = [];
+      this.activityIndex[id].push(data.update);
     }
     // Notify observers with an 'activity' type
-    this.notify(null, { type: 'activity' });
+    const activityType = id === 'system' ? 'system-activity' : 'activity'
+    this.notify(null, { type: activityType });
   }
 }
 

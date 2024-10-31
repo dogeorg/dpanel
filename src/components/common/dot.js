@@ -23,7 +23,7 @@ class NotificationDot extends LitElement {
       width: 10px;
       height: 10px;
       border-radius: 10px;
-      background: var(--sl-color-yellow-700);
+      background: var(--sl-color-rose-500);
       transform: translateX(var(--left, -33%)) translateY(var(--top, -66%));
     }
   `

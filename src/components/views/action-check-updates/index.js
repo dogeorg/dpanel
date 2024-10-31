@@ -359,8 +359,16 @@ export class CheckUpdatesView extends LitElement {
         if (version?.release && version.release !== dbxVersion) {
           clearInterval(intervalId);
           console.debug('New version found:', version.release);
+
+          // Stop spinner
           this._inflight_update = false;
+
+          // Trigger success UI
           this._update_outcome = "success";
+
+          // Unset updateAvailable flag (removes notification dot)
+          store.updateState({ sysContext: { updateAvailable: false }});
+
         }
       } catch (err) {
         // Squelch errs.

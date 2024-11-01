@@ -156,7 +156,6 @@ class ActionRow extends LitElement {
       gap: 0.25em;
 
       .label-wrap {
-        line-height: 1.1;
         font-weight: bold;
         white-space: nowrap;
         overflow: hidden;
@@ -171,6 +170,7 @@ class ActionRow extends LitElement {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        margin-top: -8px;
       }
 
       .more-wrap {

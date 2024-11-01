@@ -5,9 +5,17 @@ export const getResponse = {
   res: {
     success: true,
     updates: [{
-      name: 'dogebox',
+      name: 'Dogebox',
       version: '0.3.2',
-      summary_short: 'Various improvements to Dogeboxd, dPanel and DKM',
+      short: 'Bundles Dogeboxd, DKM, dPanel',
+      link: 'https://github.com/dogeorg/dogeboxd/release/foo',
+      long: 'This update deserunt amet ex in labore dolore et veniam dolor culpa enim dolor in deserunt do aliquip mollit dolor elit dolore dolore aute proident consectetur consequat in nostrud sit occaecat est in cupidatat laboris nulla.'
+    },
+    {
+      name: 'NixOS',
+      short: 'Security patches',
+      link: 'https://github.com/dogeorg/dogebox/release/bar',
+      long: 'This update deserunt amet ex in labore dolore et veniam dolor culpa enim dolor in deserunt do aliquip mollit dolor elit dolore dolore aute proident consectetur consequat in nostrud sit occaecat est in cupidatat laboris nulla.'
     }]
   }
 };

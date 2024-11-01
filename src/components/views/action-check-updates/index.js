@@ -10,6 +10,7 @@ import { asyncTimeout } from "/utils/timeout.js";
 import "/components/common/action-row/action-row.js";
 import "/components/common/reveal-row/reveal-row.js";
 import "/components/views/x-activity-log.js";
+import "/components/views/x-version-card.js";
 import { checkForUpdates, commenceUpdate } from "/api/system/updates.js";
 import { store } from "/state/store.js";
 import { getBootstrapV2 } from "/api/bootstrap/bootstrap.js";
@@ -25,7 +26,7 @@ export class CheckUpdatesView extends LitElement {
       mode: { type: String }, // either canInstall or mustInstall
       open: { type: Boolean, reflect: true },
       _ready: { type: Boolean },
-      _updates: { type: Object },
+      _updates: { type: Array },
       _has_updates: { type: Boolean },
       _inflight_checking: { type: Boolean },
       _confirmation_checked: { type: Boolean },
@@ -44,6 +45,7 @@ export class CheckUpdatesView extends LitElement {
     this._ready = false;
     this._page = PAGE_ONE;
     this._logs = [];
+    this._updates = [];
   }
 
   connectedCallback() {
@@ -64,15 +66,16 @@ export class CheckUpdatesView extends LitElement {
 
   async fetchUpdates() {
     // Reset
-    this._updates = false;
+    this._updates = [];
     this._inflight_checking = true;
 
     // Fetch
-    this._updates = await checkForUpdates();
+    const { updates } = await checkForUpdates();
+    this._updates = updates || [];
     await asyncTimeout(1000);
 
-    // TODO
-    this._has_updates = true;
+    // Toggle UI according to whether there are updates or not.
+    this._has_updates = !!this._updates.length;
     this._inflight_checking = false;
   }
 
@@ -216,10 +219,20 @@ export class CheckUpdatesView extends LitElement {
         <h1>System Updates</h1>
         
         <div class="updates-list">
-          <action-row prefix="box" expandable label="Dogebox v0.3.2">
-            Short description
-            <div slot="hidden"><small>Lorem ad ex nostrud magna nisi ea enim magna exercitation aliquip enim amet ad deserunt sit irure aute proident.</div>
-          </action-row>
+          ${this._updates.length ? this._updates.map((item) => html`
+            <x-version-card
+              name=${item.name}
+              version=${item.version}
+              short=${item.short}
+              link=${item.link}
+              link_label="Release notes"
+              long=${item.long}
+            ></x-version-card>
+          `): nothing }
+
+          ${!this._updates.length ? html`
+            <sl-spinner></sl-spinner>`
+          : nothing }
         </div>
 
         <sl-alert open variant="warning" style="text-align: left">

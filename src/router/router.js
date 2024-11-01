@@ -127,7 +127,7 @@ export class Router {
 
       // Do not intercept for these cases.
       if (!anchor) return
-      if (anchor._target === "_blank") return
+      if (anchor.target === "_blank") return
       if (anchor.hasAttribute("no-intercept")) return
 
       // Intercept

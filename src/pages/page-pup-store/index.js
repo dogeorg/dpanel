@@ -11,8 +11,8 @@ import '/components/common/page-banner.js';
 import '/components/views/action-manage-sources/index.js';
 
 const initialSort = (a, b) => {
-  if (a?.def?.versions[a?.def?.versionLatest]?.meta?.name < b?.def?.versions[b?.def?.versionLatest]?.meta?.name) { return -1; }
-  if (a?.def?.versions[a?.def?.versionLatest] > b?.def?.versions[b?.def?.versionLatest]?.meta?.name) { return 1; }
+  if (a?.def?.key < b?.def?.key) { return -1; }
+  if (a?.def?.key > b?.def?.key) { return 1; }
   return 0;
 }
 
@@ -161,7 +161,6 @@ class StoreView extends LitElement {
       this.packageList.setData(this.pups);
     }
     
-    // Existing code for other property changes
     if (changedProperties.has('searchValue')) {
       this.filterPackageList();
     }
@@ -171,7 +170,9 @@ class StoreView extends LitElement {
     if (this.searchValue === "") {
       this.packageList.setFilter();
     }
-    this.packageList.setFilter((pkg) => pkg?.manifest?.package?.toLowerCase()?.includes(this.searchValue.toLowerCase()));
+    this.packageList.setFilter((pkg) => {
+      return pkg?.def.key?.toLowerCase()?.includes(this.searchValue.toLowerCase())
+    });
   }
 
   handleManageSourcesClick() {
@@ -207,8 +208,14 @@ class StoreView extends LitElement {
       </page-banner>
 
       <div class="row search-wrap">
-        <sl-input class="constrained w55" type="search" size="large" placeholder="Search">
-          <sl-icon name="search" slot="prefix"></sl-icon>
+        <sl-input class="constrained w55"
+          type="search"
+          size="large"
+          placeholder="Search"
+          value="${this.searchValue}"
+          @sl-input=${(e) => this.searchValue = e.target.value}
+          >
+          <sl-icon name="search" slot="prefix" ></sl-icon>
         </sl-input>
       </div>
 

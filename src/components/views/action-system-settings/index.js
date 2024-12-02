@@ -60,6 +60,7 @@ class SystemSettings extends LitElement {
       _disks: { type: Array },
       _changes: { type: Object },
       _show_disk_size_warning: { type: Boolean },
+      _show_disk_in_use_warning: { type: Boolean },
       _is_boot_media: { type: Boolean },
       _confirmation_checked: { type: Boolean },
     };
@@ -75,6 +76,7 @@ class SystemSettings extends LitElement {
       'device-name': ''
     };
     this._show_disk_size_warning = false;
+    this._show_disk_size_in_use_warning = false;
     this._is_boot_media = false;
     this._confirmation_checked = false;
   }
@@ -177,6 +179,7 @@ class SystemSettings extends LitElement {
 
     this._is_boot_media = diskObject.bootMedia;
     this._show_disk_size_warning = !diskObject?.suitability?.storage?.sizeOK;
+    this._show_disk_in_use_warning = diskObject?.suitability?.isAlreadyUsed;
   }
 
   handleCheckboxChange(e) {
@@ -255,7 +258,10 @@ class SystemSettings extends LitElement {
 
           <sl-alert variant="warning" ?open=${this._changes.disk && !this._is_boot_media} style="margin: 1em 0em;">
             <sl-icon slot="icon" name="exclamation-triangle"></sl-icon>
-            Warning. The contents of disk <strong>${this._changes.disk}</strong> will be erased to prepare it for use as a mass storage drive for your Dogebox.
+            ${this._show_disk_in_use_warning
+              ? html`Warning. The selected disk appears to have data present. The contents of this disk <strong>(${this._changes.disk})</strong> will be erased to prepare it for use as a mass storage drive for your Dogebox.`
+              : html`Warning. The contents of disk <strong>${this._changes.disk}</strong> will be erased to prepare it for use as a mass storage drive for your Dogebox.`
+            }
           </sl-alert>
 
           <div class="action-wrap">

@@ -1,5 +1,6 @@
 import { LitElement, html, css, nothing, classMap } from '/vendor/@lit/all@3.1.2/lit-all.min.js';
 import { store } from "/state/store.js";
+import { StoreSubscriber } from "/state/subscribe.js";
 import { asyncTimeout } from "/utils/timeout.js";
 
 class PageContainer extends LitElement {
@@ -89,7 +90,7 @@ class PageContainer extends LitElement {
     previousPath: { type: String },
     upwardPath: { type: String },
     transitioning: { type: Boolean },
-    router: { type: Object }
+    router: { type: Object },
   }
 
   constructor() {
@@ -100,6 +101,7 @@ class PageContainer extends LitElement {
     this.upwardPath = "";
     this.transitioning = false;
     this.router = null;
+    this.context = new StoreSubscriber(this, store)
   }
 
   firstUpdated() {
@@ -131,6 +133,8 @@ class PageContainer extends LitElement {
 
   render() {
     const { pageTitle, pageAction, handleBackClick, handleMenuClick } = this;
+    const { updateAvailable } = store.getContext('sys');
+    const showMenuDot = updateAvailable
 
     const pageActionEl = !pageAction ? nothing : html`
       <sl-button @click=${handleBackClick} variant="default" size="large" circle>
@@ -144,7 +148,8 @@ class PageContainer extends LitElement {
         name="list"
         label="menu"
         style="font-size: 2rem;"
-      ></sl-icon>
+      >
+      </sl-icon>
     `
 
     return html`
@@ -154,7 +159,10 @@ class PageContainer extends LitElement {
           <h2 class="${pageAction ? "" : "alone"}">${pageTitle}</h2>
         </section>
         <section>
-          ${menuIconEl}
+          <span style="position:relative; display: inline-block; height: 24px">
+            <x-dot ?open=${showMenuDot} style="--top: 11px; --left: 28px"></x-dot>
+            ${menuIconEl}
+          </span>
         </section>
       </div>
 

@@ -28,15 +28,17 @@ import "/components/views/prompt-welcome/index.js";
 import "/components/views/prompt-system/index.js";
 
 // Components
-import "/utils/debug-panel.js";
+import "/utils/devtools/debug-panel.js";
+import "/components/common/dot.js";
 import { notYet } from "/components/common/not-yet-implemented.js";
 
 // Render chunks
 import * as renderMethods from "/components/layouts/standard/renders/index.js";
 
-// Router (singleton)
+// Router
 import { Router } from "/router/router.js";
 import { routes } from "/router/config.js";
+import { setRouterInstance } from "/router/index.js";
 
 // Utils
 import debounce from "/utils/debounce.js";
@@ -115,6 +117,7 @@ class DPanelApp extends LitElement {
     const outlet = this.shadowRoot.querySelector("#Outlet");
     // this.outletWrapper = this.shadowRoot.querySelector("#OutletWrapper")
     this.router = new Router(outlet);
+    setRouterInstance(this.router);
     this.router.setRoutes(routes)
     this.router.processCurrentRoute();
 
@@ -131,8 +134,18 @@ class DPanelApp extends LitElement {
 
   async fetchBootstrap() {
     try {
+      // Fetch bootstrap
       const res = await getBootstrapV2()
-      if (res) { this.pkgController.setData(res); }
+
+      // Set version on appContext
+      if (res?.version?.release) {
+        store.updateState({ appContext: { dbxVersion: res?.version?.release }})
+      }
+
+      // Process pups
+      if (res) {
+        this.pkgController.setData(res);
+      }
     } catch (err) {
       console.warn('Failed to fetch bootstrap')
     } finally {

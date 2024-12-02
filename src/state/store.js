@@ -11,14 +11,18 @@ class Store {
       pageTitle: "",
       pageAction: "",
       pageCount: 0,
-      navigationDirection: ""
+      navigationDirection: "",
+      dbxVersion: "",
+    };
+    this.sysContext = this.sysContext || {
+      updateAvailable: null,
     };
     this.networkContext = this.networkContext || {
       apiBaseUrl: `${window.location.protocol}//${window.location.hostname}:3000`,
       wsApiBaseUrl: `ws://${window.location.hostname}:3000`,
       overrideBaseUrl: false,
       overrideSocketBaseUrl: false,
-      useMocks: false,
+      useMocks: true,
       forceFailures: false,
       forceDelayInSeconds: 0,
       reqLogs: false,
@@ -30,6 +34,7 @@ class Store {
       logProgressUpdates: false,
       reflectorHost: `https://reflector.dogecoin.org`,
       reflectorToken: Math.random().toString(36).substring(2, 14),
+      "mock::updates::/system/updates::get":true,
     };
     this.pupContext = {
       computed: null,
@@ -37,16 +42,19 @@ class Store {
       state: null,
       stats: null,
       ready: false,
-      result: null
+      result: null,
     };
     this.promptContext = {
       display: false,
       name: "transaction",
     };
-    this.setupContext = {
-      hashedPassword: null,
-      view: null,
-    };
+    (this.dialogContext = {
+      name: null,
+    }),
+      (this.setupContext = {
+        hashedPassword: null,
+        view: null,
+      });
 
     // Hydrate state from localStorage unless flush parameter is present.
     if (!isUnauthedRoute() && !hasFlushParam()) {
@@ -55,6 +63,18 @@ class Store {
     if (hasFlushParam()) {
       window.location = window.location.origin + window.location.pathname;
     }
+  }
+
+  getContext(contextName) {
+    if (!contextName.endsWith('Context')) {
+      contextName = `${contextName}Context`;
+    }
+
+    if (this[contextName]) {
+      return { ...this[contextName] };
+    }
+
+    return null;
   }
 
   subscribe(controller) {
@@ -89,7 +109,6 @@ class Store {
     if (this.supportsLocalStorage()) {
       try {
         const stateToPersist = {
-          appContext: this.appContext,
           networkContext: this.networkContext,
           // Include other slices of state as needed
         };
@@ -131,6 +150,9 @@ class Store {
     if (partialState.appContext) {
       this.appContext = { ...this.appContext, ...partialState.appContext };
     }
+    if (partialState.sysContext) {
+      this.sysContext = { ...this.sysContext, ...partialState.sysContext };
+    }
     if (partialState.networkContext) {
       this.networkContext = {
         ...this.networkContext,
@@ -144,6 +166,12 @@ class Store {
       this.promptContext = {
         ...this.promptContext,
         ...partialState.promptContext,
+      };
+    }
+    if (partialState.dialogContext) {
+      this.dialogContext = {
+        ...this.dialogContext,
+        ...partialState.dialogContext,
       };
     }
     if (partialState.setupContext) {

@@ -1,4 +1,4 @@
-import { LitElement, html, css } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
+import { LitElement, html, css, nothing } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 
 class ActionRow extends LitElement {
   static get properties() {
@@ -13,6 +13,7 @@ class ActionRow extends LitElement {
       disabled: { type: Boolean },
       expandable: { type: Boolean },
       expand: { type: Boolean, reflect: true },
+      dot: { type: Boolean, reflect: true},
     };
   }
 
@@ -31,6 +32,7 @@ class ActionRow extends LitElement {
   static styles = css`
     :host {
       color: var(--sl-color-neutral-600);
+      position: relative;
     }
 
     :host([expand]) .hidden-wrap {
@@ -123,6 +125,7 @@ class ActionRow extends LitElement {
     }
 
     .base-wrap {
+      position: relative;
       display: flex;
       flex-direction: row;
       width: 100%;
@@ -131,6 +134,7 @@ class ActionRow extends LitElement {
     }
 
     .prefix-wrap {
+      position: relative;
       width: 48px;
       max-width: 48px;
       flex: 0 0 auto; /* Do not grow, or shrink, basis auto */
@@ -140,6 +144,7 @@ class ActionRow extends LitElement {
     }
 
     .body-wrap {
+      position: relative;
       height: var(--row-height, 62px);
       padding-bottom: 2px;
       flex: 1 0 auto; /* Grow to fill the space, no shrink, basis auto */
@@ -151,7 +156,6 @@ class ActionRow extends LitElement {
       gap: 0.25em;
 
       .label-wrap {
-        line-height: 1.1;
         font-weight: bold;
         white-space: nowrap;
         overflow: hidden;
@@ -159,15 +163,18 @@ class ActionRow extends LitElement {
       }
 
       .description-wrap {
+        position: relative;
         line-height: 1;
         font-size: 0.9rem;
         font-family: "Comic Neue";
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        margin-top: -8px;
       }
 
       .more-wrap {
+        position: relative;
         line-height: 1;
         font-size: 0.9rem;
         font-family: "Comic Neue";
@@ -186,6 +193,7 @@ class ActionRow extends LitElement {
     }
 
     .suffix-wrap {
+      position: relative;
       height: 100%;
       max-width: 48px;
       flex: 0 1 auto; /* Do not grow, can shrink, basis auto */
@@ -201,6 +209,9 @@ class ActionRow extends LitElement {
   `;
 
   handleClick = (e) => {
+    if (this.dot) {
+      this.dot = false;
+    }
     if (this.expandable) {
       this.expand = !this.expand;
       this.dispatchEvent(
@@ -231,6 +242,7 @@ class ActionRow extends LitElement {
       <div class="outer">
         <div class="base-wrap" part="base" @click=${this.handleClick}>
           <div class="prefix-wrap" part="prefix">
+            <x-dot ?open=${this.dot}></x-dot>
             ${this.loading
               ? html` <sl-spinner></sl-spinner> `
               : html`

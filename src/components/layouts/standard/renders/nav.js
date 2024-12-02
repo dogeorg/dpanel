@@ -10,6 +10,7 @@ export function renderNav(CURPATH) {
     opaque: this.systemPromptActive,
   });
   const menu_open = this.context.store.appContext.menuVisible;
+  const showSettingsDot = this.context.store.sysContext.updateAvailable;
   return html`
     <nav id="Nav" ?open=${menu_open} ?animating=${this.menuAnimating}>
       <div id="Side">
@@ -35,14 +36,19 @@ export function renderNav(CURPATH) {
               Explore
             </a>
 
-            <a href="/stats" @click="${(e) => { e.stopPropagation(); e.preventDefault(); notYet(); }}" class="menu-item ${CURPATH.startsWith("/stats") ? "active" : ""}">
+            <a href="/stats" @click="${(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              notYet();
+            }}" class="menu-item ${CURPATH.startsWith("/stats") ? "active" : ""}">
               <sl-icon name="heart-pulse-fill"></sl-icon>
               Monitor
             </a>
 
-            <a href="/settings" @click="${(e) => { e.stopPropagation(); e.preventDefault(); notYet(); }}" class="menu-item ${CURPATH.startsWith("/settings") ? "active" : ""}">
+            <a href="/settings" class="menu-item ${CURPATH.startsWith("/settings") ? "active" : ""}">
               <sl-icon name="sliders"></sl-icon>
               Settings
+              <x-dot ?open=${showSettingsDot} style="--left: -8px;"></x-dot>
             </a>
           </div>
 

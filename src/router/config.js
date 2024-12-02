@@ -1,4 +1,10 @@
-import { isAuthed, loadPup, asPage, performLogout } from "./middleware.js"
+import {
+  isAuthed,
+  loadPup,
+  asPage,
+  withDialog,
+  performLogout,
+} from "./middleware.js";
 
 export const routes = [
   // {
@@ -9,11 +15,11 @@ export const routes = [
   // },
   {
     path: "/",
-    before:[(ctx, cmd) => cmd.redirect("/explore")]
+    before: [(ctx, cmd) => cmd.redirect("/explore")],
   },
   {
     path: "/logout",
-    before: [performLogout]
+    before: [performLogout],
   },
   {
     path: "/login",
@@ -23,19 +29,25 @@ export const routes = [
     path: "/stats",
     component: "x-page-stats",
     pageTitle: "Stats",
-    before: [isAuthed, asPage]
+    before: [isAuthed, asPage],
   },
   {
     path: "/settings",
     component: "x-page-settings",
     pageTitle: "Settings",
-    before: [isAuthed, asPage]
+    before: [isAuthed, asPage],
+  },
+  {
+    path: "/settings/:dialog",
+    component: "x-page-settings",
+    pageTitle: "Settings",
+    before: [isAuthed, asPage, withDialog],
   },
   {
     path: "/pups",
     component: "x-page-pup-library",
     pageTitle: "Installed Pups",
-    before: [isAuthed, asPage]
+    before: [isAuthed, asPage],
   },
   {
     path: "/pups/:pupid/:pupname",
@@ -76,6 +88,7 @@ export const routes = [
     dynamicTitle: true,
     pageAction: "close",
     before: [isAuthed, asPage],
-    animate: true
-  }
-]
+    animate: true,
+  },
+];
+

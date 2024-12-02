@@ -5,12 +5,15 @@ import {
   classMap,
 } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 
-// Import dependent components
+import { hookManager } from "/api/hooks.js";
+import { bindToClass } from "/utils/class-bind.js";
+import * as devToolFunctions from "./functions/index.js";
 import "./debug-settings.js";
 
 class DebugPanel extends LitElement {
   static properties = {
     isVisible: { type: Boolean },
+    _hook_bump_version: { type: Boolean },
   };
 
   static styles = css`
@@ -63,6 +66,7 @@ class DebugPanel extends LitElement {
 
   constructor() {
     super();
+    bindToClass(devToolFunctions, this)
     this.isVisible = false;
     this.logMessages = [];
     // this.originalConsoleLog = console.log;
@@ -127,6 +131,12 @@ class DebugPanel extends LitElement {
     this.shadowRoot.querySelector("debug-settings-dialog").openDialog();
   }
 
+  handleBumpVersionToggle() {
+    const newState = !this._hook_bump_version;
+    this._hook_bump_version = newState;
+    hookManager.set('bump-version', newState);
+  }
+
   render() {
     const classes = {
       "debugger-container": true,
@@ -144,19 +154,31 @@ class DebugPanel extends LitElement {
           })}
         </div>
         <div class="floating-controls-container">
-          <div class="left">
-            <sl-button
-              size="small"
-              @click=${() => this.toggleVisibility(null, "close")}
-            >
-              Close Debug Panel
-            </sl-button>
-          </div>
+          <div class="left"></div>
           <div class="right">
-            <sl-button size="small" @click=${this.showSettingsDialog}>
-              <sl-icon name="tools" slot="prefix"></sl-icon>
-              Debugger Config
+
+            <sl-button variant="text"  size="small" @click=${() => this.toggleVisibility(null, "close")}>
+              Hide
             </sl-button>
+
+            <sl-dropdown hoist>
+              <sl-button slot="trigger" size="small" caret>Dev Tools</sl-button>
+              <sl-menu>
+                <sl-menu-item>
+                  Commands
+                  <sl-menu slot="submenu">
+                    <sl-menu-label>Response Hooks</sl-menu-label>
+                    <sl-menu-item type="checkbox" ?checked=${this._hook_bump_version} @click=${this.handleBumpVersionToggle}>Bump version</sl-menu-item>
+                    <sl-divider></sl-divider>
+                    <sl-menu-label>Synethic Events</sl-menu-label>
+                    <sl-menu-item @click=${this.emitSyntheticSystemProgress}>System Progress</sl-menu-item>
+                    <sl-menu-item @click=${this.emitSyntheticUpdateAvailable}>Update Available</sl-menu-item>
+                  </sl-menu>
+                </sl-menu-item>
+                <sl-menu-item @click=${this.showSettingsDialog}>Open Config</sl-menu-item>
+              </sl-menu>
+            </sl-dropdown>
+
           </div>
         </div>
 

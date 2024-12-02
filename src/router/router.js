@@ -49,8 +49,8 @@ export class Router {
     this.afterHooks.push(fn);
   }
 
-  go(path, replace = false) {
-    const changeState = replace ? 'replaceState' : 'pushState';
+  go(path, options = {}) {
+    const changeState = options?.replace ? 'replaceState' : 'pushState';
 
     // Update the URL without refreshing the page
     window.history[changeState]({}, '', path);
@@ -127,7 +127,7 @@ export class Router {
 
       // Do not intercept for these cases.
       if (!anchor) return
-      if (anchor._target === "_blank") return
+      if (anchor.target === "_blank") return
       if (anchor.hasAttribute("no-intercept")) return
 
       // Intercept
@@ -158,19 +158,21 @@ export class Router {
     const outgoingComponent = this.outlet.firstChild;
 
     let transDuration = 1;
+    let doAnimate = false;
     if (options.backward || route.animate) {
       transDuration = this.transitionDuration;
+      doAnimate = true;
     }
 
     // Apply 'transitioning' styles to incoming/outgoing component.
     // As we are about to have both components within the one div
     // They will require to be positioned absolutely, atop of eachother.
-    outgoingComponent && outgoingComponent.classList.add('transitioning')
-    incomingComponent.classList.add('transitioning');
+    doAnimate && outgoingComponent && outgoingComponent.classList.add('transitioning')
+    doAnimate && incomingComponent.classList.add('transitioning');
 
     // Set the animation duration
-    outgoingComponent && outgoingComponent.style.setProperty('--animation-duration', `${transDuration}ms`);
-    incomingComponent.style.setProperty('--animation-duration', `${transDuration}ms`);
+    doAnimate && outgoingComponent && outgoingComponent.style.setProperty('--animation-duration', `${transDuration}ms`);
+    doAnimate && incomingComponent.style.setProperty('--animation-duration', `${transDuration}ms`);
 
     // Is this forward navigation or a backward?
     // Forward will have the incoming component on top and sliding up
@@ -180,7 +182,7 @@ export class Router {
     topComponent.classList.add('top');
 
     // Apply animation classes depending on naviation direction
-    topComponent.classList.add(options.backward ? 'slide-out' : 'slide-in')
+    doAnimate && topComponent.classList.add(options.backward ? 'slide-out' : 'slide-in')
 
     // Add the incoming component to the router-outlet.
     this.outlet.appendChild(incomingComponent);
@@ -188,12 +190,12 @@ export class Router {
     // Remove outgoing component after transition completes.
     // Reset styles of incoming component
     this.currentTransition = setTimeout(() => {
-      incomingComponent.classList.remove('transitioning');
+      doAnimate && incomingComponent.classList.remove('transitioning');
       if (outgoingComponent) {
         this.outlet.removeChild(outgoingComponent);
       }
       this.currentTransition = null; // Reset the current transition
-    }, this.transitionDuration);
+    }, transDuration);
 
   }
 }

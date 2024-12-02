@@ -200,7 +200,10 @@ export class LocationPickerView extends LitElement {
 
         <sl-alert open variant="warning" style="text-align: left">
           <sl-icon slot="icon" name="exclamation-triangle"></sl-icon>
-          Take care. This will wipe all data on <strong>${selectedDisk.name}</strong> and is not reversable.
+          Take care. ${selectedDisk?.suitability?.isAlreadyUsed
+            ? html`The selected disk <strong>${selectedDisk.name}</strong> <u>has existing data</u>. This action will wipe all data and is not reversable.`
+            : html`This will wipe all data on <strong>${selectedDisk.name}</strong> and is not reversable.`
+          }
         </sl-alert>
 
         <sl-divider></sl-divider>

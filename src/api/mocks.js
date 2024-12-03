@@ -37,7 +37,13 @@ import {
 import { postResponse as setHostname } from "./system/hostname.mocks.js";
 import { getResponse as checkForUpdates, postResponse as commenceUpdate } from "./system/updates.mocks.js";
 
-import { getSSHPublicKeysResponse } from "./sshkeys/sshkeys.mocks.js";
+import {
+  getSSHPublicKeysResponse,
+  deleteSSHPublicKeyResponse,
+  addSSHPublicKeyResponse,
+  updateSSHStateResponse,
+  getSSHStateResponse,
+} from "./sshkeys/sshkeys.mocks.js";
 
 export const mocks = [
   storeListingMock,
@@ -68,5 +74,9 @@ export const mocks = [
   setHostname,
   checkForUpdates,
   commenceUpdate,
-  getSSHPublicKeysResponse
+  getSSHPublicKeysResponse,
+  deleteSSHPublicKeyResponse,
+  addSSHPublicKeyResponse,
+  updateSSHStateResponse,
+  getSSHStateResponse
 ];

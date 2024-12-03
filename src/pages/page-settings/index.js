@@ -6,6 +6,7 @@ import {
 } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 import "/components/common/action-row/action-row.js";
 import "/components/views/action-check-updates/index.js";
+import "/components/views/action-remote-access/index.js";
 import { notYet } from "/components/common/not-yet-implemented.js";
 import { store } from "/state/store.js";
 import { StoreSubscriber } from "/state/subscribe.js";
@@ -52,7 +53,7 @@ class SettingsPage extends LitElement {
   render() {
     const { updateAvailable } = store.getContext('sys')
     const dialog = store.getContext('dialog')
-    const hasSettingsDialog = ["updates", "versions"].includes(dialog.name);
+    const hasSettingsDialog = ["updates", "versions", "remote-access"].includes(dialog.name);
     return html`
       <div class="padded">
         <section>
@@ -68,6 +69,9 @@ class SettingsPage extends LitElement {
             </action-row>
             <action-row prefix="wifi" label="Wifi" @click=${notYet}>
               Add or remove Wifi networks
+            </action-row>
+            <action-row prefix="key" label="Remote Access" href="/settings/remote-access">
+              Manage SSH settings and keys
             </action-row>
           <div class="list-wrap">
         </section>
@@ -90,7 +94,8 @@ class SettingsPage extends LitElement {
         ?open=${hasSettingsDialog} @sl-request-close=${this.handleDialogClose}>
         ${choose(dialog.name, [
           ["updates", () => html`<x-action-check-updates></x-action-check-updates>`],
-          ["versions", () => renderVersionsDialog(store, this.handleDialogClose)]
+          ["remote-access", () => html`<x-action-remote-access></x-action-remote-access>`],
+          ["versions", () => renderVersionsDialog(store, this.handleDialogClose)],
         ])}
       </sl-dialog>
     `;

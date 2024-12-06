@@ -4,6 +4,7 @@ import { asyncTimeout } from "/utils/timeout.js";
 import { createAlert } from "/components/common/alert.js";
 import { getKeymaps, setKeymap } from "/api/system/keymaps.js";
 import { getDisks, setStorageDisk } from "/api/disks/disks.js";
+import { setBinaryCacheState } from "/api/binary/cache.js";
 import { setHostname } from "/api/system/hostname.js";
 
 // Render chunks
@@ -12,8 +13,11 @@ import { renderBanner } from "./banner.js";
 // Store
 import { store } from "/state/store.js";
 
+// Components and styles
+import { toggledSectionStyles } from "/components/common/toggled-section.js";
+
 class SystemSettings extends LitElement {
-  static styles = css`
+  static styles = [toggledSectionStyles, css`
     :host {
       display: block;
     }
@@ -50,7 +54,9 @@ class SystemSettings extends LitElement {
       gap: 1em;
       margin-bottom: 2em;
     }
-  `;
+
+    h4 { margin: 0.5em 0; display: flex; align-items: center; }
+  `];
 
   static get properties() {
     return {
@@ -73,7 +79,8 @@ class SystemSettings extends LitElement {
     this._changes = {
       keymap: 'us',
       disk: '',
-      'device-name': ''
+      'device-name': '',
+      use_fdn_binary_cache: true,
     };
     this._show_disk_size_warning = false;
     this._show_disk_size_in_use_warning = false;
@@ -123,7 +130,8 @@ class SystemSettings extends LitElement {
   async _attemptSubmit() {
     this._inflight = true;
 
-    const formFields = this.shadowRoot.querySelectorAll('sl-input, sl-select');
+    // Only input elements that have a name attribute are sent to backend.
+    const formFields = this.shadowRoot.querySelectorAll('sl-input[name], sl-select[name], sl-checkbox[name]');
     const hasInvalidField = Array.from(formFields).some(field => field.hasAttribute('data-invalid'));
 
     await asyncTimeout(2000);
@@ -140,6 +148,7 @@ class SystemSettings extends LitElement {
       await setHostname({ hostname: this._changes['device-name'] });
       await setKeymap({ keymap: this._changes.keymap });
       await setStorageDisk({ storageDevice: this._changes.disk });
+      await setBinaryCacheState({ useFdn: this._changes.use_fdn_binary_cache });
       didSucceed = true;
     } catch (err) {
       console.error('Error occurred when saving config during setup', err);
@@ -199,6 +208,7 @@ class SystemSettings extends LitElement {
           <div class="form-control">
             <sl-button class="label-button" variant="text" @click=${this._generateName}>Randomize</sl-button>
             <sl-input
+              name="device-name"
               required
               label="Set Device Name (for your local network)"
               ?disabled=${this._inflight}
@@ -212,6 +222,7 @@ class SystemSettings extends LitElement {
 
           <div class="form-control">
             <sl-select
+              name="keymap"
               required
               label="Select Keyboard Layout" 
               ?disabled=${this._inflight}
@@ -231,6 +242,7 @@ class SystemSettings extends LitElement {
 
           <div class="form-control">
             <sl-select
+              name="disk"
               required
               label="Select Mass Storage Disk"
               ?disabled=${this._inflight}
@@ -253,6 +265,26 @@ class SystemSettings extends LitElement {
               You have selected a disk with less than 300GB capacity.  You can proceed, however syncing the Blockchain could exhaust your disk.
             </sl-alert>
           </div>
+
+          <sl-details class="advanced" summary="Advanced Settings">
+            <h4>Binary Cache
+              <sl-tooltip>
+                <div slot="content">
+                  A binary cache stores pre-compiled packages to speed up installation and reduce build time. Instead of compiling everything from source code, the system can download ready-to-use binaries from the Dogecoin Foundation's cache: https://nix.dogecoin.org/
+                  </div>
+                <sl-icon-button name="question-circle" label="Binary cache explaination"></sl-icon-button></h4>
+              </sl-tooltip>
+            <div class="form-control">
+              <sl-checkbox
+                name="use_fdn_binary_cache"
+                ?checked=${this._changes.use_fdn_binary_cache}
+                .value=${this._changes.use_fdn_binary_cache}
+                @sl-change=${(e) => this._changes.use_fdn_binary_cache = e.target.checked}
+                help-text="Uncheck to opt out of using the Dogecoin Foundation binary cache">
+                Use Dogecoin FDN binary cache
+              </sl-checkbox>
+            </div>
+          </sl-details>
 
           <sl-divider style="--spacing: 2rem;"></sl-divider>
 

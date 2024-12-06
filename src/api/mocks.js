@@ -45,6 +45,8 @@ import {
   getSSHStateResponse,
 } from "./sshkeys/sshkeys.mocks.js";
 
+import { postResponse as setBinaryCacheResponse } from "./binary/cache.mocks.js"
+
 export const mocks = [
   storeListingMock,
   bootstrapV2Mocks,
@@ -78,5 +80,6 @@ export const mocks = [
   deleteSSHPublicKeyResponse,
   addSSHPublicKeyResponse,
   updateSSHStateResponse,
-  getSSHStateResponse
+  getSSHStateResponse,
+  setBinaryCacheResponse
 ];

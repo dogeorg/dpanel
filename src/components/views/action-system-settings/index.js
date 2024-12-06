@@ -279,11 +279,22 @@ class SystemSettings extends LitElement {
                 name="use_fdn_binary_cache"
                 ?checked=${this._changes.use_fdn_binary_cache}
                 .value=${this._changes.use_fdn_binary_cache}
-                @sl-change=${(e) => this._changes.use_fdn_binary_cache = e.target.checked}
+                @sl-change=${(e) => { this._changes.use_fdn_binary_cache = e.target.checked; this.requestUpdate(); }}
                 help-text="Uncheck to opt out of using the Dogecoin Foundation binary cache">
                 Use Dogecoin FDN binary cache
               </sl-checkbox>
             </div>
+
+            <sl-alert ?open=${this._changes.use_fdn_binary_cache}>
+              <sl-icon slot="icon" name="info-circle"></sl-icon>
+              Using a binary cache saves time. Binaries are still validated for authenticity before installation.
+            </sl-alert>
+
+            <sl-alert variant="warning" ?open=${!this._changes.use_fdn_binary_cache}>
+              <sl-icon slot="icon" name="exclamation-triangle"></sl-icon>
+              Just a heads up. You may experience longer Pup install times down the track (up to 30 minutes in some cases)
+            </sl-alert>
+
           </sl-details>
 
           <sl-divider style="--spacing: 2rem;"></sl-divider>

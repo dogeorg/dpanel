@@ -48,13 +48,19 @@ class Store {
       display: false,
       name: "transaction",
     };
-    (this.dialogContext = {
+    this.dialogContext = {
       name: null,
-    }),
-      (this.setupContext = {
-        hashedPassword: null,
-        view: null,
-      });
+    };
+    this.setupContext = {
+      hashedPassword: null,
+      view: null,
+    };
+    this.backupContext = this.backupContext || {
+      sizeInBytes: 0,
+      pups: {},
+      deliveryMethod: "",
+      selectedDisk: "",
+    }
 
     // Hydrate state from localStorage unless flush parameter is present.
     if (!isUnauthedRoute() && !hasFlushParam()) {
@@ -95,6 +101,7 @@ class Store {
         const savedState = JSON.parse(localStorage.getItem("storeState"));
         if (savedState) {
           this.networkContext = savedState.networkContext;
+          this.backupContext = savedState.backupContext;
           // Load other slices as needed
         }
       } catch (error) {
@@ -110,6 +117,7 @@ class Store {
       try {
         const stateToPersist = {
           networkContext: this.networkContext,
+          backupContext: this.backupContext,
           // Include other slices of state as needed
         };
         localStorage.setItem("storeState", JSON.stringify(stateToPersist));
@@ -178,6 +186,12 @@ class Store {
       this.setupContext = {
         ...this.setupContext,
         ...partialState.setupContext,
+      };
+    }
+    if (partialState.backupContext) {
+      this.backupContext = {
+        ...this.backupContext,
+        ...partialState.backupContext,
       };
     }
     // Other slices..

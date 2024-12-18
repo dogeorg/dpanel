@@ -44,6 +44,9 @@ class Store {
       ready: false,
       result: null,
     };
+    this.jobContext = {
+      count: 0
+    };
     this.promptContext = {
       display: false,
       name: "transaction",
@@ -178,6 +181,12 @@ class Store {
       this.setupContext = {
         ...this.setupContext,
         ...partialState.setupContext,
+      };
+    }
+    if (partialState.jobContext) {
+      this.jobContext = {
+        ...this.jobContext,
+        ...partialState.jobContext,
       };
     }
     // Other slices..

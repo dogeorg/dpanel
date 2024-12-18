@@ -1,5 +1,6 @@
 import { html, classMap } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 import { notYet } from "/components/common/not-yet-implemented.js";
+import "/components/views/system-tray/sys-tray.js";
 
 export function renderNav(CURPATH) {
   const gutterNavClasses = classMap({
@@ -52,12 +53,9 @@ export function renderNav(CURPATH) {
             </a>
           </div>
 
-          <!-- <div class="nav-footer">
-            <div class="connection online">
-              <sl-icon name="cloud-check-fill"></sl-icon>
-              Connected
-            </div>
-          </div> -->
+          <div class="nav-footer">
+            <system-tray></system-tray>
+          </div>
         </div>
       </div>
     </nav>

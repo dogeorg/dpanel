@@ -61,16 +61,16 @@ class SettingsPage extends LitElement {
             <h3>Menu</h3>
           </div>
           <div class="list-wrap">
-            <action-row prefix="info-circle" label="Version" href="/settings/versions">
+            <action-row prefix="info-circle" label="Version" href="/settings/versions" @click=${notYet}>
               View version details
             </action-row>
-            <action-row prefix="arrow-repeat" ?dot=${updateAvailable} label="Updates" href="/settings/updates">
+            <action-row prefix="arrow-repeat" ?dot=${updateAvailable} label="Updates" href="/settings/updates" @click=${notYet}>
               Check for updates
             </action-row>
             <action-row prefix="wifi" label="Wifi" @click=${notYet}>
               Add or remove Wifi networks
             </action-row>
-            <action-row prefix="key" label="Remote Access" href="/settings/remote-access">
+            <action-row prefix="key" label="Remote Access" href="/settings/remote-access" @click=${notYet}>
               Manage SSH settings and keys
             </action-row>
           <div class="list-wrap">

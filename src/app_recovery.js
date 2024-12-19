@@ -124,7 +124,6 @@ class AppModeApp extends LitElement {
   _determineStartingStep(setupState) {
     const {
       hasCompletedInitialConfiguration,
-      hasConfiguredStorageLocation,
       hasGeneratedKey,
       hasConfiguredNetwork,
       isForbidden,
@@ -148,12 +147,8 @@ class AppModeApp extends LitElement {
       return STEP_LOGIN;
     }
 
-    if (!hasConfiguredStorageLocation) {
-      return STEP_INTRO;
-    }
-
     if (!hasGeneratedKey) {
-      return STEP_SET_PASSWORD;
+      return STEP_INTRO;
     }
 
     if (!hasConfiguredNetwork) {

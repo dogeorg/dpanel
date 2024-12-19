@@ -8,9 +8,12 @@ import "/components/common/action-row/action-row.js";
 import "/components/views/action-check-updates/index.js";
 import "/components/views/action-remote-access/index.js";
 import { notYet } from "/components/common/not-yet-implemented.js";
+import { youSure } from "/components/common/are-you-sure.js";
 import { store } from "/state/store.js";
 import { StoreSubscriber } from "/state/subscribe.js";
 import { getRouter } from "/router/index.js";
+import { postHostShutdown } from "/api/system/post-host-shutdown.js";
+import { postHostReboot } from "/api/system/post-host-reboot.js";
 
 class SettingsPage extends LitElement {
   static styles = css`
@@ -50,6 +53,24 @@ class SettingsPage extends LitElement {
     router.go('/settings', { replace: true });
   }
 
+  performShutdown() {
+    try {
+      postHostShutdown();
+    } catch (err) {
+      // squelched
+    }
+    window.alert('Done');
+  }
+
+  performReboot() {
+    try {
+      postHostReboot();
+    } catch (err) {
+      // squelched
+    }
+    window.alert('Done');
+  }
+
   render() {
     const { updateAvailable } = store.getContext('sys')
     const dialog = store.getContext('dialog')
@@ -80,11 +101,11 @@ class SettingsPage extends LitElement {
           <div class="section-title">
             <h3>Power</h3>
           </div>
-          <action-row prefix="power" label="Shutdown" @click=${notYet}>
+          <action-row prefix="power" label="Shutdown" @click=${() => youSure({ confirmText: 'Yes, Power Off', onConfirm: this.performShutdown })}>
             Gracefully shutdown your Dogebox
           </action-row>
 
-          <action-row prefix="arrow-counterclockwise" label="Restart" @click=${notYet}>
+          <action-row prefix="arrow-counterclockwise" label="Restart" @click=${() => youSure({ confirmText: 'Yes, Reboot now', onConfirm: this.performReboot })}>
             Gracefully restart your Dogebox
           </action-row>
         </section>

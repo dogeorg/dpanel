@@ -131,6 +131,8 @@ class AppModeApp extends LitElement {
       installationMode,
     } = setupState;
 
+    console.log(setupState);
+
     if (isForbidden) {
       return STEP_LOGIN;
     }
@@ -148,12 +150,8 @@ class AppModeApp extends LitElement {
       return STEP_LOGIN;
     }
 
-    if (!hasConfiguredStorageLocation) {
-      return STEP_INTRO;
-    }
-
     if (!hasGeneratedKey) {
-      return STEP_SET_PASSWORD;
+      return STEP_INTRO;
     }
 
     if (!hasConfiguredNetwork) {

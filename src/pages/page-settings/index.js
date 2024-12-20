@@ -11,6 +11,7 @@ import { notYet } from "/components/common/not-yet-implemented.js";
 import { store } from "/state/store.js";
 import { StoreSubscriber } from "/state/subscribe.js";
 import { getRouter } from "/router/index.js";
+import { promptPowerOff, promptReboot } from "./power-helpers.js";
 
 class SettingsPage extends LitElement {
   static styles = css`
@@ -80,11 +81,11 @@ class SettingsPage extends LitElement {
           <div class="section-title">
             <h3>Power</h3>
           </div>
-          <action-row prefix="power" label="Shutdown" @click=${notYet}>
+          <action-row prefix="power" label="Shutdown" @click=${promptPowerOff}>
             Gracefully shutdown your Dogebox
           </action-row>
 
-          <action-row prefix="arrow-counterclockwise" label="Restart" @click=${notYet}>
+          <action-row prefix="arrow-counterclockwise" label="Restart" @click=${promptReboot}>
             Gracefully restart your Dogebox
           </action-row>
         </section>

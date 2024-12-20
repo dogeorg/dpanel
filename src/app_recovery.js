@@ -208,6 +208,7 @@ class AppModeApp extends LitElement {
         text: 'Rebooted.',
         subtext: 'Please re-reconnect to the same network as your Dogebox and refresh.',
       });
+      await asyncTimeout(500);
       await postHostReboot();
     } catch {
       // Ignore.
@@ -221,6 +222,7 @@ class AppModeApp extends LitElement {
         text: 'Dogebox turned off successfully.<br>You may close this page.',
         subtext: '',
       });
+      await asyncTimeout(500);
       await postHostShutdown();
     } catch {
       // Ignore.

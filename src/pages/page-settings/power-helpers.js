@@ -27,7 +27,9 @@ function onShutdown() {
     text: 'Dogebox turned off successfully.<br>You may close this page.',
     subtext: '',
   });
-  postHostShutdown();
+  setTimeout(() => {
+    postHostShutdown()
+  }, 500);
 }
 
 function onReboot() {
@@ -37,5 +39,7 @@ function onReboot() {
     text: 'Rebooted.',
     subtext: 'Please re-reconnect to the same network as your Dogebox and refresh.',
   });
-  postHostReboot();
+  setTimeout(() => {
+    postHostReboot();
+  }, 500)
 }

@@ -1,8 +1,8 @@
 import { html, nothing } from "/vendor/@lit/all@3.1.2/lit-all.min.js";
 
 export function notYet(event) {
-  event.preventDefault();
-  event.stopPropagation();
+  event && event.preventDefault && event.preventDefault();
+  event && event.stopPropagation && event.stopPropagation();
 
   if (!document.body.hasAttribute('listener-on-not-yet-dialog')) {
     document.body.addEventListener('sl-after-hide', closeNotYetDialog);

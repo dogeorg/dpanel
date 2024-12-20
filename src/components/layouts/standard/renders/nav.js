@@ -36,11 +36,7 @@ export function renderNav(CURPATH) {
               Explore
             </a>
 
-            <a href="/stats" @click="${(e) => {
-              e.stopPropagation();
-              e.preventDefault();
-              notYet();
-            }}" class="menu-item ${CURPATH.startsWith("/stats") ? "active" : ""}">
+            <a href="/stats" @click="${notYet}" class="menu-item ${CURPATH.startsWith("/stats") ? "active" : ""}">
               <sl-icon name="heart-pulse-fill"></sl-icon>
               Monitor
             </a>

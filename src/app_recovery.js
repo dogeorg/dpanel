@@ -40,6 +40,7 @@ import { StoreSubscriber } from "/state/subscribe.js";
 // Utils
 import { bindToClass } from "/utils/class-bind.js";
 import { asyncTimeout } from "/utils/timeout.js";
+import { instruction } from "/components/common/instruction.js";
 
 // APIS
 import { getSetupBootstrap } from "/api/system/get-bootstrap.js";
@@ -202,34 +203,28 @@ class AppModeApp extends LitElement {
 
   triggerReboot = async () => {
     try {
+      instruction({
+        img: '/static/img/again.png',
+        text: 'Rebooted.',
+        subtext: 'Please re-reconnect to the same network as your Dogebox and refresh.',
+      });
       await postHostReboot();
     } catch {
       // Ignore.
     }
-
-    store.updateState({
-      setupContext: {
-        view: "post-reboot",
-        hideViewClose: true,
-        preventClose: true,
-      },
-    });
   };
 
   triggerPoweroff = async () => {
     try {
+      instruction({
+        img: '/static/img/bye.png',
+        text: 'Dogebox turned off successfully.<br>You may close this page.',
+        subtext: '',
+      });
       await postHostShutdown();
     } catch {
       // Ignore.
     }
-
-    store.updateState({
-      setupContext: {
-        view: "post-power-off",
-        hideViewClose: true,
-        preventClose: true,
-      },
-    });
   };
 
   _closeMgmtDialog = () => {
@@ -392,18 +387,19 @@ class AppModeApp extends LitElement {
                   <x-confirmation-prompt
                     title="Are you sure you want to reboot?"
                     description="Remove your USB recovery stick if you want to boot back into normal mode"
-                    leftButtonText="Cancel"
-                    .leftButtonClick=${this._closeMgmtDialog}
-                    rightButtonText="Reboot"
-                    .rightButtonClick=${this.triggerReboot}
+                    bottomButtonText="Cancel"
+                    .bottomButtonClick=${this._closeMgmtDialog}
+                    topButtonText="Reboot"
+                    .topButtonClick=${this.triggerReboot}
                   ></x-confirmation-prompt>
                 `,
               ],
               [
                 "post-reboot",
                 () =>
-                  html`Please re-reconnect to the same network as your Dogebox
-                  and refresh.`,
+                  html`
+                  <img style="width: 100%;" src="/static/img/again.png" />
+                  <p class="statement">Rebooting.<br><small>Please re-reconnect to the same network as your Dogebox and refresh.</small></p>`,
               ],
               [
                 "power-off",
@@ -411,17 +407,20 @@ class AppModeApp extends LitElement {
                   <x-confirmation-prompt
                     title="Are you sure you want to power off?"
                     description="Physical access may be required to turn your Dogebox on again"
-                    leftButtonText="Cancel"
-                    .leftButtonClick=${this._closeMgmtDialog}
-                    rightButtonText="Yes, turn it off."
-                    .rightButtonClick=${this.triggerPoweroff}
+                    bottomButtonText="Cancel"
+                    .bottomButtonClick=${this._closeMgmtDialog}
+                    topButtonText="Yes, turn it off."
+                    .topButtonClick=${this.triggerPoweroff}
                   ></x-confirmation-prompt>
                 `,
               ],
               [
                 "post-power-off",
                 () =>
-                  html`Dogebox turned off successfully. You may close this page.`,
+                  html`
+                    <img style="width: 100%;" src="/static/img/bye.png" />
+                    <p class="statement">Dogebox turned off successfully.<br>You may close this page.</p>
+                  `,
               ],
               [
                 "factory-reset",

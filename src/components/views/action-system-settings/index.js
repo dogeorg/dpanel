@@ -4,7 +4,6 @@ import { asyncTimeout } from "/utils/timeout.js";
 import { createAlert } from "/components/common/alert.js";
 import { getKeymaps, setKeymap } from "/api/system/keymaps.js";
 import { getDisks, setStorageDisk } from "/api/disks/disks.js";
-import { setBinaryCacheState } from "/api/binary/cache.js";
 import { setHostname } from "/api/system/hostname.js";
 
 // Render chunks
@@ -80,7 +79,7 @@ class SystemSettings extends LitElement {
       keymap: 'us',
       disk: '',
       'device-name': '',
-      use_fdn_binary_cache: true,
+      use_fdn_pup_binary_cache: true,
     };
     this._show_disk_size_warning = false;
     this._show_disk_size_in_use_warning = false;
@@ -144,11 +143,16 @@ class SystemSettings extends LitElement {
 
     let didSucceed = false
 
+    store.updateState({
+      setupContext: {
+        useFoundationPupBinaryCache: this._changes.use_fdn_pup_binary_cache,
+      },
+    });
+
     try {
       await setHostname({ hostname: this._changes['device-name'] });
       await setKeymap({ keymap: this._changes.keymap });
       await setStorageDisk({ storageDevice: this._changes.disk });
-      await setBinaryCacheState({ useFdn: this._changes.use_fdn_binary_cache });
       didSucceed = true;
     } catch (err) {
       console.error('Error occurred when saving config during setup', err);
@@ -276,21 +280,21 @@ class SystemSettings extends LitElement {
               </sl-tooltip>
             <div class="form-control">
               <sl-checkbox
-                name="use_fdn_binary_cache"
-                ?checked=${this._changes.use_fdn_binary_cache}
-                .value=${this._changes.use_fdn_binary_cache}
-                @sl-change=${(e) => { this._changes.use_fdn_binary_cache = e.target.checked; this.requestUpdate(); }}
+                name="use_fdn_pup_binary_cache"
+                ?checked=${this._changes.use_fdn_pup_binary_cache}
+                .value=${this._changes.use_fdn_pup_binary_cache}
+                @sl-change=${(e) => { this._changes.use_fdn_pup_binary_cache = e.target.checked; this.requestUpdate(); }}
                 help-text="Uncheck to opt out of using the Dogecoin Foundation binary cache">
                 Use Dogecoin FDN binary cache
               </sl-checkbox>
             </div>
 
-            <sl-alert ?open=${this._changes.use_fdn_binary_cache}>
+            <sl-alert ?open=${this._changes.use_fdn_pup_binary_cache}>
               <sl-icon slot="icon" name="info-circle"></sl-icon>
               Using a binary cache saves time. Binaries are still validated for authenticity before installation.
             </sl-alert>
 
-            <sl-alert variant="warning" ?open=${!this._changes.use_fdn_binary_cache}>
+            <sl-alert variant="warning" ?open=${!this._changes.use_fdn_pup_binary_cache}>
               <sl-icon slot="icon" name="exclamation-triangle"></sl-icon>
               Just a heads up. You may experience longer Pup install times down the track (up to 30 minutes in some cases)
             </sl-alert>

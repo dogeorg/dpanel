@@ -123,7 +123,7 @@ class IframeView extends LitElement {
           <iframe
             src="${iframeURL}"
             frameBorder="0"
-            sandbox
+            sandbox="allow-scripts"
             ></iframe>
         </div>
       `;

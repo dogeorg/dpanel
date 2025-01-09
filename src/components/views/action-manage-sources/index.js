@@ -236,7 +236,7 @@ export class SourceManagerView extends LitElement {
                 </div>
               </div>
               <div class="dropdown-selection-alt" slot="suffix">
-                <sl-dropdown>
+                <sl-dropdown hoist>
                   <sl-button slot="trigger" caret></sl-button>
                   <sl-menu>
                     <sl-menu-item value="refres" @click=${() => this.handleRefreshClick(s)}>Refresh</sl-menu-item>

@@ -129,8 +129,8 @@ class SocketChannel {
           pkgController.ingestProgressUpdate(data);
           break;
 
-        case "system-state":
-          sysController.ingestSystemStateUpdate(data)
+        case "system-updates-available":
+          sysController.ingestSystemUpdatesAvailable(data)
           break;
       }
       this.notify();

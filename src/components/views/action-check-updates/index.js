@@ -279,14 +279,14 @@ export class CheckUpdatesView extends LitElement {
         ${!this._inflight_update && this._update_outcome === "error" ? html`
           <sl-alert open variant="danger" style="text-align: left">
           <small style="display:inline-block; margin-bottom: 4px;">Update failed</small>
-          <sl-progress-bar value=1 style="--indicator-color: var(--sl-color-danger-600)"></sl-progress-bar>
+          <sl-progress-bar value=100 style="--indicator-color: var(--sl-color-danger-600)"></sl-progress-bar>
         </sl-alert>
         `: nothing }
 
         ${!this._inflight_update && this._update_outcome === "timeout" ? html`
           <sl-alert open variant="warning" style="text-align: left">
           <small style="display:inline-block; margin-bottom: 4px;">Update timeout</small>
-          <sl-progress-bar value=80 style="--indicator-color: var(--sl-color-warning-600)"></sl-progress-bar>
+          <sl-progress-bar value=100 style="--indicator-color: var(--sl-color-danger-600)"></sl-progress-bar>
         </sl-alert>
         `: nothing }
 
@@ -368,7 +368,8 @@ export class CheckUpdatesView extends LitElement {
 
   async pollForUpdateChange() {
     let attempts = 0;
-    const maxAttempts = 12 // 24*5000ms = 120 seconds;
+    const pollEveryMs = 5000
+    const maxAttempts = 120 // 120*0500ms/1000ms/60 = 10 minutes of waiting;
 
     const intervalId = setInterval(async () => {
       try {
@@ -403,7 +404,7 @@ export class CheckUpdatesView extends LitElement {
       } finally {
         attempts++;
       }
-    }, 5000);
+    }, pollEveryMs);
 
     return () => clearInterval(intervalId);
   }

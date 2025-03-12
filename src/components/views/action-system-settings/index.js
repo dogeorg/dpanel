@@ -154,8 +154,13 @@ class SystemSettings extends LitElement {
 
   _generateName() {
     const rando = Math.round(Math.random() * 1000);
-    this._changes['device-name'] = `my_dogebox_${rando}`;
+    this._changes["device-name"] = `my-dogebox-${rando}`;
     this.requestUpdate();
+  }
+
+  _handleInputChange(e) {
+    const field = e.target.getAttribute("data-field");
+    this._changes[field] = e.target.value;
   }
 
   _handleKeymapInputChange(e) {

@@ -18,6 +18,13 @@ export const routes = [
     before: [(ctx, cmd) => cmd.redirect("/explore")],
   },
   {
+    path: "/foo",
+    component: "x-page-foo",
+    pageTitle: "Foo",
+    pageAction: "back",
+    before: [isAuthed, asPage]
+  },
+  {
     path: "/logout",
     before: [performLogout],
   },

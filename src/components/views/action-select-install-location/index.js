@@ -9,7 +9,7 @@ import { createAlert } from "/components/common/alert.js";
 import { asyncTimeout } from "/utils/timeout.js";
 import "/components/common/action-row/action-row.js";
 import { getDisks, postInstallToDisk } from "/api/disks/disks.js";
-import { promptPowerOff } from "./power-helpers.js";
+import { promptPowerOff } from "/pages/page-settings/power-helpers.js";
 
 const PAGE_ONE = "intro";
 const PAGE_TWO = "disk_selection";
@@ -256,7 +256,7 @@ export class LocationPickerView extends LitElement {
         ${!this._inflight_install && this._install_outcome ? html`
           <p class="note-text">Please reboot your Dogebox</p>
           <p class="note-text">While powered off, don't forget to remove the installation media</p>
-          <sl-button variant="warning" @click=${promptPowerOff}" style="margin-block-start: 1em;">
+          <sl-button variant="warning" @click=${promptPowerOff} style="margin-block-start: 1em;">
             <sl-icon name="power"></sl-icon>
             Shutdown
           </sl-button>

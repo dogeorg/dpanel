@@ -8,7 +8,9 @@ import {
 import { createAlert } from "/components/common/alert.js";
 import { asyncTimeout } from "/utils/timeout.js";
 import "/components/common/action-row/action-row.js";
+import "/components/views/x-activity-log.js";
 import { getDisks, postInstallToDisk } from "/api/disks/disks.js";
+import { recoveryChannel } from "/controllers/sockets/recovery-channel.js";
 
 const PAGE_ONE = "intro";
 const PAGE_TWO = "disk_selection";
@@ -28,6 +30,7 @@ export class LocationPickerView extends LitElement {
       _confirmation_checked: { type: Boolean },
       _inflight_install: { type: Boolean },
       _install_outcome: { type: String },
+      _logs: { type: Array },
     };
   }
 
@@ -45,6 +48,7 @@ export class LocationPickerView extends LitElement {
     this._inflight_install = false;
     this._install_outcome = "";
     this._header = "Such Install"
+    this._logs = recoveryChannel.getMessages(); // Initialize with current messages
   }
 
   firstUpdated() {
@@ -64,10 +68,24 @@ export class LocationPickerView extends LitElement {
   connectedCallback() {
     super.connectedCallback();
     this.addEventListener('sl-request-close', this.denyClose);
+
+    // Subscribe to message updates
+    this._unsubscribe = recoveryChannel.subscribeToMessages((messages) => {
+      // Get the latest message from the array
+      const latestMessage = messages[messages.length - 1];
+      if (latestMessage) {
+        // Format the message in the way our component expects
+        this._logs = messages.map(msg => ({ msg }));
+        this.requestUpdate();
+      }
+    });
   }
 
   disconnectedCallback() {
     this.removeEventListener('sl-request-close', this.denyClose);
+    if (this._unsubscribe) {
+      this._unsubscribe(); // Cleanup subscription
+    }
     super.disconnectedCallback();
   }
 
@@ -85,7 +103,7 @@ export class LocationPickerView extends LitElement {
     // Otherwise, do nothing, allow close.
   }
 
-  render() {
+  render() {    
     return html`
       <sl-dialog ?open=${this.open} no-header>
         <div class="wrap">
@@ -246,6 +264,9 @@ export class LocationPickerView extends LitElement {
           <small style="display:inline-block; margin-bottom: 4px;">Installation in progress</small>
           <sl-progress-bar indeterminate></sl-progress-bar>
         </sl-alert>
+        <div class="activity-log-wrap">
+          <x-activity-log .logs=${this._logs}></x-activity-log>
+        </div>
         `: nothing }
 
         ${this._inflight_install ? html`
@@ -399,6 +420,11 @@ export class LocationPickerView extends LitElement {
       justify-content: center;
       gap: 1.5em;
       width: 100%;
+    }
+
+    .activity-log-wrap {
+      text-align: left;
+      margin-top: 12px;
     }
   `;
 }

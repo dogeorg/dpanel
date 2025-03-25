@@ -1,39 +1,31 @@
 import WebSocketClient from "/api/sockets.js";
 import { store } from "/state/store.js";
-import { pkgController } from "/controllers/package/index.js";
-import { sysController } from "/controllers/system/index.js";
-import { asyncTimeout } from "/utils/timeout.js";
-import { performMockCycle, c1, c4, c5, mockInstallEvent } from "/api/mocks/pup-state-cycle.js";
 import { isUnauthedRoute } from "/utils/url-utils.js";
 
-async function mockedMainChannelRunner(onMessageCallback) {
-  if (store.networkContext.demoSystemPrompt) {
-    setTimeout(() => {
-      const mockData = {
-        type: "ShowPrompt",
-        name: store.networkContext.demoSystemPrompt,
-      };
-      onMessageCallback({ data: JSON.stringify(mockData) });
-    }, 2000);
-  }
+async function mockedRecoveryChannelRunner(onMessageCallback) {
+  let messageCount = 0;
+  const interval = setInterval(() => {
+    const mockData = {
+      type: "recovery",
+      message: `Recovery progress ${messageCount * 10}%`,
+      timestamp: new Date().toISOString()
+    };
+    onMessageCallback({ data: JSON.stringify(mockData) });
+    messageCount++;
+    
+    if (messageCount > 10) {
+      clearInterval(interval);
+    }
+  }, 1000);
 
-  if (store.networkContext.demoInstallPup) {
-    setTimeout(() => {
-      onMessageCallback({
-        data: JSON.stringify(installEvent)
-      })
-    }, 3000)
-  }
-
-  if (store.networkContext.demoPupLifecycle) {
-    await performMockCycle(c5, (statusUpdate) => onMessageCallback({ data: JSON.stringify(statusUpdate) }))
-  }
+  return () => clearInterval(interval);
 }
 
 class SocketChannel {
   observers = [];
   reconnectInterval = 500;
   maxReconnectInterval = 10000;
+  _logs = [];
 
   constructor() {
     this.wsClient = null;
@@ -50,21 +42,17 @@ class SocketChannel {
       return;
     }
 
-    if (isUnauthedRoute()) {
-      return;
-    }
-
     this.wsClient = new WebSocketClient(
-      `${store.networkContext.wsApiBaseUrl}/ws/state/`,
+      `${store.networkContext.wsApiBaseUrl}/ws/recovery/`,
       store.networkContext,
-      mockedMainChannelRunner,
+      mockedRecoveryChannelRunner,
     );
 
     // Update component state based on WebSocket events
     this.wsClient.onOpen = () => {
       this.isConnected = true;
       this.reconnectInterval = 1000; // reset.
-      console.log("MAIN WEBSOCKET CONNECTED!!");
+      console.log("RECOVERY WEBSOCKET CONNECTED!!");
       this.notify();
     };
 
@@ -87,50 +75,9 @@ class SocketChannel {
       }
 
       switch (data.type) {
-        case "pup":
-          // emitted on state change (eg: installing, ready)
-          if (store.networkContext.logStateUpdates) {
-                console.log(`##-STATE-## installation: ${data.update.installation}`, { payload: data.update });
-              }
-          pkgController.updatePupModel(data.update.id, data.update)
-          break;
-
-        case "stats":
-          // emitted on an interval (contains current status and vitals)
-          if (data && data.update && Array.isArray(data.update)) {
-            data.update.forEach((statsUpdatePayload) => {
-              if (store.networkContext.logStatsUpdates) {
-                console.log('--STATS--', statsUpdatePayload.status, { payload: statsUpdatePayload });
-              }
-              pkgController.updatePupStatsModel(statsUpdatePayload.id, statsUpdatePayload)
-            });
-          }
-          break;
-
-        case "action":
-          // emitted in response to an action
-          await asyncTimeout(500); // Why?
-          pkgController.resolveAction(data.id, data);
-          break;
-
-        case "prompt": // synthetic (client side only)
-          store.updateState({
-            promptContext: {
-              display: true,
-              name: data.name,
-            },
-          });
-          break;
-
-        case "progress":
-          if (store.networkContext.logProgressUpdates) {
-            console.log("--PROGRESS", data);
-          }
-          pkgController.ingestProgressUpdate(data);
-          break;
-
-        case "system-state":
-          sysController.ingestSystemStateUpdate(data)
+        case "recovery":
+          console.log("RECOVERY", data.update);
+          this._logs = [...this._logs, data.update];
           break;
       }
       this.notify();
@@ -198,6 +145,22 @@ class SocketChannel {
   doThing() {
     this.notify();
   }
+
+  // Get current messages
+  getMessages() {
+    return this._logs || [];
+  }
+
+  // Subscribe to message updates
+  subscribeToMessages(callback) {
+    const messageObserver = {
+      requestUpdate: () => {
+        callback(this._logs || []);
+      }
+    };
+    this.addObserver(messageObserver);
+    return () => this.removeObserver(messageObserver);
+  }
 }
 
 // Instance holder
@@ -210,4 +173,4 @@ function getInstance() {
   return instance;
 }
 
-export const mainChannel = getInstance();
+export const recoveryChannel = getInstance();

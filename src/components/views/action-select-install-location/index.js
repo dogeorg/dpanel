@@ -264,10 +264,11 @@ export class LocationPickerView extends LitElement {
           <small style="display:inline-block; margin-bottom: 4px;">Installation in progress</small>
           <sl-progress-bar indeterminate></sl-progress-bar>
         </sl-alert>
+        `: nothing }
+
         <div class="activity-log-wrap">
           <x-activity-log .logs=${this._logs}></x-activity-log>
         </div>
-        `: nothing }
 
         ${this._inflight_install ? html`
           <p><small>This may take 10 minutes or more.  Do not refresh or power off your Dogebox while installation is in progress.</small></p>`

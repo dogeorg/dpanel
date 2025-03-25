@@ -25,7 +25,7 @@ class SocketChannel {
   observers = [];
   reconnectInterval = 500;
   maxReconnectInterval = 10000;
-  _logs = [];
+  _logs = [""];
 
   constructor() {
     this.wsClient = null;

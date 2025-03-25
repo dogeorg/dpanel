@@ -9,6 +9,7 @@ import { createAlert } from "/components/common/alert.js";
 import { asyncTimeout } from "/utils/timeout.js";
 import "/components/common/action-row/action-row.js";
 import { getDisks, postInstallToDisk } from "/api/disks/disks.js";
+import { promptPowerOff } from "/pages/page-settings/power-helpers.js";
 
 const PAGE_ONE = "intro";
 const PAGE_TWO = "disk_selection";
@@ -34,7 +35,8 @@ export class LocationPickerView extends LitElement {
   constructor() {
     super();
     this.mode = "";
-    this.open = false;
+    this.mainDialogOpen = true;
+    this.existingInstallationDialogOpen = false;
     this._ready = false;
     this._page = PAGE_ONE;
     this._allDisks = [];
@@ -48,7 +50,7 @@ export class LocationPickerView extends LitElement {
   }
 
   firstUpdated() {
-    if (this.open) {
+    if (this.mainDialogOpen) {
       this._inflight_disks = true;
       this.fetchDisks();
     }
@@ -85,9 +87,18 @@ export class LocationPickerView extends LitElement {
     // Otherwise, do nothing, allow close.
   }
 
-  render() {
+  render() {  
+    console.log('mode', this.mode);
+    console.log('mainDialogOpen', this.mainDialogOpen);
+    console.log('existingInstallationDialogOpen', this.existingInstallationDialogOpen);
+
+    if (this.mode === 'isInstalled') {
+      this.existingInstallationDialogOpen = true;
+      return this.renderExistingInstall();
+    }
+    
     return html`
-      <sl-dialog ?open=${this.open} no-header>
+      <sl-dialog ?open=${this.mainDialogOpen} no-header>
         <div class="wrap">
           ${choose(this._page, [
             [PAGE_ONE, this.renderIntro],
@@ -95,6 +106,28 @@ export class LocationPickerView extends LitElement {
             [PAGE_THREE, this.renderConfirm],
             [PAGE_FOUR, this.renderInstallation],
           ])}
+        </div>
+      </sl-dialog>
+    `;
+  
+  }
+
+  renderExistingInstall = () => {
+    return html`
+      <sl-dialog ?open=${this.existingInstallationDialogOpen} no-header>
+        <div class="wrap">
+            <h1 style="margin-bottom: 24px;">Dogebox OS is already installed on this device</h1>
+            <p>If you just installed, you might have forgotten to <u>remove the installation media</u>. Please power off and try again.</p>
+            <sl-button variant="warning" @click=${promptPowerOff} style="margin-block-start: 1em;">
+              <sl-icon name="power"></sl-icon>
+              Shutdown
+            </sl-button>
+            <div>
+              <sl-button style="margin-block-start: 2em;" @click=${() => { 
+                this.mode = 'canInstall';
+                this.existingInstallationDialogOpen = false;
+                this.mainDialogOpen = true; }}>I know what I'm doing - I want to reinstall</sl-button>
+            </div>
         </div>
       </sl-dialog>
     `;
@@ -266,7 +299,7 @@ export class LocationPickerView extends LitElement {
 
   handleStay() {
     console.log('clicked');
-    this.open = false;
+    this.mainDialogOpen = false;
     return;
   }
 

@@ -346,7 +346,7 @@ class AppModeApp extends LitElement {
                       <action-select-install-location
                         style="z-index: 999"
                         mode=${this.installationMode}
-                        ?open=${["canInstall", "mustInstall"].includes(
+                        ?open=${["canInstall", "mustInstall", "isInstalled"].includes(
                           this.installationMode,
                         )}
                       ></action-select-install-location>

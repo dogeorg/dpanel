@@ -10,7 +10,7 @@ import { asyncTimeout } from "/utils/timeout.js";
 import "/components/common/action-row/action-row.js";
 import "/components/views/x-activity-log.js";
 import { getDisks, postInstallToDisk } from "/api/disks/disks.js";
-import { recoveryChannel } from "/controllers/sockets/recovery-channel.js";
+import { mainChannel } from "/controllers/sockets/main-channel.js";
 
 const PAGE_ONE = "intro";
 const PAGE_TWO = "disk_selection";
@@ -30,7 +30,7 @@ export class LocationPickerView extends LitElement {
       _confirmation_checked: { type: Boolean },
       _inflight_install: { type: Boolean },
       _install_outcome: { type: String },
-      _logs: { type: Array },
+      _logs: { type: Array, state: true },
     };
   }
 
@@ -48,13 +48,19 @@ export class LocationPickerView extends LitElement {
     this._inflight_install = false;
     this._install_outcome = "";
     this._header = "Such Install"
-    this._logs = recoveryChannel.getMessages(); // Initialize with current messages
+    this._logs = [];
+    this._unsubscribe = null;
   }
 
   firstUpdated() {
     if (this.open) {
       this._inflight_disks = true;
       this.fetchDisks();
+    }
+    // Set initial logs
+    const initialLogs = mainChannel.getRecoveryLogs();
+    if (initialLogs && initialLogs.length > 0) {
+      this._logs = initialLogs.map(msg => ({ msg }));
     }
   }
 
@@ -70,13 +76,9 @@ export class LocationPickerView extends LitElement {
     this.addEventListener('sl-request-close', this.denyClose);
 
     // Subscribe to message updates
-    this._unsubscribe = recoveryChannel.subscribeToMessages((messages) => {
-      // Get the latest message from the array
-      const latestMessage = messages[messages.length - 1];
-      if (latestMessage) {
-        // Format the message in the way our component expects
+    this._unsubscribe = mainChannel.subscribeToRecoveryLogs((messages) => {
+      if (messages && messages.length > 0) {
         this._logs = messages.map(msg => ({ msg }));
-        this.requestUpdate();
       }
     });
   }

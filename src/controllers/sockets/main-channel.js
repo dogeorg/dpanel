@@ -37,46 +37,26 @@ class SocketChannel {
   recoveryLogs = ["Connecting to WebSocket"];
 
   constructor() {
-    console.log("[WebSocket] Initializing SocketChannel");
     this.wsClient = null;
     this.isConnected = false;
-    console.log("[WebSocket] Current state:", {
-      isConnected: this.isConnected,
-      reconnectInterval: this.reconnectInterval,
-      maxReconnectInterval: this.maxReconnectInterval,
-      observersCount: this.observers.length
-    });
     
     this.setupSocketConnection();
 
     if (!this.isConnected) {
-      console.log("[WebSocket] Initial connection failed, attempting to connect");
       this.wsClient && this.wsClient.connect();
     }
-
-    console.log("[WebSocket] Constructor completed");
   }
 
   setupSocketConnection() {
-    console.log("[WebSocket] Starting setupSocketConnection");
-    console.log("[WebSocket] Current connection state:", {
-      isConnected: this.isConnected,
-      wsClient: this.wsClient ? "exists" : "null",
-      networkContext: store.networkContext
-    });
-
     if (this.isConnected) {
-      console.log("[WebSocket] Already connected, skipping setup");
       return;
     }
 
     if (isUnauthedRoute()) {
-      console.log("[WebSocket] Unauthenticated route detected, skipping setup");
       return;
     }
 
     const wsUrl = `${store.networkContext.wsApiBaseUrl}/ws/state/`;
-    console.log("[WebSocket] Creating new WebSocket client with URL:", wsUrl);
     
     this.wsClient = new WebSocketClient(
       wsUrl,
@@ -86,44 +66,31 @@ class SocketChannel {
 
     // Update component state based on WebSocket events
     this.wsClient.onOpen = () => {
-      console.log("[WebSocket] Connection opened successfully");
+        
       this.isConnected = true;
       this.reconnectInterval = 1000; // reset.
-      console.log("[WebSocket] Connection state updated:", {
-        isConnected: this.isConnected,
-        reconnectInterval: this.reconnectInterval
-      });
+      console.log("CONNECTED!!");
       this.recoveryLogs = [...this.recoveryLogs, "Websocket connected"];
       this.notify();
     };
 
-    this.wsClient.onMessage = async (event) => {
-      console.log("[WebSocket] Received message:", event);
-      
+    this.wsClient.onMessage = async (event) => {      
+
       let err, data;
       try {
         data = JSON.parse(event.data);
-        console.log("[WebSocket] Parsed message data:", data);
       } catch (err) {
-        console.error("[WebSocket] Failed to parse incoming event:", {
-          error: err,
-          event: event
-        });
+        console.warn("failed to JSON.parse incoming event", event, err);
         err = true;
       }
 
-      if (err || !data) {
-        console.log("[WebSocket] Skipping message processing due to error or missing data");
-        return;
-      }
+      if (err || !data) return;
 
       // Switch on message type
       if (!data.type) {
-        console.warn("[WebSocket] Received event without type:", event);
+        console.warn("received an event that lacks an event type", event);
         return;
       }
-
-      console.log("[WebSocket] Processing message type:", data.type);
 
       switch (data.type) {
         case "pup":
@@ -173,7 +140,7 @@ class SocketChannel {
           break;
 
         case "recovery":
-          console.log("RECOVERY", data.update);
+          console.log("--RECOVERY", data.update);
           this.recoveryLogs = [...this.recoveryLogs, data.update];
           break;
       }
@@ -181,16 +148,12 @@ class SocketChannel {
     };
 
     this.wsClient.onError = (event) => {
-      console.error("[WebSocket] Connection error:", event);
+      console.log("ERRORS", event);
       this.notify();
     };
 
     this.wsClient.onClose = (event) => {
-      console.log("[WebSocket] Connection closing:", {
-        code: event.code,
-        reason: event.reason,
-        wasClean: event.wasClean
-      });
+      console.log("CLOSING");
       this.isConnected = false;
       this.notify();
       this.attemptReconnect();
@@ -198,18 +161,11 @@ class SocketChannel {
   }
 
   attemptReconnect() {
-    console.log("[WebSocket] Attempting reconnection:", {
-      currentInterval: this.reconnectInterval,
-      maxInterval: this.maxReconnectInterval,
-      isConnected: this.isConnected
-    });
-
     if (!this.isConnected) {
       setTimeout(() => {
-        console.log(`[WebSocket] Executing reconnection attempt after ${this.reconnectInterval}ms`);
+        console.log(`Attempting to reconnect...`);
         this.setupSocketConnection();
         if (!this.isConnected) {
-          console.log("[WebSocket] Connection still not established, calling connect()");
           this.wsClient.connect();
         }
       }, this.reconnectInterval);
@@ -219,7 +175,6 @@ class SocketChannel {
         this.reconnectInterval * 1.15,
         this.maxReconnectInterval,
       );
-      console.log("[WebSocket] Updated reconnect interval:", this.reconnectInterval);
     }
   }
 

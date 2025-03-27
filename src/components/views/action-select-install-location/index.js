@@ -105,7 +105,7 @@ export class LocationPickerView extends LitElement {
     // Otherwise, do nothing, allow close.
   }
 
-  render() {    
+  render() {
     return html`
       <sl-dialog ?open=${this.open} no-header>
         <div class="wrap">

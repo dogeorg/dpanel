@@ -104,7 +104,7 @@ class AppModeApp extends LitElement {
     super.connectedCallback();
     this.isLoggedIn = !!store.networkContext.token;
 
-    // Instanciate a web socket connection and add main app as an observer
+    // Instantiate a web socket connection and add main app as an observer
     this.mainChannel.addObserver(this);
   }
 

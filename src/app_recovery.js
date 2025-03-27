@@ -47,7 +47,7 @@ import { getSetupBootstrap } from "/api/system/get-bootstrap.js";
 import { postHostReboot } from "/api/system/post-host-reboot.js";
 import { postHostShutdown } from "/api/system/post-host-shutdown.js";
 
-// Recovery web socket channel (singleton)
+// Main WebSocket channel (singleton)
 import { mainChannel } from "/controllers/sockets/main-channel.js";
 
 // Do this once to set the location of shoelace assets (icons etc..)

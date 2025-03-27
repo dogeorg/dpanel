@@ -74,7 +74,7 @@ class SocketChannel {
       this.notify();
     };
 
-    this.wsClient.onMessage = async (event) => {      
+    this.wsClient.onMessage = async (event) => {
 
       let err, data;
       try {

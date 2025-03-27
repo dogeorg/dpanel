@@ -431,15 +431,13 @@ export class LocationPickerView extends LitElement {
       width: 100%;
     }
 
-<<<<<<< HEAD
     .note-text {
       margin-block-start: 0em;
       margin-block-end: 0em;
-=======
+      
     .activity-log-wrap {
       text-align: left;
       margin-top: 12px;
->>>>>>> main
     }
   `;
 }

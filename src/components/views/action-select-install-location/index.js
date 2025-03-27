@@ -8,8 +8,10 @@ import {
 import { createAlert } from "/components/common/alert.js";
 import { asyncTimeout } from "/utils/timeout.js";
 import "/components/common/action-row/action-row.js";
+import "/components/views/x-activity-log.js";
 import { getDisks, postInstallToDisk } from "/api/disks/disks.js";
 import { promptPowerOff } from "/pages/page-settings/power-helpers.js";
+import { mainChannel } from "/controllers/sockets/main-channel.js";
 
 const PAGE_ONE = "intro";
 const PAGE_TWO = "disk_selection";
@@ -29,6 +31,7 @@ export class LocationPickerView extends LitElement {
       _confirmation_checked: { type: Boolean },
       _inflight_install: { type: Boolean },
       _install_outcome: { type: String },
+      _logs: { type: Array, state: true },
     };
   }
 
@@ -46,12 +49,19 @@ export class LocationPickerView extends LitElement {
     this._inflight_install = false;
     this._install_outcome = "";
     this._header = "Such Install"
+    this._logs = [];
+    this._unsubscribe = null;
   }
 
   firstUpdated() {
     if (this.open) {
       this._inflight_disks = true;
       this.fetchDisks();
+    }
+    // Set initial logs
+    const initialLogs = mainChannel.getRecoveryLogs();
+    if (initialLogs && initialLogs.length > 0) {
+      this._logs = initialLogs.map(msg => ({ msg }));
     }
   }
 
@@ -65,10 +75,20 @@ export class LocationPickerView extends LitElement {
   connectedCallback() {
     super.connectedCallback();
     this.addEventListener('sl-request-close', this.denyClose);
+
+    // Subscribe to message updates
+    this._unsubscribe = mainChannel.subscribeToRecoveryLogs((messages) => {
+      if (messages && messages.length > 0) {
+        this._logs = messages.map(msg => ({ msg }));
+      }
+    });
   }
 
   disconnectedCallback() {
     this.removeEventListener('sl-request-close', this.denyClose);
+    if (this._unsubscribe) {
+      this._unsubscribe(); // Cleanup subscription
+    }
     super.disconnectedCallback();
   }
 
@@ -249,6 +269,10 @@ export class LocationPickerView extends LitElement {
         </sl-alert>
         `: nothing }
 
+        <div class="activity-log-wrap">
+          <x-activity-log .logs=${this._logs}></x-activity-log>
+        </div>
+
         ${this._inflight_install ? html`
           <p><small>This may take 10 minutes or more.  Do not refresh or power off your Dogebox while installation is in progress.</small></p>`
         : nothing }
@@ -407,9 +431,15 @@ export class LocationPickerView extends LitElement {
       width: 100%;
     }
 
+<<<<<<< HEAD
     .note-text {
       margin-block-start: 0em;
       margin-block-end: 0em;
+=======
+    .activity-log-wrap {
+      text-align: left;
+      margin-top: 12px;
+>>>>>>> main
     }
   `;
 }
